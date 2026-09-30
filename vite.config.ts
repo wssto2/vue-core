@@ -11,6 +11,8 @@ const entries: Record<string, string> = {
   "controls/index": "src/controls/index.ts",
   "i18n/index": "src/i18n/index.ts",
   "state/index": "src/state/index.ts",
+  "client/index": "src/client/index.ts",
+  "platform/index": "src/platform/index.ts",
 };
 
 const peers = Object.keys(pkg.peerDependencies);
