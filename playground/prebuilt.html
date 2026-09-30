@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-accent="emerald">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue-core playground, prebuilt stylesheet</title>
+    <style>
+      /* No Tailwind here: only the variables and font of the prebuilt dist/styles.css. */
+      body { margin: 0; padding: var(--app-screen-padding); background: var(--app-surface-page); color: var(--app-content-default); font-family: var(--font-sans); font-size: var(--app-text-body); }
+      .card { background: var(--app-surface-cell); border-radius: var(--app-radius-group); box-shadow: var(--app-shadow-group); padding: var(--app-row-inset); max-width: 24rem; }
+      .action { background: var(--app-tint); color: var(--app-content-on-tint); border: 0; border-radius: var(--app-radius-control); padding: 0.5rem 1rem; font: inherit; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1 style="margin: 0 0 0.5rem; font-size: var(--app-text-title); color: var(--app-content-strong)">Prebuilt stylesheet</h1>
+      <p style="margin: 0 0 1rem; color: var(--app-content-muted)">Tokens and Inter from <code style="font-family: var(--font-mono)">styles.css</code>.</p>
+      <button class="action" type="button">Save</button>
+    </div>
+    <script type="module" src="/src/prebuilt.ts"></script>
+  </body>
+</html>

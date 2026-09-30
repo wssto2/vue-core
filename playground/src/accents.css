@@ -1,0 +1,37 @@
+/* A second brand accent (violet) on top of the library's emerald: the variables of the
+   "Accent" block in theme.css, light, then dark, plus the primary and anchor palettes.
+   Switched at runtime by data-accent, hence the doubled specificity that keeps the dark
+   values ahead of the light ones. An app with one accent writes this once on :root / .dark. */
+:root[data-accent="violet"] {
+  --color-primary-50: #F5F3FF;
+  --color-primary-100: #EDE9FE;
+  --color-primary-200: #DDD6FE;
+  --color-primary-300: #C4B5FD;
+  --color-primary-400: #A78BFA;
+  --color-primary-500: #8B5CF6;
+  --color-primary-600: #7C3AED;
+  --color-primary-700: #6D28D9;
+  --color-primary-800: #5B21B6;
+  --color-primary-900: #4C1D95;
+  --color-primary-950: #2E1065;
+  --color-anchor-800: #2A2150;
+  --color-anchor-900: #1D1638;
+  --color-anchor-950: #110D24;
+
+  --app-tint: #6D28D9;
+  --app-tint-soft: #EFEAFB;
+  --app-control-on: #7C3AED;
+  --app-tile-brand: #7C3AED;
+  --app-tile-anchor: #2A2150;
+  --app-tile-anchor-foreground: #C4B5FD;
+  --app-content-inverse-accent: #C4B5FD;
+}
+
+:root[data-accent="violet"].dark {
+  --app-tint: #A78BFA;
+  --app-tint-soft: #2A2147;
+  --app-control-on: #8B5CF6;
+  --app-content-on-tint: #1E0B4B;
+  --app-tile-anchor: #362B66;
+  --app-content-inverse-accent: #6D28D9;
+}

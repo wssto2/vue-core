@@ -1,0 +1,5 @@
+/* What an application that authors Tailwind utilities writes once. */
+@import "tailwindcss";
+@import "@wssto2/vue-core/tailwind.css";
+@import "@wssto2/vue-core/fonts.css";
+@import "./accents.css";
