@@ -1,0 +1,206 @@
+/* Variants, shape utilities, animations and the touch-device feel. Tokens are in
+   theme.css; this file needs Tailwind's own import before it. Component-specific
+   rules (tables, toasts, date picker, docks) move in with their components. */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Compact or touch-first screens (phones, iPad): the same condition theme.css
+   uses for iOS type sizes and row metrics. `compact:text-right` etc. */
+@custom-variant compact {
+  @media (max-width: 47.999rem), (pointer: coarse) {
+    @slot;
+  }
+}
+
+/*
+ * rounded-button — the shape of every button-like control. Desktop follows macOS: a
+ * rounded rectangle on the control radius, the same as fields, filters and pop-up
+ * buttons beside it. Compact and touch-first screens keep iOS capsules. Counts
+ * and dots stay round; badges are 6 px labels.
+ */
+@utility rounded-button {
+  border-radius: var(--app-radius-control);
+  @variant compact {
+    border-radius: calc(infinity * 1px);
+  }
+}
+
+/*
+ * scrollbar-subtle — a macOS-style scroller that looks the same on Windows:
+ * no track, no arrows, a thin rounded thumb that only shows while the pointer
+ * is over the scrolling area (or the thumb is being dragged).
+ *
+ * Chromium/Safari draw it from ::-webkit-scrollbar (the transparent border
+ * insets the 6px thumb inside a 10px lane). Firefox has no pseudo-elements,
+ * so it gets the standard thin bar with the same colours instead. The standard
+ * properties must stay out of Chromium's way: once scrollbar-color is set,
+ * Chromium 121+ ignores ::-webkit-scrollbar entirely.
+ */
+@utility scrollbar-subtle {
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+    background-color: transparent;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: rgb(9 9 11 / 0.22);
+  }
+  &::-webkit-scrollbar-thumb:hover,
+  &::-webkit-scrollbar-thumb:active {
+    background-color: rgb(9 9 11 / 0.4);
+  }
+  &:where(.dark, .dark *):hover::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.22);
+  }
+  &:where(.dark, .dark *)::-webkit-scrollbar-thumb:hover,
+  &:where(.dark, .dark *)::-webkit-scrollbar-thumb:active {
+    background-color: rgb(255 255 255 / 0.4);
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover {
+      scrollbar-color: rgb(9 9 11 / 0.22) transparent;
+    }
+    &:where(.dark, .dark *):hover {
+      scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+    }
+  }
+}
+
+/* --- Animations: waiting and results. Under reduced motion each becomes a short
+   fade (below): what changed still shows, nothing moves. Fill mode `backwards`,
+   never `both`: an animation still in effect keeps a stacking context, and a
+   finished step would trap its dropdowns under a sheet's sticky footer. */
+@theme {
+  --animate-grow-and-shrink-width: grow-and-shrink-width 700ms infinite;
+  /* A one-time-code input: the fake caret in the active cell, and the wrong-code shake. */
+  --animate-caret-blink: caret-blink 1.1s ease-out infinite;
+  --animate-shake: shake 400ms ease-in-out;
+  --animate-text-swap: app-text-swap var(--app-motion-reveal) var(--app-motion-standard-easing) backwards;
+  --animate-reveal: app-reveal 450ms var(--app-motion-standard-easing) backwards;
+  --animate-step-in: app-step-in var(--app-motion-sheet) var(--app-motion-sheet-easing) backwards;
+  --animate-step-back: app-step-back var(--app-motion-sheet) var(--app-motion-sheet-easing) backwards;
+  --animate-row-flash: app-row-flash 1.4s ease-out backwards;
+  --animate-pop: app-pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  /* Rows landing after a list's skeleton, staggered by the caller (at most ~8 rows). */
+  --animate-row-in: app-reveal 280ms var(--app-motion-standard-easing) backwards;
+
+  @keyframes app-text-swap {
+    from { opacity: 0; transform: translateY(6px); filter: blur(2px); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+  @keyframes app-reveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes app-step-in {
+    from { opacity: 0; transform: translateX(28px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes app-step-back {
+    from { opacity: 0; transform: translateX(-28px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes app-row-flash {
+    from { background-color: var(--app-surface-selected); }
+    to { background-color: transparent; }
+  }
+  @keyframes app-pop {
+    from { opacity: 0; transform: scale(0.6); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes caret-blink {
+    0%, 70%, 100% { opacity: 1; }
+    20%, 50% { opacity: 0; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+  @keyframes grow-and-shrink-width {
+    0%, 100% { width: 100%; }
+    50% { width: 20%; }
+  }
+}
+
+@keyframes app-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
+}
+@keyframes app-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes app-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animate-text-swap: app-fade 200ms ease backwards;
+    --animate-reveal: app-fade 200ms ease backwards;
+    --animate-step-in: app-fade 200ms ease backwards;
+    --animate-step-back: app-fade 200ms ease backwards;
+    --animate-row-flash: none;
+    --animate-pop: app-fade 200ms ease backwards;
+    --animate-row-in: app-fade 200ms ease backwards;
+  }
+}
+
+/*
+ * App feel on touch devices and when installed to the home screen.
+ */
+html {
+  /* No grey flash on tap: pressed states come from the components' active: styles. */
+  -webkit-tap-highlight-color: transparent;
+  /* Keep text at the sizes the theme sets when the phone rotates. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (pointer: coarse) {
+  /* iOS zooms the whole page into any field whose text is under 16px when it is
+     focused. Unlayered, so this outranks the fields' text-sm utilities — on
+     touch devices only; desktop keeps the 13px type scale. A field whose own text is
+     already larger (a hero field) opts out with data-large-text — the rule is a
+     minimum, not a size. */
+  :is(input, select, textarea):not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [data-large-text]) {
+    font-size: 16px;
+  }
+
+  /* Controls are not text: no selection highlight or long-press callout when a
+     thumb rests on one. (Not on labels — Safari then refuses to select inside
+     the input a label wraps.) */
+  button,
+  [role="tab"],
+  [role="button"],
+  nav a {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+@media (display-mode: standalone) {
+  /* Installed: no rubber-band past the ends of the page and no browser
+     pull-to-reload (a normal browser tab keeps both). */
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+}

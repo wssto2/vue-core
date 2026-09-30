@@ -1,0 +1,11 @@
+/* The design system as Tailwind v4 source: tokens, variants and utilities. For an
+   app that runs its own Tailwind:
+
+     @import "tailwindcss";
+     @import "@wssto2/vue-core/tailwind.css";
+     @import "@wssto2/vue-core/fonts.css";
+
+   An app that does not author Tailwind utilities imports the prebuilt
+   "@wssto2/vue-core/styles.css" instead (this, the fonts and Tailwind's base). */
+@import "./theme.css";
+@import "./base.css";

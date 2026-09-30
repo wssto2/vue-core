@@ -1,0 +1,558 @@
+/**
+ * Design values — the single place the look is decided.
+ * Visual direction "Emerald Native": Apple grouped structure with an Emerald
+ * brand accent. Extracted from arv-next (frontend/css/theme.css); names of the
+ * roles are kept, values are unchanged.
+ *
+ * Everything here overrides or extends Tailwind's own theme namespaces, so
+ * components keep writing ordinary utilities (text-sm, rounded-lg) and a change
+ * here restyles every screen at once.
+ *
+ * Two layers:
+ *   1. Scales and palettes (@theme below) — raw values. Components not yet moved
+ *      to roles still use them directly (bg-primary-700, text-gray-500…).
+ *   2. Semantic roles (:root / .dark, then @theme inline) — what components use:
+ *      bg-surface-cell, text-content-muted, rounded-group…
+ *
+ * BRAND ACCENT. The accent is a handful of variables, all in the "Accent" block
+ * of :root and .dark below, plus the --color-primary-* and --color-anchor-*
+ * palettes. An app re-brands by redefining them after this file (light on :root,
+ * dark on .dark). Everything else that is green today (link, focus ring,
+ * selection) is derived from those, and status colours (success, warning,
+ * danger, info) never follow the brand.
+ *
+ * Legacy type scale (palettes stay until every component reads roles):
+ *   text-3xs  10px  status badges (uppercase)
+ *   text-2xs  11px  micro labels          text-lg   16px  panel titles
+ *   text-xs   12px  helper text, captions         text-xl   18px  page titles
+ *   text-sm   13px  tables, lists, form fields    text-2xl  22px  hero numbers
+ *   text-base 14px  body text                     text-3xl  28px  rare hero
+ * Components use the semantic type roles instead (text-body, text-footnote…),
+ * which grow to iOS sizes on compact and touch-first screens.
+ */
+@theme {
+  /* --- Font: Inter on every platform; the rest is only a fallback while it loads
+     (the face itself is in fonts.css). */
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --default-font-feature-settings: "cv11";
+
+  /* --- Type scale: 14px base for a dense business UI, one step below
+     Tailwind's defaults, plus a micro step. */
+  --text-3xs: 0.625rem;
+  --text-3xs--line-height: 0.875rem;
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.125rem;
+  --text-xl--line-height: 1.625rem;
+  --text-2xl: 1.375rem;
+  --text-2xl--line-height: 1.875rem;
+  --text-3xl: 1.75rem;
+  --text-3xl--line-height: 2.25rem;
+
+  /* --- Radius ---------------------------------------------------- */
+  --radius: 0.375rem;
+  --radius-xs: 0.1875rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* --- Shadows: soft, tinted with the neutral ink ---------------- */
+  --shadow-2xs: 0 1px 0 rgb(9 9 11 / 0.04);
+  --shadow-xs: 0 1px 2px 0 rgb(9 9 11 / 0.06);
+  --shadow-sm: 0 1px 2px 0 rgb(9 9 11 / 0.06), 0 1px 3px 0 rgb(9 9 11 / 0.06);
+  --shadow: var(--shadow-sm);
+  --shadow-md: 0 4px 12px -2px rgb(9 9 11 / 0.10), 0 2px 4px -2px rgb(9 9 11 / 0.06);
+  --shadow-lg: 0 16px 32px -8px rgb(9 9 11 / 0.18), 0 4px 8px -4px rgb(9 9 11 / 0.08);
+  --shadow-xl: 0 24px 48px -12px rgb(9 9 11 / 0.24);
+  /* Bars pinned to the bottom edge cast their shadow upwards. */
+  --shadow-up: 0 -4px 12px -2px rgb(9 9 11 / 0.10);
+
+  /* --- Brand palette: Emerald (Tailwind's emerald as hex). Solid fills with
+     white text use primary-700 (#047857): 600 is below AA for text. ------- */
+  --color-primary-50: #ECFDF5;
+  --color-primary-100: #D1FAE5;
+  --color-primary-200: #A7F3D0;
+  --color-primary-300: #6EE7B7;
+  --color-primary-400: #34D399;
+  --color-primary-500: #10B981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065F46;
+  --color-primary-900: #064E3B;
+  --color-primary-950: #022C22;
+
+  /* --- Neutral: a true, untinted gray (Tailwind's zinc). Semantic roles below
+     use their own faintly brand-tinted neutrals instead. -------------- */
+  --color-gray-50: #FAFAFA;
+  --color-gray-100: #F4F4F5;
+  --color-gray-200: #E4E4E7;
+  --color-gray-300: #D4D4D8;
+  --color-gray-400: #A1A1AA;
+  --color-gray-500: #71717A;
+  --color-gray-600: #52525B;
+  --color-gray-700: #3F3F46;
+  --color-gray-800: #27272A;
+  --color-gray-900: #18181B;
+  --color-gray-950: #09090B;
+
+  /* --- Anchor: the one dark surface (a navigation rail). A near-black with the
+     brand's hue in it, so the frame carries the brand without a colour block.
+     Light text on it uses gray-300/white; hovers use white/opacity. ------- */
+  --color-anchor-800: #17302A;
+  --color-anchor-900: #0F211D;
+  --color-anchor-950: #091613;
+}
+
+/* --- Status palettes: what a colour MEANS, not which hue it is. Components not
+   yet on roles write bg-warning-50 / text-danger-700 / ring-info-600/20, so
+   re-pointing a palette here restyles every badge at once. `inline` resolves the
+   alias at the utility, which keeps opacity modifiers (/20) working.
+     success  → emerald (fixed: independent of the brand accent)
+     warning  → amber   (in progress, waiting on someone)
+     danger   → red     (needs a decision or is broken)
+     info     → sky     (active, in contact)
+   Components use the status-* roles below instead. */
+@theme inline {
+  --color-success-50: #ECFDF5;
+  --color-success-300: #6EE7B7;
+  --color-success-400: #34D399;
+  --color-success-500: #10B981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065F46;
+
+  --color-warning-50: var(--color-amber-50);
+  --color-warning-300: var(--color-amber-300);
+  --color-warning-400: var(--color-amber-400);
+  --color-warning-500: var(--color-amber-500);
+  --color-warning-600: var(--color-amber-600);
+  --color-warning-700: var(--color-amber-700);
+  --color-warning-800: var(--color-amber-800);
+
+  --color-danger-50: var(--color-red-50);
+  --color-danger-300: var(--color-red-300);
+  --color-danger-400: var(--color-red-400);
+  --color-danger-500: var(--color-red-500);
+  --color-danger-600: var(--color-red-600);
+  --color-danger-700: var(--color-red-700);
+  --color-danger-800: var(--color-red-800);
+
+  --color-info-50: var(--color-sky-50);
+  --color-info-300: var(--color-sky-300);
+  --color-info-400: var(--color-sky-400);
+  --color-info-500: var(--color-sky-500);
+  --color-info-600: var(--color-sky-600);
+  --color-info-700: var(--color-sky-700);
+  --color-info-800: var(--color-sky-800);
+}
+
+/* ======================================================================
+   Semantic roles
+   ----------------------------------------------------------------------
+   The --app-* indirection lets light and dark share one utility:
+   `text-content-muted` replaces `text-gray-500 dark:text-gray-400`.
+
+   Colours used as text backgrounds are opaque on purpose (contrast is tested
+   on the rendered pair). Translucent materials are made at the component with
+   an opacity modifier plus backdrop blur: `bg-surface-overlay/90 backdrop-blur-xl`.
+   Add a role only for a stable, recurring meaning; never in a feature.
+   ====================================================================== */
+:root {
+  /* Accent: the brand. Redefine these (and the primary / anchor palettes above)
+     to re-brand; dark values are under .dark. */
+  --app-tint: #047857;
+  --app-tint-soft: #E6F2EE;
+  --app-control-on: #059669;
+  --app-content-on-tint: #FFFFFF;
+  --app-tile-brand: #059669;
+  --app-tile-brand-foreground: #FFFFFF;
+  --app-tile-anchor: #17302A;
+  --app-tile-anchor-foreground: #6EE7B7;
+  /* Accents that only sit on surface-inverse (toast icons, toast actions). */
+  --app-content-inverse-accent: #6EE7B7;
+
+  /* Content */
+  --app-content-default: #2B3632;
+  --app-content-strong: #0D1714;
+  --app-content-muted: #5B6763;
+  --app-content-disabled: #98A39F;
+  --app-content-destructive: #C62A1F;
+  --app-content-inverse: #F1F5F3;
+  --app-content-inverse-danger: #FF8A80;
+
+  /* Surfaces */
+  --app-surface-page: #F1F4F2;
+  --app-surface-cell: #FFFFFF;
+  --app-surface-raised: #FFFFFF;
+  --app-surface-overlay: #FAFCFB;
+  --app-surface-inverse: #15201D;
+
+  /* Fills and controls */
+  --app-fill: #EDEFEE;
+  --app-fill-strong: #D8DDDB;
+  --app-segment-selected: #FFFFFF;
+  --app-scrim: rgb(8 18 15 / 0.32);
+
+  /* Borders */
+  --app-border-separator: rgb(18 38 32 / 0.11);
+  --app-border-control: #7C8884;
+  --app-border-strong: #2B3632;
+  --app-border-destructive: #C62A1F;
+
+  /* Status: content / surface pairs, plus solid fills for white text */
+  --app-status-success-content: #047857;
+  --app-status-success-surface: #E1F2ED;
+  --app-status-success-solid: #047857;
+  --app-status-warning-content: #9A4A07;
+  --app-status-warning-surface: #FAEDDF;
+  --app-status-warning-solid: #9A4A07;
+  --app-status-danger-content: #B42318;
+  --app-status-danger-surface: #F9EAE9;
+  --app-status-danger-solid: #B91C1C;
+  --app-status-info-content: #0369A1;
+  --app-status-info-surface: #E3F1F9;
+  --app-status-info-solid: #0369A1;
+  --app-status-neutral-content: #465350;
+  --app-status-neutral-surface: #F1F3F2;
+  --app-status-neutral-solid: #5B6763;
+
+  /* Icon tiles: brand = the application's programmes and primary status icons
+     (tile-brand above), anchor = integrations and navigation (also person and
+     record avatars), neutral = system and export */
+  --app-tile-neutral: #6B7773;
+  --app-tile-neutral-foreground: #FFFFFF;
+
+  /* Elevation */
+  --app-shadow-group: 0 0 0 1px rgb(18 38 32 / 0.05);
+  --app-shadow-float: 0 8px 30px rgb(15 33 29 / 0.16), 0 0 0 1px rgb(15 33 29 / 0.06);
+  --app-shadow-dialog: 0 30px 80px rgb(0 0 0 / 0.28), 0 0 0 1px rgb(0 0 0 / 0.08);
+  --app-shadow-dock: var(--shadow-up);
+  --app-shadow-knob: 0 2px 5px rgb(0 0 0 / 0.16), 0 0 1px rgb(0 0 0 / 0.22);
+
+  /* Geometry (desktop / fine pointer; compact overrides below) */
+  --app-screen-padding: 1rem;
+  --app-section-gap: 1rem;
+  --app-group-gap: 1.5rem;
+  --app-row-height: 2.5rem;
+  --app-row-inset: 0.875rem;
+  --app-tile-size: 1.375rem;
+  --app-target-size: 2rem;
+  --app-bar-height: 3.25rem;
+  --app-switch-width: 2.125rem;
+  --app-switch-height: 1.25rem;
+  --app-radius-control: 0.4375rem;
+  --app-radius-group: 0.625rem;
+  --app-radius-menu: 0.75rem;
+  --app-radius-sheet: 0.875rem;
+  --app-radius-dialog: 1rem;
+  --app-dialog-width: 37.5rem;
+  --app-readable-width: 48rem;
+  --app-content-width: 72.5rem;
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-safe-right: env(safe-area-inset-right, 0px);
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --app-safe-left: env(safe-area-inset-left, 0px);
+
+  /* Type roles (desktop: macOS density) */
+  --app-text-large-title: 1.75rem;
+  --app-text-large-title-leading: 2.125rem;
+  --app-text-title: 1.375rem;
+  --app-text-title-leading: 1.75rem;
+  --app-text-headline: 0.875rem;
+  --app-text-headline-leading: 1.25rem;
+  --app-text-body: 0.875rem;
+  --app-text-body-leading: 1.25rem;
+  --app-text-subheadline: 0.8125rem;
+  --app-text-subheadline-leading: 1.125rem;
+  --app-text-footnote: 0.75rem;
+  --app-text-footnote-leading: 1rem;
+  --app-text-caption: 0.6875rem;
+  --app-text-caption-leading: 0.875rem;
+
+  /* Motion */
+  --app-motion-fast: 120ms;
+  --app-motion-normal: 200ms;
+  --app-motion-sheet: 350ms;
+  /* A navigation drawer's push; under reduced motion the page does not slide and
+     the drawer fades for this long instead. */
+  --app-motion-drawer: 280ms;
+  --app-motion-standard-easing: cubic-bezier(0.2, 0, 0, 1);
+  --app-motion-sheet-easing: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Waiting and results: a status text swapping, a result revealed; the shimmer
+     of a status line that is still working. */
+  --app-motion-reveal: 320ms;
+  --app-motion-shimmer: 1.8s;
+}
+
+.dark {
+  --app-tint: #34D399;
+  --app-tint-soft: #163328;
+  --app-control-on: #10B981;
+  --app-content-on-tint: #03261C;
+  --app-tile-anchor: #1D3A33;
+  --app-content-inverse-accent: #047857;
+
+  --app-content-default: #D5DEDA;
+  --app-content-strong: #EEF3F1;
+  --app-content-muted: #98A6A1;
+  --app-content-disabled: #5F6D68;
+  --app-content-destructive: #FF6B5E;
+  --app-content-inverse: #0D1714;
+  --app-content-inverse-danger: #B42318;
+
+  --app-surface-page: #060B0A;
+  --app-surface-cell: #111916;
+  --app-surface-raised: #141D1A;
+  --app-surface-overlay: #1E2825;
+  --app-surface-inverse: #E9EFEC;
+
+  --app-fill: #26312D;
+  --app-fill-strong: #394742;
+  --app-segment-selected: #3A4743;
+  --app-scrim: rgb(0 0 0 / 0.55);
+
+  --app-border-separator: rgb(210 235 226 / 0.10);
+  --app-border-control: #7F8D88;
+  --app-border-strong: #D5DEDA;
+  --app-border-destructive: #FF6B5E;
+
+  --app-status-success-content: #6EE7B7;
+  --app-status-success-surface: #17372B;
+  --app-status-success-solid: #047857;
+  --app-status-warning-content: #FCD34D;
+  --app-status-warning-surface: #343218;
+  --app-status-warning-solid: #9A4A07;
+  --app-status-danger-content: #FF8A7F;
+  --app-status-danger-surface: #372622;
+  --app-status-danger-solid: #B91C1C;
+  --app-status-info-content: #7DD3FC;
+  --app-status-info-surface: #17333A;
+  --app-status-info-solid: #0369A1;
+  --app-status-neutral-content: #B4C0BC;
+  --app-status-neutral-surface: #293530;
+  --app-status-neutral-solid: #5B6763;
+
+  --app-tile-neutral: #4F5B57;
+
+  --app-shadow-group: 0 0 0 1px rgb(210 235 226 / 0.04);
+  --app-shadow-float: 0 12px 40px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.07);
+  --app-shadow-dialog: 0 30px 80px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+/* Roles that are the accent under another name. Declared on :root and .dark so
+   they resolve against the accent of the element that carries the class. */
+:root,
+.dark {
+  --app-content-link: var(--app-tint);
+  --app-surface-selected: var(--app-tint-soft);
+  --app-border-focus: var(--app-tint);
+  --app-border-selected: var(--app-tint);
+}
+
+/* Geometry responds to space and input independently. A narrow fine-pointer
+   window also gets touch-sized targets; a wide touch device keeps them. */
+@media (min-width: 48rem) {
+  :root { --app-screen-padding: 1.5rem; --app-section-gap: 1.5rem; }
+}
+@media (max-width: 47.999rem), (any-pointer: coarse) {
+  :root { --app-target-size: 2.75rem; }
+}
+/* Compact or touch-first (phones, iPad): iOS type sizes and row metrics. A
+   touch laptop keeps desktop density because its primary pointer is fine. */
+@media (max-width: 47.999rem), (pointer: coarse) {
+  :root {
+    --app-group-gap: 1.75rem;
+    --app-row-height: 2.75rem;
+    --app-row-inset: 1rem;
+    --app-tile-size: 1.8125rem;
+    --app-bar-height: 2.75rem;
+    --app-switch-width: 3.1875rem;
+    --app-switch-height: 1.9375rem;
+    --app-radius-control: 0.5rem;
+    --app-radius-group: 0.75rem;
+    --app-radius-menu: 0.875rem;
+    --app-text-large-title: 2.125rem;
+    --app-text-large-title-leading: 2.5625rem;
+    --app-text-title: 1.75rem;
+    --app-text-title-leading: 2.125rem;
+    --app-text-headline: 1.0625rem;
+    --app-text-headline-leading: 1.375rem;
+    --app-text-body: 1.0625rem;
+    --app-text-body-leading: 1.375rem;
+    --app-text-subheadline: 0.9375rem;
+    --app-text-subheadline-leading: 1.25rem;
+    --app-text-footnote: 0.8125rem;
+    --app-text-footnote-leading: 1.125rem;
+    --app-text-caption: 0.75rem;
+    --app-text-caption-leading: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --app-motion-fast: 0ms;
+    --app-motion-normal: 0ms;
+    --app-motion-sheet: 0ms;
+    --app-motion-reveal: 0ms;
+    --app-motion-drawer: 120ms;
+  }
+}
+
+@theme inline {
+  --color-content: var(--app-content-default);
+  --color-content-strong: var(--app-content-strong);
+  --color-content-muted: var(--app-content-muted);
+  --color-content-disabled: var(--app-content-disabled);
+  --color-content-link: var(--app-content-link);
+  --color-content-destructive: var(--app-content-destructive);
+  --color-content-inverse: var(--app-content-inverse);
+  --color-content-inverse-accent: var(--app-content-inverse-accent);
+  --color-content-inverse-danger: var(--app-content-inverse-danger);
+  --color-content-on-tint: var(--app-content-on-tint);
+
+  --color-surface-page: var(--app-surface-page);
+  --color-surface-cell: var(--app-surface-cell);
+  --color-surface-raised: var(--app-surface-raised);
+  --color-surface-overlay: var(--app-surface-overlay);
+  --color-surface-selected: var(--app-surface-selected);
+  --color-surface-inverse: var(--app-surface-inverse);
+
+  --color-fill: var(--app-fill);
+  --color-fill-strong: var(--app-fill-strong);
+  --color-segment-selected: var(--app-segment-selected);
+  --color-control-on: var(--app-control-on);
+  --color-tint: var(--app-tint);
+  --color-tint-soft: var(--app-tint-soft);
+  --color-scrim: var(--app-scrim);
+
+  --color-border-separator: var(--app-border-separator);
+  --color-border-control: var(--app-border-control);
+  --color-border-strong: var(--app-border-strong);
+  --color-border-focus: var(--app-border-focus);
+  --color-border-selected: var(--app-border-selected);
+  --color-border-destructive: var(--app-border-destructive);
+
+  --color-status-success-content: var(--app-status-success-content);
+  --color-status-success-surface: var(--app-status-success-surface);
+  --color-status-success-solid: var(--app-status-success-solid);
+  --color-status-warning-content: var(--app-status-warning-content);
+  --color-status-warning-surface: var(--app-status-warning-surface);
+  --color-status-warning-solid: var(--app-status-warning-solid);
+  --color-status-danger-content: var(--app-status-danger-content);
+  --color-status-danger-surface: var(--app-status-danger-surface);
+  --color-status-danger-solid: var(--app-status-danger-solid);
+  --color-status-info-content: var(--app-status-info-content);
+  --color-status-info-surface: var(--app-status-info-surface);
+  --color-status-info-solid: var(--app-status-info-solid);
+  --color-status-neutral-content: var(--app-status-neutral-content);
+  --color-status-neutral-surface: var(--app-status-neutral-surface);
+  --color-status-neutral-solid: var(--app-status-neutral-solid);
+
+  --color-tile-brand: var(--app-tile-brand);
+  --color-tile-brand-foreground: var(--app-tile-brand-foreground);
+  --color-tile-anchor: var(--app-tile-anchor);
+  --color-tile-anchor-foreground: var(--app-tile-anchor-foreground);
+  --color-tile-neutral: var(--app-tile-neutral);
+  --color-tile-neutral-foreground: var(--app-tile-neutral-foreground);
+
+  --shadow-group: var(--app-shadow-group);
+  --shadow-float: var(--app-shadow-float);
+  --shadow-dialog: var(--app-shadow-dialog);
+  --shadow-dock: var(--app-shadow-dock);
+  --shadow-knob: var(--app-shadow-knob);
+
+  --spacing-screen-padding: var(--app-screen-padding);
+  --spacing-section-gap: var(--app-section-gap);
+  --spacing-group-gap: var(--app-group-gap);
+  --spacing-row: var(--app-row-height);
+  --spacing-row-inset: var(--app-row-inset);
+  --spacing-tile: var(--app-tile-size);
+  --spacing-target-size: var(--app-target-size);
+  --spacing-bar-height: var(--app-bar-height);
+  --spacing-switch-width: var(--app-switch-width);
+  --spacing-switch-height: var(--app-switch-height);
+
+  --radius-control: var(--app-radius-control);
+  --radius-group: var(--app-radius-group);
+  --radius-menu: var(--app-radius-menu);
+  --radius-sheet: var(--app-radius-sheet);
+  --radius-dialog: var(--app-radius-dialog);
+
+  --container-dialog: var(--app-dialog-width);
+  --container-readable: var(--app-readable-width);
+  --container-content: var(--app-content-width);
+
+  --text-large-title: var(--app-text-large-title);
+  --text-large-title--line-height: var(--app-text-large-title-leading);
+  --text-large-title--letter-spacing: -0.02em;
+  --text-title: var(--app-text-title);
+  --text-title--line-height: var(--app-text-title-leading);
+  --text-title--letter-spacing: -0.02em;
+  --text-headline: var(--app-text-headline);
+  --text-headline--line-height: var(--app-text-headline-leading);
+  --text-body: var(--app-text-body);
+  --text-body--line-height: var(--app-text-body-leading);
+  --text-subheadline: var(--app-text-subheadline);
+  --text-subheadline--line-height: var(--app-text-subheadline-leading);
+  --text-footnote: var(--app-text-footnote);
+  --text-footnote--line-height: var(--app-text-footnote-leading);
+  --text-caption: var(--app-text-caption);
+  --text-caption--line-height: var(--app-text-caption-leading);
+
+  --ease-motion-standard: var(--app-motion-standard-easing);
+  --ease-motion-sheet: var(--app-motion-sheet-easing);
+}
+
+@utility duration-motion-fast { transition-duration: var(--app-motion-fast); }
+@utility duration-motion-normal { transition-duration: var(--app-motion-normal); }
+@utility duration-motion-sheet { transition-duration: var(--app-motion-sheet); }
+@utility duration-motion-reveal { transition-duration: var(--app-motion-reveal); }
+
+/* A status line that is still working: the text shimmers from muted to strong.
+   Under reduced motion it stays still and muted; the words still change. */
+@utility text-shimmer {
+  background-image: linear-gradient(90deg, var(--app-content-muted) 0%, var(--app-content-muted) 38%,
+    var(--app-content-strong) 50%, var(--app-content-muted) 62%, var(--app-content-muted) 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: app-shimmer var(--app-motion-shimmer) linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-image: none;
+    color: var(--app-content-muted);
+  }
+}
+
+/* Grows the pointer hit area to the target size without changing layout: an
+   invisible ::after centred on the element, never smaller than the element.
+   For small independent controls (buttons, switches, pop-up buttons). */
+@utility hit-target {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    top: min(0px, calc((100% - var(--app-target-size)) / 2));
+    bottom: min(0px, calc((100% - var(--app-target-size)) / 2));
+    left: min(0px, calc((100% - var(--app-target-size)) / 2));
+    right: min(0px, calc((100% - var(--app-target-size)) / 2));
+  }
+}
+
+/* Apply at the outer edge once; do not stack this on an already inset dock. */
+@utility p-screen-safe {
+  padding-top: max(var(--app-screen-padding), var(--app-safe-top));
+  padding-right: max(var(--app-screen-padding), var(--app-safe-right));
+  padding-bottom: max(var(--app-screen-padding), var(--app-safe-bottom));
+  padding-left: max(var(--app-screen-padding), var(--app-safe-left));
+}
