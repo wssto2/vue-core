@@ -106,6 +106,14 @@ describe("loading", () => {
   });
 });
 
+describe("columns", () => {
+  it("a column that sorts by a key the contract does not list is an error when the columns are read", () => {
+    const { definition } = setup();
+    const { result: list } = inApp(() => useCollection(definition, { state: { kind: "memory" }, columns: [{ key: "title", label: "Title", sort: "titel" }] }));
+    expect(() => list.columns.value).toThrow(/column "title" sorts by "titel", which is not in the query contract's sorts/);
+  });
+});
+
 describe("states", () => {
   it("tells empty, no matches and failed apart", async () => {
     const loader = fakeLoader((query) => {

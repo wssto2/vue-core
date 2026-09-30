@@ -19,7 +19,7 @@ export interface CollectionQuery<Sort extends string = string, Filter extends st
 }
 
 /** One page of a list, normalized: what `load` returns, whatever envelope the backend used. */
-export interface CollectionPage<Row> {
+export interface ListPage<Row> {
   readonly rows: readonly Row[];
   /** Rows in the whole result set. */
   readonly total: number;
@@ -47,7 +47,7 @@ export interface LoadContext {
 export type CollectionLoader<Row, Sort extends string, Filter extends string, View extends string> = (
   query: CollectionQuery<Sort, Filter, View>,
   context: LoadContext,
-) => Promise<CollectionPage<Row>>;
+) => Promise<ListPage<Row>>;
 
 /** Where a list keeps its state between visits. */
 export type CollectionStateSource =

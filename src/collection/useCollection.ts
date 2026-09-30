@@ -22,7 +22,7 @@ import { LIST_CONTEXT_PARAM, withQuery } from "./location";
 import type { SavedView, SavedViewState, SavedViews } from "./savedViews";
 import { onSessionChange } from "./session";
 import { decodeState, encodeState, restoreState, type Json } from "./state";
-import type { CollectionPage, CollectionQuery, CollectionStateSource, SortDirection } from "./types";
+import type { ListPage, CollectionQuery, CollectionStateSource, SortDirection } from "./types";
 
 /**
  * A link into a list carries plain parameters (`?scope=long`, `?followup=overdue`): a count on the
@@ -33,17 +33,17 @@ export interface LinkedQuery<Filter extends string> {
   /** The parameter that names a view (default: no view parameter). Used only when it is one of the contract's views. */
   view?: string;
   /** Parameter to filter; a transform turns the parameter's text into the filter's value (`mine=1` into the user's id). `"any"` clears a filter the list sets by default. */
-  params?: Readonly<Record<string, Filter | { filter: Filter; value: (text: string) => string | number | null }>>;
+  params?: Readonly<Record<string, NoInfer<Filter> | { filter: NoInfer<Filter>; value: (text: string) => string | number | null }>>;
   /** Parameters that only label a filter (`line_name` for `line`): dropped along with it. */
   consume?: readonly string[];
 }
 
-export interface UseCollectionOptions<Row, Sort extends string, Filter extends string, View extends string, Col extends Column<Row, Sort>> {
+export interface UseCollectionOptions<Row, Filter extends string, View extends string, Col extends Column<Row>> {
   /** Where the list keeps its state; two lists on one page need two URL keys. */
   state: CollectionStateSource;
   columns?: MaybeRefOrGetter<readonly Col[]>;
-  filters?: MaybeRefOrGetter<readonly FilterDescriptor<Filter>[]>;
-  views?: MaybeRefOrGetter<readonly ViewDescriptor<View>[]>;
+  filters?: MaybeRefOrGetter<readonly FilterDescriptor<NoInfer<Filter>>[]>;
+  views?: MaybeRefOrGetter<readonly ViewDescriptor<NoInfer<View>>[]>;
   /** Where a row's record lives. Record links carry the list's state (`?from=`) so the record page can step through the list. */
   recordRoute?: (row: Row) => RouteLocationRaw;
   /** Offers "Saved views" on the list. */
@@ -85,14 +85,19 @@ export interface SavedViewsHandle {
  * batch into one request (several calls in a tick load once), a newer request supersedes the older,
  * and a failure is never confused with an empty list.
  */
-export interface Collection<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Col extends Column<Row, Sort> = Column<Row, Sort>> {
-  readonly definition: CollectionDefinition<Row, Sort, Filter, View>;
+export interface Collection<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Col extends Column<Row> = Column<Row>> {
+  /** The definition's id. */
+  readonly id: string;
+  /** The record's identity (the definition's `key`): what rows are keyed by. */
+  rowKey(row: Row): string | number;
+  /** The page sizes the list offers. */
+  readonly pageSizes: readonly number[];
   /** The request state: loading (nothing to show), loaded, refreshing (previous rows stay), stale (a refresh failed, previous rows stay) or failed. */
-  readonly state: Readonly<Ref<AsyncState<CollectionPage<Row>>>>;
+  readonly state: Readonly<Ref<AsyncState<ListPage<Row>>>>;
   /** The query the list shows or is loading. */
   readonly query: Readonly<Ref<CollectionQuery<Sort, Filter, View>>>;
-  /** The last loaded page, kept while refreshing or stale; null before the first one. */
-  readonly page: ComputedRef<CollectionPage<Row> | null>;
+  /** The last page that loaded, kept while another loads, refreshes or fails (so the pager and the count stay); null before the first and after a session change. */
+  readonly page: ComputedRef<ListPage<Row> | null>;
   readonly rows: ComputedRef<readonly Row[]>;
   readonly total: ComputedRef<number>;
   readonly display: ComputedRef<CollectionDisplay>;
@@ -172,9 +177,9 @@ const messageOf = (error: unknown): string => (error instanceof Error && error.m
  * request only, treats a cancelled request as nothing happened, and follows the URL when the
  * user goes back or forward. It stops with the scope it was created in.
  */
-export function useCollection<Row, Sort extends string, Filter extends string, View extends string, const Col extends Column<Row, Sort> = Column<Row, Sort>>(
+export function useCollection<Row, Sort extends string, Filter extends string, View extends string, const Col extends Column<Row> = Column<Row>>(
   definition: CollectionDefinition<Row, Sort, Filter, View>,
-  options: UseCollectionOptions<Row, Sort, Filter, View, Col>,
+  options: UseCollectionOptions<Row, Filter, View, Col>,
 ): Collection<Row, Sort, Filter, View, Col> {
   const where = `useCollection("${definition.id}")`;
   const source = options.state;
@@ -200,9 +205,11 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     return decodeState(definition, Array.isArray(raw) ? raw[0] : raw) ?? definition.defaults;
   })();
   const query = shallowRef<CollectionQuery<Sort, Filter, View>>(start);
-  const state = shallowRef<AsyncState<CollectionPage<Row>>>({ status: "loading" });
+  const state = shallowRef<AsyncState<ListPage<Row>>>({ status: "loading" });
   const error = shallowRef<unknown>(null);
-  const page = computed(() => (hasValue(state.value) ? state.value.value : null));
+  // The last page that loaded, kept through loading and failures: the pager and the count must not flicker to nothing between pages.
+  const known = shallowRef<ListPage<Row> | null>(null);
+  const page = computed(() => (hasValue(state.value) ? state.value.value : known.value));
 
   let disposed = false;
   let controller: AbortController | null = null;
@@ -268,6 +275,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
         return;
       }
       error.value = null;
+      known.value = loaded;
       state.value = { status: "loaded", value: loaded };
     } catch (failure) {
       // A request that was cancelled (superseded, disposed, the session changed) did not fail.
@@ -473,6 +481,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     controller?.abort();
     sequence++;
     state.value = { status: "loading" };
+    known.value = null;
     error.value = null;
     clearSaved();
     if (identity !== null) changed();
@@ -481,7 +490,9 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
   changed(); // the one initial load, after the setup that created the list has finished adjusting it
 
   return {
-    definition,
+    id: definition.id,
+    pageSizes: definition.contract.pageSizes,
+    rowKey: (row) => definition.key(row),
     state,
     query,
     page,
@@ -490,7 +501,13 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     display,
     isFiltered,
     error,
-    columns: computed(() => toValue(options.columns) ?? []),
+    columns: computed(() => {
+      const columns = toValue(options.columns) ?? [];
+      const sorts = definition.contract.sorts as readonly string[] | null;
+      // A column's `sort` is checked against the contract when the columns are read: a typo is an error at setup, not a header that sorts by nothing.
+      if (sorts) for (const column of columns) if (column.sort !== undefined && !sorts.includes(column.sort)) throw new Error(`${where}: column "${column.key}" sorts by "${column.sort}", which is not in the query contract's sorts (${sorts.join(", ")}).`);
+      return columns;
+    }),
     filters: computed(() => toValue(options.filters) ?? []),
     views,
     savedViews,

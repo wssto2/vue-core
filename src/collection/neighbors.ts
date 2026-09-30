@@ -5,7 +5,7 @@ import type { CollectionDefinition } from "./definition";
 import { LIST_CONTEXT_PARAM } from "./location";
 import { onSessionChange } from "./session";
 import { decodeState, encodeState, queryKey } from "./state";
-import type { CollectionPage, CollectionQuery } from "./types";
+import type { ListPage, CollectionQuery } from "./types";
 
 /** The previous or next record of the list a record page was opened from. */
 export interface Neighbor {
@@ -65,13 +65,13 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
   const loading = ref(false);
   const listRoute = shallowRef<RouteLocationRaw | null>(null);
 
-  const cache = new Map<string, Promise<CollectionPage<Row>>>();
+  const cache = new Map<string, Promise<ListPage<Row>>>();
   let generation = 0;
   // Pages are shared between steps, so they are cancelled together (disposal, session change), never per step.
   let lifetime = new AbortController();
   let disposed = false;
 
-  function fetchPage(query: CollectionQuery<Sort, Filter, View>, page: number, signal: AbortSignal): Promise<CollectionPage<Row> | null> {
+  function fetchPage(query: CollectionQuery<Sort, Filter, View>, page: number, signal: AbortSignal): Promise<ListPage<Row> | null> {
     const asked = { ...query, page };
     const key = queryKey(asked);
     let request = cache.get(key);
@@ -116,7 +116,7 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
     // Never leave the previous record's neighbors in place while resolving: a quick second step would start from the wrong record.
     previous.value = null;
     next.value = null;
-    const indexIn = (data: CollectionPage<Row> | null) => (data ? data.rows.findIndex((row) => String(definition.key(row)) === String(current)) : -1);
+    const indexIn = (data: ListPage<Row> | null) => (data ? data.rows.findIndex((row) => String(definition.key(row)) === String(current)) : -1);
     const at = (page: number, key: string | number): Neighbor => {
       const state = encodeState(definition, { ...query, page });
       return { key, to: { name: route.name ?? undefined, params: { ...route.params, [options.param]: String(key) }, query: { ...route.query, [LIST_CONTEXT_PARAM]: state }, hash: route.hash } };

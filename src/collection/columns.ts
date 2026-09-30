@@ -87,8 +87,8 @@ export type ColumnKind<Row> =
   | { kind: "timestamp"; precision?: "date" | "dateTime" }
   | { kind: "number"; format?: Intl.NumberFormatOptions }
   | { kind: "money"; currency: string | ((row: Row) => string) }
-  /** A status: the tone carries the meaning; `label` defaults to the value. */
-  | { kind: "badge"; tone: (row: Row) => Tone | "context"; label?: (row: Row) => string }
+  /** A status: the tone carries the meaning; `text` defaults to the value. */
+  | { kind: "badge"; tone: (row: Row) => Tone | "context"; text?: (row: Row) => string }
   | { kind: "custom" };
 
 export type Column<Row, Sort extends string = string> = ColumnCommon<Row, Sort> & ColumnKind<Row>;

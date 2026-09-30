@@ -1,5 +1,5 @@
 import type { ApiResult, HttpClient, QueryValue } from "../client";
-import type { CollectionLoader, CollectionPage, CollectionQuery } from "./types";
+import type { CollectionLoader, ListPage, CollectionQuery } from "./types";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const count = (...candidates: unknown[]): number | null => {
@@ -25,12 +25,12 @@ export function listParams(query: CollectionQuery): Record<string, QueryValue> {
 }
 
 /**
- * Reads a list answer into a `CollectionPage`. Understands go-core's envelope (`data` is the rows,
+ * Reads a list answer into a `ListPage`. Understands go-core's envelope (`data` is the rows,
  * `meta` has `total`, `page`, `per_page`, `last_page`, `from`, `to`, and may carry `views` and lookups)
  * and ARV's older shape with the numbers next to `data` (`current_page`). Missing numbers are derived
  * from what is there rather than becoming 0; `query` supplies the page and size that were asked for.
  */
-export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): CollectionPage<Row> {
+export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row> {
   const body = result.data;
   const legacy = isRecord(body) && Array.isArray(body.data);
   const rows = (Array.isArray(body) ? body : legacy ? body.data : []) as Row[];

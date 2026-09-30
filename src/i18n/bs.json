@@ -10,6 +10,81 @@
       "saved": "Spremljeno",
       "more": "Više"
     },
+    "collection": {
+      "search": {
+        "label": "Pretraži",
+        "placeholder": "Upišite za pretragu..."
+      },
+      "clear": "Poništi",
+      "no_data": "Nema podataka",
+      "no_results": "Prema traženom upitu nisu pronađeni podaci.",
+      "failed": {
+        "title": "Popis nije moguće učitati"
+      },
+      "open_record": "Pogledaj detalje",
+      "views_label": "Prikazi",
+      "page": {
+        "label": "Stranice",
+        "previous": "Prethodna stranica",
+        "next": "Sljedeća stranica",
+        "page_of": "Stranica {current} od {total}",
+        "total": "Prikaz {from} do {to} od ukupno {total} zapisa",
+        "per_page": "Zapisa po stranici"
+      },
+      "filters": {
+        "show_all": "Prikaži sve",
+        "apply": "Primijeni",
+        "clear": "Očisti",
+        "type_to_filter": "Upišite za filtriranje...",
+        "panel_title": "Filteri",
+        "panel_button": "Filteri",
+        "reset_all": "Poništi sve",
+        "range_from": "Od",
+        "range_until": "Do"
+      },
+      "date_presets": {
+        "label": "Uneseno",
+        "options": {
+          "today": "Danas",
+          "yesterday": "Jučer",
+          "this_week": "Ovaj tjedan",
+          "last_week": "Prošli tjedan",
+          "this_month": "Ovaj mjesec",
+          "last_month": "Prošli mjesec",
+          "this_year": "Ova godina",
+          "last_year": "Prošla godina"
+        }
+      },
+      "saved": {
+        "title": "Spremljeni filteri",
+        "menu": "Spremljeni filteri",
+        "save": "Spremi",
+        "name_placeholder": "Naziv, npr. Novi Renault",
+        "saved_toast": "Filteri „{name}” spremljeni i primijenjeni.",
+        "deleted_toast": "Filteri „{name}” obrisani.",
+        "delete": "Obriši „{name}”",
+        "save_button": "Spremi filtere",
+        "name_label": "Naziv filtera",
+        "replace": "Zamijeni",
+        "replace_hint": "Postojeći filter „{name}” bit će zamijenjen.",
+        "nothing_to_save": "Odaberite barem jedan filter za spremanje.",
+        "save_failed": "Filtere nije moguće spremiti.",
+        "delete_failed": "Filtere nije moguće obrisati.",
+        "undo": "Poništi"
+      },
+      "empty": {
+        "title": "Nema rezultata za odabrane filtere",
+        "description": "Uklonite neki od filtera ili poništite sve.",
+        "remove_last": "Ukloni: {filter}",
+        "clear_all": "Poništi sve filtere",
+        "search": "Pretraga"
+      },
+      "record_pager": {
+        "label": "Kretanje kroz popis",
+        "previous": "Prethodni",
+        "next": "Sljedeći"
+      }
+    },
     "state": {
       "loading": "Učitavanje sadržaja",
       "stale": "Prikazani su prethodni podaci. Možda nisu ažurni.",

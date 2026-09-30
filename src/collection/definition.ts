@@ -142,3 +142,9 @@ export function defineCollection<Row, Sort extends string = string, Filter exten
     migrate: input.migrate,
   });
 }
+
+/** The row, sort keys, filter keys and views of a definition, for typing code written against it. */
+export type RowOf<D> = D extends CollectionDefinition<infer Row, string, string, string> ? Row : never;
+export type SortOf<D> = D extends CollectionDefinition<never, infer Sort, string, string> ? Sort : never;
+export type FilterOf<D> = D extends CollectionDefinition<never, string, infer Filter, string> ? Filter : never;
+export type ViewOf<D> = D extends CollectionDefinition<never, string, string, infer View> ? View : never;

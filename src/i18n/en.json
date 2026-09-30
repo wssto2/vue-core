@@ -10,6 +10,81 @@
       "saved": "Saved",
       "more": "More"
     },
+    "collection": {
+      "search": {
+        "label": "Search",
+        "placeholder": "Type to search..."
+      },
+      "clear": "Reset",
+      "no_data": "No data",
+      "no_results": "No results found for your search.",
+      "failed": {
+        "title": "The list could not be loaded"
+      },
+      "open_record": "View details",
+      "views_label": "Views",
+      "page": {
+        "label": "Pages",
+        "previous": "Previous page",
+        "next": "Next page",
+        "page_of": "Page {current} of {total}",
+        "total": "Showing {from} to {to} of {total} entries",
+        "per_page": "Records per page"
+      },
+      "filters": {
+        "show_all": "Show all",
+        "apply": "Apply",
+        "clear": "Clear",
+        "type_to_filter": "Type to filter...",
+        "panel_title": "Filters",
+        "panel_button": "Filters",
+        "reset_all": "Reset all",
+        "range_from": "From",
+        "range_until": "Until"
+      },
+      "date_presets": {
+        "label": "Created",
+        "options": {
+          "today": "Today",
+          "yesterday": "Yesterday",
+          "this_week": "This week",
+          "last_week": "Last week",
+          "this_month": "This month",
+          "last_month": "Last month",
+          "this_year": "This year",
+          "last_year": "Last year"
+        }
+      },
+      "saved": {
+        "title": "Saved filters",
+        "menu": "Saved filters",
+        "save": "Save",
+        "name_placeholder": "Name, e.g. New Renault",
+        "saved_toast": "Filters “{name}” saved and applied.",
+        "deleted_toast": "Filters “{name}” deleted.",
+        "delete": "Delete “{name}”",
+        "save_button": "Save filters",
+        "name_label": "Filter name",
+        "replace": "Replace",
+        "replace_hint": "The existing filter “{name}” will be replaced.",
+        "nothing_to_save": "Select at least one filter to save.",
+        "save_failed": "The filters could not be saved.",
+        "delete_failed": "The filters could not be deleted.",
+        "undo": "Undo"
+      },
+      "empty": {
+        "title": "No results for the selected filters",
+        "description": "Remove one of the filters or clear them all.",
+        "remove_last": "Remove: {filter}",
+        "clear_all": "Clear all filters",
+        "search": "Search"
+      },
+      "record_pager": {
+        "label": "List navigation",
+        "previous": "Previous",
+        "next": "Next"
+      }
+    },
     "state": {
       "loading": "Loading content",
       "stale": "Showing previous data. It may be out of date.",

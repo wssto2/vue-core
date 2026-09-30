@@ -1,0 +1,32 @@
+/* Collection rows: the semantic type roles of a list row and the table look. Feature code uses
+   these roles instead of picking a grey, so the hierarchy of a row is changed in one place. */
+@utility text-row-title {
+  @apply text-sm font-semibold text-content-strong;
+}
+
+@utility text-row-subtitle {
+  @apply text-xs text-content-muted;
+}
+
+@utility text-row-meta {
+  @apply text-xs text-content-muted;
+}
+
+/* The table of a CollectionTable, on grouped cells: hairline separators, content-role text, a fill
+   on hover. Scoped to `.collection-grid`: ARV styled every <table> of the application this way. */
+table.collection-grid tbody {
+  @apply divide-y divide-border-separator;
+}
+
+/* Regular weight: only the row's title leads. Tabular figures keep dates and amounts aligned down a column. */
+table.collection-grid tbody td {
+  @apply px-4 py-2.5 whitespace-nowrap text-sm font-normal tabular-nums text-content;
+}
+
+table.collection-grid.condensed tbody td {
+  @apply px-2 py-1;
+}
+
+table.collection-grid tbody tr:hover {
+  @apply bg-fill/60 transition-colors;
+}

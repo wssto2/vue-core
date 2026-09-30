@@ -10,6 +10,81 @@
       "saved": "Shranjeno",
       "more": "Več"
     },
+    "collection": {
+      "search": {
+        "label": "Išči",
+        "placeholder": "Vpišite za iskanje..."
+      },
+      "clear": "Ponastavi",
+      "no_data": "Ni podatkov",
+      "no_results": "Za vaše iskanje ni najdenih podatkov.",
+      "failed": {
+        "title": "Seznama ni mogoče naložiti"
+      },
+      "open_record": "Poglej podrobnosti",
+      "views_label": "Pogledi",
+      "page": {
+        "label": "Strani",
+        "previous": "Prejšnja stran",
+        "next": "Naslednja stran",
+        "page_of": "Stran {current} od {total}",
+        "total": "Prikaz {from} do {to} od skupaj {total} zapisov",
+        "per_page": "Zapisov na stran"
+      },
+      "filters": {
+        "show_all": "Prikaži vse",
+        "apply": "Uporabi",
+        "clear": "Počisti",
+        "type_to_filter": "Vpišite za filtriranje...",
+        "panel_title": "Filtri",
+        "panel_button": "Filtri",
+        "reset_all": "Ponastavi vse",
+        "range_from": "Od",
+        "range_until": "Do"
+      },
+      "date_presets": {
+        "label": "Vneseno",
+        "options": {
+          "today": "Danes",
+          "yesterday": "Včeraj",
+          "this_week": "Ta teden",
+          "last_week": "Prejšnji teden",
+          "this_month": "Ta mesec",
+          "last_month": "Prejšnji mesec",
+          "this_year": "To leto",
+          "last_year": "Prejšnje leto"
+        }
+      },
+      "saved": {
+        "title": "Shranjeni filtri",
+        "menu": "Shranjeni filtri",
+        "save": "Shrani",
+        "name_placeholder": "Ime, npr. Nov Renault",
+        "saved_toast": "Filtri „{name}” shranjeni in uporabljeni.",
+        "deleted_toast": "Filtri „{name}” izbrisani.",
+        "delete": "Izbriši „{name}”",
+        "save_button": "Shrani filtre",
+        "name_label": "Ime filtra",
+        "replace": "Zamenjaj",
+        "replace_hint": "Obstoječi filter „{name}” bo zamenjan.",
+        "nothing_to_save": "Za shranjevanje izberite vsaj en filter.",
+        "save_failed": "Filtrov ni mogoče shraniti.",
+        "delete_failed": "Filtrov ni mogoče izbrisati.",
+        "undo": "Razveljavi"
+      },
+      "empty": {
+        "title": "Za izbrane filtre ni rezultatov",
+        "description": "Odstranite katerega od filtrov ali ponastavite vse.",
+        "remove_last": "Odstrani: {filter}",
+        "clear_all": "Ponastavi vse filtre",
+        "search": "Iskanje"
+      },
+      "record_pager": {
+        "label": "Premikanje po seznamu",
+        "previous": "Prejšnji",
+        "next": "Naslednji"
+      }
+    },
     "state": {
       "loading": "Nalaganje vsebine",
       "stale": "Prikazani so prejšnji podatki. Morda niso posodobljeni.",

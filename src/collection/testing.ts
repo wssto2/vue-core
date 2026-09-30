@@ -4,7 +4,7 @@ import { createApp, defineComponent, h, nextTick, type App } from "vue";
 import { createMemoryHistory, createRouter, type Router } from "vue-router";
 import { ApiError } from "../client";
 import { installPlatform, type Platform } from "../platform";
-import type { CollectionPage, CollectionQuery, LoadContext } from "./types";
+import type { ListPage, CollectionQuery, LoadContext } from "./types";
 
 export const deferred = <T>() => {
   let resolve!: (value: T) => void;
@@ -21,7 +21,7 @@ export interface Row {
   readonly title: string;
 }
 
-export const page = (rows: readonly Row[], overrides: Partial<CollectionPage<Row>> = {}): CollectionPage<Row> => ({
+export const page = (rows: readonly Row[], overrides: Partial<ListPage<Row>> = {}): ListPage<Row> => ({
   rows,
   total: rows.length,
   page: 1,
@@ -33,7 +33,7 @@ export const page = (rows: readonly Row[], overrides: Partial<CollectionPage<Row
 });
 
 /** A loader that records every call and answers from a queue, or from a function of the query. */
-export function fakeLoader(answer: (query: CollectionQuery, context: LoadContext, call: number) => Promise<CollectionPage<Row>> | CollectionPage<Row>) {
+export function fakeLoader(answer: (query: CollectionQuery, context: LoadContext, call: number) => Promise<ListPage<Row>> | ListPage<Row>) {
   const calls: { query: CollectionQuery; signal: AbortSignal }[] = [];
   const load = (query: CollectionQuery, context: LoadContext) => {
     calls.push({ query, signal: context.signal });
