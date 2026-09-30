@@ -9,3 +9,18 @@ export { createPlatform, installPlatform, platformKey, usePlatform } from "./pla
 export type { Platform, PlatformOptions } from "./platform";
 export { createSession } from "./session";
 export type { Session, SessionAdapter, SessionEnd, SessionOptions, SessionSnapshot, SessionState, SessionUser } from "./session";
+
+/**
+ * The permission identifiers of the application. The library declares none: an app adds its own by
+ * augmenting this interface (declaration merging, like `IconRegistry`), so route metadata and
+ * `defineRoutes` reject a permission the catalogue does not have.
+ *
+ *   declare module "@wssto2/vue-core/platform" {
+ *     interface PermissionRegistry { "tickets:view": true; "tickets:update": true }
+ *   }
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- an empty interface is the point: apps augment it
+export interface PermissionRegistry {}
+
+/** Every permission identifier the application declared; any string until it declares some. */
+export type Permission = keyof PermissionRegistry extends never ? string : Extract<keyof PermissionRegistry, string>;
