@@ -468,9 +468,9 @@ describe("filters", () => {
     await fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
     await flush();
     const dialog = screen.getByRole("dialog");
-    await fireEvent.click(within(dialog).getByRole("button", { name: "Show all" }));
+    await fireEvent.click(within(dialog).getByRole("button", { name: "Location" }));
     await flush();
-    await fireEvent.click(screen.getByRole("menuitemradio", { name: "Zagreb" }));
+    await fireEvent.click(screen.getByRole("option", { name: "Zagreb" }).querySelector("button")!);
     await flush();
     const before = loader.calls.length;
     await fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Apply" }));
@@ -478,6 +478,18 @@ describe("filters", () => {
     expect(list.query.value.filters).toEqual({ location: "b" });
     expect(loader.calls.length).toBe(before + 1);
     expect(document.querySelector("[data-test='collection-filter-chips']")!.textContent).toContain("Zagreb");
+  });
+
+  it("the panel edits a range with two number fields and applies it as one value; a typed decimal comma is understood", async () => {
+    const { list } = await mountList({ filters: [{ key: "location", label: "Price", type: "range", placement: "panel", unit: "EUR", decimals: 2 }] });
+    await fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
+    await flush();
+    const dialog = screen.getByRole("dialog");
+    await fireEvent.update(within(dialog).getByLabelText("From"), "1000");
+    await fireEvent.update(within(dialog).getByLabelText("Until"), "2500,5");
+    await fireEvent.click(within(dialog).getByRole("button", { name: "Apply" }));
+    await flush();
+    expect(list.query.value.filters).toEqual({ location: "1000,2500.5" });
   });
 
   it("saved views: saved from the panel, listed in the toolbar and applied in one request", async () => {

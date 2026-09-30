@@ -2,11 +2,13 @@
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
-import { PopupButton, Tabs } from "../controls";
+import { Tabs } from "../controls";
+import NumberField from "../form/NumberField.vue";
+import SelectField from "../form/SelectField.vue";
 import { Icon } from "../icon";
 import { useMediaQuery } from "../internal/mediaQuery";
 import { Sheet } from "../modal";
-import { Menu, Popover, toast, type MenuItem } from "../overlay";
+import { Popover, toast } from "../overlay";
 import { isApiError } from "../client";
 import type { Collection } from "./useCollection";
 import { isEmptyFilterValue, joinRange, narrowedOptions, splitRange, type FilterDescriptor } from "./filters";
@@ -15,8 +17,8 @@ import type { SavedView } from "./savedViews";
 /**
  * The filters declared with `placement: "panel"` (and every filter a phone moves here), edited as a
  * draft in a sheet and applied in one go, so a change to six fields costs one request instead of six.
- * Desktop picks options from menus; touch screens get chips for a short option set and a drill-down
- * row for a longer one, inside the same sheet. A list with saved views shows them first.
+ * Desktop picks options with a `SelectField` and ranges with `NumberField`s; touch screens get chips for
+ * a short option set and a drill-down row for a longer one, inside the same sheet. A list with saved views shows them first.
  */
 const props = defineProps<{
   collection: Collection<Row>;
@@ -70,6 +72,16 @@ function reset() {
 }
 
 const numeric = (text: string) => text.replace(/[^\d.,-]/g, "").replace(",", ".");
+/** A range side is kept as text in the draft (it is joined back into "from,until"); its field edits it as a number. */
+const rangeNumber = (key: string, side: "min" | "max"): number | null => {
+  const text = rangeDraft.value[key]?.[side] ?? "";
+  const value = text === "" ? Number.NaN : Number(numeric(text));
+  return Number.isNaN(value) ? null : value;
+};
+function setRange(key: string, side: "min" | "max", value: number | null) {
+  const range = rangeDraft.value[key];
+  if (range) range[side] = value === null ? "" : String(value);
+}
 
 function draftValues(): Record<string, string | null> {
   const values: Record<string, string | null> = {};
@@ -97,13 +109,11 @@ function valueLabel(filter: FilterDescriptor): string {
   return optionsFor(filter).find((option) => option.value === value)?.label ?? value;
 }
 
-function menuItems(filter: FilterDescriptor): MenuItem[] {
-  const current = draft.value[filter.key] ?? null;
-  return [
-    { id: "__all", label: allLabel(filter), checked: current === null, onSelect: () => setValue(filter.key, null) },
-    ...optionsFor(filter).map((option) => ({ id: `option-${option.value}`, label: option.label, checked: current === option.value, onSelect: () => setValue(filter.key, option.value) })),
-  ];
-}
+/** The options of a select as a `SelectField` lists them: values as text (the draft's), with "show all" as the empty one. */
+const selectOptions = (filter: FilterDescriptor) => [
+  { value: "", label: allLabel(filter) },
+  ...optionsFor(filter).map((option) => ({ value: String(option.value), label: option.label })),
+];
 
 const segmentTabs = (filter: FilterDescriptor) => [
   { value: "", label: allLabel(filter) },
@@ -257,14 +267,8 @@ defineExpose({ present });
           <div v-else-if="filter.type === 'range'" role="group" :aria-label="filter.label">
             <p class="mb-1.5 text-footnote font-medium text-content-muted">{{ filter.label }}</p>
             <div v-if="rangeDraft[filter.key]" class="grid grid-cols-2 gap-3">
-              <label v-for="side in (['min', 'max'] as const)" :key="side"
-                class="flex items-center gap-2 rounded-control bg-fill px-2.5 focus-within:bg-surface-cell focus-within:ring-[1.5px] focus-within:ring-inset focus-within:ring-border-focus">
-                <input v-model="rangeDraft[filter.key]![side]" type="text" inputmode="decimal" autocomplete="off" :name="`${filter.key}_${side}`"
-                  :placeholder="t(side === 'min' ? 'core.collection.filters.range_from' : 'core.collection.filters.range_until')"
-                  :aria-label="`${filter.label}: ${t(side === 'min' ? 'core.collection.filters.range_from' : 'core.collection.filters.range_until')}`"
-                  class="min-w-0 flex-1 bg-transparent py-1.5 text-right text-body tabular-nums text-content-strong outline-none placeholder:text-content-disabled" />
-                <span v-if="filter.unit" class="shrink-0 text-footnote text-content-muted">{{ filter.unit }}</span>
-              </label>
+              <NumberField v-for="side in (['min', 'max'] as const)" :key="side" :model-value="rangeNumber(filter.key, side)" :name="`${filter.key}_${side}`" width="full" :decimals="filter.decimals ?? 0"
+                :suffix="filter.unit" :label="t(side === 'min' ? 'core.collection.filters.range_from' : 'core.collection.filters.range_until')" @update:model-value="(value) => setRange(filter.key, side, value)" />
             </div>
           </div>
 
@@ -290,14 +294,8 @@ defineExpose({ present });
             <Icon name="arrowRightSLine" :size="18" class="shrink-0 text-content-muted" />
           </button>
 
-          <div v-else>
-            <p class="mb-1.5 text-footnote font-medium text-content-muted">{{ filter.label }}</p>
-            <Menu :items="menuItems(filter)" :label="filter.label" placement="bottom-start">
-              <template #trigger="{ toggle, attrs, presented }">
-                <PopupButton v-bind="attrs" popup="menu" :expanded="presented" :disabled="!!filter.dependsOn && optionsFor(filter).length === 0" @click="toggle">{{ valueLabel(filter) }}</PopupButton>
-              </template>
-            </Menu>
-          </div>
+          <SelectField v-else :model-value="draft[filter.key] ?? ''" :label="filter.label" :options="selectOptions(filter)" :disabled="!!filter.dependsOn && optionsFor(filter).length === 0"
+            @update:model-value="(value) => setValue(filter.key, value === '' ? null : value)" />
         </template>
       </div>
     </template>
