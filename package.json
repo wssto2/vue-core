@@ -60,6 +60,14 @@
       "types": "./dist/platform/index.d.ts",
       "import": "./dist/platform/index.js"
     },
+    "./router": {
+      "types": "./dist/router/index.d.ts",
+      "import": "./dist/router/index.js"
+    },
+    "./app": {
+      "types": "./dist/app/index.d.ts",
+      "import": "./dist/app/index.js"
+    },
     "./format": {
       "types": "./dist/format/index.d.ts",
       "import": "./dist/format/index.js"
