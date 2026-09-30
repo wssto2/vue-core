@@ -39,7 +39,7 @@ export interface ShellDefinition {
 
 /** Where an error the application caught came from. */
 export interface ApplicationErrorReport {
-  readonly source: "vue" | "unhandledrejection" | "window" | "effect" | "messages" | "session" | "router";
+  readonly source: "vue" | "unhandledrejection" | "window" | "effect" | "messages" | "session" | "router" | "locale";
   readonly error: unknown;
   /** The route the user was on, when there was one. */
   readonly route: string | null;
@@ -102,6 +102,12 @@ export interface ApplicationOptions {
   noAccess?: Component;
   /** Identifies a session for session effects: they restart when it changes. Default: the user's id. */
   sessionKey?: (session: SessionSnapshot) => string;
+  /**
+   * Called after a switch to another locale committed (not for the start locale, a switch to the locale already active, or a
+   * switch a later one superseded), so the application can save the choice on the user. Not awaited: the page has already
+   * changed; a failure (thrown or rejected) is reported to `onError` with `source: "locale"`.
+   */
+  onLocaleChange?: (locale: string) => void | Promise<void>;
   /** Called with every error the application catches (component errors, unhandled rejections, failed effects and loads). Default: `console.error`. */
   onError?: (report: ApplicationErrorReport) => void;
 }
@@ -253,7 +259,19 @@ export function createApplication(options: ApplicationOptions): Application {
     state,
     locale: computed(() => composer.locale.value),
     locales: supportedLocales,
-    setLocale: (locale) => messages.setLocale(locale),
+    setLocale: async (locale) => {
+      const before = composer.locale.value;
+      const committed = await messages.setLocale(locale);
+      if (committed && composer.locale.value !== before) {
+        const failed = (error: unknown) => report({ source: "locale", error, detail: locale });
+        try {
+          void Promise.resolve(options.onLocaleChange?.(locale)).catch(failed);
+        } catch (error) {
+          failed(error);
+        }
+      }
+      return committed;
+    },
     retry: () => retry(),
   };
 

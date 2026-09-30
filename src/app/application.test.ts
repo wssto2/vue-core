@@ -352,6 +352,43 @@ describe("message namespaces", () => {
     expect(target.textContent).toBe("Vstopnice");
   });
 
+  it("onLocaleChange is called once per committed switch, never for a superseded one, the same locale or a failing save", async () => {
+    const { platform } = fakeBackend(signedIn(1));
+    const slowHr = deferred<{ default: Record<string, unknown> }>();
+    const slow = localeMessages("tickets", { en: async () => ({ default: { title: "Tickets" } }), hr: () => slowHr.promise, sl: async () => ({ default: { title: "Vstopnice" } }) });
+    const changes: string[] = [];
+    const reports: unknown[] = [];
+    let failing = false;
+    const application = createApplication(
+      options(platform, [loginFeature, defineFeature({ id: "tickets", routes: [{ name: "tickets.index", path: "/tickets", component: label }], messages: slow })], "/tickets", {
+        onLocaleChange: async (locale) => {
+          changes.push(locale);
+          if (failing) throw new Error("save failed");
+        },
+        onError: (report) => reports.push(report),
+      }),
+    );
+    await start(application);
+    expect(changes).toEqual([]); // the start locale is not a change
+
+    const toHr = application.setLocale("hr");
+    const toSl = application.setLocale("sl");
+    await toSl;
+    slowHr.resolve({ default: { title: "Tiketi" } });
+    expect(await toHr).toBe(false);
+    await settle();
+    expect(changes).toEqual(["sl"]); // hr was superseded
+
+    await application.setLocale("sl");
+    expect(changes).toEqual(["sl"]); // already active
+
+    failing = true;
+    expect(await application.setLocale("en")).toBe(true); // the switch stands
+    await settle();
+    expect(changes).toEqual(["sl", "en"]);
+    expect(reports).toMatchObject([{ source: "locale", detail: "en" }]);
+  });
+
   it("a failed optional load reports, falls back and is retried on the next visit", async () => {
     const { platform } = fakeBackend(signedIn(1));
     let fail = true;
