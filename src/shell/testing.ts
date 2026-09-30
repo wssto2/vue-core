@@ -40,8 +40,11 @@ export async function startShell(shell: Component | ShellDefinition, settings: {
   location?: string;
   session?: SessionSnapshot | null;
   extra?: Partial<ApplicationOptions>;
+  /** Steers the fake backend before the application starts. */
+  prepare?: (backend: ReturnType<typeof fakeBackend>["backend"]) => void;
 } = {}): Promise<Started> {
   const { platform, backend } = fakeBackend(settings.session === undefined ? signedIn(1) : settings.session);
+  settings.prepare?.(backend);
   const application = createApplication(options(platform, [baseFeature, ...(settings.features ?? [])], settings.location ?? "/", { shell, ...settings.extra }));
   const target = document.createElement("div");
   document.body.append(target);

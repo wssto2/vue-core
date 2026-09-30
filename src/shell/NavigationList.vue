@@ -5,6 +5,7 @@ import { RouterLink, type RouteLocationRaw } from "vue-router";
 import { Icon } from "../icon";
 import { useNavigation, type NavigationItem } from "../router/navigation";
 import { useKnownIcon } from "./icons";
+import { isPlainClick } from "./links";
 import { groupNavigation } from "./navigationGroups";
 
 /**
@@ -34,8 +35,7 @@ const known = useKnownIcon();
 const groups = computed(() => groupNavigation(props.items ?? fromApplication?.value ?? []));
 
 function follow(event: MouseEvent, navigate: (event: MouseEvent) => unknown, to: RouteLocationRaw) {
-  const plain = event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.defaultPrevented;
-  if (props.appearance === "drawer" && plain) {
+  if (props.appearance === "drawer" && isPlainClick(event)) {
     event.preventDefault();
     emit("select", to);
     return;

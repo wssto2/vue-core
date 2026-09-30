@@ -15,7 +15,7 @@ import { headerSurfaceKey } from "./accountMenu";
  *
  * `badge` is a count (capped visually by the caller) or `"dot"` for "something needs you".
  */
-const props = defineProps<{
+defineProps<{
   label: string;
   icon: IconName;
   /** Makes it a link to a route. */
