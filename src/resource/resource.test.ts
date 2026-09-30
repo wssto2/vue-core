@@ -234,10 +234,20 @@ describe("useRouteResource", () => {
     await page.router.push("/elsewhere");
     await settle();
     expect(load).toHaveBeenCalledTimes(1);
+    expect(page.container.textContent).toBe("elsewhere");
+    page.unmount();
     expect(signals[0]?.aborted).toBe(true);
     read.resolve(ticket(1));
     await settle();
-    expect(page.container.textContent).toBe("elsewhere");
+  });
+
+  it("keeps showing its record while it is still mounted after the route left it (a leave transition), not 'not found'", async () => {
+    const page = await openAt("/tickets/6", async (id) => ticket(id));
+    await settle();
+    // The route has moved on but the page has not unmounted yet: its parameter is gone.
+    await page.router.push("/elsewhere");
+    expect(page.resource().id.value).toBe(6);
+    expect(page.state()).toEqual({ status: "loaded", value: ticket(6) });
   });
 
   it("names the key when a section asks for a resource nobody provided", () => {

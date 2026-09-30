@@ -1,4 +1,4 @@
-import { computed, hasInjectionContext, inject, provide, type InjectionKey } from "vue";
+import { hasInjectionContext, inject, provide, shallowRef, watch, type InjectionKey } from "vue";
 import { useRoute } from "vue-router";
 import { MissingContextError } from "../platform/context";
 import { positiveInteger, useResource, type IdentifyOption, type Resource, type ResourceBaseOptions, type ResourceId } from "./resource";
@@ -32,6 +32,8 @@ export interface RouteResourceOptions<T, Id extends ResourceId = number> extends
  * - A parameter change clears the previous record and aborts its read; a response for a record the
  *   route has left is dropped. A save that finishes after the user moved on is ignored by `update`:
  *   the record says which one it is (its `id`, or `identify` when it has none).
+ * - Once the route leaves the page (the parameter is gone while the page is still mounted, in a leave
+ *   transition) the page keeps its record: nothing is read and nothing flashes "not found".
  * - Failure is told apart: `notFound` (404, or no such identity) and `unavailable` (retry).
  */
 export function useRouteResource<T>(options: RouteResourceOptions<T> & IdentifyOption<T, number> & { readonly parse?: undefined }): RouteResource<T>;
@@ -43,14 +45,21 @@ export function useRouteResource<T, Id extends ResourceId>(
 ): RouteResource<T, Id> {
   const route = useRoute();
   const parse = options.parse ?? (positiveInteger as unknown as (raw: string) => Id | null);
-  const resource = useResource<T, Id>({
-    ...options,
-    for: computed(() => {
-      const raw = route.params[options.param];
+  // The identity follows the parameter, except when the parameter disappears: the route has moved on and
+  // this page is only still mounted (a leave transition), so it keeps showing its record instead of "not found".
+  const identity = shallowRef<Id | null>(null);
+  let started = false;
+  watch(
+    () => route.params[options.param],
+    (raw) => {
+      if (raw === undefined && started) return;
+      started = true;
       const text = Array.isArray(raw) ? raw[0] : raw;
-      return text === undefined ? null : parse(text);
-    }),
-  });
+      identity.value = text === undefined ? null : parse(text);
+    },
+    { immediate: true, flush: "sync" },
+  );
+  const resource = useResource<T, Id>({ ...options, for: identity });
   if (options.key) provide(options.key, resource);
   return resource;
 }
