@@ -3,4 +3,5 @@ export type { Resource, ResourceContext, ResourceId, ResourceOptions, ResourceSt
 export { useRouteResource, useRouteResourceContext } from "./routeResource";
 export type { RouteResource, RouteResourceOptions } from "./routeResource";
 export type { RecordListContext, RecordNeighbors } from "./listContext";
+export { default as RecordPager } from "./RecordPager.vue";
 export { default as ResourcePage } from "./ResourcePage.vue";

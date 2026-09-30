@@ -14,7 +14,6 @@ export type { SavedView, SavedViews, SavedViewState } from "./savedViews";
 export { default as CollectionPage } from "./CollectionPage.vue";
 export { default as CollectionTable } from "./CollectionTable.vue";
 export { default as CollectionCell } from "./CollectionCell.vue";
-export { default as NeighborPager } from "./NeighborPager.vue";
 export { default as RecordIdentity } from "./RecordIdentity.vue";
 export { DATE_PRESETS, useDatePresetFilter } from "./datePresets";
 export type { CellSlots, CollectionSlots } from "./slots";

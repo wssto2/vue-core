@@ -1,0 +1,35 @@
+/* The brand accent: the palettes and the "Accent" variables of the library's theme.css, redefined
+   after it (light on :root, dark on .dark). Status colours never follow the brand. */
+:root {
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+  --color-primary-950: #172554;
+  --color-anchor-800: #1B2A4A;
+  --color-anchor-900: #111C33;
+  --color-anchor-950: #0A1222;
+
+  --app-tint: #1D4ED8;
+  --app-tint-soft: #E8EFFD;
+  --app-control-on: #2563EB;
+  --app-tile-brand: #2563EB;
+  --app-tile-anchor: #1B2A4A;
+  --app-tile-anchor-foreground: #93C5FD;
+  --app-content-inverse-accent: #93C5FD;
+}
+
+.dark {
+  --app-tint: #60A5FA;
+  --app-tint-soft: #1B2A4A;
+  --app-control-on: #3B82F6;
+  --app-content-on-tint: #0A1222;
+  --app-tile-anchor: #22335C;
+  --app-content-inverse-accent: #1D4ED8;
+}

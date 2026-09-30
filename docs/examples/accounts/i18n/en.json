@@ -1,0 +1,9 @@
+{
+  "title": "Accounts",
+  "record": "Account",
+  "plan": "Plan",
+  "active": "Active",
+  "inactive": "Inactive",
+  "sections": { "label": "Parts of the account", "general": "General", "activity": "Activity" },
+  "activity": { "empty": "Nothing happened yet." }
+}

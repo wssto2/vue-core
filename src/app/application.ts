@@ -39,7 +39,7 @@ export interface ShellDefinition {
 
 /** Where an error the application caught came from. */
 export interface ApplicationErrorReport {
-  readonly source: "vue" | "unhandledrejection" | "window" | "effect" | "messages" | "session" | "router";
+  readonly source: "vue" | "unhandledrejection" | "window" | "effect" | "messages" | "session" | "router" | "locale";
   readonly error: unknown;
   /** The route the user was on, when there was one. */
   readonly route: string | null;
@@ -78,6 +78,12 @@ export interface ApplicationLocaleOptions {
   fallback?: string;
   /** The locales the application offers. Default: the library's (`en`, `hr`, `bs`, `sl`). */
   supported?: readonly string[];
+  /**
+   * Called after a switch to another locale committed (not for the start locale, a switch to the locale already active, or a
+   * switch a later one superseded), so the application can save the choice on the user. Not awaited: the page has already
+   * changed; a failure (thrown or rejected) is reported to `onError` with `source: "locale"`.
+   */
+  onChange?: (locale: string) => void | Promise<void>;
 }
 
 export interface ApplicationOptions {
@@ -94,8 +100,8 @@ export interface ApplicationOptions {
   formatting?: Partial<Formatters>;
   /** Message namespaces the application or its shell owns itself, outside any feature. */
   messages?: readonly MessageNamespace[];
-  /** The application's icons (`installIcons`). */
-  icons?: IconSet;
+  /** The application's icons (`installIcons`): one set, or several partial ones (a feature's own) that are merged. */
+  icons?: IconSet | readonly IconSet[];
   /** The backend's destination catalogue, for validating the features' bindings. */
   navigation?: NavigationCatalogue;
   /** What stands in place of a page the user may not open. */
@@ -253,7 +259,19 @@ export function createApplication(options: ApplicationOptions): Application {
     state,
     locale: computed(() => composer.locale.value),
     locales: supportedLocales,
-    setLocale: (locale) => messages.setLocale(locale),
+    setLocale: async (locale) => {
+      const before = composer.locale.value;
+      const committed = await messages.setLocale(locale);
+      if (committed && composer.locale.value !== before) {
+        const failed = (error: unknown) => report({ source: "locale", error, detail: locale });
+        try {
+          void Promise.resolve(options.locale?.onChange?.(locale)).catch(failed);
+        } catch (error) {
+          failed(error);
+        }
+      }
+      return committed;
+    },
     retry: () => retry(),
   };
 
@@ -311,7 +329,7 @@ export function createApplication(options: ApplicationOptions): Application {
   installFormatting(app, formatting);
   pageChrome = installPageChrome(app);
   installBottomDock(app);
-  if (options.icons) installIcons(app, options.icons);
+  if (options.icons) installIcons(app, ...(Array.isArray(options.icons) ? options.icons : [options.icons as IconSet]));
   app.provide(applicationKey, environment);
   app.provide(navigationKey, navigation);
   app.provide(shellContributionsKey, contributions);

@@ -99,7 +99,7 @@ export function createNavigation(options: NavigationOptions): ComputedRef<readon
       const children = resolve(node.children ?? [], key);
       if (node.route === undefined) return children.length > 0 ? [item(node, key, null, children, false)] : [];
 
-      const bound = destinations.get(node.route);
+      const bound = (destinations as ReadonlyMap<string, OwnedNavigationBinding>).get(node.route); // the server's token: any string, not only a declared destination
       if (!bound) return [];
       const { to, within = [] } = bound.binding;
       const inside = within.some((name) => router.currentRoute.value.matched.some((record) => record.name === name));

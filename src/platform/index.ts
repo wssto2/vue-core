@@ -9,8 +9,8 @@ export { httpSessionAdapter, parseSessionPayload } from "./httpSession";
 export type { HttpSessionOptions, UserParser } from "./httpSession";
 export { createPlatform, installPlatform, platformKey, usePlatform } from "./platform";
 export type { Platform, PlatformOptions } from "./platform";
-export { createSession } from "./session";
-export type { Session, SessionAdapter, SessionEnd, SessionOptions, SessionSnapshot, SessionState, SessionUser } from "./session";
+export { beforeSignOutTimeout, createSession } from "./session";
+export type { BeforeSignOutHook, Session, SessionAdapter, SessionEnd, SessionOptions, SessionSnapshot, SessionState, SessionUser } from "./session";
 
 /**
  * The permission identifiers of the application. The library declares none: an app adds its own by

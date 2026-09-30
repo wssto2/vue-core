@@ -266,6 +266,7 @@ describe("BackofficeShell on a phone", () => {
     const bar = within(topBar()!);
     expect(bar.queryByRole("button", { name: "Menu" })).toBeNull(); // a record page has a back, not the menu
     expect(bar.getByRole("button", { name: "Leads" })).toBeTruthy();
+    expect(topBar()!.querySelector("[data-shell-bar-back] svg")!.getAttribute("width")).toBe("28"); // ARV's chevron size
     expect(topBar()!.querySelector("[data-shell-bar-title]")!.textContent).toBe("Lead 7");
     await fireEvent.click(bar.getByRole("button", { name: "Save changes" }));
     expect(save).toHaveBeenCalledTimes(1);

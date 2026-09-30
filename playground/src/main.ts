@@ -21,7 +21,7 @@ const i18n = createI18n({ legacy: false, locale: "en", fallbackLocale: "en", mes
 app.use(i18n);
 installFormatting(app, createFormatting({ locale: () => i18n.global.locale.value }));
 app.use(createRouter({ history: createWebHashHistory(), routes: [{ path: "/:rest(.*)*", component: { render: () => null } }] }));
-installIcons(app, { ...appIcons, ...shellIcons });
+installIcons(app, appIcons, shellIcons);
 installPageChrome(app);
 installBottomDock(app);
 

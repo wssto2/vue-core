@@ -35,7 +35,7 @@ async function open(definition: ReturnType<typeof setup>["definition"], id: numb
   const { result } = inApp(
     () => {
       const route = useRoute();
-      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID" });
+      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID", backLabel: "Tickets" });
     },
     { router, platform },
   );
@@ -78,6 +78,24 @@ describe("useCollectionNeighbors", () => {
     expect(middle.next.value).toMatchObject({ key: 6, to: { query: { from: stateOf(definition, { page: 2 }) } } });
   });
 
+  it("supplies the record page's list context: back with the list's state, the pager from the neighbors", async () => {
+    const { definition } = setup();
+    const { neighbors } = await open(definition, 6, stateOf(definition, { page: 2 }));
+
+    expect(neighbors.context.back).toMatchObject({ label: "Tickets", to: { name: "list", query: { query: stateOf(definition, { page: 2 }) } } });
+    expect(neighbors.context.neighbors).toMatchObject({ position: 6, total: 12, previous: { params: { recordID: "5" } }, next: { params: { recordID: "7" } } });
+
+    const edge = (await open(definition, 12, stateOf(definition, { page: 3 }))).neighbors;
+    expect(edge.context.neighbors).toMatchObject({ position: 12, next: null });
+  });
+
+  it("has a list context for a direct link too: back to the plain list, no pager", async () => {
+    const { definition } = setup();
+    const { neighbors } = await open(definition, 3, null);
+    expect(neighbors.context.back).toEqual({ label: "Tickets", to: { name: "list" } });
+    expect(neighbors.context.neighbors).toBeNull();
+  });
+
   it("finds a record that slipped to the neighboring page", async () => {
     const { definition } = setup();
     const { neighbors } = await open(definition, 7, stateOf(definition, { page: 1 }));
@@ -112,7 +130,7 @@ describe("useCollectionNeighbors", () => {
     const router = await makeRouter(`/records/5?from=${from}`);
     const { result: neighbors } = inApp(() => {
       const route = useRoute();
-      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID" });
+      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID", backLabel: "Tickets" });
     }, { router });
     await flush();
     expect(neighbors.position.value).toBe(5);
@@ -139,7 +157,7 @@ describe("useCollectionNeighbors", () => {
     const router = await makeRouter(`/records/b2?from=${encodeState(definition, definition.defaults)}`);
     const { result } = inApp(() => {
       const route = useRoute();
-      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID" });
+      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID", backLabel: "Tickets" });
     }, { router });
     await flush();
     expect(result.position.value).toBe(2);
@@ -153,7 +171,7 @@ describe("useCollectionNeighbors", () => {
     const router = await makeRouter(`/records/1?from=${at(1)}`);
     const { result: neighbors } = inApp(() => {
       const route = useRoute();
-      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID" });
+      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID", backLabel: "Tickets" });
     }, { router });
     await flush();
     expect(neighbors.position.value).toBe(1);

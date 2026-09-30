@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": [],
+    "paths": {
+      "@wssto2/vue-core": ["../../src/index.ts"],
+      "@wssto2/vue-core/*": ["../../src/*/index.ts"]
+    }
+  },
+  "include": ["./**/*"]
+}

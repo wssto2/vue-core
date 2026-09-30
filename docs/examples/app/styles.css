@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@import "@wssto2/vue-core/tailwind.css";
+@import "@wssto2/vue-core/fonts.css";
+@import "./brand.css";

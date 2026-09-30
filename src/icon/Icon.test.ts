@@ -1,6 +1,7 @@
 import { render } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { iconSetKey } from "./environment";
+import { createApp, defineComponent, h, inject } from "vue";
+import { iconSetKey, installIcons, provideIcons } from "./environment";
 import Icon from "./Icon.vue";
 import type { IconName } from "./index";
 
@@ -81,5 +82,34 @@ describe("Icon", () => {
     const { container } = render(Icon, { props: { name: named("broken") }, ...provide({ broken: "<div>no</div>" }) });
 
     expect(container.querySelector("svg")).toBeNull();
+  });
+
+  describe("partial sets", () => {
+    const car = '<svg viewBox="0 0 24 24"><path id="car" d="M0 0"/></svg>';
+    const user = '<svg viewBox="0 0 24 24"><path id="user" d="M0 0"/></svg>';
+    const installed = (...sets: Record<string, string>[]) => {
+      const app = createApp(defineComponent({ render: () => null }));
+      installIcons(app, ...(sets as never[]));
+      return app._context.provides[iconSetKey as symbol] as Record<string, string>;
+    };
+
+    it("merges the sets of several features", () => {
+      expect(installed({ carLine: car }, { userLine: user })).toEqual({ carLine: car, userLine: user });
+    });
+
+    it("throws naming the icon and both sets when a name is in two", () => {
+      expect(() => installed({ carLine: car }, { userLine: user }, { carLine: user })).toThrow(/"carLine".*#1 and #3/);
+    });
+
+    it("adds to the installed icons below the caller instead of replacing them", () => {
+      let seen: Record<string, string> = {};
+      const Child = defineComponent({ render() { seen = inject(iconSetKey as never, {}) as Record<string, string>; return null; } });
+      const Parent = defineComponent({ setup() { provideIcons({ userLine: user } as never); return () => h(Child); } });
+      const app = createApp(Parent);
+      installIcons(app, { carLine: car } as never);
+      app.mount(document.createElement("div"));
+
+      expect(seen).toEqual({ carLine: car, userLine: user });
+    });
   });
 });

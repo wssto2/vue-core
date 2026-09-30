@@ -36,7 +36,7 @@ export default defineComponent({
       if (!svg) {
         if (reported !== props.name) {
           reported = props.name;
-          console.error(`[vue-core] Icon "${props.name}" is neither in the installed icon set (installIcons) nor a library icon.`);
+          console.error(`[vue-core] Icon "${props.name}" is in no installed icon set and is not a library icon: add its SVG to a set passed to installIcons() / createApplication({ icons }).`);
         }
         return null;
       }

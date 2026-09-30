@@ -81,11 +81,6 @@
         "remove_last": "Ukloni: {filter}",
         "clear_all": "Poništi sve filtere",
         "search": "Pretraga"
-      },
-      "record_pager": {
-        "label": "Kretanje kroz popis",
-        "previous": "Prethodni",
-        "next": "Sljedeći"
       }
     },
     "state": {

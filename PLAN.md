@@ -90,14 +90,9 @@ playground/    Vite app consuming the package ONLY through its public exports
 | V6 | P08.08 | Invalid / direct / 404 / retry / racing-ID / save-after-navigation; first-accessible-section and no-access; nested back; one sidebar; a rich custom layout (lead-like) works on the same resource state |
 | V7 | P08.09 | Wrong field name rejected by `vue-tsc`; duplicate submit, leave/discard, conflict rebase only where enabled, foreign-field errors, first-error focus, failed save keeps the draft, save-succeeded-refresh-failed; full-record vs dedicated-endpoint group saves stay explicit (D22) |
 
-### Follow-ups (small, not yet assigned)
+### Follow-ups
 
-- `installIcons` accepts partial icon sets and merges them (modular sets per feature), still type-checked against `IconRegistry` (V4b Q6).
-- `Icon` size 28 for the top-bar back chevron, to keep ARV's look (V4b Q8).
-- `createApplication({ onLocaleChange })` so an app can persist the chosen locale on the user (ARV does) (V4b Q5).
-- Bridge V5 ↔ V6: `useCollectionNeighbors` yields a `RecordListContext` for `ResourcePage` (one record pager, not V5's `NeighborPager` and V6's private `RecordPager` side by side).
-- Search-text highlight in `RecordIdentity` (ARV's `SearchableToken`) (V5 Q3).
-- A before-sign-out hook on the session (ARV removes the push subscription while the session still exists) — needed by the notifications module (V4b Q4).
+All V4b–V6 follow-ups were done in V8.
 
 Later (not in this run; they need go-core backend modules first): users & sign-in, roles, notifications, home/dashboard UI modules; switching arv-next onto the package.
 
@@ -113,4 +108,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | V5 | Done | aa1fe81…bc3a747, merge into main | Accepted 2026-10-01. `CollectionPage` justified (customer list 55 lines vs ARV 222, lead 84 vs 470). Sort keeps the page (as ARV); URL state via replace (as ARV); failed load = warning banner with retry (ARV showed "No data"); record pager keys don't auto-repeat. ARV bugs #60–73. |
 | V6 | Done | d0a123c…3a96af9, merge be7b4e0 | Accepted 2026-10-01; checked in the browser (dealer sections, lead rich layout). Dependent `useResource({ for: record })` waits for its parent (fixed c0ad1c0, verified in the browser). ResourcePage defaults to `width="content"`; `steps`/`hub` navigator variants not ported. ARV bugs #80–86. |
 | V7 | Pending | | |
-| V8 | Pending | | |
+| V8 | Done | 7a2f545…438314a + locale.onChange | Accepted 2026-10-01. Partial icon sets; icon size 28; `locale.onChange` (moved from top-level `onLocaleChange` in review); before-sign-out hooks (3 s cap); one `RecordPager` in `resource` fed by `useCollectionNeighbors(...).context`; search highlight (title only, as ARV); README + recipes whose snippets are compiled (`check:docs`). |

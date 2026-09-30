@@ -28,7 +28,7 @@ const application = createApplication({
   shell: custom
     ? { component: CustomShell, slots: ["headerActions", "accountMenu", "host"] }
     : backofficeShell({ identity: (user: Employee) => ({ name: user.name, detail: user.email }) }),
-  icons: { ...appIcons, ...shellIcons },
+  icons: [appIcons, shellIcons],
   i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports", records: "Records", customers: "Customers", leads: "Leads" } }, hr: { nav: { work: "Rad", tickets: "Tiketi", reports: "Izvještaji", records: "Zapisi", customers: "Kupci", leads: "Upiti" } } } },
   navigation: { known: ["tickets", "reports", "records", "customers", "leads", "forms"] },
   features: [

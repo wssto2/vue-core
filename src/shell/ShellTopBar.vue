@@ -84,7 +84,7 @@ function goBack() {
         <button v-else-if="back" type="button" data-shell-bar-back
           class="hit-target inline-flex min-w-0 cursor-pointer items-center rounded-control pr-2 text-body text-content-link active:opacity-60"
           @click="goBack">
-          <Icon name="arrowLeftSLine" :size="32" class="-mr-1 shrink-0" />
+          <Icon name="arrowLeftSLine" :size="28" class="-mr-0.5 shrink-0" />
           <!-- Once the title takes the middle, the back button shrinks to its arrow (the label would run into the title); the label stays for screen readers. -->
           <span class="truncate" :class="showTitle ? 'sr-only' : ''">{{ back.label }}</span>
         </button>
