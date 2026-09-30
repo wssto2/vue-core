@@ -55,6 +55,28 @@ for (const name of ["vue", "vue-router", "vue-i18n"]) {
 if (existsSync(join(installed, "node_modules"))) fail("the installed package carries its own node_modules");
 console.log("vue, vue-router and vue-i18n: one copy each, none nested in the package");
 
+step("subpaths resolve in Node and share one ApiError class");
+// Imports through the package name from inside the playground: the exports map, the shared chunk
+// and the peers all have to work for a consumer, not just exist on disk.
+run(
+  "node",
+  [
+    "--input-type=module",
+    "-e",
+    `
+    import { ApiError, createHttpClient } from "@wssto2/vue-core/client";
+    import { createPlatform, parseSessionPayload } from "@wssto2/vue-core/platform";
+    let thrown;
+    try { parseSessionPayload("x"); } catch (error) { thrown = error; }
+    if (!(thrown instanceof ApiError)) throw new Error("the platform subpath throws its own ApiError class, not the client subpath's");
+    const platform = createPlatform({ config: { apiBase: "", locale: "en", appName: null, capabilities: [] }, transport: async () => { throw new Error("no requests at construction"); } });
+    if (typeof createHttpClient !== "function" || platform.session.state.value.status !== "unknown") throw new Error("platform did not build");
+    console.log("client and platform subpaths import; ApiError is one class");
+    `,
+  ],
+  playground,
+);
+
 step("packed output is free of app knowledge");
 const pkg = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"));
 const forbidden = [
