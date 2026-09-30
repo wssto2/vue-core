@@ -3,6 +3,7 @@ import { useForm } from "./useForm";
 import { useResourceForm } from "./useResourceForm";
 import type { FormValidator } from "./validation";
 import type { Resource } from "../resource";
+import { useGroupSheet } from "./useGroupSheet";
 
 interface Ticket {
   readonly id: number;
@@ -75,3 +76,28 @@ useResourceForm({
   toValues: (ticket) => ({ subject: ticket.id }),
   save: async (_payload, ticket) => ticket,
 });
+
+// a group sheet: its fields are fields of the record's form, and a dedicated endpoint receives exactly them
+useGroupSheet({ form: record, group: "general", fields: ["subject"] });
+useGroupSheet({
+  form: record,
+  group: "general",
+  fields: ["subject", "dueOn"],
+  save: async (changes) => {
+    const due: string | null = changes.dueOn;
+    void due;
+  },
+});
+useGroupSheet({
+  form: record,
+  group: "general",
+  fields: ["subject"],
+  save: async (changes) => {
+    // @ts-expect-error dueOn is not one of the sheet's fields, so a dedicated endpoint never receives it
+    void changes.dueOn;
+  },
+});
+// @ts-expect-error a field the record's form does not have
+useGroupSheet({ form: record, group: "general", fields: ["subject", "nope"] });
+// a rebase needs a form that can take a freshly read record as its base
+useGroupSheet({ form: record, group: "general", fields: ["subject"], rebase: { reload: async () => undefined, message: () => "stale" } });

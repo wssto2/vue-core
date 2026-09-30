@@ -3,8 +3,8 @@ import type { Resource, ResourceId } from "../resource";
 import { cloneValue } from "./snapshot";
 import { useForm, type Form, type FormOptions, type SubmitContext, type SubmitResult } from "./useForm";
 
-/** The part of a `Resource` a record form reads: the loaded record, its identity, and where a saved record goes. */
-export type RecordSource<Record> = Pick<Resource<Record, ResourceId>, "id" | "data" | "update" | "reload">;
+/** The part of a `Resource` a record form reads: the loaded record, its state, its identity, and where a saved record goes. */
+export type RecordSource<Record> = Pick<Resource<Record, ResourceId>, "id" | "data" | "state" | "update" | "reload">;
 
 export interface RecordFormOptions<Record, Values extends object, Output = Values> extends FormOptions<Values, Output> {
   /** The record the page already loaded (`useRouteResource`). The form never fetches its own copy: it is filled from this one. */
@@ -28,8 +28,12 @@ export interface RecordForm<Record, Values extends object, Output = Values> exte
    * value once, without a further request, and the form takes it as draft and baseline.
    */
   save(options?: { readonly refresh?: (saved: Record) => Promise<unknown> | unknown }): Promise<SubmitResult<Record>>;
-  /** After the record was read again: takes the new record as the base and lays the draft of `keep` on top of it (a stale save, rebased). The result is dirty: saving stays a deliberate act. */
-  rebase(keep: readonly (keyof Values & string)[]): void;
+  /**
+   * After the record was read again: takes the new record as the base and lays the draft of `keep` on top of it (a stale save,
+   * rebased). With fields kept the result is dirty: saving stays a deliberate act. Returns false, changing nothing, when the
+   * resource does not hold a freshly loaded record (the read failed).
+   */
+  rebase(keep?: readonly (keyof Values & string)[]): boolean;
 }
 
 /**
@@ -100,12 +104,13 @@ export function useResourceForm<Record, Values extends object, Output = Values>(
     record: computed(() => held.value),
     outdated: computed(() => outdated.value),
     save,
-    rebase(keep) {
+    rebase(keep = []) {
       const record = options.source.data.value;
-      if (!record) return;
+      if (!record || options.source.state.value.status !== "loaded") return false;
       const mine = Object.fromEntries(keep.map((field) => [field, cloneValue(form.values[field])])) as Partial<Values>;
       take(record);
       Object.assign(form.values, mine);
+      return true;
     },
     reset() {
       const record = held.value;
