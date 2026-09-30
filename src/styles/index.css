@@ -1,5 +1,6 @@
 /* Entry of the prebuilt stylesheet, dist/styles.css. */
-@import "tailwindcss";
+/* Utilities are generated for the library's own sources only (not playground/). */
+@import "tailwindcss" source("../");
 @import "./fonts.css";
 /* static: the prebuilt file carries every token as a CSS variable, used here or not. */
 @import "./tailwind.css" theme(static);
