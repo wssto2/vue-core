@@ -108,5 +108,5 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | V4 | Done | ddb4446…7165912 | Accepted 2026-09-30. Denied routes render a derived no-access state (URL kept, live on permission refresh); nested outlets must be `AppRouterView`; dates numeric by default via `useFormat` (ARV passes its own); record titles with data come from page chrome (V6); `useAppUpdates` + view transitions go to V4b. ARV bugs #30–38. |
 | V4b | Done | 5fce035…64091d3 | Accepted 2026-10-01; checked in the browser (desktop sidebar, phone push drawer). Progress bar after 0.3 s (D23), sign-out failure now a toast, tablet sidebar holds still (bug #44). ARV bugs #40–48. |
 | V5 | Pending | | |
-| V6 | Pending | | |
+| V6 | Done (fix pending) | d0a123c…3a96af9, merge be7b4e0 | Accepted 2026-10-01; checked in the browser (dealer sections, lead rich layout). Pending fix: a dependent `useResource({ for })` must wait for its parent (lead not-found showed two banners + sections). ResourcePage defaults to `width="content"`; `steps`/`hub` navigator variants not ported. ARV bugs #80–86. |
 | V7 | Pending | | |
