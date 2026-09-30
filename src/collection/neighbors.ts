@@ -1,6 +1,7 @@
 import { getCurrentScope, onScopeDispose, ref, shallowRef, watch, type Ref } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 import { isAborted } from "../client";
+import type { RecordListContext } from "../resource/listContext";
 import type { CollectionDefinition } from "./definition";
 import { LIST_CONTEXT_PARAM } from "./location";
 import { onSessionChange } from "./session";
@@ -24,6 +25,11 @@ export interface CollectionNeighbors {
   readonly loading: Readonly<Ref<boolean>>;
   /** The list as the user left it (its route with the state in the query); null without list state. */
   readonly listRoute: Readonly<Ref<RouteLocationRaw | null>>;
+  /**
+   * What a record page takes as `list` (`<ResourcePage :list="neighbors.context">`, or its `back` and pager in a page of its own):
+   * back to the list as the user left it (the plain list without state), and the pager once the record's place is known.
+   */
+  readonly context: RecordListContext;
 }
 
 export interface NeighborOptions {
@@ -33,6 +39,8 @@ export interface NeighborOptions {
   current: () => string | number | null | undefined;
   /** The list's route, for `listRoute`. */
   list: RouteLocationRaw;
+  /** What the back link to the list says ("Tickets"); a function follows the locale. */
+  backLabel: string | (() => string);
   /** The record route's parameter that holds the key: a neighbor's page is the current route with this parameter replaced. */
   param: string;
   /** The URL key the list keeps its state under. Default `"query"`. */
@@ -194,5 +202,14 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
     void resolve();
   });
 
-  return { position, total, previous, next, loading, listRoute };
+  const context: RecordListContext = {
+    get back() {
+      return { label: typeof options.backLabel === "function" ? options.backLabel() : options.backLabel, to: listRoute.value ?? options.list };
+    },
+    get neighbors() {
+      return position.value === null ? null : { position: position.value, total: total.value, previous: previous.value?.to ?? null, next: next.value?.to ?? null };
+    },
+  };
+
+  return { position, total, previous, next, loading, listRoute, context };
 }

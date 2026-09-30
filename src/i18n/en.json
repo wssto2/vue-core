@@ -78,11 +78,6 @@
         "remove_last": "Remove: {filter}",
         "clear_all": "Clear all filters",
         "search": "Search"
-      },
-      "record_pager": {
-        "label": "List navigation",
-        "previous": "Previous",
-        "next": "Next"
       }
     },
     "state": {
