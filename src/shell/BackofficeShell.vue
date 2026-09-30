@@ -3,7 +3,6 @@ import { computed, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type { RouteLocationRaw } from "vue-router";
 import { ShellOutlet } from "../app/contributions";
-import { useMediaQuery } from "../internal/mediaQuery";
 import { Toaster } from "../overlay";
 import { BottomDock, usePageChromeContext } from "../page";
 import { usePlatform } from "../platform/platform";
@@ -53,9 +52,6 @@ const chrome = usePageChromeContext();
 const identity = useShellIdentity(props.identity);
 
 const authenticated = computed(() => session.state.value.status === "authenticated");
-// The sidebar mounts from md up (below, the drawer replaces it): never both, so a contribution is mounted once.
-const wide = useMediaQuery("(min-width: 48rem)");
-const sidebar = computed(() => authenticated.value && wide.value);
 const accountSheet = useTemplateRef("accountSheet");
 </script>
 
@@ -81,7 +77,7 @@ const accountSheet = useTemplateRef("accountSheet");
       </ShellTopBar>
 
       <div class="flex flex-1">
-        <ShellSidebar v-if="sidebar && identity" :identity="identity" :home="home">
+        <ShellSidebar v-if="identity" :identity="identity" :home="home">
           <template v-if="$slots.brand" #brand="scope"><slot name="brand" v-bind="scope" /></template>
           <template v-if="$slots.footer" #footer><slot name="footer" /></template>
         </ShellSidebar>
@@ -95,7 +91,7 @@ const accountSheet = useTemplateRef("accountSheet");
         </div>
       </div>
 
-      <BottomDock :class="sidebar ? 'left-64' : ''" />
+      <BottomDock :class="authenticated ? 'md:left-64' : ''" />
     </ShellStage>
 
     <AccountSheet v-if="identity" ref="accountSheet" :identity="identity" />

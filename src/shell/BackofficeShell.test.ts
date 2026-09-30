@@ -145,9 +145,9 @@ describe("BackofficeShell on a wide screen", () => {
     expect(tally.mounts).toBe(1);
   });
 
-  it("renders the bottom dock beside the sidebar", async () => {
+  it("renders the bottom dock beside the sidebar (from md up)", async () => {
     await startShell(backofficeShell(), { session, extra });
-    expect(document.querySelector("[data-bottom-dock]")!.className).toContain("left-64");
+    expect(document.querySelector("[data-bottom-dock]")!.className).toContain("md:left-64");
   });
 });
 
@@ -204,7 +204,7 @@ describe("BackofficeShell on a phone", () => {
     const menu = within(within(drawer as HTMLElement).getByRole("navigation", { name: "Menu" }));
     expect(menu.getAllByRole("link").map((link) => link.textContent?.trim())).toEqual(["Dashboard", "Other"]);
     expect(within(drawer as HTMLElement).getByText("Ana Anić")).toBeTruthy();
-    expect(document.querySelector("[data-bottom-dock]")!.className).not.toContain("left-64");
+    expect(document.querySelector("[data-bottom-dock]")!.className).toContain("md:left-64"); // a media-query class: inert on a phone
   });
 
   it("mounts a header action once in the bar, beside the menu button, and never twice when the screen changes", async () => {

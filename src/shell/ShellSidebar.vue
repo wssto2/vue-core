@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { provide } from "vue";
+import { useMediaQuery } from "../internal/mediaQuery";
 import type { RouteLocationRaw } from "vue-router";
 import { ShellOutlet } from "../app/contributions";
 import AccountMenu from "./AccountMenu.vue";
@@ -12,8 +13,8 @@ import type { ShellIdentity } from "./identity";
  * The desktop sidebar: an attached, full-height dark rail, the page's one dark surface (the
  * `anchor` palette), sticky and scrolling on its own when the menu is taller than the window. From
  * top to bottom: the brand (home) with the shell's `headerActions`, the server's menu, a `footer`
- * slot, and the account block. Mount it from the md breakpoint up (`BackofficeShell` does); phones
- * use the navigation drawer.
+ * slot, and the account block. It renders from the md breakpoint up and nothing below it (phones use
+ * the navigation drawer), so a header action contributed to the shell is mounted once, never in both.
  *
  *   <ShellSidebar :identity="identity" :home="{ name: 'home' }"><template #footer>…</template></ShellSidebar>
  */
@@ -27,10 +28,12 @@ defineSlots<{
 }>();
 
 provide(headerSurfaceKey, "rail");
+
+const wide = useMediaQuery("(min-width: 48rem)");
 </script>
 
 <template>
-  <aside data-shell-sidebar class="flex w-64 shrink-0 flex-col bg-anchor-900 dark:border-r dark:border-white/5 dark:bg-anchor-950">
+  <aside v-if="wide" data-shell-sidebar class="flex w-64 shrink-0 flex-col bg-anchor-900 dark:border-r dark:border-white/5 dark:bg-anchor-950">
     <div class="sticky top-0 flex h-screen flex-col">
       <div class="flex items-center justify-between gap-2 pt-5 pr-2 pb-3 pl-4">
         <ShellBrand :to="home" tone="light" class="min-w-0">

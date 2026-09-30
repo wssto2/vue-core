@@ -70,6 +70,7 @@ run(
     import { defineRoutes } from "@wssto2/vue-core/router";
     import { createFormatting } from "@wssto2/vue-core/format";
     import { localeMessages } from "@wssto2/vue-core/i18n";
+    import { backofficeShell, groupNavigation } from "@wssto2/vue-core/shell";
     let thrown;
     try { parseSessionPayload("x"); } catch (error) { thrown = error; }
     if (!(thrown instanceof ApiError)) throw new Error("the platform subpath throws its own ApiError class, not the client subpath's");
@@ -79,7 +80,10 @@ run(
     const routes = defineRoutes({ record: { name: "r", path: "/r/:id", component: {} } });
     const feature = defineFeature({ id: "f", routes: routes.records, messages: localeMessages("f", {}) });
     if (routes.record({ id: 1 }).name !== "r" || feature.id !== "f" || createFormatting({ locale: () => "en" }).date(new Date(2026, 8, 30)) !== "09/30/2026") throw new Error("the app, router, format and i18n subpaths did not behave");
-    console.log("client, platform, app, router, format and i18n subpaths import; ApiError is one class");
+    // The shell subpath evaluates in Node too (no window at import) and its definition names what it renders.
+    const shell = backofficeShell();
+    if (!shell.slots.includes("accountMenu") || typeof shell.progress?.start !== "function" || groupNavigation([]).length !== 0) throw new Error("the shell subpath did not behave");
+    console.log("client, platform, app, router, format, i18n and shell subpaths import; ApiError is one class");
     `,
   ],
   playground,
@@ -136,9 +140,9 @@ if (!css.includes("#6d28d9")) fail("built CSS lacks the second accent (violet)")
 // One CSS build: the app's Tailwind scans the package (`@source` in tailwind.css), so a class
 // that only a library component uses must appear in the playground's CSS. The playground's own
 // sources must not contain it, or the check proves nothing.
-const libraryOnly = ["align-[-0.125em]", "min-h-14", "z-10001"];
-// Only the CSS of the page that builds its own Tailwind (not the prebuilt stylesheet's page).
-const ownCss = built.filter((file) => /^assets\/index-.*\.css$/.test(file)).map((file) => readFileSync(join(playground, "dist", file), "utf8")).join("\n");
+const libraryOnly = ["align-[-0.125em]", "min-h-14", "z-10001", "min-h-[2.875rem]"];
+// Only the CSS of the pages that build their own Tailwind (not the prebuilt stylesheet's page); the bundler names a chunk shared by several pages after one of its modules, so the file is found by elimination.
+const ownCss = built.filter((file) => file.endsWith(".css") && !/^assets\/prebuilt-/.test(file)).map((file) => readFileSync(join(playground, "dist", file), "utf8")).join("\n");
 const playgroundSources = [...walk(join(playground, "src"))].map((file) => readFileSync(file, "utf8")).join("\n");
 const cssSelector = (name) => name.replace(/([[\].:/%()])/g, "\\$1");
 for (const name of libraryOnly) {
