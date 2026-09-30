@@ -76,6 +76,7 @@ playground/    Vite app consuming the package ONLY through its public exports
 | **V5** Collections | `defineCollection` + `useCollection` with a typed `load(query, {signal})` loader (no `.withURL()` in the final API), validated URL state, latest-request-wins, neighbors from the same definition; `CollectionTable`/`CollectionList`/`CollectionFilter*`/`CollectionPager`/cells; `CollectionPage` only if it removes real duplication | `frontend/components/collection/`, customer + lead `views/Index.vue` as reference usages | V4 |
 | **V6** Records | `useRouteResource` (+ pluggable ID parser, default positive int), stale-response protection, `SectionNavigator` from route meta with first-accessible-section redirect, `ResourcePage` only if justified | `frontend/components/resource/`, `components/page/SectionNavigator.vue`, dealer `views/Details.vue` | V4 |
 | **V7** Forms | form state (`useResourceForm`, error bags, dirty snapshot, leave guard, save chrome), fields (`components/form/*`), `FormGroup`/`GroupEditAction`/`GroupSheet`/`useGroupSheet`/`useSheetSave`/`useSheetDiscardGuard`/`RecordGroupScope`, `EditorPage`; typed field keys | `frontend/composables/forms/`, `components/form/`, `components/modal/GroupSheet.vue`, `composables/useGroupSheet.ts`, `useSheet*.ts`, `useLeaveGuard.ts`, `useDirtySnapshot.ts` | V5, V6 |
+| **V8** Polish & docs | The Follow-ups list below; README (getting started: install, composition root, a list page, a record page, a custom shell, theming/brand, i18n) and `docs/recipes/` for each existing area | PLAN Follow-ups, V1–V6 reports | V5, V6 |
 
 ### Packet mapping and acceptance per phase
 
@@ -112,3 +113,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | V5 | Done | aa1fe81…bc3a747, merge into main | Accepted 2026-10-01. `CollectionPage` justified (customer list 55 lines vs ARV 222, lead 84 vs 470). Sort keeps the page (as ARV); URL state via replace (as ARV); failed load = warning banner with retry (ARV showed "No data"); record pager keys don't auto-repeat. ARV bugs #60–73. |
 | V6 | Done | d0a123c…3a96af9, merge be7b4e0 | Accepted 2026-10-01; checked in the browser (dealer sections, lead rich layout). Dependent `useResource({ for: record })` waits for its parent (fixed c0ad1c0, verified in the browser). ResourcePage defaults to `width="content"`; `steps`/`hub` navigator variants not ported. ARV bugs #80–86. |
 | V7 | Pending | | |
+| V8 | Pending | | |
