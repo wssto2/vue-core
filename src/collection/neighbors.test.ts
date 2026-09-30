@@ -132,6 +132,21 @@ describe("useCollectionNeighbors", () => {
     expect(calls.length).toBe(requests); // page 1 and 2 are cached now
   });
 
+  it("finds records by any key, not only numbers (ARV read Number(item.id))", async () => {
+    const rows = ["a1", "b2", "c3"].map((id) => ({ id, title: id }));
+    const loader = fakeLoader(() => page(rows as never, { lastPage: 1, total: 3 }));
+    const definition = defineCollection({ id: "codes", stateVersion: 1, load: loader.load as never, key: (row: { id: string }) => row.id, defaults: { pageSize: 5 } });
+    const router = await makeRouter(`/records/b2?from=${encodeState(definition, definition.defaults)}`);
+    const { result } = inApp(() => {
+      const route = useRoute();
+      return useCollectionNeighbors(definition, { current: () => route.params.recordID as string, list: { name: "list" }, param: "recordID" });
+    }, { router });
+    await flush();
+    expect(result.position.value).toBe(2);
+    expect(result.previous.value?.key).toBe("a1");
+    expect(result.next.value?.key).toBe("c3");
+  });
+
   it("keeps the cache bounded", async () => {
     const { definition, calls } = setup();
     const at = (page: number) => stateOf(definition, { page });
