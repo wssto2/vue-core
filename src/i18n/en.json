@@ -29,6 +29,9 @@
       "body": "The entered data has not been saved. If you continue, your changes will be lost.",
       "confirm": "Discard changes",
       "cancel": "Continue editing"
+    },
+    "toast": {
+      "notifications": "Notifications"
     }
   }
 }

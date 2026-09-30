@@ -128,7 +128,7 @@ if (!css.includes("#6d28d9")) fail("built CSS lacks the second accent (violet)")
 // One CSS build: the app's Tailwind scans the package (`@source` in tailwind.css), so a class
 // that only a library component uses must appear in the playground's CSS. The playground's own
 // sources must not contain it, or the check proves nothing.
-const libraryOnly = ["align-[-0.125em]"];
+const libraryOnly = ["align-[-0.125em]", "min-h-14", "z-10001"];
 // Only the CSS of the page that builds its own Tailwind (not the prebuilt stylesheet's page).
 const ownCss = built.filter((file) => /^assets\/index-.*\.css$/.test(file)).map((file) => readFileSync(join(playground, "dist", file), "utf8")).join("\n");
 const playgroundSources = [...walk(join(playground, "src"))].map((file) => readFileSync(file, "utf8")).join("\n");

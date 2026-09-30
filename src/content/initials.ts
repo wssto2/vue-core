@@ -4,7 +4,7 @@
  */
 export function initialsFor(name: string | null | undefined): string {
   const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
-  const letters = words.length > 1 ? [words[0]?.[0], words.at(-1)?.[0]] : [words[0]?.[0]];
+  const letters = words.length > 1 ? [words[0]?.[0], words[words.length - 1]?.[0]] : [words[0]?.[0]];
 
   return letters.filter(Boolean).join("").toLocaleUpperCase() || "?";
 }

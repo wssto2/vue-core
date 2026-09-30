@@ -29,6 +29,9 @@
       "body": "Vneseni podatki niso shranjeni. Če nadaljujete, bodo spremembe izgubljene.",
       "confirm": "Zavrzi spremembe",
       "cancel": "Nadaljuj z urejanjem"
+    },
+    "toast": {
+      "notifications": "Obvestila"
     }
   }
 }

@@ -12,6 +12,8 @@ const entries: Record<string, string> = {
   "i18n/index": "src/i18n/index.ts",
   "state/index": "src/state/index.ts",
   "content/index": "src/content/index.ts",
+  "overlay/index": "src/overlay/index.ts",
+  "modal/index": "src/modal/index.ts",
   "client/index": "src/client/index.ts",
   "platform/index": "src/platform/index.ts",
 };

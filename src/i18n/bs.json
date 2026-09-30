@@ -29,6 +29,9 @@
       "body": "Uneseni podaci nisu spremljeni. Ako nastavite, izmjene će biti izgubljene.",
       "confirm": "Odbaci promjene",
       "cancel": "Nastavi s uređivanjem"
+    },
+    "toast": {
+      "notifications": "Obavijesti"
     }
   }
 }

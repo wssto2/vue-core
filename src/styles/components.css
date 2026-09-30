@@ -13,3 +13,61 @@
 [data-bottom-dock]:has(.dock-tab-bar) .dock-safe-area:not(.dock-tab-bar) {
   padding-bottom: 0;
 }
+
+/* Toasts: an inverse card with a coloured icon and an accent action (Undo, Retry), bottom
+   centre, stacked. vue-sonner reads these variables; doubled selectors outrank the sheet it
+   injects at runtime. The variables need a third attribute: its theme block
+   `[data-sonner-toaster][data-theme=light]` has the doubled selector's specificity, and in a
+   production build its sheet is injected after ours and won (a white toast). */
+[data-sonner-toaster][data-sonner-toaster][data-theme] {
+  --normal-bg: var(--app-surface-inverse);
+  --normal-text: var(--app-content-inverse);
+  --normal-border: transparent;
+  --border-radius: var(--app-radius-menu);
+  --width: 22.5rem;
+  font-family: var(--font-sans);
+}
+
+[data-sonner-toast][data-sonner-toast][data-styled="true"] {
+  gap: 0.625rem;
+  padding: 0.625rem 0.625rem 0.625rem 0.875rem;
+  box-shadow: var(--app-shadow-float);
+  font-size: var(--text-subheadline);
+  line-height: var(--text-subheadline--line-height);
+}
+
+[data-sonner-toast][data-sonner-toast] [data-icon] { color: var(--app-content-inverse-accent); }
+[data-sonner-toast][data-sonner-toast][data-type="error"] [data-icon],
+[data-sonner-toast][data-sonner-toast][data-type="warning"] [data-icon] { color: var(--app-content-inverse-danger); }
+[data-sonner-toast][data-sonner-toast] [data-description] { color: var(--app-content-inverse); opacity: 0.8; }
+
+[data-sonner-toast][data-sonner-toast] [data-button][data-button] {
+  height: auto;
+  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--app-content-inverse-accent);
+  font-size: var(--text-subheadline);
+  font-weight: 700;
+  white-space: nowrap;
+}
+[data-sonner-toast][data-sonner-toast][data-type="error"] [data-button][data-button] { color: var(--app-content-inverse-danger); }
+
+/* Toasts float above whatever is docked (BottomDock publishes its height as --bottom-dock-h). */
+[data-sonner-toaster][data-sonner-toaster][data-y-position="bottom"] {
+  bottom: calc(var(--bottom-dock-h, 0px) + var(--offset, 32px));
+}
+
+@media (max-width: 600px) {
+  [data-sonner-toaster][data-sonner-toaster][data-y-position="bottom"] {
+    bottom: calc(var(--bottom-dock-h, 0px) + 16px);
+  }
+}
+
+/* The dock keeps its place while the page slides under it on a screen transition. */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  [data-bottom-dock] {
+    view-transition-name: app-bottom-dock;
+  }
+}

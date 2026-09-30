@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/vue";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createCommentVNode, defineComponent, h, nextTick, ref } from "vue";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { mockMedia } from "../testing/media";
@@ -201,7 +201,10 @@ describe("Tabs", () => {
   });
 
   describe("scope on a compact screen", () => {
-    const media = mockMedia({ compact: true });
+    let media: ReturnType<typeof mockMedia>;
+    beforeEach(() => {
+      media = mockMedia({ compact: true });
+    });
     afterEach(() => media.restore());
 
     it("turns into a row of capsules using the short labels", () => {

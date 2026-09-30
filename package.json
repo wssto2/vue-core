@@ -36,6 +36,14 @@
       "types": "./dist/content/index.d.ts",
       "import": "./dist/content/index.js"
     },
+    "./overlay": {
+      "types": "./dist/overlay/index.d.ts",
+      "import": "./dist/overlay/index.js"
+    },
+    "./modal": {
+      "types": "./dist/modal/index.d.ts",
+      "import": "./dist/modal/index.js"
+    },
     "./state": {
       "types": "./dist/state/index.d.ts",
       "import": "./dist/state/index.js"
