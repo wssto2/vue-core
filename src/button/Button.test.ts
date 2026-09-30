@@ -46,6 +46,16 @@ describe("Button", () => {
     expect(container.querySelector("button")!.className).not.toMatch(/(?:primary|gray|red|green)-\d{2,3}/);
   });
 
+  // arv-next's `disabled:` variants never apply to an anchor, and it added a literal class "disabled".
+  it("dims a disabled link through aria-disabled, and adds no stray class", () => {
+    render(Button, { props: { href: "/x", disabled: true }, slots: { default: "Go" } });
+    const link = screen.getByText("Go");
+
+    expect(link.className).toContain("aria-disabled:opacity-45");
+    expect(link.classList.contains("disabled")).toBe(false);
+    expect(link.getAttribute("aria-disabled")).toBe("true");
+  });
+
   it("emits click, and emits nothing while disabled or processing", async () => {
     const onClick = vi.fn();
     const { rerender } = render(Button, { props: { onClick }, slots: { default: "Go" } });

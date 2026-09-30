@@ -94,6 +94,16 @@ describe("AlertDialog", () => {
     }
   });
 
+  // arv-next's DeleteModal ignored `show(0)` and `show("")`: a falsy subject was "nothing to delete".
+  it("hands any subject on, a falsy one included", async () => {
+    const onConfirm = vi.fn();
+    mountAlert({ onConfirm }, 0);
+    await open();
+
+    await fireEvent.click(confirmButton());
+    expect(onConfirm).toHaveBeenCalledWith(0);
+  });
+
   it("the default confirm label is Confirm", async () => {
     mountAlert({ confirmLabel: undefined });
     await open();
