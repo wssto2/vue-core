@@ -17,7 +17,7 @@ export type { CoreIconName } from "./core";
 /** Every name `Icon` accepts: the library's own icons and the app's. */
 export type IconName = CoreIconName | keyof IconRegistry;
 /** Pixel sizes the design uses; the icon scales from its 24-unit viewBox. */
-export type IconSize = 12 | 14 | 16 | 18 | 20 | 22 | 24 | 32;
+export type IconSize = 12 | 14 | 16 | 18 | 20 | 22 | 24 | 28 | 32;
 /**
  * SVG sources by icon name. A set may be partial (a feature brings its own icons; `installIcons`
  * merges several) but may only hold registered names; the library's own icons can be replaced by
