@@ -32,6 +32,10 @@
       "types": "./dist/i18n/index.d.ts",
       "import": "./dist/i18n/index.js"
     },
+    "./state": {
+      "types": "./dist/state/index.d.ts",
+      "import": "./dist/state/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tailwind.css": "./src/styles/tailwind.css",
     "./fonts.css": "./src/styles/fonts.css",

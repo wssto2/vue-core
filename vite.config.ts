@@ -10,6 +10,7 @@ const entries: Record<string, string> = {
   "button/index": "src/button/index.ts",
   "controls/index": "src/controls/index.ts",
   "i18n/index": "src/i18n/index.ts",
+  "state/index": "src/state/index.ts",
 };
 
 const peers = Object.keys(pkg.peerDependencies);
