@@ -1,0 +1,7 @@
+node_modules
+dist
+playground/dist
+playground/node_modules
+playground/.pack
+*.tgz
+coverage
