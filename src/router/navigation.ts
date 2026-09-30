@@ -13,7 +13,7 @@ export interface NavigationBinding {
   readonly destination: Destination;
   /** The route it opens: a `defineRoutes` target such as `ticketRoutes.index`. */
   readonly to: RouteLocationRaw;
-  /** Route names under which the destination stays highlighted: the record pages of a list destination. */
+  /** Names of the routes under which the destination stays highlighted: the record pages of a list destination. */
   readonly within?: readonly string[];
 }
 
@@ -108,7 +108,8 @@ export function createNavigation(options: NavigationOptions): ComputedRef<readon
   }
 
   function isCurrent(to: RouteLocationRaw): boolean {
-    const target = router.resolve(to).matched.at(-1);
+    const { matched } = router.resolve(to);
+    const target = matched[matched.length - 1];
     return target !== undefined && router.currentRoute.value.matched.includes(target);
   }
 

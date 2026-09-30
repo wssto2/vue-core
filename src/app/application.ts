@@ -349,8 +349,18 @@ export function createApplication(options: ApplicationOptions): Application {
       }),
     );
 
+    // The page's language and title follow the locale (`lang` is what screen readers and hyphenation go by).
     const scope = effectScope();
-    scope.run(() => watch(() => composer.locale.value, () => applyTitle(router.currentRoute.value)));
+    scope.run(() =>
+      watch(
+        () => composer.locale.value,
+        (locale) => {
+          document.documentElement.lang = locale;
+          applyTitle(router.currentRoute.value);
+        },
+        { immediate: true },
+      ),
+    );
     undo.push(() => scope.stop());
   }
 

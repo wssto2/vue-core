@@ -146,7 +146,7 @@ describe("mount", () => {
 
   it("renders a custom shell around the routed page, with the contributions of the features in its outlets", async () => {
     const { platform } = fakeBackend(signedIn(1));
-    const shell = defineComponent({ render: () => h("div", [h("header", [h(ShellOutlet, { slot: "headerActions" })]), h("main", [h(AppRouterView)])]) });
+    const shell = defineComponent({ render: () => h("div", [h("header", [h(ShellOutlet, { name: "headerActions" })]), h("main", [h(AppRouterView)])]) });
     const bell = defineComponent({ render: () => h("button", "bell") });
     const search = defineComponent({ render: () => h("button", "search") });
     const guestOnly = defineComponent({ render: () => h("button", "help") });
@@ -221,6 +221,17 @@ describe("the locale", () => {
     mounted.push(application);
     return application.locale.value;
   };
+
+  it("sets the page's language and keeps it in step with the locale", async () => {
+    const { platform } = fakeBackend(null, { locale: "hr" });
+    const application = createApplication(options(platform, [loginFeature], "/login"));
+    await start(application);
+    expect(document.documentElement.lang).toBe("hr");
+
+    await application.setLocale("sl");
+    await settle();
+    expect(document.documentElement.lang).toBe("sl");
+  });
 
   it("starts in the server's locale when the application supports it (ARV ignored `ba`), else in the fallback", () => {
     expect(localeOf({ locale: "hr" })).toBe("hr");
@@ -316,7 +327,7 @@ describe("message namespaces", () => {
     const { platform } = fakeBackend(signedIn(1));
     const bellMessages = localeMessages("bell", { en: async () => ({ default: { label: "Notifications" } }) });
     const bell = defineComponent({ setup() { const { t } = useI18n(); return () => h("button", t("bell.label")); } });
-    const shell = defineComponent({ render: () => h("div", [h(ShellOutlet, { slot: "headerActions" }), h(AppRouterView)]) });
+    const shell = defineComponent({ render: () => h("div", [h(ShellOutlet, { name: "headerActions" }), h(AppRouterView)]) });
     const notifications = defineFeature({ id: "notifications", messages: bellMessages, contributions: [{ id: "bell", slot: "headerActions", component: bell, scope: "authenticated", messages: ["bell"] }] });
     const target = await start(createApplication(options(platform, [loginFeature, notifications, feature(vi.fn())], "/tickets", { shell })));
     expect(target.querySelector("button")!.textContent).toBe("Notifications");

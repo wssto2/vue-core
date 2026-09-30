@@ -5,6 +5,8 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   build: {
-    rollupOptions: { input: { index: "index.html", prebuilt: "prebuilt.html" } },
+    // The manifest lets scripts/check-consumer.mjs follow what each page can reach.
+    manifest: true,
+    rollupOptions: { input: { index: "index.html", prebuilt: "prebuilt.html", app: "app.html", "app-lite": "app-lite.html" } },
   },
 });

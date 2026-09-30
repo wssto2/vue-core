@@ -33,13 +33,13 @@ export const [shellContributionsKey, useShellContributions] = defineFeatureConte
  * Where a shell renders what features contribute to one of its places. A shell puts one outlet at
  * each place it offers and wraps it as its layout needs; the outlet itself adds no element.
  *
- *   <div class="flex gap-2"><ShellOutlet slot="headerActions" /></div>
+ *   <div class="flex gap-2"><ShellOutlet name="headerActions" /></div>
  */
 export const ShellOutlet = defineComponent({
   name: "ShellOutlet",
-  props: { slot: { type: String as PropType<ShellSlot>, required: true } },
+  props: { name: { type: String as PropType<ShellSlot>, required: true } },
   setup(props) {
     const contributions = useShellContributions();
-    return () => contributions.get(props.slot).map((entry) => h(entry.component, { key: entry.id }));
+    return () => contributions.get(props.name).map((entry) => h(entry.component, { key: entry.id }));
   },
 });
