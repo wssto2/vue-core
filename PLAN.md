@@ -93,7 +93,7 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 
 | Phase | State | Commits | Review notes |
 |---|---|---|---|
-| V1 | Review | 34d3240 cec2b85 30c99c4 9797f6b 5e7d0cc 62c9032 fc66f32 (plan edits 7355a2c 1897903) | `npm run check` green; see the phase report for deviations and open questions |
+| V1 | Done | 2391480…3d3fe83 | Accepted 2026-09-30. Decision: apps with their own Tailwind import `tailwind.css`, which will `@source` the package dist (V3); prebuilt `styles.css` is the fallback. |
 | V2 | Pending | | |
 | V3 | Pending | | |
 | V4 | Pending | | |
