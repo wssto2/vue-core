@@ -52,3 +52,6 @@ export { default as EditorPage } from "./EditorPage.vue";
 export { useSectionStates } from "./sectionStates";
 export { useSaveChrome } from "./useSaveChrome";
 export type { SaveChromeOptions } from "./useSaveChrome";
+export { default as CommandDialog } from "./CommandDialog.vue";
+export { useCommand } from "./useCommand";
+export type { Command, CommandOptions } from "./useCommand";
