@@ -55,7 +55,8 @@ src/
   router/      defineRoutes, guards, navigation binding
   i18n/        core messages + feature locale loader
   styles/      tokens, theme, styles.css entry
-  icon/ controls/ button/ overlay/ modal/ state/   presentation primitives
+  icon/ controls/ button/ overlay/ modal/ state/ content/   presentation primitives
+  shell/       BackofficeShell: sidebar, top bar, phone drawer, account menu, contribution outlets
   page/        AdaptivePageShell, headers, actions, SectionNavigator, EditorPage
   collection/  collection state + table/list/filter/pager
   resource/    route resource state + ResourcePage
@@ -71,6 +72,7 @@ playground/    Vite app consuming the package ONLY through its public exports
 | **V2** Client & platform | HTTP client + `ApiError` + request ids + abort; public bootstrap config reader (validated, business config separate); session and access *interfaces* + `can(permission)` client; `defineFeatureContext` (typed injection key + required lookup); `createPlatform` building one app-scoped client set with no side effects | `frontend/api/base.ts`, `composables/usePolicies.ts`, `composables/fetch/`, `main.ts` config loading | V1 |
 | **V3** Presentation primitives | icon (icon set supplied by the app, typed), buttons, controls, `Popover`/`Tooltip`/`Menu`/`AlertDialog`, `Modal`/`Sheet`/`ConfirmModal`/`DiscardChangesModal`, state (`AsyncSection`, `StatusLine`, `ProgressTrack`), `Badge`/`Chip`/`Banner`/`EmptyView`/`KeyValue*`; `AdaptivePageShell`, `PageActions`, `PageToolbar`, `RecordHeader`, `ResourceHeader`, `ResourceBoundary`, page chrome/focus composables; toasts via vue-sonner only if kept | `frontend/components/{icon,button,controls,overlay,modal,state,page}/`, top-level shared components | V1 |
 | **V4** App & feature runtime | `createApplication`, `defineFeature` (routes, messages, context, shell contributions, effects), feature locale loader, protected-by-default guards with public opt-in, session-scoped effects with cancellation, `dispose()`, duplicate-registration errors | `frontend/main.ts`, `router/`, `i18n/`, `App.vue`, `layouts/` | V2, V3 |
+| **V4b** Backoffice shell | `BackofficeShell` from ARV's layouts: sidebar navigation (server tree via the V4 destination bindings), top bar with page chrome, phone push drawer (UI D18), account menu slot, header action / host outlets for shell contributions (V4), bottom tab bar/dock; custom shells use the same outlets | `frontend/layouts/` (`MainHeader`, `sidebar/*`), `App.vue`, `documentation/ui-system/page-shell.md` | V4 |
 | **V5** Collections | `defineCollection` + `useCollection` with a typed `load(query, {signal})` loader (no `.withURL()` in the final API), validated URL state, latest-request-wins, neighbors from the same definition; `CollectionTable`/`CollectionList`/`CollectionFilter*`/`CollectionPager`/cells; `CollectionPage` only if it removes real duplication | `frontend/components/collection/`, customer + lead `views/Index.vue` as reference usages | V4 |
 | **V6** Records | `useRouteResource` (+ pluggable ID parser, default positive int), stale-response protection, `SectionNavigator` from route meta with first-accessible-section redirect, `ResourcePage` only if justified | `frontend/components/resource/`, `components/page/SectionNavigator.vue`, dealer `views/Details.vue` | V4 |
 | **V7** Forms | form state (`useResourceForm`, error bags, dirty snapshot, leave guard, save chrome), fields (`components/form/*`), `FormGroup`/`GroupEditAction`/`GroupSheet`/`useGroupSheet`/`useSheetSave`/`useSheetDiscardGuard`/`RecordGroupScope`, `EditorPage`; typed field keys | `frontend/composables/forms/`, `components/form/`, `components/modal/GroupSheet.vue`, `composables/useGroupSheet.ts`, `useSheet*.ts`, `useLeaveGuard.ts`, `useDirtySnapshot.ts` | V5, V6 |
@@ -95,8 +97,9 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 |---|---|---|---|
 | V1 | Done | 2391480…3d3fe83 | Accepted 2026-09-30. Decision: apps with their own Tailwind import `tailwind.css`, which will `@source` the package dist (V3); prebuilt `styles.css` is the fallback. |
 | V2 | Done | 58efe42…d3f21a0 | Accepted 2026-09-30. Bootstrap wire keys snake_case (go-core JSON); `/auth/me` keeps ARV's `{user, expires_at, access}`; no per-call parser (generated types). 9 ARV bugs listed in the V2 report. |
-| V3 | Pending | | |
+| V3 | Done | 8bfdc12…8fe3321 | Accepted 2026-09-30. `tone="critical"` kept (HTML `role` stays free); date/number formatting becomes an app environment in V4; look changes from dropping legacy palettes await the owner (Panel radius, Banner surface, tooltip, skeleton, muted labels). ARV bugs #15–29. |
 | V4 | Pending | | |
+| V4b | Pending | | |
 | V5 | Pending | | |
 | V6 | Pending | | |
 | V7 | Pending | | |
