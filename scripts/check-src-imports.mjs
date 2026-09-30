@@ -32,7 +32,7 @@ for (const file of files(src)) {
       if (!isTest && target !== src && !target.startsWith(src + sep)) problems.push(`${where} leaves src/`);
     } else if (spec === "tailwindcss" && file.endsWith(".css")) {
       // the stylesheet entry imports Tailwind itself (a devDependency, bundled into dist/styles.css)
-    } else if (isTest && (spec.startsWith("node:") || spec === "vitest")) {
+    } else if (isTest && (spec.startsWith("node:") || spec === "vitest" || spec === "@testing-library/vue")) {
       // tests
     } else if (!allowed.some((name) => spec === name || spec.startsWith(`${name}/`))) {
       problems.push(`${where} is not a peer or dependency`);

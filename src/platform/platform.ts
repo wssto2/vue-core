@@ -1,0 +1,99 @@
+import type { App } from "vue";
+import { createHttpClient, type HttpClient, type HttpClientOptions, type Transport } from "../client";
+import { createAccessClient, type AccessClient, type AccessClientOptions } from "./access";
+import type { BootstrapConfig } from "./bootstrap";
+import { defineFeatureContext } from "./context";
+import { httpSessionAdapter } from "./httpSession";
+import { createSession, type Session, type SessionAdapter, type SessionUser } from "./session";
+
+/** One application's shared services. Everything in it belongs to this instance alone. */
+export interface Platform<U extends SessionUser = SessionUser, C extends BootstrapConfig = BootstrapConfig> {
+  readonly config: C;
+  readonly http: HttpClient;
+  readonly session: Session<U>;
+  /** Reads the session's access; empty until the session is restored or established. */
+  readonly access: AccessClient;
+}
+
+export interface PlatformOptions<U extends SessionUser, C extends BootstrapConfig> extends AccessClientOptions {
+  /** The validated bootstrap config (`readBootstrap()`); its `apiBase` prefixes every request. */
+  config: C;
+  /** Default: `fetch`. */
+  transport?: Transport;
+  /** Extra headers on every request (an embed token, a tenant header); read again per attempt. */
+  headers?: HttpClientOptions["headers"];
+  credentials?: HttpClientOptions["credentials"];
+  requestId?: HttpClientOptions["requestId"];
+  /**
+   * How the session is read and ended: an adapter, or a function building one over this platform's
+   * client. Default: `httpSessionAdapter` (GET `/auth/me`, POST `/auth/logout`, user = `{ id }`).
+   */
+  session?: SessionAdapter<U> | ((http: HttpClient) => SessionAdapter<U>);
+  /**
+   * Called once when a request is answered 401 while signed in, before the session is given up
+   * (concurrent 401s share one call). Renew it (for example a refresh-token call, then
+   * `session.refresh()`) and return true: the failed request is sent again. False or a throw expires
+   * the session. Without it a 401 expires the session at once.
+   */
+  renewSession?: (session: Session<U>) => Promise<boolean>;
+  /** Called after a 401 expired a signed-in session: the application decides (usually: go to the login page). */
+  onSessionExpired?: () => void;
+  /** Called with the failure of a session load. */
+  onSessionError?: (error: unknown) => void;
+}
+
+/**
+ * Builds the app-scoped services: HTTP client, session, access and the config. Nothing runs at
+ * construction (no request, timer or listener); the session is asked when the application calls
+ * `platform.session.restore()`. Every call returns an independent set.
+ */
+export function createPlatform<C extends BootstrapConfig>(options: PlatformOptions<SessionUser, C> & { session?: undefined }): Platform<SessionUser, C>;
+export function createPlatform<U extends SessionUser, C extends BootstrapConfig>(
+  options: PlatformOptions<U, C> & { session: NonNullable<PlatformOptions<U, C>["session"]> },
+): Platform<U, C>;
+export function createPlatform<U extends SessionUser, C extends BootstrapConfig>(options: PlatformOptions<U, C>): Platform<U, C> {
+  let renewal: Promise<boolean> | null = null;
+
+  const http = createHttpClient({
+    baseUrl: options.config.apiBase,
+    transport: options.transport,
+    headers: options.headers,
+    credentials: options.credentials,
+    requestId: options.requestId,
+    async onUnauthorized() {
+      if (session.state.value.status !== "authenticated") return "fail"; // nothing to expire
+      if (options.renewSession) {
+        renewal ??= options.renewSession(session).then(
+          (renewed) => renewed,
+          () => false,
+        ).finally(() => {
+          renewal = null;
+        });
+        if (await renewal) return "retry";
+      }
+      session.expire();
+      return "fail";
+    },
+  });
+
+  // Without `session` the overloads fix U to SessionUser, which is what the default adapter produces.
+  const source = options.session ?? ((client: HttpClient) => httpSessionAdapter(client) as unknown as SessionAdapter<U>);
+  const adapter = typeof source === "function" ? source(http) : source;
+  const session = createSession<U>(adapter, { onError: options.onSessionError, onExpired: options.onSessionExpired });
+  const access = createAccessClient(
+    () => {
+      const state = session.state.value;
+      return state.status === "authenticated" ? state.access : null;
+    },
+    { covers: options.covers },
+  );
+
+  return { config: options.config, http, session, access };
+}
+
+/** The platform as a context: `installPlatform(app, platform)` once, `usePlatform()` in components. */
+export const [platformKey, usePlatform] = defineFeatureContext<Platform>("platform");
+
+export function installPlatform(app: App, platform: Platform): void {
+  app.provide(platformKey, platform);
+}

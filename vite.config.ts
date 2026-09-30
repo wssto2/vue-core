@@ -7,6 +7,7 @@ import pkg from "./package.json" with { type: "json" };
 const entries: Record<string, string> = {
   index: "src/index.ts",
   "client/index": "src/client/index.ts",
+  "platform/index": "src/platform/index.ts",
 };
 
 const peers = Object.keys(pkg.peerDependencies);
