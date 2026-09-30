@@ -8,6 +8,8 @@ import Shell from "./Shell.vue";
 import { reportsFeature } from "./features/reports/feature";
 import { sessionFeature } from "./features/session/feature";
 import { createTicketsFeature } from "./features/tickets/feature";
+import { createCustomersFeature } from "./features/customers/feature";
+import { createLeadsFeature } from "./features/leads/feature";
 
 const platform = createDemoPlatform();
 
@@ -16,12 +18,14 @@ const application = createApplication({
   router: { history: createWebHashHistory() }, // the page is served from a static file, so the route lives in the hash
   shell: { component: Shell, slots: ["headerActions"] },
   icons: appIcons,
-  i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports" } }, hr: { nav: { work: "Rad", tickets: "Tiketi", reports: "Izvještaji" } } } },
-  navigation: { known: ["tickets", "reports"] },
+  i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports", customers: "Customers", leads: "Leads" } }, hr: { nav: { work: "Rad", tickets: "Tiketi", reports: "Izvještaji", customers: "Kupci", leads: "Leadovi" } } } },
+  navigation: { known: ["tickets", "reports", "customers", "leads"] },
   features: [
     sessionFeature,
     createTicketsFeature({ list: () => [{ id: 1, subject: "Printer on fire" }, { id: 2, subject: "No coffee" }] }),
     reportsFeature,
+    createCustomersFeature(platform.http),
+    createLeadsFeature(platform.http),
   ],
 });
 

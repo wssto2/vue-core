@@ -1,0 +1,16 @@
+{
+  "title": "Customers",
+  "description": "People and companies",
+  "name": "Name",
+  "city": "City",
+  "created": "Created",
+  "updated": "Last change",
+  "create": "New customer",
+  "creating": "Creating a customer is not part of the playground.",
+  "call": "Call",
+  "email": "E-mail",
+  "details": "View details",
+  "record": "Customer {id}",
+  "back": "Customers",
+  "failed": "The customer could not be loaded."
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Kupci",
+  "description": "Osobe i tvrtke",
+  "name": "Naziv",
+  "city": "Grad",
+  "created": "Uneseno",
+  "updated": "Zadnja promjena",
+  "create": "Novi kupac",
+  "creating": "Izrada kupca nije dio playgrounda.",
+  "call": "Nazovi",
+  "email": "E-mail",
+  "details": "Prikaži detalje",
+  "record": "Kupac {id}",
+  "back": "Kupci",
+  "failed": "Kupca nije moguće učitati."
+}

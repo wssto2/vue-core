@@ -59,6 +59,8 @@ type Setup = {
   savedViews?: Parameters<typeof useCollection>[1]["savedViews"];
   pageActions?: PageAction[];
   withSlots?: boolean;
+  emptySlot?: boolean;
+  blankCity?: boolean;
   record?: boolean;
   state?: "url" | "memory";
   rows?: Customer[];
@@ -108,6 +110,8 @@ async function mountList(setup: Setup = {}) {
       }) as never;
       return () =>
         h(props.mode === "page" ? CollectionPage : CollectionTable, { collection: list, title: "Customers", rowActions: setup.rowActions, actionsVisible: setup.actionsVisible, rowLabel: (c: Customer) => `${c.first_name} ${c.last_name}`, actions: setup.pageActions } as never, {
+          ...(setup.emptySlot ? { empty: () => h("p", { "data-test": "first-use" }, "Add your first customer") } : {}),
+          ...(setup.blankCity ? { "cell-city": ({ item }: { item: Customer }) => (item.city ? h("span", item.city) : null) } : {}),
           ...(setup.withSlots
             ? {
                 "cell-phase_label": ({ item, compact }: { item: Customer; compact: boolean }) => h("span", { "data-test": "phase" }, `${compact ? "c" : "d"}:${item.phase.label}`),
@@ -176,9 +180,30 @@ describe("states", () => {
   });
 
   it("the first-use slot replaces the empty state only when nothing narrows the list", async () => {
-    const { list } = await mountList({ rows: [] });
-    expect(screen.getByText("No data")).toBeTruthy();
-    expect(list.display.value).toBe("empty");
+    const { list } = await mountList({ rows: [], emptySlot: true });
+    expect(screen.getByText("Add your first customer")).toBeTruthy();
+    expect(screen.queryByText("No data")).toBeNull();
+    list.search("ana");
+    await flush();
+    expect(screen.queryByText("Add your first customer")).toBeNull();
+    expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeTruthy();
+  });
+
+  it("a cell slot that renders nothing is respected: no raw value comes back in its place", async () => {
+    restoreViewport();
+    restoreViewport = viewport(true);
+    await mountList({ blankCity: true });
+    const rows = document.querySelectorAll("[data-test='collection-row']");
+    expect(rows[0]!.querySelector(".text-row-meta")!.textContent).toContain("Split");
+    expect(rows[1]!.querySelector(".text-row-meta")!.textContent).not.toMatch(/null|undefined/);
+  });
+
+  it("puts the page actions in the page shell and the total in the title", async () => {
+    const onClick = vi.fn();
+    await mountList({ pageActions: [{ id: "create", label: "New customer", placement: "primary", onClick }] });
+    await fireEvent.click(screen.getByRole("button", { name: "New customer" }));
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(screen.getByRole("heading", { name: /Customers/ }).parentElement!.textContent).toMatch(/Customers\s*2/);
   });
 
   it("keeps the rows with a status line while refreshing, and a banner with retry when a refresh fails", async () => {

@@ -1,0 +1,18 @@
+{
+  "title": "Leadovi",
+  "description": "Upiti koje treba pratiti",
+  "columns": { "name": "Ime", "city": "Grad", "created": "Uneseno", "phase": "Faza", "assigned": "Dodijeljeno", "next": "Sljedeći korak", "heard": "Saznao od" },
+  "unassigned": "Nedodijeljeno",
+  "views": { "all": "Svi leadovi", "mine": "Moji" },
+  "phases": { "1": "Zaprimljen", "2": "Kontaktiran", "3": "Prihvaćena probna vožnja", "4": "Ponuda izrađena", "5": "Ponuda poslana", "6": "Ponuda odbijena", "7": "Zatvoren", "7_bought": "Zatvoren: kupio", "7_rejected": "Zatvoren: odbio", "open": "Otvoreni" },
+  "closed": { "bought": "Kupio", "rejected": "Odbio" },
+  "heard": { "1": "Dolazni poziv", "2": "Odlazni poziv", "3": "Web", "4": "Facebook", "5": "Instagram", "6": "TikTok", "7": "LinkedIn", "8": "Dolazni e-mail", "9": "Odlazni e-mail", "10": "Dolazak u salon" },
+  "filters": { "assigned": "Agent", "none": "Nitko", "followup": "Praćenje", "phase": "Faza", "overdue": "Kasni", "today": "Danas ili kasnije", "without": "Bez praćenja" },
+  "call": "Nazovi",
+  "email": "E-mail",
+  "details": "Prikaži detalje",
+  "record": "Lead {id}",
+  "back": "Leadovi",
+  "overdue": "Kasni",
+  "failed": "Lead nije moguće učitati."
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Leads",
+  "description": "Enquiries to follow up",
+  "columns": { "name": "Name", "city": "City", "created": "Created", "phase": "Phase", "assigned": "Assigned to", "next": "Next step", "heard": "Heard from" },
+  "unassigned": "Unassigned",
+  "views": { "all": "All leads", "mine": "Mine" },
+  "phases": { "1": "Received", "2": "Contacted", "3": "Test drive accepted", "4": "Offer made", "5": "Offer sent", "6": "Offer rejected", "7": "Closed", "7_bought": "Closed: bought", "7_rejected": "Closed: declined", "open": "Open" },
+  "closed": { "bought": "Bought", "rejected": "Declined" },
+  "heard": { "1": "Incoming call", "2": "Outgoing call", "3": "Web", "4": "Facebook", "5": "Instagram", "6": "TikTok", "7": "LinkedIn", "8": "Incoming e-mail", "9": "Outgoing e-mail", "10": "Walk-in" },
+  "filters": { "assigned": "Agent", "none": "Nobody", "followup": "Follow-up", "phase": "Phase", "overdue": "Overdue", "today": "Today or later", "without": "Without one" },
+  "call": "Call",
+  "email": "E-mail",
+  "details": "View details",
+  "record": "Lead {id}",
+  "back": "Leads",
+  "overdue": "Overdue",
+  "failed": "The lead could not be loaded."
+}

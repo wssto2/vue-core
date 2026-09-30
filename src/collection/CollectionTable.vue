@@ -138,7 +138,7 @@ const lastChip = computed<FilterChip | null>(() => {
     const chip = activeChips.value.find((candidate) => candidate.key === key || candidate.clears.includes(key));
     if (chip) return chip;
   }
-  return activeChips.value.at(-1) ?? null;
+  return activeChips.value[activeChips.value.length - 1] ?? null;
 });
 
 function removeChip(chip: FilterChip) {
