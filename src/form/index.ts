@@ -1,5 +1,5 @@
 export { ErrorBag } from "./errors";
-export { focusFirstError } from "./focus";
+export { fieldKey, focusFirstError } from "./focus";
 export { useDirtySnapshot, useSheetDiscardGuard } from "./dirty";
 export { createLeaveGuard, installLeaveGuard, leaveGuardKey, useLeaveGuard, useLeaveGuardContext } from "./leaveGuard";
 export type { LeaveGuard, PendingLeave } from "./leaveGuard";

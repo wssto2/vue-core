@@ -84,6 +84,8 @@ export interface FormOptions<Values extends object, Output = Values> {
   readonly validator?: FormValidator<Output>;
   /** Server messages are often codes: turn one into a sentence (`t(message)`). Default: as sent. */
   readonly translate?: (message: string, field: string) => string;
+  /** The draft's name for a field the server names, given the whole dotted path (`tax_id` is `taxId`, `lines.0.unit_price` is `lines.0.unitPrice`). Default: the same name. */
+  readonly serverField?: (field: string) => string;
   /** The sentence for a failure; return undefined for the library's default of that kind. */
   readonly failureMessage?: (kind: FormFailureKind, error: unknown) => string | undefined;
 }
@@ -99,8 +101,6 @@ export interface Form<Values extends object, Output = Values> {
   readonly submitting: Readonly<Ref<boolean>>;
   /** Why the last submit failed, until the next one starts (or `dismissFailure`). */
   readonly failure: Readonly<Ref<FormFailure | null>>;
-  /** Errors on fields the form does not have (a server field the draft lacks, a rule of the whole form): they cannot sit on a field, so a form shows them itself. */
-  readonly unplaced: ComputedRef<readonly { readonly field: string; readonly message: string }[]>;
   /** The value, the error and the marker of one field: `<TextField v-bind="form.bind('email')" />`. Misspelled names and wrong value types are compile errors. */
   bind<Key extends keyof Values & string>(key: Key): FieldBinding<Values[Key]>;
   /** The two number fields of a month and a year, for `MonthYearField`: `<MonthYearField v-bind="form.bindMonthYear('regMonth', 'regYear')" />`. */
@@ -158,11 +158,6 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
   const submitting = ref(false);
   const failure = shallowRef<FormFailure | null>(null);
   const dirty = computed(() => !sameValue(values, baseline.value));
-  const unplaced = computed(() =>
-    Object.entries(errors.all())
-      .filter(([path]) => !(fieldOfPath(path) in values))
-      .map(([field, messages]) => ({ field, message: messages[0] ?? "" })),
-  );
 
   let inFlight: Promise<SubmitResult<unknown>> | null = null;
   let key = newKey();
@@ -184,9 +179,10 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
     return (failure.value = { kind, message, requestId, error });
   }
 
-  function place(messages: FieldMessages) {
-    const translate = options.translate;
-    errors.set(translate ? Object.fromEntries(Object.entries(messages).map(([field, list]) => [field, list.map((message) => translate(message, field))])) : messages);
+  function place(messages: FieldMessages, fromServer = false) {
+    const { translate, serverField } = options;
+    const named = fromServer && serverField ? Object.entries(messages).map(([field, list]) => [serverField(field), list] as const) : Object.entries(messages);
+    errors.set(Object.fromEntries(translate ? named.map(([field, list]) => [field, list.map((message) => translate(message, field))]) : named));
   }
 
   function validate(): Output | null {
@@ -248,7 +244,7 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
         submitting.value = false;
         if (isAborted(error)) return { status: "aborted" };
         const kind = classify(error);
-        if (kind === "invalid" && isApiError(error)) place(error.fields);
+        if (kind === "invalid" && isApiError(error)) place(error.fields, true);
         return { status: "failed", failure: fail(kind, error) };
       }
       const hydrated = submitOptions?.hydrateFrom?.(saved) ?? null;
@@ -282,7 +278,6 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
     dirty,
     submitting,
     failure,
-    unplaced,
     bind<Key extends keyof Values & string>(field: Key): FieldBinding<Values[Key]> {
       return {
         get modelValue() {

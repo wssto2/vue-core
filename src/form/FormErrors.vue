@@ -2,7 +2,6 @@
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import Banner from "../state/Banner.vue";
-import { fieldOfPath } from "./validation";
 import type { Form } from "./useForm";
 
 /**
@@ -13,10 +12,11 @@ import type { Form } from "./useForm";
  *
  *   <FormErrors :form="form" :label="fieldLabel" />
  *
- * A field counts as shown while an element carries `data-field-key="<name>"` (`form.bind()` sets it).
+ * A field counts as shown while an element carries `data-field-key="<name>"` (`form.bind()` sets it; `fieldKey(path)` does for a field wired by hand,
+ * such as one inside a list), or carries the name of something that contains it.
  */
 const props = withDefaults(defineProps<{
-  form: Pick<Form<object>, "failure" | "errors" | "unplaced">;
+  form: Pick<Form<object>, "failure" | "errors">;
   /** The name of a field for people (`(key) => t("ticket." + key)`); by default the key. */
   label?: (field: string) => string;
   /** Where to look for shown fields; by default the whole document. */
@@ -31,31 +31,25 @@ watch(
   async (errors) => {
     await nextTick();
     const root = props.scope ?? document;
-    hidden.value = Object.entries(errors).flatMap(([path, messages]) => {
-      const field = fieldOfPath(path);
-      const message = messages[0];
-      return message && !root.querySelector(`[data-field-key~="${CSS.escape(field)}"]`) ? [{ field: path, message }] : [];
-    });
+    // A path is shown when some element carries it, or one of the paths it is inside (`lines` holds `lines.0.quantity`).
+    const shown = new Set([...root.querySelectorAll("[data-field-key]")].flatMap((element) => (element.getAttribute("data-field-key") ?? "").split(/\s+/)));
+    const isShown = (path: string) => path.split(".").some((_, index, parts) => shown.has(parts.slice(0, index + 1).join(".")));
+    hidden.value = Object.entries(errors).flatMap(([path, messages]) => (messages[0] && !isShown(path) ? [{ field: path, message: messages[0] }] : []));
   },
   { immediate: true },
 );
 
-// The form's own unplaced errors first; the rest of the hidden ones after them, once each.
-const listed = computed(() => {
-  const own = props.form.unplaced.value;
-  return [...own, ...hidden.value.filter((entry) => !own.some((known) => known.field === entry.field))];
-});
 const failure = computed(() => props.form.failure.value);
 const tone = computed(() => (failure.value?.kind === "conflict" || failure.value?.kind === "refresh" ? "warning" : "critical"));
 </script>
 
 <template>
-  <Banner v-if="failure || listed.length" :tone="failure ? tone : 'warning'" data-test="form-errors">
+  <Banner v-if="failure || hidden.length" :tone="failure ? tone : 'warning'" data-test="form-errors">
     <p v-if="failure" class="text-footnote font-medium">{{ failure.message }}</p>
-    <template v-if="listed.length">
+    <template v-if="hidden.length">
       <p class="text-footnote" :class="failure ? 'mt-1' : 'font-medium'">{{ t("core.form.errors.hidden_title") }}</p>
       <ul class="mt-1 list-inside list-disc text-footnote" data-test="form-errors-hidden">
-        <li v-for="entry in listed" :key="entry.field">{{ entry.field ? props.label(entry.field) : "" }}<template v-if="entry.field">: </template>{{ entry.message }}</li>
+        <li v-for="entry in hidden" :key="entry.field">{{ entry.field ? props.label(entry.field) : "" }}<template v-if="entry.field">: </template>{{ entry.message }}</li>
       </ul>
     </template>
     <p v-if="failure?.requestId" class="mt-1 text-caption text-content-muted">{{ t("core.form.errors.request", { id: failure.requestId }) }}</p>

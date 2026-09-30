@@ -1,0 +1,92 @@
+{
+  "title": "Obrasci",
+  "intro": "Zapis koji se uređuje u listovima grupa, dugi obrazac za unos i dijalog naredbe, nad lažnim poslužiteljem koji odgovara 422 i 409.",
+  "account": "Račun",
+  "accounts": "Računi",
+  "accountsHint": "Otvorite račun, uredite jednu grupu, pa probajte e-adresu taken{'@'}example.com ili “Kolega je promijenio” i spremite grupu.",
+  "changeStatus": "Promijeni status…",
+  "colleague": "Kolega je promijenio",
+  "colleagueDone": "Netko drugi je spremio ovaj račun: vaše sljedeće spremanje je zastarjelo.",
+  "statusMessage": "Arhiviranje traži razlog. Poslužitelj odbija status koji račun već ima.",
+  "loadFailed": "Računi se nisu mogli učitati.",
+  "required": "Obavezno",
+  "invalidEmail": "Unesite ispravnu e-adresu.",
+  "saved": "Spremljeno",
+  "stale": "Račun je promijenio netko drugi. Učitan je ponovno; provjerite svoje promjene i spremite opet.",
+  "newOffer": "Nova ponuda",
+  "status": {
+    "active": "Aktivan",
+    "paused": "Na čekanju",
+    "archived": "Arhiviran"
+  },
+  "groups": {
+    "identity": "Identifikacija",
+    "identity_locked": "Identifikacija arhiviranog računa se ne može mijenjati.",
+    "contact": "Kontakt",
+    "address": "Adresa",
+    "notes": "Napomene"
+  },
+  "fields": {
+    "name": "Naziv",
+    "taxId": "OIB",
+    "taxIdHint": "11 znamenki",
+    "email": "E-adresa",
+    "phone": "Telefon",
+    "channel": "Željeni kanal",
+    "street": "Ulica",
+    "city": "Grad",
+    "country": "Država",
+    "notes": "Napomene",
+    "note": "Napomena",
+    "status": "Status",
+    "customerId": "Kupac",
+    "lines": "Stavke",
+    "extras": "Dodaci"
+  },
+  "offer": {
+    "create": "Izradi ponudu",
+    "created": "Ponuda je izrađena",
+    "sections": {
+      "customer": "Kupac",
+      "lines": "Stavke",
+      "options": "Opcije"
+    },
+    "customer": "Kupac",
+    "customerPlaceholder": "Upišite naziv…",
+    "deliveryOn": "Isporuka",
+    "channel": "Potvrda putem",
+    "chooseCustomer": "Odaberite kupca.",
+    "chooseChannel": "Odaberite način potvrde.",
+    "line": "Stavka {n}",
+    "product": "Proizvod",
+    "quantity": "Količina",
+    "quantityMin": "Unesite količinu od najmanje 1.",
+    "unitPrice": "Jedinična cijena",
+    "priceMin": "Unesite cijenu veću od 0.",
+    "noLines": "Dodajte barem jednu stavku.",
+    "addLine": "Dodaj stavku",
+    "removeLine": "Ukloni",
+    "urgent": "Hitno",
+    "urgentHint": "Hitne ponude ne mogu uključivati osiguranje.",
+    "extrasLabel": "Dodaci",
+    "extras": {
+      "delivery": "Dostava",
+      "insurance": "Osiguranje",
+      "installation": "Ugradnja"
+    },
+    "note": "Napomena",
+    "net": "Neto",
+    "vat": "PDV 25 %",
+    "total": "Ukupno",
+    "fields": {
+      "customerId": "Kupac",
+      "channel": "Potvrda putem",
+      "lines": "Stavke",
+      "extras": "Dodaci",
+      "deliveryOn": "Isporuka",
+      "note": "Napomena",
+      "urgent": "Hitno"
+    }
+  },
+  "nav": "Obrasci"
+}

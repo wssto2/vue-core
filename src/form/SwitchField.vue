@@ -37,26 +37,13 @@ function toggle() {
     <div class="flex items-center gap-2">
       <slot name="before" />
       <button :id="id" type="button" role="switch" :aria-checked="model" :aria-label="props.label" :aria-describedby="describedby" :aria-invalid="invalid || undefined" :disabled="props.disabled"
-        :style="style" class="switch-track hit-target relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-motion-fast ease-motion-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-45"
+        :style="style" class="hit-target relative inline-flex h-(--switch-h) w-(--switch-w) shrink-0 cursor-pointer rounded-full transition-colors duration-motion-fast ease-motion-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-45"
         :class="model ? 'bg-control-on' : 'bg-fill-strong'" @click="toggle">
-        <span class="switch-knob pointer-events-none absolute left-0.5 top-0.5 rounded-full bg-white shadow-knob" />
+        <!-- The knob: the track's height less a hairline on each side, sliding the track's width less its own. -->
+        <span class="pointer-events-none absolute left-0.5 top-0.5 size-[calc(var(--switch-h)-0.25rem)] rounded-full bg-white shadow-knob transition-transform duration-motion-normal ease-motion-standard"
+          :class="model ? 'translate-x-[calc(var(--switch-w)-var(--switch-h))]' : ''" />
         <span class="sr-only">{{ model ? t("core.form.yes") : t("core.form.no") }}</span>
       </button>
     </div>
   </Field>
 </template>
-
-<style scoped>
-.switch-track {
-  width: var(--switch-w);
-  height: var(--switch-h);
-}
-.switch-knob {
-  width: calc(var(--switch-h) - 0.25rem);
-  height: calc(var(--switch-h) - 0.25rem);
-  transition: transform var(--app-motion-normal) var(--app-motion-standard-easing);
-}
-.switch-track[aria-checked="true"] .switch-knob {
-  transform: translateX(calc(var(--switch-w) - var(--switch-h)));
-}
-</style>

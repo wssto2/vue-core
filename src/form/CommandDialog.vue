@@ -19,7 +19,7 @@ import type { Form } from "./useForm";
  *   </CommandDialog>
  */
 const props = withDefaults(defineProps<{
-  command: Pick<Command<object, unknown, unknown>, "open" | "run" | "dismiss"> & { readonly form: Pick<Form<object>, "dirty" | "submitting" | "failure" | "errors" | "unplaced"> };
+  command: Pick<Command<object, unknown, unknown>, "open" | "run" | "dismiss"> & { readonly form: Pick<Form<object>, "dirty" | "submitting" | "failure" | "errors"> };
   title: string;
   subtitle?: string;
   /** What the primary action says: exactly what it does ("Assign"). */

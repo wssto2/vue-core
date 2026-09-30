@@ -16,6 +16,7 @@ import { themeFeature } from "./features/theme/feature";
 import { createTicketsFeature } from "./features/tickets/feature";
 import { createCustomersFeature } from "./features/customers/feature";
 import { createLeadsFeature } from "./features/leads/feature";
+import { formsFeature } from "./features/forms/feature";
 
 const platform = createDemoPlatform();
 const custom = new URLSearchParams(location.search).get("shell") === "custom";
@@ -29,7 +30,7 @@ const application = createApplication({
     : backofficeShell({ identity: (user: Employee) => ({ name: user.name, detail: user.email }) }),
   icons: { ...appIcons, ...shellIcons },
   i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports", records: "Records", customers: "Customers", leads: "Leads" } }, hr: { nav: { work: "Rad", tickets: "Tiketi", reports: "Izvještaji", records: "Zapisi", customers: "Kupci", leads: "Upiti" } } } },
-  navigation: { known: ["tickets", "reports", "records", "customers", "leads"] },
+  navigation: { known: ["tickets", "reports", "records", "customers", "leads", "forms"] },
   features: [
     sessionFeature,
     themeFeature,
@@ -38,6 +39,7 @@ const application = createApplication({
     createCustomersFeature(platform.http),
     createLeadsFeature(platform.http),
     recordsFeature,
+    formsFeature,
     viewTransitions(), // screen transitions on phones and tablets
     appUpdates({ url: "app.html" }), // offers a reload when a new build is served
   ],

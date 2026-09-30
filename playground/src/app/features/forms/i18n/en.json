@@ -1,0 +1,92 @@
+{
+  "title": "Forms",
+  "intro": "A record edited in group sheets, a long create form and a command dialog, over a fake backend that answers 422 and 409.",
+  "account": "Account",
+  "accounts": "Accounts",
+  "accountsHint": "Open an account, edit one of its groups, then try the e-mail taken{'@'}example.com, or use “A colleague changed it” and save a group.",
+  "changeStatus": "Change status…",
+  "colleague": "A colleague changed it",
+  "colleagueDone": "Someone else saved this account: your next save is stale.",
+  "statusMessage": "Archiving needs a reason. Setting the status it already has is refused by the server.",
+  "loadFailed": "The accounts could not be loaded.",
+  "required": "Required",
+  "invalidEmail": "Enter a valid e-mail address.",
+  "saved": "Saved",
+  "stale": "The account was changed by someone else. It was read again; check your changes and save again.",
+  "newOffer": "New offer",
+  "status": {
+    "active": "Active",
+    "paused": "Paused",
+    "archived": "Archived"
+  },
+  "groups": {
+    "identity": "Identification",
+    "identity_locked": "The identification of an archived account cannot change.",
+    "contact": "Contact",
+    "address": "Address",
+    "notes": "Notes"
+  },
+  "fields": {
+    "name": "Name",
+    "taxId": "Tax id",
+    "taxIdHint": "11 digits",
+    "email": "E-mail",
+    "phone": "Phone",
+    "channel": "Preferred channel",
+    "street": "Street",
+    "city": "City",
+    "country": "Country",
+    "notes": "Notes",
+    "note": "Note",
+    "status": "Status",
+    "customerId": "Customer",
+    "lines": "Lines",
+    "extras": "Extras"
+  },
+  "offer": {
+    "create": "Create offer",
+    "created": "Offer created",
+    "sections": {
+      "customer": "Customer",
+      "lines": "Lines",
+      "options": "Options"
+    },
+    "customer": "Customer",
+    "customerPlaceholder": "Type a name…",
+    "deliveryOn": "Delivery",
+    "channel": "Confirm by",
+    "chooseCustomer": "Choose a customer.",
+    "chooseChannel": "Choose how to confirm.",
+    "line": "Line {n}",
+    "product": "Product",
+    "quantity": "Quantity",
+    "quantityMin": "Enter a quantity of at least 1.",
+    "unitPrice": "Unit price",
+    "priceMin": "Enter a price above 0.",
+    "noLines": "Add at least one line.",
+    "addLine": "Add line",
+    "removeLine": "Remove",
+    "urgent": "Urgent",
+    "urgentHint": "Urgent offers cannot include insurance.",
+    "extrasLabel": "Extras",
+    "extras": {
+      "delivery": "Delivery",
+      "insurance": "Insurance",
+      "installation": "Installation"
+    },
+    "note": "Note",
+    "net": "Net",
+    "vat": "VAT 25 %",
+    "total": "Total",
+    "fields": {
+      "customerId": "Customer",
+      "channel": "Confirm by",
+      "lines": "Lines",
+      "extras": "Extras",
+      "deliveryOn": "Delivery",
+      "note": "Note",
+      "urgent": "Urgent"
+    }
+  },
+  "nav": "Forms"
+}

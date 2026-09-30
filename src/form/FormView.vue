@@ -16,7 +16,7 @@ import type { Form } from "./useForm";
  * errors that have no field on screen (see `FormErrors`).
  */
 const props = withDefaults(defineProps<{
-  form?: Pick<Form<object>, "failure" | "errors" | "unplaced" | "submitting">;
+  form?: Pick<Form<object>, "failure" | "errors" | "submitting">;
   editable?: boolean;
   /** The name of a field for people, for the errors that have no field on screen. */
   fieldLabel?: (field: string) => string;

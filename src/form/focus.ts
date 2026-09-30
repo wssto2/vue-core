@@ -23,3 +23,9 @@ export async function focusFirstError(root: ParentNode = document, sections?: Se
   (control ?? row).focus({ preventScroll: true });
   return true;
 }
+
+/**
+ * Marks a field you wired by hand (a value inside a list: `v-model="line.quantity"` with its own `:error`) as the place where the errors of
+ * `path` show, so `FormErrors` does not list them as fields that are not on screen: `<NumberField v-model="line.quantity" v-bind="fieldKey(`lines.${i}.quantity`)" />`.
+ */
+export const fieldKey = (path: string): { "data-field-key": string } => ({ "data-field-key": path });

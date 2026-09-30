@@ -244,16 +244,14 @@ describe("useForm: submit", () => {
     expect(form.dirty.value).toBe(true);
   });
 
-  it("makes an error on a field the form does not have visible: it is listed as unplaced", async () => {
-    const form = make();
-    filled(form);
+  it("puts a server error on the draft's name for the field (tax_id is taxId), nested paths too", async () => {
+    const form = withSetup(() => useForm({ defaults: () => ({ taxId: "", lines: [{ unitPrice: 0 }] }), serverField: (field) => field.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase()) })).result;
     await form.submit(async () => {
-      throw api("validation", { status: 422, fields: { nickname: ["taken"], subject: ["long"], "": ["whole form"] } });
+      throw api("validation", { status: 422, fields: { tax_id: ["11 digits"], "lines.0.unit_price": ["too low"] } });
     });
-    expect(form.unplaced.value).toEqual([
-      { field: "nickname", message: "taken" },
-      { field: "", message: "whole form" },
-    ]);
+    expect(form.errors.first("taxId")).toBe("11 digits");
+    expect(form.errors.first("lines.0.unitPrice")).toBe("too low");
+    expect(form.bind("taxId").error).toBe("11 digits");
   });
 
   it("does not report a cancelled request as a failure", async () => {

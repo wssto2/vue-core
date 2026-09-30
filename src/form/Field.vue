@@ -83,7 +83,7 @@ const progress = computed(() =>
 <template>
   <FormRow v-if="group && !hiddenInGroup" v-bind="progress" :label="props.label" :for="editable ? controlId : undefined" :sub="editable ? props.hint : undefined"
     :sub-id="hintId" :required="editable && !locked && props.required" :layout="row" :label-align="row === 'entry' ? props.rowLabelAlign : undefined"
-    :error="props.error" :error-id="errorId" :data-field-locked="locked ? 'true' : undefined">
+    :error="editable ? props.error : undefined" :error-id="errorId" :data-field-locked="locked ? 'true' : undefined">
     <div class="relative w-full min-w-0" :title="locked ? props.lockedReason : undefined">
       <div :class="editable ? (row === 'setting' ? 'flex min-w-0 flex-col items-end' : row === 'stacked' ? 'flex min-w-0 flex-col items-stretch' : 'flex min-w-0 flex-col items-start compact:items-end') : ''">
         <slot v-if="editable" :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" />

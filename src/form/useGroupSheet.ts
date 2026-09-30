@@ -13,7 +13,6 @@ export interface GroupSheetForm<Values extends object> {
   readonly values: Values;
   readonly errors: ErrorBag;
   readonly failure: Readonly<Ref<FormFailure | null>>;
-  readonly unplaced: ComputedRef<readonly { readonly field: string; readonly message: string }[]>;
   dismissFailure(): void;
   submitFields<Keys extends FieldsOf<Values>, Saved>(
     fields: Keys,
@@ -67,7 +66,7 @@ export interface GroupSheetState<Group extends string> {
   readonly notice: Readonly<Ref<string | null>>;
   /** The form's failure, for a banner in the sheet. */
   readonly failure: Readonly<Ref<FormFailure | null>>;
-  readonly form: Pick<GroupSheetForm<object>, "errors" | "failure" | "unplaced">;
+  readonly form: Pick<GroupSheetForm<object>, "errors" | "failure">;
   /** Opens the sheet: the group's current values are its baseline. */
   present(): void;
   /** Closes it (after a save); a sheet with unsaved edits asks first. */

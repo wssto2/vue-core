@@ -32,7 +32,7 @@ import type { Form } from "./useForm";
 const props = withDefaults(defineProps<{
   title: string;
   back: PageBack;
-  form?: Pick<Form<object>, "dirty" | "submitting" | "failure" | "errors" | "unplaced" | "reset">;
+  form?: Pick<Form<object>, "dirty" | "submitting" | "failure" | "errors" | "reset">;
   /** The name of the primary action ("Create offer"); by default "Save". */
   saveLabel?: string;
   /** Whether the viewer may save; default true. */

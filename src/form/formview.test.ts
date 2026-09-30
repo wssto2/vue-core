@@ -4,7 +4,7 @@ import { defineComponent, h, nextTick } from "vue";
 import { ApiError } from "../client";
 import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
-import { focusFirstError } from "./focus";
+import { fieldKey, focusFirstError } from "./focus";
 import FormErrors from "./FormErrors.vue";
 import FormGroup from "./FormGroup.vue";
 import FormRow from "./FormRow.vue";
@@ -110,15 +110,32 @@ describe("FormErrors", () => {
     expect(listed).not.toContain("EMAIL");
   });
 
+  it("treats a hand-wired field (fieldKey) and a container named after the list as showing the errors of a value inside it", async () => {
+    const { form } = mountForm((f) => [
+      h(TextField, { modelValue: "", label: "Line", error: "Required", ...fieldKey("lines.0.product") }),
+      h("div", { "data-field-key": "tags" }),
+      h(TextField, { ...f.bind("name"), label: "Name" }),
+    ]);
+    await form().submit(async () => {
+      throw reject({ "lines.0.product": ["Required"], "tags.1": ["too long"], "lines.1.product": ["nobody shows me"] });
+    });
+    await settle();
+    const listed = document.querySelector("[data-test='form-errors-hidden']")!.textContent;
+    expect(listed).toContain("LINES.1.PRODUCT");
+    expect(listed).not.toContain("LINES.0.PRODUCT");
+    expect(listed).not.toContain("TAGS.1");
+  });
+
   it("renders nothing for a form with nothing to say", () => {
     mountForm((f) => h(TextField, { ...f.bind("name"), label: "Name" }));
     expect(document.querySelector("[data-test='form-errors']")).toBeNull();
   });
 
-  it("works on its own over any form", () => {
+  it("works on its own over any form", async () => {
     const form = withSetup(() => useForm({ defaults: empty })).result;
     form.errors.set({ "": ["The whole form is invalid"] });
     render(FormErrors, { props: { form }, global });
+    await settle();
     expect(screen.getByText(/The whole form is invalid/)).toBeTruthy();
   });
 });
