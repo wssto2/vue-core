@@ -49,7 +49,12 @@
         "body": "Zahtevanega zapisa ni mogoče najti."
       },
       "unavailable": "Pri nalaganju podatkov je prišlo do napake. Poskusite znova.",
-      "offline": "Strežnika ni mogoče doseči. Preverite povezavo in poskusite znova."
+      "offline": "Strežnika ni mogoče doseči. Preverite povezavo in poskusite znova.",
+      "pager": {
+        "previous": "Prejšnji zapis",
+        "next": "Naslednji zapis",
+        "records": "Zapisi"
+      }
     },
     "sections": {
       "label": "Razdelki"

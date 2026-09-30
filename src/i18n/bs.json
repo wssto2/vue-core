@@ -49,7 +49,12 @@
         "body": "Traženi zapis nije pronađen."
       },
       "unavailable": "Dogodila se greška prilikom učitavanja podataka. Molimo pokušajte ponovo.",
-      "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo."
+      "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
+      "pager": {
+        "previous": "Prethodni zapis",
+        "next": "Sljedeći zapis",
+        "records": "Zapisi"
+      }
     },
     "sections": {
       "label": "Sekcije"

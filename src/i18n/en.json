@@ -49,7 +49,12 @@
         "body": "The record could not be found."
       },
       "unavailable": "An error occurred while loading data. Please try again.",
-      "offline": "The server could not be reached. Check your connection and try again."
+      "offline": "The server could not be reached. Check your connection and try again.",
+      "pager": {
+        "previous": "Previous record",
+        "next": "Next record",
+        "records": "Records"
+      }
     },
     "sections": {
       "label": "Sections"
