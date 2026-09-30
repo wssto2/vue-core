@@ -1,0 +1,23 @@
+import { nextTick } from "vue";
+import type { SectionIndex } from "../page";
+
+const CONTROLS = "input:not([type=hidden]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex='-1'])";
+
+/**
+ * Moves focus to the first field with an error (fields mark themselves with `data-field-error`), after a
+ * failed submit. With the page's section index, a field inside a collapsed or scrolled-away section is revealed
+ * first. Returns whether there was one. Nothing moves while the user is typing: call it from the submit's answer, not from a watcher.
+ */
+export async function focusFirstError(root: ParentNode = document, sections?: SectionIndex | null): Promise<boolean> {
+  const row = root.querySelector<HTMLElement>("[data-field-error]");
+  if (!row) return false;
+  const section = sections?.sections.value.find((each) => each.element.contains(row));
+  if (section) {
+    await sections?.scrollTo(section.id, { updateUrl: false });
+    await nextTick();
+  }
+  const control = row.matches(CONTROLS) ? row : row.querySelector<HTMLElement>(CONTROLS);
+  (control ?? row).scrollIntoView?.({ block: "center" });
+  (control ?? row).focus({ preventScroll: true });
+  return true;
+}

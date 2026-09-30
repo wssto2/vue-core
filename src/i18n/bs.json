@@ -8,7 +8,10 @@
       "save": "Spremi",
       "saving": "Spremam…",
       "saved": "Spremljeno",
-      "more": "Više"
+      "more": "Više",
+      "edit": "Uredi",
+      "clear": "Očisti",
+      "done": "Gotovo"
     },
     "collection": {
       "search": {
@@ -147,6 +150,60 @@
     },
     "sections": {
       "label": "Sekcije"
+    },
+    "form": {
+      "unsaved_changes": "Nespremljene promjene",
+      "failure": {
+        "invalid": "Provjerite označena polja i pokušajte ponovo.",
+        "conflict": "Zapis se promijenio dok ste ga uređivali.",
+        "forbidden": "Nemate ovlaštenje za ovu radnju.",
+        "unauthorized": "Vaša sesija je istekla. Prijavite se ponovo.",
+        "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
+        "failed": "Promjene nisu spremljene. Pokušajte ponovo.",
+        "refresh": "Promjene su spremljene, ali se ažurirani zapis nije mogao učitati. Osvježite stranicu."
+      },
+      "errors": {
+        "hidden_title": "Greške u poljima koja trenutno nisu prikazana:",
+        "request": "Zahtjev {id}"
+      },
+      "sections": {
+        "errors": "Greške: {count}",
+        "done": "završeno"
+      },
+      "required": {
+        "label": "Obavezna polja",
+        "count": "{filled} od {total}",
+        "marker": "obavezno"
+      },
+      "group": {
+        "edit": "Uredi",
+        "foreign": "Spremanje traži i podatke iz grupe: {groups}. Prvo dopunite tu grupu."
+      },
+      "select": {
+        "choose": "Odaberite…",
+        "search": "Pretraži",
+        "no_matches": "Nema rezultata",
+        "loading": "Učitavanje…",
+        "clear": "Očisti",
+        "done": "Gotovo"
+      },
+      "number": {
+        "invalid": "Unesite broj."
+      },
+      "file": {
+        "choose": "Odaberi datoteku",
+        "drop": "ili prevucite datoteku ovdje",
+        "remove": "Ukloni",
+        "allowed": "Dozvoljeni formati: {formats}",
+        "max_size": "Najveća veličina: {size}",
+        "invalid_type": "Format datoteke nije podržan.",
+        "too_large": "Datoteka je veća od {size}."
+      },
+      "yes": "Da",
+      "no": "Ne",
+      "otp": {
+        "label": "Kod za potvrdu, {length} cifara"
+      }
     }
   }
 }

@@ -8,7 +8,10 @@
       "save": "Save",
       "saving": "Saving…",
       "saved": "Saved",
-      "more": "More"
+      "more": "More",
+      "edit": "Edit",
+      "clear": "Clear",
+      "done": "Done"
     },
     "collection": {
       "search": {
@@ -147,6 +150,60 @@
     },
     "sections": {
       "label": "Sections"
+    },
+    "form": {
+      "unsaved_changes": "Unsaved changes",
+      "failure": {
+        "invalid": "Check the marked fields and try again.",
+        "conflict": "The record changed while you were editing it.",
+        "forbidden": "You do not have permission to do this.",
+        "unauthorized": "Your session has expired. Sign in again.",
+        "offline": "The server could not be reached. Check your connection and try again.",
+        "failed": "The changes could not be saved. Try again.",
+        "refresh": "Your changes were saved, but the updated record could not be loaded. Reload the page."
+      },
+      "errors": {
+        "hidden_title": "Errors in fields that are not shown:",
+        "request": "Request {id}"
+      },
+      "sections": {
+        "errors": "Errors: {count}",
+        "done": "done"
+      },
+      "required": {
+        "label": "Required fields",
+        "count": "{filled} of {total}",
+        "marker": "required"
+      },
+      "group": {
+        "edit": "Edit",
+        "foreign": "Saving also needs data from: {groups}. Complete that group first."
+      },
+      "select": {
+        "choose": "Choose…",
+        "search": "Search",
+        "no_matches": "No matches",
+        "loading": "Loading…",
+        "clear": "Clear",
+        "done": "Done"
+      },
+      "number": {
+        "invalid": "Enter a number."
+      },
+      "file": {
+        "choose": "Choose file",
+        "drop": "or drop a file here",
+        "remove": "Remove",
+        "allowed": "Allowed formats: {formats}",
+        "max_size": "Maximum size: {size}",
+        "invalid_type": "The file format is not supported.",
+        "too_large": "The file is larger than {size}."
+      },
+      "yes": "Yes",
+      "no": "No",
+      "otp": {
+        "label": "Verification code, {length} digits"
+      }
     }
   }
 }

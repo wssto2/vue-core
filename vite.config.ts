@@ -23,6 +23,7 @@ const entries: Record<string, string> = {
   "collection/index": "src/collection/index.ts",
   "resource/index": "src/resource/index.ts",
   "shell/index": "src/shell/index.ts",
+  "form/index": "src/form/index.ts",
 };
 
 // Peers and runtime dependencies stay external: the consumer installs one copy of each (a second

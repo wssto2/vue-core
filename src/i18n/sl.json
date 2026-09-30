@@ -8,7 +8,10 @@
       "save": "Shrani",
       "saving": "Shranjujem…",
       "saved": "Shranjeno",
-      "more": "Več"
+      "more": "Več",
+      "edit": "Uredi",
+      "clear": "Počisti",
+      "done": "Končano"
     },
     "collection": {
       "search": {
@@ -147,6 +150,60 @@
     },
     "sections": {
       "label": "Razdelki"
+    },
+    "form": {
+      "unsaved_changes": "Neshranjene spremembe",
+      "failure": {
+        "invalid": "Preverite označena polja in poskusite znova.",
+        "conflict": "Zapis se je spremenil, medtem ko ste ga urejali.",
+        "forbidden": "Za to dejanje nimate pooblastila.",
+        "unauthorized": "Vaša seja je potekla. Prijavite se znova.",
+        "offline": "Strežnik ni dosegljiv. Preverite povezavo in poskusite znova.",
+        "failed": "Sprememb ni bilo mogoče shraniti. Poskusite znova.",
+        "refresh": "Spremembe so shranjene, vendar posodobljenega zapisa ni bilo mogoče naložiti. Osvežite stran."
+      },
+      "errors": {
+        "hidden_title": "Napake v poljih, ki trenutno niso prikazana:",
+        "request": "Zahteva {id}"
+      },
+      "sections": {
+        "errors": "Napake: {count}",
+        "done": "končano"
+      },
+      "required": {
+        "label": "Obvezna polja",
+        "count": "{filled} od {total}",
+        "marker": "obvezno"
+      },
+      "group": {
+        "edit": "Uredi",
+        "foreign": "Shranjevanje zahteva tudi podatke iz skupine: {groups}. Najprej dopolnite to skupino."
+      },
+      "select": {
+        "choose": "Izberite…",
+        "search": "Išči",
+        "no_matches": "Ni zadetkov",
+        "loading": "Nalaganje…",
+        "clear": "Počisti",
+        "done": "Končano"
+      },
+      "number": {
+        "invalid": "Vnesite število."
+      },
+      "file": {
+        "choose": "Izberi datoteko",
+        "drop": "ali povlecite datoteko sem",
+        "remove": "Odstrani",
+        "allowed": "Dovoljene oblike: {formats}",
+        "max_size": "Največja velikost: {size}",
+        "invalid_type": "Oblika datoteke ni podprta.",
+        "too_large": "Datoteka je večja od {size}."
+      },
+      "yes": "Da",
+      "no": "Ne",
+      "otp": {
+        "label": "Koda za potrditev, {length} števk"
+      }
     }
   }
 }
