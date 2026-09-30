@@ -72,6 +72,10 @@
       "types": "./dist/format/index.d.ts",
       "import": "./dist/format/index.js"
     },
+    "./collection": {
+      "types": "./dist/collection/index.d.ts",
+      "import": "./dist/collection/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tailwind.css": "./src/styles/tailwind.css",
     "./fonts.css": "./src/styles/fonts.css",
