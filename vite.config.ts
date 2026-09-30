@@ -14,12 +14,15 @@ const entries: Record<string, string> = {
   "content/index": "src/content/index.ts",
   "overlay/index": "src/overlay/index.ts",
   "modal/index": "src/modal/index.ts",
+  "page/index": "src/page/index.ts",
   "client/index": "src/client/index.ts",
   "platform/index": "src/platform/index.ts",
 };
 
-const peers = Object.keys(pkg.peerDependencies);
-const external = (id: string) => peers.some((name) => id === name || id.startsWith(`${name}/`));
+// Peers and runtime dependencies stay external: the consumer installs one copy of each (a second
+// vue-sonner would be a second toast queue).
+const externals = [...Object.keys(pkg.peerDependencies), ...Object.keys(pkg.dependencies)];
+const external = (id: string) => externals.some((name) => id === name || id.startsWith(`${name}/`));
 
 export default defineConfig({
   plugins: [vue()],

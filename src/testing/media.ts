@@ -16,7 +16,7 @@ export function mockMedia(initial: Partial<MediaState> = {}) {
   const lists = new Set<{ query: string; last: boolean; listeners: Set<() => void> }>();
 
   const evaluate = (query: string) =>
-    query.includes("prefers-reduced-motion") ? state.reducedMotion : query.includes("pointer: coarse") ? state.compact : false;
+    query.includes("prefers-reduced-motion") ? state.reducedMotion : query.includes("pointer: coarse") || query.includes("max-width: 47.999rem") ? state.compact : false;
 
   window.matchMedia = ((query: string) => {
     const entry = { query, last: evaluate(query), listeners: new Set<() => void>() };

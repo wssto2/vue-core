@@ -44,6 +44,10 @@
       "types": "./dist/modal/index.d.ts",
       "import": "./dist/modal/index.js"
     },
+    "./page": {
+      "types": "./dist/page/index.d.ts",
+      "import": "./dist/page/index.js"
+    },
     "./state": {
       "types": "./dist/state/index.d.ts",
       "import": "./dist/state/index.js"
