@@ -16,6 +16,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tailwind.css": "./src/styles/tailwind.css",
     "./fonts.css": "./src/styles/fonts.css",
