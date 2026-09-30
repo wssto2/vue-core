@@ -1,7 +1,7 @@
 import { hasInjectionContext, inject, provide, shallowRef, watch, type InjectionKey } from "vue";
 import { useRoute } from "vue-router";
 import { MissingContextError } from "../platform/context";
-import { positiveInteger, useResource, type IdentifyOption, type Resource, type ResourceBaseOptions, type ResourceId } from "./resource";
+import { positiveInteger, useResource, type Resource, type ResourceBaseOptions, type ResourceId } from "./resource";
 
 /** The record a routed page is about: a `Resource` whose identity is a route parameter. */
 export type RouteResource<T, Id extends ResourceId = number> = Resource<T, Id>;
@@ -36,9 +36,13 @@ export interface RouteResourceOptions<T, Id extends ResourceId = number> extends
  *   transition) the page keeps its record: nothing is read and nothing flashes "not found".
  * - Failure is told apart: `notFound` (404, or no such identity) and `unavailable` (retry).
  */
-export function useRouteResource<T>(options: RouteResourceOptions<T> & IdentifyOption<T, number> & { readonly parse?: undefined }): RouteResource<T>;
+export function useRouteResource<T extends { readonly id: number }>(options: RouteResourceOptions<T> & { readonly identify?: (value: T) => number; readonly parse?: undefined }): RouteResource<T>;
+export function useRouteResource<T>(options: RouteResourceOptions<T> & { readonly identify: (value: T) => number; readonly parse?: undefined }): RouteResource<T>;
+export function useRouteResource<T extends { readonly id: Id }, Id extends ResourceId>(
+  options: RouteResourceOptions<T, Id> & { readonly identify?: (value: T) => Id; readonly parse: (raw: string) => Id | null },
+): RouteResource<T, Id>;
 export function useRouteResource<T, Id extends ResourceId>(
-  options: RouteResourceOptions<T, Id> & IdentifyOption<T, Id> & { readonly parse: (raw: string) => Id | null },
+  options: RouteResourceOptions<T, Id> & { readonly identify: (value: T) => Id; readonly parse: (raw: string) => Id | null },
 ): RouteResource<T, Id>;
 export function useRouteResource<T, Id extends ResourceId>(
   options: RouteResourceOptions<T, Id> & { readonly identify?: (value: T) => Id; readonly parse?: (raw: string) => Id | null },

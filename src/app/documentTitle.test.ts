@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { defineComponent, h, ref } from "vue";
+import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { AdaptivePageShell, usePageChrome } from "../page";
 import { createApplication, type Application } from "./application";
 import { defineFeature } from "./feature";
@@ -19,7 +20,7 @@ async function open(record: ReturnType<typeof defineComponent>, location = "/tic
     id: "tickets",
     routes: [
       { name: "tickets.index", path: "/tickets", component: page("list"), meta: { titleKey: "tickets.title" } },
-      { name: "tickets.record", path: "/tickets/:id", component: record, meta: { titleKey: "tickets.title" } },
+      { name: "tickets.record", path: "/tickets/:id", component: record, meta: { titleKey: "tickets.title" }, children: [{ name: "tickets.general", path: "general", component: page("general") }] },
     ],
   });
   const { platform } = fakeBackend(signedIn(1));
@@ -73,5 +74,19 @@ describe("the browser tab title of a record page", () => {
     title.value = null;
     await settle();
     expect(document.title).toBe("Tickets · Test app");
+  });
+
+  it("keeps the record's name when the page moves to one of its sections (the navigation lands while the page stays mounted)", async () => {
+    const record = defineComponent({
+      setup() {
+        const router = useRouter();
+        onMounted(() => void router.replace({ name: "tickets.general", params: { id: 7 } }));
+        return () => h(AdaptivePageShell, { title: "Printer on fire", documentTitle: "Printer on fire" });
+      },
+    });
+    const application = await open(record);
+    await settle();
+    expect(application.router.currentRoute.value.name).toBe("tickets.general");
+    expect(document.title).toBe("Printer on fire · Test app");
   });
 });

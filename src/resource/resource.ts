@@ -41,11 +41,6 @@ export interface ResourceContext {
   readonly signal: AbortSignal;
 }
 
-/** `update` needs to tell which identity a value belongs to: a value with an `id` of the identity's type says it itself. */
-export type IdentifyOption<T, Id extends ResourceId> = [T] extends [{ readonly id: Id }]
-  ? { readonly identify?: (value: T) => Id }
-  : { readonly identify: (value: T) => Id };
-
 export interface ResourceBaseOptions<T, Id extends ResourceId> {
   /** The identity to load, reactive. Null loads nothing and is `notFound`. */
   readonly for: MaybeRefOrGetter<Id | null>;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId, useTemplateRef } from "vue";
 import Panel from "../content/Panel.vue";
+import type { PanelProps } from "../content/panel";
 import { sectionId, useSectionAnchor } from "./sectionIndex";
 
 /**
@@ -13,15 +14,13 @@ import { sectionId, useSectionAnchor } from "./sectionIndex";
  * The anchor (and URL fragment) is a slug of the title; pass `id` when the title carries data or two
  * sections share one. Outside a section index it is the plain `Panel`.
  */
-const props = defineProps<{
+const props = withDefaults(defineProps<PanelProps & {
   title: string;
   /** The anchor id and URL fragment; by default a slug of the title. */
   id?: string;
-  /** Shown before the title in the panel and in the section list ("02"). */
-  number?: string;
-}>();
+}>(), { id: undefined, icon: undefined, number: undefined, subtitle: undefined, presentation: "card", collapsible: false, flush: false, headingLevel: 2 });
 
-defineOptions({ inheritAttrs: false });
+const collapsed = defineModel<boolean>("collapsed", { default: false });
 defineSlots<{ actions?: () => unknown; footer?: () => unknown; default?: () => unknown }>();
 
 const anchor = props.id ?? (sectionId(props.title) || `section-${useId()}`);
@@ -32,7 +31,8 @@ useSectionAnchor(anchor, () => props.title, element, { number: () => props.numbe
 </script>
 
 <template>
-  <Panel ref="panel" v-bind="{ ...$attrs, id: anchor, tabindex: -1 }" :title="props.title" :number="props.number" class="scroll-mt-[calc(var(--app-bar-height)+1.5rem)]">
+  <Panel ref="panel" v-model:collapsed="collapsed" v-bind="{ id: anchor, tabindex: -1 }" :title="props.title" :icon="props.icon" :number="props.number" :subtitle="props.subtitle"
+    :presentation="props.presentation" :collapsible="props.collapsible" :flush="props.flush" :heading-level="props.headingLevel" class="scroll-mt-[calc(var(--app-bar-height)+1.5rem)]">
     <template v-if="$slots.actions" #actions><slot name="actions" /></template>
     <template v-if="$slots.footer" #footer><slot name="footer" /></template>
     <slot />

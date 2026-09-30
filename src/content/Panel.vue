@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId, useSlots } from "vue";
-import { Icon, type IconName } from "../icon";
+import { Icon } from "../icon";
+import type { PanelProps } from "./panel";
 
 /**
  * A titled region of a record page. `card` is a surface with a title bar, a body and an optional
@@ -17,20 +18,7 @@ import { Icon, type IconName } from "../icon";
  * its own state); the body stays in the DOM while collapsed so form state survives. Extra
  * attributes (an `id` for a jump link) land on the root.
  */
-const props = withDefaults(defineProps<{
-  title?: string;
-  icon?: IconName;
-  /** A section number shown before the title ("01"). */
-  number?: string;
-  /** A quieter line after the title, from `sm` up. */
-  subtitle?: string;
-  presentation?: "card" | "section";
-  collapsible?: boolean;
-  /** The body has no padding (a table or a list that brings its own). */
-  flush?: boolean;
-  /** The level of the title's heading. */
-  headingLevel?: 2 | 3 | 4;
-}>(), {
+const props = withDefaults(defineProps<PanelProps>(), {
   title: undefined,
   icon: undefined,
   number: undefined,

@@ -278,10 +278,11 @@ export function createApplication(options: ApplicationOptions): Application {
 
   // The page chrome is installed with the Vue app below; a page registers its own tab title there (a record's name).
   let pageChrome: PageChrome | null = null;
-  // `fromPage`: the page on screen registered a tab title of its own. Not right after a navigation, when what is mounted is still the previous page.
-  function applyTitle(to: RouteLocationNormalized, fromPage = false): void {
+  // A title the page on screen registered (a record's name) wins over its route's. Right after a navigation that page may still be
+  // the previous one, for the moment before it unmounts and the watcher below applies the right title.
+  function applyTitle(to: RouteLocationNormalized): void {
     const key = to.meta.titleKey;
-    const page = (fromPage ? pageChrome?.documentTitle.value : null) ?? (key && composer.te(key) ? composer.t(key) : null);
+    const page = pageChrome?.documentTitle.value ?? (key && composer.te(key) ? composer.t(key) : null);
     const title = (options.router?.documentTitle ?? defaultDocumentTitle)(page, platform.config.appName);
     if (title !== "") document.title = title;
   }
@@ -346,7 +347,7 @@ export function createApplication(options: ApplicationOptions): Application {
         login,
         home,
         prepare,
-        afterNavigation: (to) => applyTitle(to),
+        afterNavigation: applyTitle,
         progress: options.router?.progress,
         onError: (error) => report({ source: "router", error }),
       }),
@@ -354,7 +355,7 @@ export function createApplication(options: ApplicationOptions): Application {
 
     // A page that registers its tab title after it loaded (a record), or leaves: the tab follows.
     const titleScope = effectScope();
-    titleScope.run(() => watch(() => pageChrome?.documentTitle.value, () => applyTitle(router.currentRoute.value, true)));
+    titleScope.run(() => watch(() => pageChrome?.documentTitle.value, () => applyTitle(router.currentRoute.value)));
     undo.push(() => titleScope.stop());
 
     // The page's language and title follow the locale (`lang` is what screen readers and hyphenation go by).
@@ -364,7 +365,7 @@ export function createApplication(options: ApplicationOptions): Application {
         () => composer.locale.value,
         (locale) => {
           document.documentElement.lang = locale;
-          applyTitle(router.currentRoute.value, true);
+          applyTitle(router.currentRoute.value);
         },
         { immediate: true },
       ),

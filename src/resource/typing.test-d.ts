@@ -28,6 +28,11 @@ export const ticket: RouteResource<Ticket> = useRouteResource({ key: TICKET, par
 export const subject: string | undefined = ticket.data.value?.subject;
 export const section: RouteResource<Ticket> = useRouteResourceContext(TICKET);
 
+// --- positive: a loader written as a lambda (its parameters typed by the context, its record by what it returns), with or without a key
+declare const api: { get(id: number, options?: { signal?: AbortSignal }): Promise<{ data: Ticket }> };
+export const fromLambda: RouteResource<Ticket> = useRouteResource({ param: "ticketID", load: (id, { signal }) => api.get(id, { signal }).then((response) => response.data) });
+export const fromKeyedLambda: RouteResource<Ticket> = useRouteResource({ key: TICKET, param: "ticketID", load: (id) => api.get(id).then((response) => response.data) });
+
 // --- positive: another identity through `parse`; a record without an `id` says which one it is
 export const byUuid: RouteResource<{ readonly id: string }, string> = useRouteResource({ param: "accountID", parse: (raw) => raw || null, load: loadByUuid });
 export const note: RouteResource<Note> = useRouteResource({ param: "noteID", load: loadNote, identify: () => 1 });
