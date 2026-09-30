@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/vue";
 import { describe, expect, it } from "vitest";
 import { defineComponent, nextTick, ref } from "vue";
+import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
 import Avatar from "./Avatar.vue";
 import Divider from "./Divider.vue";
@@ -11,7 +12,8 @@ import MicroLabel from "./MicroLabel.vue";
 import Panel from "./Panel.vue";
 import Timestamp from "./Timestamp.vue";
 
-const global = { plugins: [createTestI18n("en")] };
+const i18n = createTestI18n("en");
+const global = { plugins: [i18n, testFormatting(i18n)] };
 
 describe("initialsFor and Avatar", () => {
   it("takes the first letters of the first and last word", () => {
@@ -118,7 +120,7 @@ describe("Timestamp", () => {
     const time = container.querySelector("time")!;
 
     expect(time.getAttribute("datetime")).toBe("2026-01-01");
-    expect(time.textContent).toMatch(/Jan 1, 2026/);
+    expect(time.textContent).toMatch(/01\/01\/2026/);
   });
 
   it("says there is no data for nothing or for a non-date", () => {
