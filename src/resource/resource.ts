@@ -31,7 +31,7 @@ export interface Resource<T, Id extends ResourceId = number> {
   /**
    * Replaces the value with what a save returned (no extra request) and drops every read still in
    * flight. A value of another identity than the one shown (a save that began on a record the user has
-   * since left) is ignored: returns false.
+   * since left) is ignored: returns false. The value says which one it is through its `id` or `identify`.
    */
   update(value: T): boolean;
 }
@@ -41,10 +41,12 @@ export interface ResourceContext {
   readonly signal: AbortSignal;
 }
 
-export interface ResourceBaseOptions<T, Id extends ResourceId> {
+export interface ResourceOptions<T, Id extends ResourceId = number> {
   /** The identity to load, reactive. Null loads nothing and is `notFound`. */
   readonly for: MaybeRefOrGetter<Id | null>;
   readonly load: (id: Id, context: ResourceContext) => Promise<T>;
+  /** Which identity a value belongs to, for `update`; by default its `id`. A value with neither is taken to be the current one. */
+  readonly identify?: (value: T) => Id;
   /** The text of a failed read; by default a sentence per kind of failure, in the app's language. */
   readonly errorMessage?: (error: unknown) => string;
 }
@@ -69,7 +71,7 @@ const hasId = (value: unknown): value is { id: ResourceId } => typeof value === 
  * the record's resource, so one failing never blanks the other. `useRouteResource` is the same
  * thing for the record of a page.
  */
-export function useResource<T, Id extends ResourceId = number>(options: ResourceBaseOptions<T, Id> & { readonly identify?: (value: T) => Id }): Resource<T, Id> {
+export function useResource<T, Id extends ResourceId = number>(options: ResourceOptions<T, Id>): Resource<T, Id> {
   const { t } = useI18n();
   const id = computed(() => toValue(options.for));
   const state = shallowRef<ResourceState<T>>({ status: "loading" });

@@ -1,12 +1,12 @@
 import { hasInjectionContext, inject, provide, shallowRef, watch, type InjectionKey } from "vue";
 import { useRoute } from "vue-router";
 import { MissingContextError } from "../platform/context";
-import { positiveInteger, useResource, type Resource, type ResourceBaseOptions, type ResourceId } from "./resource";
+import { positiveInteger, useResource, type Resource, type ResourceOptions, type ResourceId } from "./resource";
 
 /** The record a routed page is about: a `Resource` whose identity is a route parameter. */
 export type RouteResource<T, Id extends ResourceId = number> = Resource<T, Id>;
 
-export interface RouteResourceOptions<T, Id extends ResourceId = number> extends Omit<ResourceBaseOptions<T, Id>, "for"> {
+export interface RouteResourceOptions<T, Id extends ResourceId = number> extends Omit<ResourceOptions<T, Id>, "for" | "identify"> {
   /** Provides the resource to the page's routed sections (`useRouteResourceContext(key)`); declare it once in the feature's context file. */
   readonly key?: InjectionKey<RouteResource<T, Id>>;
   /** The route parameter that holds the identity (`"ticketID"` for `/tickets/:ticketID`). */
