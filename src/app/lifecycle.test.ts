@@ -277,6 +277,19 @@ describe("repeated mount and dispose", () => {
     balance(add.document, remove.document);
   });
 
+  it("the default web history's listeners are removed by dispose too", () => {
+    const add = vi.spyOn(window, "addEventListener");
+    const remove = vi.spyOn(window, "removeEventListener");
+    const { platform } = fakeBackend(signedIn(1));
+
+    // No `router.history`: the router gets the default web history, which registers popstate when it is created.
+    const application = createApplication({ platform, features: [login], i18n: { missingWarn: false } });
+    expect(add.mock.calls.map((call) => call[0])).toContain("popstate");
+    application.dispose();
+
+    expect(remove.mock.calls.map((call) => call[0])).toContain("popstate");
+  });
+
   it("dispose during mount never mounts and never starts an effect", async () => {
     const gate = deferred<void>();
     const started = vi.fn();

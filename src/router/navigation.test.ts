@@ -46,7 +46,7 @@ describe("createNavigation", () => {
   ];
 
   async function setup(bindings: OwnedNavigationBinding[], navigation: readonly NavigationNode[] = tree) {
-    const router = createRouter({ history: createMemoryHistory(), routes: [...routes.records] });
+    const router = createRouter({ history: createMemoryHistory(), routes: [{ path: "/", component: view }, ...routes.records] });
     await router.push("/");
     const session = createSession({ load: async () => ({ ...snapshotOf(1), navigation }), signOut: async () => {} });
     await session.restore();
