@@ -109,6 +109,12 @@ describe("Skeleton, DrawnCheck, ProgressTrack", () => {
     expect(bar.className).toContain("motion-reduce:animate-none");
   });
 
+  it("skeleton carries no size utility of its own, so the caller's width and height apply", () => {
+    const { container } = render(Skeleton, { attrs: { class: "h-10 w-2/3" } });
+    const classes = container.firstElementChild!.className.split(/\s+/);
+    expect(classes.filter((c) => /^(h|w)-/.test(c))).toEqual(["h-10", "w-2/3"]);
+  });
+
   it("the drawn check is decorative and holds still under reduced motion", () => {
     const { container } = render(DrawnCheck, { props: { circle: true } });
     expect(container.querySelector("svg")!.getAttribute("aria-hidden")).toBe("true");
