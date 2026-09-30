@@ -43,6 +43,20 @@ export type CoreMessages = {
     toast: {
       notifications: string;
     };
+    shell: {
+      menu: string;
+      home: string;
+      account: {
+        open: string;
+        language: string;
+        sign_out: string;
+        sign_out_failed: string;
+      };
+      update: {
+        available: string;
+        reload: string;
+      };
+    };
     no_access: {
       title: string;
       body: string;

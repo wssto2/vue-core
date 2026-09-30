@@ -72,6 +72,10 @@
       "types": "./dist/app/index.d.ts",
       "import": "./dist/app/index.js"
     },
+    "./shell": {
+      "types": "./dist/shell/index.d.ts",
+      "import": "./dist/shell/index.js"
+    },
     "./format": {
       "types": "./dist/format/index.d.ts",
       "import": "./dist/format/index.js"

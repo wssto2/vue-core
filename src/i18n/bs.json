@@ -33,6 +33,20 @@
     "toast": {
       "notifications": "Obavijesti"
     },
+    "shell": {
+      "menu": "Meni",
+      "home": "Početna",
+      "account": {
+        "open": "Otvori korisnički meni",
+        "language": "Jezik",
+        "sign_out": "Odjava",
+        "sign_out_failed": "Server nije završio vašu sesiju. Pokušajte ponovo."
+      },
+      "update": {
+        "available": "Dostupna je nova verzija aplikacije",
+        "reload": "Osvježi"
+      }
+    },
     "no_access": {
       "title": "Nemate pristup",
       "body": "Vaše privilegije ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."

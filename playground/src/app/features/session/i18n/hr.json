@@ -1,1 +1,7 @@
-{ "login": { "title": "Prijava", "submit": "Prijavi se kao Ana" }, "sign_out": "Odjava" }
+{
+  "login": { "title": "Prijava", "submit": "Prijavi se kao Ana" },
+  "notifications": "Obavijesti, nepročitano: {count}",
+  "notifications_empty": "Nema novih obavijesti u playgroundu",
+  "search": "Pretraži",
+  "search_soon": "Pretraga nije dio playgrounda"
+}

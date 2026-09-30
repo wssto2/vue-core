@@ -3,6 +3,8 @@ export interface MediaState {
   /** Phones and touch-first screens (the `compact:` condition). */
   compact: boolean;
   reducedMotion: boolean;
+  /** Running as an installed app (`display-mode: standalone`). */
+  standalone: boolean;
 }
 
 /**
@@ -11,12 +13,20 @@ export interface MediaState {
  * Returns `restore`. Not public; tests only.
  */
 export function mockMedia(initial: Partial<MediaState> = {}) {
-  const state: MediaState = { compact: false, reducedMotion: false, ...initial };
+  const state: MediaState = { compact: false, reducedMotion: false, standalone: false, ...initial };
   const original = window.matchMedia;
   const lists = new Set<{ query: string; last: boolean; listeners: Set<() => void> }>();
 
   const evaluate = (query: string) =>
-    query.includes("prefers-reduced-motion") ? state.reducedMotion : query.includes("pointer: coarse") || query.includes("max-width: 47.999rem") ? state.compact : false;
+    query.includes("prefers-reduced-motion")
+      ? state.reducedMotion
+      : query.includes("display-mode: standalone")
+        ? state.standalone
+        : query.includes("min-width: 48rem")
+          ? !state.compact
+          : query.includes("pointer: coarse") || query.includes("max-width: 47.999rem")
+            ? state.compact
+            : false;
 
   window.matchMedia = ((query: string) => {
     const entry = { query, last: evaluate(query), listeners: new Set<() => void>() };

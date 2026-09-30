@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { AdaptivePageShell } from "@wssto2/vue-core/page";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 </script>
 
 <template>
-  <h1 class="text-large-title font-semibold text-content-strong">{{ t("reports.title") }}</h1>
+  <AdaptivePageShell :title="t('reports.title')" />
 </template>

@@ -33,6 +33,20 @@
     "toast": {
       "notifications": "Obvestila"
     },
+    "shell": {
+      "menu": "Meni",
+      "home": "Domov",
+      "account": {
+        "open": "Odpri uporabniški meni",
+        "language": "Jezik",
+        "sign_out": "Odjava",
+        "sign_out_failed": "Strežnik ni končal vaše seje. Poskusite znova."
+      },
+      "update": {
+        "available": "Na voljo je nova različica aplikacije",
+        "reload": "Osveži"
+      }
+    },
     "no_access": {
       "title": "Ni dostopa",
       "body": "Vaše pravice ne vključujejo te strani. Če menite, da je prišlo do napake, se obrnite na skrbnika."

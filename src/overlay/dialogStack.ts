@@ -20,7 +20,8 @@ import { perDocument } from "../internal/perDocument";
  * `data-dialog-inert-skip`.
  */
 export const INERT_SKIP_ATTR = "data-dialog-inert-skip";
-const SCROLL_LOCK_CLASS = "overflow-hidden";
+/** The class the stack puts on `<body>` while a dialog is open. */
+export const SCROLL_LOCK_CLASS = "overflow-hidden";
 
 interface Entry {
   root: () => HTMLElement | null;

@@ -33,6 +33,8 @@ import { ApplicationError, validateComposition, type CompositionIssue } from "./
 export interface ShellDefinition {
   readonly component: Component;
   readonly slots: readonly ShellSlot[];
+  /** The shell's page-load indicator; used as `router.progress` unless the application sets its own. */
+  readonly progress?: { start(): void; done(): void };
 }
 
 /** Where an error the application caught came from. */
@@ -167,7 +169,7 @@ export function createApplication(options: ApplicationOptions): Application {
   const { platform } = options;
   const supportedLocales = options.locale?.supported ?? (Object.keys(coreMessages) as string[]);
   const fallbackLocale = options.locale?.fallback ?? "en";
-  const shell = options.shell === undefined ? undefined : isShellDefinition(options.shell) ? options.shell : { component: options.shell, slots: undefined };
+  const shell = options.shell === undefined ? undefined : isShellDefinition(options.shell) ? options.shell : { component: options.shell, slots: undefined, progress: undefined };
 
   // --- 1. validate the composition; nothing is built from an invalid one
   const appIssues: CompositionIssue[] = [];
@@ -348,7 +350,7 @@ export function createApplication(options: ApplicationOptions): Application {
         home,
         prepare,
         afterNavigation: applyTitle,
-        progress: options.router?.progress,
+        progress: options.router?.progress ?? shell?.progress,
         onError: (error) => report({ source: "router", error }),
       }),
     );
