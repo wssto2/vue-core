@@ -7,5 +7,5 @@
 </script>
 
 <template>
-  <div class="h-4 w-full animate-pulse rounded-lg bg-fill-strong motion-reduce:animate-none" aria-hidden="true"></div>
+  <div class="skeleton-bar animate-pulse rounded-lg bg-fill-strong motion-reduce:animate-none" aria-hidden="true"></div>
 </template>

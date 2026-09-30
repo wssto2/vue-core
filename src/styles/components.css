@@ -71,3 +71,9 @@
     view-transition-name: app-bottom-dock;
   }
 }
+
+/* Skeleton: a text line high and full width by default, at zero specificity so any size
+   class the caller passes (`h-10 w-2/3`) wins regardless of utility order. */
+:where(.skeleton-bar) {
+  height: 1rem;
+}

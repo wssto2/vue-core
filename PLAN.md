@@ -97,7 +97,7 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 |---|---|---|---|
 | V1 | Done | 2391480…3d3fe83 | Accepted 2026-09-30. Decision: apps with their own Tailwind import `tailwind.css`, which will `@source` the package dist (V3); prebuilt `styles.css` is the fallback. |
 | V2 | Done | 58efe42…d3f21a0 | Accepted 2026-09-30. Bootstrap wire keys snake_case (go-core JSON); `/auth/me` keeps ARV's `{user, expires_at, access}`; no per-call parser (generated types). 9 ARV bugs listed in the V2 report. |
-| V3 | Done | 8bfdc12…8fe3321 | Accepted 2026-09-30. `tone="critical"` kept (HTML `role` stays free); date/number formatting becomes an app environment in V4; look changes from dropping legacy palettes await the owner (Panel radius, Banner surface, tooltip, skeleton, muted labels). ARV bugs #15–29. |
+| V3 | Done | 8bfdc12…8fe3321 | Accepted 2026-09-30. `tone="critical"` kept (HTML `role` stays free); date/number formatting becomes an app environment in V4; look changes from dropping legacy palettes (Panel radius + hairline, Banner status surfaces, tooltip, skeleton fill, darker muted labels) approved by the owner 2026-09-30 after a before/after comparison; Skeleton sizing fixed on main (caller width/height win). ARV bugs #15–29. |
 | V4 | Pending | | |
 | V4b | Pending | | |
 | V5 | Pending | | |
