@@ -6,6 +6,7 @@ import pkg from "./package.json" with { type: "json" };
 // entry here: name = path under dist/ (without extension), value = source file.
 const entries: Record<string, string> = {
   index: "src/index.ts",
+  "icon/index": "src/icon/index.ts",
 };
 
 const peers = Object.keys(pkg.peerDependencies);
