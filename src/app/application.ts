@@ -94,8 +94,8 @@ export interface ApplicationOptions {
   formatting?: Partial<Formatters>;
   /** Message namespaces the application or its shell owns itself, outside any feature. */
   messages?: readonly MessageNamespace[];
-  /** The application's icons (`installIcons`). */
-  icons?: IconSet;
+  /** The application's icons (`installIcons`): one set, or several partial ones (a feature's own) that are merged. */
+  icons?: IconSet | readonly IconSet[];
   /** The backend's destination catalogue, for validating the features' bindings. */
   navigation?: NavigationCatalogue;
   /** What stands in place of a page the user may not open. */
@@ -311,7 +311,7 @@ export function createApplication(options: ApplicationOptions): Application {
   installFormatting(app, formatting);
   pageChrome = installPageChrome(app);
   installBottomDock(app);
-  if (options.icons) installIcons(app, options.icons);
+  if (options.icons) installIcons(app, ...(Array.isArray(options.icons) ? options.icons : [options.icons as IconSet]));
   app.provide(applicationKey, environment);
   app.provide(navigationKey, navigation);
   app.provide(shellContributionsKey, contributions);

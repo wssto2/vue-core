@@ -16,7 +16,8 @@ export const fine: IconName = "loader4Line";
 // @ts-expect-error not an icon
 export const notFine: IconName = "noSuchIcon";
 
-// A set may replace core icons and, with no app names registered, holds nothing else.
+// A set may be partial, replace core icons and, with no app names registered, holds nothing else.
 export const set: IconSet = { close: "<svg/>" };
+export const empty: IconSet = {};
 // @ts-expect-error a name nobody registered
 export const extra: IconSet = { unknown: "<svg/>" };

@@ -13,7 +13,7 @@ const application = createApplication({
   platform: createDemoPlatform(),
   router: { history: createWebHashHistory() },
   shell: backofficeShell(),
-  icons: { ...appIcons, ...shellIcons },
+  icons: [appIcons, shellIcons],
   i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports" } } } },
   features: [sessionFeature, createTicketsFeature({ list: () => [{ id: 1, subject: "Printer on fire" }] })],
 });
