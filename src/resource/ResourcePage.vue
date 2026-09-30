@@ -33,6 +33,9 @@ import type { Resource, ResourceId } from "./resource";
  * - A record opened from a list passes `list` (back with the list's state, the pager); a direct link
  *   passes `back`. `#pager` replaces the pager.
  *
+ * A region of the record that loads on its own takes the record's resource (`useResource({ for: record, load })`): it waits until
+ * the record is loaded, so a missing record is one not-found state, never one per region.
+ *
  * A record page with a layout of its own (a lead's columns, independent panels) composes
  * `AdaptivePageShell`, the header and `SectionNavigator` itself on the same resource.
  */

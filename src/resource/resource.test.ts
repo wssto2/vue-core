@@ -305,4 +305,65 @@ describe("useResource", () => {
     await nextTick();
     expect(first.resource.state.value).toMatchObject({ status: "failed", reason: "notFound" });
   });
+
+  describe("that depends on another resource", () => {
+    async function mountPair(readParent: (id: number) => Promise<{ id: number }>, readChild: (id: number) => Promise<string[]>) {
+      const identity = ref<number | null>(1);
+      const held: { parent?: ReturnType<typeof useResource<{ id: number }>>; child?: ReturnType<typeof useResource<string[]>> } = {};
+      const Host = defineComponent({
+        setup() {
+          held.parent = useResource({ for: () => identity.value, load: (id) => readParent(id) });
+          held.child = useResource({ for: held.parent, load: (id) => readChild(id) });
+          return () => null;
+        },
+      });
+      render(Host, { global: { plugins: [i18n] } });
+      return { identity, parent: held.parent!, child: held.child! };
+    }
+
+    it("reads nothing and stays loading while its parent loads, then starts when the parent is loaded", async () => {
+      const parentRead = deferred<{ id: number }>();
+      const readChild = vi.fn(async (id: number) => [`of ${id}`]);
+      const pair = await mountPair(() => parentRead.promise, readChild);
+      await settle();
+      expect(readChild).not.toHaveBeenCalled();
+      expect(pair.child.state.value).toEqual({ status: "loading" });
+
+      parentRead.resolve({ id: 1 });
+      await settle();
+      expect(readChild).toHaveBeenCalledTimes(1);
+      expect(pair.child.state.value).toEqual({ status: "loaded", value: ["of 1"] });
+    });
+
+    it("never reads and never fails on its own when its parent failed or does not exist", async () => {
+      const readChild = vi.fn(async () => {
+        throw new Error("would fail");
+      });
+      const pair = await mountPair(async () => {
+        throw new ApiError({ kind: "notFound", message: "no", status: 404 });
+      }, readChild);
+      await settle();
+      expect(pair.parent.state.value).toMatchObject({ status: "failed", reason: "notFound" });
+      expect(readChild).not.toHaveBeenCalled();
+      expect(pair.child.state.value).toEqual({ status: "loading" });
+    });
+
+    it("starts over when the parent's identity changes, and a re-read of the same parent does not reset it", async () => {
+      const readChild = vi.fn(async (id: number) => [`of ${id}`]);
+      const pair = await mountPair(async (id) => ({ id }), readChild);
+      await settle();
+      expect(readChild).toHaveBeenCalledTimes(1);
+
+      await pair.parent.reload();
+      await settle();
+      expect(readChild).toHaveBeenCalledTimes(1);
+      expect(pair.child.state.value).toMatchObject({ status: "loaded" });
+
+      pair.identity.value = 2;
+      expect(pair.child.state.value).toEqual({ status: "loading" });
+      await settle();
+      expect(readChild).toHaveBeenCalledTimes(2);
+      expect(pair.child.state.value).toEqual({ status: "loaded", value: ["of 2"] });
+    });
+  });
 });

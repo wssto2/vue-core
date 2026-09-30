@@ -42,8 +42,12 @@ export interface ResourceContext {
 }
 
 export interface ResourceOptions<T, Id extends ResourceId = number> {
-  /** The identity to load, reactive. Null loads nothing and is `notFound`. */
-  readonly for: MaybeRefOrGetter<Id | null>;
+  /**
+   * The identity to load, reactive (null loads nothing and is `notFound`), or the resource this one depends on
+   * (a lead's comments depend on the lead): it then loads nothing, and cannot fail on its own, until that
+   * resource has its record, starts when it has, and starts over when the parent's identity changes.
+   */
+  readonly for: MaybeRefOrGetter<Id | null> | Resource<unknown, Id>;
   readonly load: (id: Id, context: ResourceContext) => Promise<T>;
   /** Which identity a value belongs to, for `update`; by default its `id`. A value with neither is taken to be the current one. */
   readonly identify?: (value: T) => Id;
@@ -58,14 +62,19 @@ export function positiveInteger(raw: string): number | null {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+const isResource = <Id extends ResourceId>(value: unknown): value is Resource<unknown, Id> =>
+  typeof value === "object" && value !== null && "state" in value && "reload" in value && "id" in value;
+
 const hasId = (value: unknown): value is { id: ResourceId } => typeof value === "object" && value !== null && "id" in value;
 
 /**
  * Loads one thing for an identity, with the race rules built in: latest read wins, a read for an
  * identity that was left is dropped (and aborted), nothing lands after the scope ended.
  *
- *   const comments = useResource({ for: () => lead.id.value, load: (id, { signal }) => api.comments(id, { signal }) });
+ *   const comments = useResource({ for: lead, load: (id, { signal }) => api.comments(id, { signal }) });
  *   <AsyncSection :state="comments.state.value" @retry="comments.reload()">…</AsyncSection>
+ *
+ * `for: lead` (a resource) rather than an identity makes the region wait for that record: it stays loading, reads nothing and cannot fail until the record is loaded.
  *
  * It is the state of a region that loads on its own (a lead's comments, its history): independent of
  * the record's resource, so one failing never blanks the other. `useRouteResource` is the same
@@ -73,7 +82,10 @@ const hasId = (value: unknown): value is { id: ResourceId } => typeof value === 
  */
 export function useResource<T, Id extends ResourceId = number>(options: ResourceOptions<T, Id>): Resource<T, Id> {
   const { t } = useI18n();
-  const id = computed(() => toValue(options.for));
+  const parent = isResource<Id>(options.for) ? options.for : null;
+  const id = computed(() => (parent ? parent.id.value : toValue(options.for as MaybeRefOrGetter<Id | null>)));
+  // A dependent resource waits for its parent's record: it reads nothing before it, and nothing of its own can fail.
+  const waiting = computed(() => parent !== null && parent.data.value === null);
   const state = shallowRef<ResourceState<T>>({ status: "loading" });
   // The identity the value in `state` belongs to.
   let held: Id | null = null;
@@ -97,6 +109,11 @@ export function useResource<T, Id extends ResourceId = number>(options: Resource
   async function read(): Promise<void> {
     const target = id.value;
     const current = supersede();
+    if (waiting.value) {
+      held = null;
+      state.value = { status: "loading" };
+      return;
+    }
     if (target === null) {
       held = null;
       state.value = { status: "failed", reason: "notFound", error: t("core.resource.not_found.body") };
@@ -141,7 +158,7 @@ export function useResource<T, Id extends ResourceId = number>(options: Resource
   }
 
   // Synchronously, so a record page's first read starts in its setup and a route change never shows the previous record.
-  watch(id, () => void read(), { immediate: true, flush: "sync" });
+  watch([id, waiting], () => void read(), { immediate: true, flush: "sync" });
   if (getCurrentScope()) onScopeDispose(supersede);
 
   return {
