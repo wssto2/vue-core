@@ -1,0 +1,34 @@
+{
+  "core": {
+    "actions": {
+      "cancel": "Prekliči",
+      "close": "Zapri",
+      "confirm": "Potrdi",
+      "retry": "Poskusi znova",
+      "save": "Shrani",
+      "saving": "Shranjujem…",
+      "saved": "Shranjeno",
+      "more": "Več"
+    },
+    "state": {
+      "loading": "Nalaganje vsebine",
+      "stale": "Prikazani so prejšnji podatki. Morda niso posodobljeni.",
+      "refreshing": "Osveževanje. Prikazani so prejšnji podatki.",
+      "empty": "Ni podatkov",
+      "no_value": "Ni vneseno"
+    },
+    "page": {
+      "breadcrumbs": "Navigacijska pot",
+      "more_actions": "Več dejanj"
+    },
+    "wait": {
+      "seconds": "{count} s"
+    },
+    "discard_changes": {
+      "title": "Neshranjene spremembe",
+      "body": "Vneseni podatki niso shranjeni. Če nadaljujete, bodo spremembe izgubljene.",
+      "confirm": "Zavrzi spremembe",
+      "cancel": "Nadaljuj z urejanjem"
+    }
+  }
+}

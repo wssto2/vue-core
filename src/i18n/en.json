@@ -1,0 +1,34 @@
+{
+  "core": {
+    "actions": {
+      "cancel": "Cancel",
+      "close": "Close",
+      "confirm": "Confirm",
+      "retry": "Try again",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "more": "More"
+    },
+    "state": {
+      "loading": "Loading content",
+      "stale": "Showing previous data. It may be out of date.",
+      "refreshing": "Refreshing. Showing previous data.",
+      "empty": "No data",
+      "no_value": "Not entered"
+    },
+    "page": {
+      "breadcrumbs": "Breadcrumbs",
+      "more_actions": "More actions"
+    },
+    "wait": {
+      "seconds": "{count} s"
+    },
+    "discard_changes": {
+      "title": "Unsaved changes",
+      "body": "The entered data has not been saved. If you continue, your changes will be lost.",
+      "confirm": "Discard changes",
+      "cancel": "Continue editing"
+    }
+  }
+}

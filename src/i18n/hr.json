@@ -1,0 +1,34 @@
+{
+  "core": {
+    "actions": {
+      "cancel": "Odustani",
+      "close": "Zatvori",
+      "confirm": "Potvrdi",
+      "retry": "Pokušaj ponovno",
+      "save": "Spremi",
+      "saving": "Spremam…",
+      "saved": "Spremljeno",
+      "more": "Više"
+    },
+    "state": {
+      "loading": "Učitavanje sadržaja",
+      "stale": "Prikazani su prethodni podaci. Možda nisu ažurni.",
+      "refreshing": "Osvježavanje. Prikazani su prethodni podaci.",
+      "empty": "Nema podataka",
+      "no_value": "Nije uneseno"
+    },
+    "page": {
+      "breadcrumbs": "Navigacijska putanja",
+      "more_actions": "Više radnji"
+    },
+    "wait": {
+      "seconds": "{count} s"
+    },
+    "discard_changes": {
+      "title": "Nespremljene promjene",
+      "body": "Uneseni podaci nisu spremljeni. Ako nastavite, izmjene će biti izgubljene.",
+      "confirm": "Odbaci promjene",
+      "cancel": "Nastavi s uređivanjem"
+    }
+  }
+}
