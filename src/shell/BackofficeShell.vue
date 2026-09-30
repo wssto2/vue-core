@@ -3,6 +3,7 @@ import { computed, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type { RouteLocationRaw } from "vue-router";
 import { ShellOutlet } from "../app/contributions";
+import LeaveGuardRoot from "../form/LeaveGuardRoot.vue";
 import { Toaster } from "../overlay";
 import { BottomDock, usePageChromeContext } from "../page";
 import { usePlatform } from "../platform/platform";
@@ -100,6 +101,9 @@ const accountSheet = useTemplateRef("accountSheet");
     <Teleport to="body">
       <div data-dialog-inert-skip><Toaster /></div>
     </Teleport>
+
+    <!-- The one "Discard changes?" question of the application (forms and sheets with unsaved changes ask it). -->
+    <LeaveGuardRoot />
 
     <ShellOutlet name="host" />
   </div>

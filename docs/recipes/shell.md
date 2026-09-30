@@ -138,6 +138,7 @@ A shell is a component plus the list of slots it renders. Compose it from the li
 <script setup lang="ts">
 import { ShellOutlet } from "@wssto2/vue-core/app";
 import { BottomDock, usePageChromeContext } from "@wssto2/vue-core/page";
+import { LeaveGuardRoot } from "@wssto2/vue-core/form";
 import { AppRouterView } from "@wssto2/vue-core/router";
 import { AccountSheet, NavigationDrawer, ShellSidebar, ShellStage, ShellTopBar, useShellIdentity } from "@wssto2/vue-core/shell";
 import { useTemplateRef } from "vue";
@@ -170,6 +171,8 @@ const accountSheet = useTemplateRef("accountSheet");
     </ShellStage>
     <AccountSheet v-if="identity" ref="accountSheet" :identity="identity" />
     <ShellOutlet name="host" />
+    <!-- The one "Discard changes?" dialog: forms with unsaved changes ask through it. `backofficeShell` renders it; a shell of your own must. -->
+    <LeaveGuardRoot />
   </div>
 </template>
 ```
@@ -190,5 +193,7 @@ createApplication({
   features: [sessionFeature, notificationsFeature],
 });
 ```
+
+A shell of your own renders `<LeaveGuardRoot />` once (as `CustomShell.vue` does): `createApplication` installs the application's leave guard, `backofficeShell` renders its dialog, and without the dialog a page with unsaved changes that is left fails with a `MissingLeaveGuardRootError` instead of letting the user lose their work silently.
 
 Naming the slots has a purpose: a feature that contributes to a slot the shell does not render fails at startup, naming the feature, instead of silently showing nothing. The page chrome (the back, the title, the page's actions) is read by `ShellTopBar` from the page itself, so a custom shell gets the same phone bar and sidebar behavior.

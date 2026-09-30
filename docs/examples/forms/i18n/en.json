@@ -1,0 +1,16 @@
+{
+  "tickets": "Tickets",
+  "ticket": "Ticket",
+  "create": "Create ticket",
+  "details": "Details",
+  "contact": "Contact",
+  "subject": "Subject",
+  "priority": "Priority",
+  "dueOn": "Due",
+  "email": "E-mail",
+  "phone": "Phone",
+  "assign": "Assign…",
+  "assignee": "Assignee",
+  "note": "Note",
+  "stale": "The ticket was changed by someone else. It was read again; check your changes and save again."
+}

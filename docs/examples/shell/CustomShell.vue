@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ShellOutlet } from "@wssto2/vue-core/app";
 import { BottomDock, usePageChromeContext } from "@wssto2/vue-core/page";
+import { LeaveGuardRoot } from "@wssto2/vue-core/form";
 import { AppRouterView } from "@wssto2/vue-core/router";
 import { AccountSheet, NavigationDrawer, ShellSidebar, ShellStage, ShellTopBar, useShellIdentity } from "@wssto2/vue-core/shell";
 import { useTemplateRef } from "vue";
@@ -33,5 +34,7 @@ const accountSheet = useTemplateRef("accountSheet");
     </ShellStage>
     <AccountSheet v-if="identity" ref="accountSheet" :identity="identity" />
     <ShellOutlet name="host" />
+    <!-- The one "Discard changes?" dialog: forms with unsaved changes ask through it. `backofficeShell` renders it; a shell of your own must. -->
+    <LeaveGuardRoot />
   </div>
 </template>

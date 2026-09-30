@@ -1,7 +1,7 @@
 export { ErrorBag } from "./errors";
 export { fieldKey, focusFirstError } from "./focus";
 export { useDirtySnapshot, useSheetDiscardGuard } from "./dirty";
-export { createLeaveGuard, installLeaveGuard, leaveGuardKey, useLeaveGuard, useLeaveGuardContext } from "./leaveGuard";
+export { createLeaveGuard, installLeaveGuard, MissingLeaveGuardRootError, leaveGuardKey, useLeaveGuard, useLeaveGuardContext } from "./leaveGuard";
 export type { LeaveGuard, PendingLeave } from "./leaveGuard";
 export { default as LeaveGuardRoot } from "./LeaveGuardRoot.vue";
 export { useForm } from "./useForm";

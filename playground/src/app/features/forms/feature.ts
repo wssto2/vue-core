@@ -1,5 +1,4 @@
-import { defineFeature, provideContext } from "@wssto2/vue-core/app";
-import { createLeaveGuard, leaveGuardKey } from "@wssto2/vue-core/form";
+import { defineFeature } from "@wssto2/vue-core/app";
 import { localeMessages } from "@wssto2/vue-core/i18n";
 import { formsRoutes } from "./routes";
 
@@ -8,8 +7,6 @@ import { formsRoutes } from "./routes";
 export const formsFeature = defineFeature({
   id: "forms",
   routes: formsRoutes.records,
-  // The leave guard is the app's: one per application, shared by every page that asks "discard changes?".
-  context: provideContext(leaveGuardKey, createLeaveGuard()),
   // Essential: the sidebar shows this feature's name before any of its routes is entered.
   messages: localeMessages("forms", { en: () => import("./i18n/en.json"), hr: () => import("./i18n/hr.json") }, { essential: true }),
   navigation: [{ destination: "forms", to: formsRoutes.index, within: ["forms.account", "forms.offer.new"] }],

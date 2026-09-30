@@ -27,6 +27,19 @@ export interface LeaveGuard {
   register(isDirty: () => boolean): () => void;
   /** Whether any registered check has unsaved changes (before a pull to refresh, say). */
   hasUnsavedChanges(): boolean;
+  /** `LeaveGuardRoot` announces itself while it is mounted; returns the release. Without one nobody can be asked, which `confirm` reports. */
+  attach(): () => void;
+}
+
+/** A page with unsaved changes had to ask "discard changes?" but the shell renders no `<LeaveGuardRoot />`: there is no dialog to ask with. */
+export class MissingLeaveGuardRootError extends Error {
+  constructor() {
+    super(
+      'A page with unsaved changes needs to ask "Discard changes?", but no <LeaveGuardRoot /> is mounted. ' +
+        "BackofficeShell renders it; a shell of your own must render <LeaveGuardRoot /> once (import it from @wssto2/vue-core/form).",
+    );
+    this.name = "MissingLeaveGuardRootError";
+  }
 }
 
 export function createLeaveGuard(): LeaveGuard {
@@ -35,7 +48,11 @@ export function createLeaveGuard(): LeaveGuard {
   // One answer per navigation: every guard of the same navigation receives the same `to` object.
   const decisions = new WeakMap<RouteLocationNormalized, Promise<boolean>>();
 
+  let roots = 0;
+
   function confirm(to: RouteLocationNormalized | null = null): Promise<boolean> {
+    // Answering "yes, leave" for a question nobody can see would lose the user's work silently: fail instead.
+    if (roots === 0) return Promise.reject(new MissingLeaveGuardRootError());
     const known = to ? decisions.get(to) : undefined;
     if (known) return known;
     const open = pending.value;
@@ -60,6 +77,14 @@ export function createLeaveGuard(): LeaveGuard {
   return {
     pending,
     confirm,
+    attach() {
+      roots++;
+      let released = false;
+      return () => {
+        if (!released) roots--;
+        released = true;
+      };
+    },
     register(isDirty) {
       checks.add(isDirty);
       return () => checks.delete(isDirty);
@@ -70,7 +95,7 @@ export function createLeaveGuard(): LeaveGuard {
 
 export const [leaveGuardKey, useLeaveGuardContext] = defineFeatureContext<LeaveGuard>("vue-core.leaveGuard");
 
-/** Creates the app's leave guard and installs it; mount `<LeaveGuardRoot />` once (in the shell) to show its question. */
+/** Creates the app's leave guard and installs it (`createApplication` does this); `BackofficeShell` renders the `<LeaveGuardRoot />` that shows its question, a shell of your own renders it once. */
 export function installLeaveGuard(app: App): LeaveGuard {
   const guard = createLeaveGuard();
   app.provide(leaveGuardKey, guard);
@@ -88,7 +113,7 @@ export function installLeaveGuard(app: App): LeaveGuard {
  * touching the router asks itself: `if (await confirmDiscard()) load(next)`. `isDirty` is read at that
  * moment, so a form whose baseline moved on save lets the redirect after it through.
  *
- * Needs the app's guard (`installLeaveGuard`).
+ * Needs the app's guard (`createApplication` installs it).
  */
 export function useLeaveGuard(isDirty: () => boolean): { confirmDiscard: () => Promise<boolean> } {
   const guard = useLeaveGuardContext();

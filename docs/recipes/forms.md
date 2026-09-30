@@ -10,37 +10,38 @@
 
 A screen with group sheets has no global Save. A command is never a field autosave.
 
-The working examples are in `playground/src/app/features/forms/` (an account record in group sheets, an offer editor, a status command, over a fake backend that answers 422 and 409).
+The code below is `docs/examples/forms/` (a ticket feature: a record in group sheets, a create form, an assign command), compiled by `npm run typecheck:docs`. A larger working example, with a fake backend that answers 422 and 409, is `playground/src/app/features/forms/`.
 
 ## Once per application
 
-Mount the leave guard so "Unsaved changes" is asked in one place:
+Nothing to set up. `createApplication` installs the application's leave guard, so `useLeaveGuard` (and every form, sheet and command that asks "Discard changes?") works in any page, and `backofficeShell` renders the one dialog that asks. A shell of your own renders `<LeaveGuardRoot />` once; without it a page with unsaved changes that is left fails with a `MissingLeaveGuardRootError` instead of letting the user lose their work silently (the [shell recipe](shell.md) has the custom shell).
 
-```ts
-const application = createApplication({ … });
-installLeaveGuard(application.app);      // or a feature's `context: provideContext(leaveGuardKey, createLeaveGuard())`
-```
+<!-- example: docs/examples/shell/CustomShell.vue:37-38 -->
 ```vue
-<!-- the shell, once, like <Toaster /> -->
-<LeaveGuardRoot />
+    <!-- The one "Discard changes?" dialog: forms with unsaved changes ask through it. `backofficeShell` renders it; a shell of your own must. -->
+    <LeaveGuardRoot />
 ```
 
 The app's validator is whatever has Zod's `safeParse` shape (Zod 3 and 4, or a hand-written object). The library does not depend on Zod.
 
 ## Form state
 
+<!-- example: docs/examples/forms/form.ts:44-51 -->
 ```ts
-const form = useForm({
-  defaults: () => ({ subject: "", priority: null as number | null, tags: [] as string[] }),   // the draft: what fields edit
-  validator: ticketSchema,                                                                     // its output is the payload
-  translate: (message) => t(message),                                                          // server codes into sentences
-  serverField: camel,                                                                          // `due_on` is `dueOn` in the draft
-});
+  return useForm({
+    defaults: () => ({ subject: "", priority: null as number | null, tags: [] as string[] }), // the draft: what fields edit
+    validator: {
+      safeParse: (input) => ((input as { subject: string }).subject.trim() === "" ? { success: false, error: { issues: [{ path: ["subject"], message: "Enter a subject." }] } } : { success: true, data: input as { subject: string; priority: number | null; tags: string[] } }),
+    },
+    translate: (message) => t(message), // server codes into sentences
+    serverField: camel, // `due_on` is `dueOn` in the draft
+  });
 ```
 
+<!-- example: docs/examples/forms/components/CreateFields.vue:12-13 -->
 ```vue
-<TextField v-bind="form.bind('subject')" :label="t('subject')" required />
-<NumberField v-bind="form.bind('priority')" :label="t('priority')" />
+    <TextField v-bind="props.form.bind('subject')" :label="t('forms.subject')" required />
+    <NumberField v-bind="props.form.bind('priority')" :label="t('forms.priority')" />
 ```
 
 `bind()` is typed from the draft: `bind('subjct')` or a number field bound to text does not compile. It supplies the value, the change, the error and a marker the page uses to count errors. Changing a field clears its message.
@@ -60,14 +61,16 @@ A value inside a list is wired by hand: `v-model="line.quantity"`, `:error="form
 
 ### Over a loaded record
 
+<!-- example: docs/examples/forms/views/Record.vue:15-23 -->
 ```ts
-const ticket = useRouteResource({ param: "ticketID", load: (id, { signal }) => api.get(id, { signal }) });
+const ticket = useRouteResource({ key: TICKET, param: "ticketID", load: (id, { signal }) => api.get(id, signal) });
 const form = useResourceForm({
-  source: ticket,                                                 // hydrates from the page's record: no second request
+  source: ticket, // hydrates from the page's record: no second request
   defaults: emptyTicket,
   validator: ticketSchema,
-  toValues: (t) => ({ subject: t.subject, dueOn: t.due_on }),     // DTO to draft, explicit
-  save: (payload, t, { idempotencyKey }) => api.update(t.id, body(payload, t)),   // the endpoint's body, stated here
+  toValues: ticketValues, // DTO to draft, explicit
+  serverField: camel,
+  save: (payload, current, { idempotencyKey }) => api.update(current.id, ticketBody(payload, current), idempotencyKey), // the record's full update
 });
 ```
 
@@ -75,19 +78,56 @@ It is filled once and again for another record; a record that changes under unsa
 
 ## 1. One group of a record (D22)
 
+<!-- example: docs/examples/forms/views/Record.vue:25-26 -->
 ```ts
-const groups = provideRecordGroups<"contact" | "address">({ edit: (group) => sheets[group].present });
-const contact = useGroupSheet({ form, group: "contact", fields: ["email", "phone"], groupOf: groups.groupOf });
+const sheets = {} as Record<"details" | "contact", { present: () => void }>;
+const groups = provideRecordGroups<"details" | "contact">({ edit: (group) => sheets[group].present });
 ```
+
+Each group is one sheet. Details saves the record's full update (the default) and rebases a stale save; Contact has an endpoint of its own:
+
+<!-- example: docs/examples/forms/views/Record.vue:28-35 -->
+```ts
+// Details saves the record's full update (the default); its endpoint documents 409 as "your copy is stale", so a stale save is rebased.
+const details = useGroupSheet({
+  form,
+  group: "details",
+  fields: ["subject", "priority", "dueOn"],
+  groupOf: groups.groupOf,
+  rebase: { reload: () => ticket.reload(), message: () => t("forms.stale") },
+});
+```
+
+<!-- example: docs/examples/forms/views/Record.vue:36-44 -->
+```ts
+// Contact has an endpoint of its own: it receives exactly these fields. A 409 there is shown as the conflict it is.
+const contact = useGroupSheet({
+  form,
+  group: "contact",
+  fields: ["email", "phone"],
+  groupOf: groups.groupOf,
+  save: (changes) => api.saveContact(ticket.id.value ?? 0, changes),
+  onSaved: () => ticket.reload(),
+});
+```
+<!-- example: docs/examples/forms/views/Record.vue:50-65 -->
 ```vue
-<FormView :editable="false">                               <!-- the page reads -->
-  <FormGroup group="contact" :header="t('contact')">        <!-- Edit appears in its header -->
-    <TextField v-bind="form.bind('email')" :label="t('email')" />
-  </FormGroup>
-</FormView>
-<GroupSheet :sheet="contact" :title="t('contact')" :editable="canEdit" :group-label="groupLabel">
-  <RecordGroupScope only="contact" :editable="canEdit"><ContactSections :form="form" /></RecordGroupScope>
-</GroupSheet>
+<template>
+  <ResourcePage :resource="ticket" :title="ticket.data.value?.subject ?? t('forms.ticket')" :back="{ label: t('forms.tickets'), to: '/' }">
+    <template #header="{ record }"><RecordHeader :title="record.subject" /></template>
+    <template #default>
+      <FormView :editable="false"><TicketSections :form="form" /></FormView>
+      <AssignDialog />
+    </template>
+  </ResourcePage>
+
+  <GroupSheet :sheet="details" :title="t('forms.details')" :editable="true" :group-label="groupLabel">
+    <RecordGroupScope only="details" :editable="true"><TicketSections :form="form" /></RecordGroupScope>
+  </GroupSheet>
+  <GroupSheet :sheet="contact" :title="t('forms.contact')" :editable="true" :group-label="groupLabel">
+    <RecordGroupScope only="contact" :editable="true"><TicketSections :form="form" /></RecordGroupScope>
+  </GroupSheet>
+</template>
 ```
 
 One markup serves the read page and every sheet: in its sheet only the group shows. Decisions the sheet makes explicit:
@@ -100,17 +140,17 @@ One markup serves the read page and every sheet: in its sheet only the group sho
 
 ## 2. A long form
 
+<!-- example: docs/examples/forms/views/Create.vue:22-24 -->
 ```vue
-<EditorPage :title="t('offers.create')" :back="backToOffers" :form="form" :save-label="t('offers.create')" @save="save">
-  <SectionPanel :title="t('customer')" number="01" presentation="section">…fields…</SectionPanel>
-  <SectionPanel :title="t('lines')" number="02" presentation="section" collapsible>…</SectionPanel>
-  <template #aside><OfferSummary :totals="totals" /></template>
-</EditorPage>
+  <EditorPage :title="t('forms.create')" :back="{ label: t('forms.tickets'), to: '/' }" :form="form" :save-label="t('forms.create')" @save="save">
+    <SectionPanel :title="t('forms.details')" number="01" presentation="section"><CreateFields :form="form" /></SectionPanel>
+  </EditorPage>
 ```
+<!-- example: docs/examples/forms/views/Create.vue:15-18 -->
 ```ts
 async function save() {
-  const result = await form.submit((payload, { idempotencyKey }) => api.create(body(payload)));
-  if (result.status === "saved") router.push(…);
+  const result = await form.submit((payload, { idempotencyKey }) => api.create({ subject: payload.subject, priority: payload.priority, due_on: null, email: "", phone: "" }, idempotencyKey));
+  if (result.status === "saved") void router.push({ name: "forms.record", params: { ticketID: result.value.id } });
 }
 ```
 
@@ -118,19 +158,29 @@ With a `form` the page does the rest: Save in the page chrome with a spinner, "U
 
 ## 3. A command
 
+<!-- example: docs/examples/forms/components/AssignDialog.vue:13-23 -->
 ```ts
 const assign = useCommand({
   defaults: () => ({ assignee: null as number | null, note: "" }),
-  validator: assignSchema,
-  run: (input, { idempotencyKey }) => api.assign(ticket.id.value!, input),
+  validator: {
+    safeParse: (input) => {
+      const { assignee, note } = input as { assignee: number | null; note: string };
+      return assignee === null ? { success: false, error: { issues: [{ path: ["assignee"], message: "Choose who takes it." }] } } : { success: true, data: { assignee, note } };
+    },
+  },
+  run: (input, { idempotencyKey }) => api.assign(ticket.id.value ?? 0, { assignee_id: input.assignee, note: input.note }, idempotencyKey),
   done: (saved) => ticket.update(saved),
 });
 ```
+<!-- example: docs/examples/forms/components/AssignDialog.vue:27-33 -->
 ```vue
-<Button @click="assign.present()">Assign…</Button>
-<CommandDialog :command="assign" :title="t('assign')" :confirm-label="t('assign')">
-  <FormGroup><ComboField v-bind="assign.form.bind('assignee')" :label="t('assignee')" :search="findUsers" /></FormGroup>
-</CommandDialog>
+  <Button @click="assign.present()">{{ t("forms.assign") }}</Button>
+  <CommandDialog :command="assign" :title="t('forms.assign')" :confirm-label="t('forms.assign')">
+    <FormGroup>
+      <ComboField v-bind="assign.form.bind('assignee')" :label="t('forms.assignee')" :search="(query, { signal }) => api.users(query, signal)" />
+      <TextareaField v-bind="assign.form.bind('note')" :label="t('forms.note')" stacked />
+    </FormGroup>
+  </CommandDialog>
 ```
 
 Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.

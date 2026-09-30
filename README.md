@@ -295,6 +295,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Record page](docs/recipes/record-page.md): a simple record, a record with sections, regions that load on their own, previous / next
 - [Shell](docs/recipes/shell.md): the default shell, contributions from features, a custom shell
 - [App setup](docs/recipes/app-setup.md): config, session, effects, locales, errors
+- [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens
 
 Forms have their own recipe when that phase lands.

@@ -10,6 +10,7 @@ import {
   type RouterHistory,
   type RouterScrollBehavior,
 } from "vue-router";
+import { installLeaveGuard } from "../form/leaveGuard";
 import { createFormatting, formattingKey, installFormatting, type Formatters, type Formatting } from "../format";
 import { coreMessages, createMessageRuntime, type MessageNamespace } from "../i18n";
 import { iconSetKey } from "../icon/environment";
@@ -329,6 +330,7 @@ export function createApplication(options: ApplicationOptions): Application {
   installFormatting(app, formatting);
   pageChrome = installPageChrome(app);
   installBottomDock(app);
+  installLeaveGuard(app);
   if (options.icons) installIcons(app, ...(Array.isArray(options.icons) ? options.icons : [options.icons as IconSet]));
   app.provide(applicationKey, environment);
   app.provide(navigationKey, navigation);

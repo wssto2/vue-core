@@ -31,6 +31,7 @@ describe("useDirtySnapshot", () => {
 describe("useSheetDiscardGuard", () => {
   const mount = () => {
     const guard = createLeaveGuard();
+    guard.attach();
     const name = ref("");
     const { result } = withSetup(() => useSheetDiscardGuard(() => name.value), [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
     return { guard, name, sheet: result };

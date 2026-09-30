@@ -4,7 +4,7 @@ import { defineComponent, h, nextTick, ref, type App } from "vue";
 import { createMemoryHistory, createRouter, RouterView } from "vue-router";
 import { MissingContextError } from "../platform/context";
 import { createTestI18n } from "../testing/i18n";
-import { createLeaveGuard, leaveGuardKey, useLeaveGuard } from "./leaveGuard";
+import { createLeaveGuard, leaveGuardKey, MissingLeaveGuardRootError, useLeaveGuard } from "./leaveGuard";
 import LeaveGuardRoot from "./LeaveGuardRoot.vue";
 import { settle, withSetup } from "./testing";
 
@@ -91,6 +91,7 @@ describe("the leave guard", () => {
 describe("the leave guard's answers", () => {
   it("shares one open dismissal question between two sheets asking at once (ARV replaced the first, which then never settled)", async () => {
     const guard = createLeaveGuard();
+    guard.attach();
     const first = guard.confirm();
     const second = guard.confirm();
     guard.pending.value?.resolve(true);
@@ -101,6 +102,7 @@ describe("the leave guard's answers", () => {
 
   it("a newer navigation answers the older unanswered one with stay", async () => {
     const guard = createLeaveGuard();
+    guard.attach();
     const older = guard.confirm({ path: "/a" } as never);
     const newer = guard.confirm({ path: "/b" } as never);
     expect(await older).toBe(false);
@@ -143,6 +145,18 @@ describe("the leave guard's answers", () => {
     const { result } = withSetup(() => useLeaveGuard(() => false), [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
     expect(await result.confirmDiscard()).toBe(true);
     expect(guard.pending.value).toBeNull();
+  });
+
+  it("fails loudly, never passes silently, when a question must be asked and no LeaveGuardRoot is mounted", async () => {
+    const guard = createLeaveGuard();
+    await expect(guard.confirm()).rejects.toThrow(MissingLeaveGuardRootError);
+    await expect(guard.confirm()).rejects.toThrow("<LeaveGuardRoot />");
+    const release = guard.attach();
+    const asked = guard.confirm();
+    guard.pending.value?.resolve(true);
+    expect(await asked).toBe(true);
+    release();
+    await expect(guard.confirm()).rejects.toThrow(MissingLeaveGuardRootError);
   });
 
   it("fails with an actionable error when the app installed no leave guard", () => {
