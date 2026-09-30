@@ -4,7 +4,7 @@ import { createAccessClient, type AccessClient, type AccessClientOptions } from 
 import type { BootstrapConfig } from "./bootstrap";
 import { defineFeatureContext } from "./context";
 import { httpSessionAdapter } from "./httpSession";
-import { createSession, type Session, type SessionAdapter, type SessionUser } from "./session";
+import { createSession, type BeforeSignOutHook, type Session, type SessionAdapter, type SessionUser } from "./session";
 
 /** One application's shared services. Everything in it belongs to this instance alone. */
 export interface Platform<U extends SessionUser = SessionUser, C extends BootstrapConfig = BootstrapConfig> {
@@ -38,8 +38,14 @@ export interface PlatformOptions<U extends SessionUser, C extends BootstrapConfi
   renewSession?: (session: Session<U>) => Promise<boolean>;
   /** Called after a 401 expired a signed-in session: the application decides (usually: go to the login page). */
   onSessionExpired?: () => void;
-  /** Called with the failure of a session load. */
+  /** Called with the failure of a session load or of a before-sign-out hook. */
   onSessionError?: (error: unknown) => void;
+  /**
+   * Runs at every sign-out while the session still exists: before the server is told and before the local state
+   * clears (ARV removes the device's push subscription here). Bounded to 3 s; a failure is reported to
+   * `onSessionError` and never blocks the sign-out. A feature adds its own with `session.onBeforeSignOut`.
+   */
+  beforeSignOut?: BeforeSignOutHook<U>;
 }
 
 /**
@@ -79,7 +85,7 @@ export function createPlatform<U extends SessionUser, C extends BootstrapConfig>
   // Without `session` the overloads fix U to SessionUser, which is what the default adapter produces.
   const source = options.session ?? ((client: HttpClient) => httpSessionAdapter(client) as unknown as SessionAdapter<U>);
   const adapter = typeof source === "function" ? source(http) : source;
-  const session = createSession<U>(adapter, { onError: options.onSessionError, onExpired: options.onSessionExpired });
+  const session = createSession<U>(adapter, { onError: options.onSessionError, onExpired: options.onSessionExpired, beforeSignOut: options.beforeSignOut });
   const access = createAccessClient(
     () => {
       const state = session.state.value;

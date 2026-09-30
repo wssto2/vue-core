@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createSession, type SessionAdapter, type SessionSnapshot } from "./session";
+import { beforeSignOutTimeout, createSession, type SessionAdapter, type SessionSnapshot } from "./session";
 import { deferred, snapshotOf } from "./testing";
 
 function adapterOf(load: SessionAdapter["load"], signOut: SessionAdapter["signOut"] = async () => {}): SessionAdapter {
@@ -123,6 +123,99 @@ describe("establish / expire / signOut", () => {
     session.establish(snapshotOf(1));
     await expect(session.signOut()).rejects.toThrow("offline");
     expect(session.state.value.status).toBe("anonymous");
+  });
+});
+
+describe("before-sign-out hooks", () => {
+  it("run while the user is still signed in, before the server is told, and the sign-out waits for them", async () => {
+    const order: string[] = [];
+    const hook = deferred<void>();
+    const session = createSession(adapterOf(async () => null, async () => void order.push("server")), {
+      beforeSignOut: async (user) => {
+        order.push(`option:${user.id}:${session.state.value.status}`);
+      },
+    });
+    session.onBeforeSignOut(async () => {
+      order.push(`added:${session.state.value.status}`);
+      await hook.promise;
+      order.push("added done");
+    });
+    session.establish(snapshotOf(5));
+
+    const ending = session.signOut();
+    await Promise.resolve();
+    expect(session.state.value.status).toBe("authenticated"); // not cleared yet
+    expect(order).not.toContain("server");
+    hook.resolve();
+    await ending;
+
+    expect(order).toEqual(["option:5:authenticated", "added:authenticated", "added done", "server"]);
+    expect(session.state.value).toEqual({ status: "anonymous", reason: "signedOut" });
+  });
+
+  it("a failing hook is reported and does not block the sign-out or the other hooks", async () => {
+    const onError = vi.fn();
+    const signOut = vi.fn(async () => {});
+    const other = vi.fn();
+    const session = createSession(adapterOf(async () => null, signOut), { onError });
+    session.onBeforeSignOut(async () => Promise.reject(new Error("push gone")));
+    session.onBeforeSignOut(other);
+    session.establish(snapshotOf(1));
+
+    await session.signOut();
+
+    expect(onError).toHaveBeenCalledWith(new Error("push gone"));
+    expect(other).toHaveBeenCalledOnce();
+    expect(signOut).toHaveBeenCalledOnce();
+    expect(session.state.value.status).toBe("anonymous");
+  });
+
+  it("a hook that never finishes is given up on after the timeout: aborted, reported, the sign-out goes on", async () => {
+    vi.useFakeTimers();
+    try {
+      const onError = vi.fn();
+      const signOut = vi.fn(async () => {});
+      let signal: AbortSignal | undefined;
+      const session = createSession(adapterOf(async () => null, signOut), { onError });
+      session.onBeforeSignOut((_user, given) => {
+        signal = given;
+        return new Promise<void>(() => {});
+      });
+      session.establish(snapshotOf(1));
+
+      const ending = session.signOut();
+      await vi.advanceTimersByTimeAsync(beforeSignOutTimeout - 1);
+      expect(signOut).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      await ending;
+
+      expect(signal?.aborted).toBe(true);
+      expect(onError).toHaveBeenCalledOnce();
+      expect(signOut).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a removed hook no longer runs, hooks do not run when nobody is signed in, and concurrent sign-outs share one", async () => {
+    const hook = vi.fn();
+    const signOut = vi.fn(async () => {});
+    const session = createSession(adapterOf(async () => null, signOut));
+    const remove = session.onBeforeSignOut(hook);
+    await session.signOut(); // anonymous: nothing to clean up
+    expect(hook).not.toHaveBeenCalled();
+
+    remove();
+    session.establish(snapshotOf(1));
+    await session.signOut();
+    expect(hook).not.toHaveBeenCalled();
+
+    session.onBeforeSignOut(hook);
+    session.establish(snapshotOf(2));
+    signOut.mockClear();
+    await Promise.all([session.signOut(), session.signOut()]);
+    expect(hook).toHaveBeenCalledOnce();
+    expect(signOut).toHaveBeenCalledOnce();
   });
 });
 

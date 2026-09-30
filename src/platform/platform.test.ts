@@ -15,6 +15,23 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("beforeSignOut", () => {
+  it("runs at sign-out while the session still exists, before the server is told and before the state clears", async () => {
+    const order: string[] = [];
+    const adapter: SessionAdapter = { load: async () => snapshotOf(4), signOut: async () => void order.push("server") };
+    const platform = createPlatform({
+      config: config(),
+      session: adapter,
+      beforeSignOut: async (user) => void order.push(`hook:${user.id}:${platform.session.state.value.status}`),
+    });
+    await platform.session.restore();
+
+    await platform.session.signOut();
+
+    expect(order).toEqual(["hook:4:authenticated", "server"]);
+  });
+});
+
 describe("createPlatform has no side effects", () => {
   it("makes no request, starts no timer and adds no listener", () => {
     vi.useFakeTimers();

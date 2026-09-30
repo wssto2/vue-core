@@ -41,6 +41,15 @@ export interface SessionAdapter<U extends SessionUser = SessionUser> {
 }
 
 /**
+ * Work that must happen while the session still exists, right before it ends: removing this device's push
+ * subscription, flushing a draft. `signal` aborts when the hook ran out of time.
+ */
+export type BeforeSignOutHook<U extends SessionUser = SessionUser> = (user: U, signal: AbortSignal) => void | Promise<void>;
+
+/** The longest `signOut()` waits for its hooks; the sign-out goes on after that. */
+export const beforeSignOutTimeout = 3000;
+
+/**
  * The current session of one platform. `state` is reactive; every change of who is signed in cancels
  * the requests of the previous state and drops their late answers, so one session never leaks into the next.
  */
@@ -54,29 +63,66 @@ export interface Session<U extends SessionUser = SessionUser> {
   establish(snapshot: SessionSnapshot<U>): void;
   /** The server rejected the session (401): signed in becomes anonymous with reason `expired`. No-op when nobody is signed in. */
   expire(): void;
-  /** Signs out locally first (state cleared before anything else can read it), then ends the session on the server; rejects if that call fails. */
+  /**
+   * Runs the before-sign-out hooks (together, at most `beforeSignOutTimeout` ms; a failing or late one is reported
+   * to `onError` and never blocks), then signs out locally (state cleared before anything else can read it), then
+   * ends the session on the server; rejects if that call fails. Concurrent calls share one sign-out.
+   */
   signOut(): Promise<void>;
+  /**
+   * Adds a hook `signOut()` runs while the user is still signed in. Returns the function that removes it: a
+   * session effect returns it as its stop, so the hook lives exactly as long as the effect.
+   */
+  onBeforeSignOut(hook: BeforeSignOutHook<U>): () => void;
 }
 
-export interface SessionOptions {
-  /** Called with the failure of a load (also when the state is kept because the user is signed in): log it. */
+export interface SessionOptions<U extends SessionUser = SessionUser> {
+  /** Called with the failure of a load (also when the state is kept because the user is signed in) or of a before-sign-out hook: log it. */
   onError?: (error: unknown) => void;
+  /** A hook every sign-out runs first (see `Session.onBeforeSignOut` for the ones a feature adds). */
+  beforeSignOut?: BeforeSignOutHook<U>;
   /** Called after `expire()` moved a signed-in session to anonymous. */
   onExpired?: () => void;
 }
 
 export function createSession<U extends SessionUser = SessionUser>(
   adapter: SessionAdapter<U>,
-  options: SessionOptions = {},
+  options: SessionOptions<U> = {},
 ): Session<U> {
   const state = shallowRef<SessionState<U>>({ status: "unknown" });
   let epoch = 0; // bumped by every change of who is signed in
+  const hooks = new Set<BeforeSignOutHook<U>>(options.beforeSignOut ? [options.beforeSignOut] : []);
+  let signingOut: Promise<void> | null = null;
   let current: { controller: AbortController; promise: Promise<SessionState<U>> } | null = null;
 
   function supersede(): void {
     epoch++;
     current?.controller.abort();
     current = null;
+  }
+
+  /** Runs the hooks with the signed-in user; never rejects, never takes longer than `beforeSignOutTimeout`. */
+  async function runHooks(user: U): Promise<void> {
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<void>((resolve) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        options.onError?.(new Error(`A before-sign-out hook did not finish within ${beforeSignOutTimeout} ms; signing out without it.`));
+        resolve();
+      }, beforeSignOutTimeout);
+    });
+    const all = Promise.all(
+      [...hooks].map(async (hook) => {
+        try {
+          await hook(user, controller.signal);
+        } catch (error) {
+          options.onError?.(error);
+        }
+      }),
+    ).then(() => undefined);
+    await Promise.race([all, timeout]);
+    clearTimeout(timer);
   }
 
   function ask(): Promise<SessionState<U>> {
@@ -120,10 +166,23 @@ export function createSession<U extends SessionUser = SessionUser>(
       state.value = { status: "anonymous", reason: "expired" };
       options.onExpired?.();
     },
-    async signOut() {
-      supersede();
-      state.value = { status: "anonymous", reason: "signedOut" };
-      await adapter.signOut();
+    signOut() {
+      signingOut ??= (async () => {
+        try {
+          const before = state.value;
+          if (before.status === "authenticated" && hooks.size > 0) await runHooks(before.user); // no hooks: the state clears synchronously
+          supersede();
+          state.value = { status: "anonymous", reason: "signedOut" };
+          await adapter.signOut();
+        } finally {
+          signingOut = null;
+        }
+      })();
+      return signingOut;
+    },
+    onBeforeSignOut(hook) {
+      hooks.add(hook);
+      return () => void hooks.delete(hook);
     },
   };
 }
