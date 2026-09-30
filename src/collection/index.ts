@@ -4,6 +4,7 @@ export { useCollection } from "./useCollection";
 export type { Collection, CollectionDisplay, LinkedQuery, SavedViewsHandle, UseCollectionOptions } from "./useCollection";
 export type { CollectionLoader, ListPage, CollectionQuery, CollectionStateSource, LoadContext, SortDirection } from "./types";
 export { httpList, listParams, readListPage } from "./http";
+export { LIST_CONTEXT_PARAM } from "./location";
 export type { CollectionColumns, Column, ColumnKey, ColumnKind, ColumnValue, MobileRole, RowAction, SlotKey } from "./columns";
 export type { FilterDescriptor, FilterOption, ViewDescriptor } from "./filters";
 export { useCollectionNeighbors } from "./neighbors";

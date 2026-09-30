@@ -1,4 +1,4 @@
-import { nextTick, ref } from "vue";
+import { getCurrentScope, nextTick, onScopeDispose, ref } from "vue";
 import { useRouter, type RouteLocationRaw } from "vue-router";
 import type { SwipeAction } from "../controls";
 import type { MenuItem } from "../overlay";
@@ -123,6 +123,8 @@ export function useRowInteractions<Row>(options: RowInteractionOptions<Row>) {
     }
     void router.push(target);
   }
+
+  if (getCurrentScope()) onScopeDispose(cancelPress);
 
   return { menuItems, menuLabel, swipeActions, openMenuFrom, onContextMenu, onPointerDown, onPointerMove, cancelPress, onClickCapture, onClick, actionsOf };
 }

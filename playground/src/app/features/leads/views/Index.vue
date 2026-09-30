@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CollectionPage, useCollection, useDatePresetFilter, type CollectionColumns, type FilterDescriptor, type RowAction } from "@wssto2/vue-core/collection";
+import { CollectionPage, useCollection, useDatePresetFilter, type CollectionColumns, type FilterDescriptor, type RowAction, type ViewDescriptor } from "@wssto2/vue-core/collection";
 import { Avatar } from "@wssto2/vue-core/content";
 import { useFormat } from "@wssto2/vue-core/format";
 import { Badge, type Tone } from "@wssto2/vue-core/state";
@@ -18,7 +18,8 @@ const { list, savedViews } = useLeads();
 const name = (lead: Lead) => `${lead.first_name} ${lead.last_name}`;
 const contact = (lead: Lead) => lead.email || lead.mobile_phone;
 const recordOf = (lead: Lead) => leadRoutes.record({ leadID: lead.id });
-const phaseTone = (lead: Lead): Tone => ({ 1: "neutral", 2: "info", 3: "info", 4: "warning", 5: "warning", 6: "critical", 7: lead.phase.decision === "bought" ? "positive" : "neutral" } as const)[lead.phase.phase as 1] ?? "neutral";
+const PHASE_TONES: Record<number, Tone> = { 1: "neutral", 2: "info", 3: "info", 4: "warning", 5: "warning", 6: "critical" };
+const phaseTone = (lead: Lead): Tone => (lead.phase.phase === 7 ? (lead.phase.decision === "bought" ? "positive" : "neutral") : (PHASE_TONES[lead.phase.phase] ?? "neutral"));
 const phaseText = (lead: Lead) => (lead.phase.phase === 7 ? `${t("leads.phases.7")} | ${t(`leads.closed.${lead.phase.decision ?? "rejected"}`)}` : t(`leads.phases.${lead.phase.phase}`));
 const overdue = (lead: Lead) => lead.next_contact_at !== null && Date.parse(lead.next_contact_at) < Date.UTC(2026, 8, 30, 12);
 
@@ -36,14 +37,14 @@ const columns = computed(() => [
 const filters = computed<FilterDescriptor<"phase" | "assigned_to" | "followup" | "created_at">[]>(() => [
   useDatePresetFilter("created_at"),
   { key: "assigned_to", icon: "phoneLine", label: t("leads.filters.assigned"), type: "select", options: [{ value: "none", label: t("leads.filters.none") }, { value: 1, label: "Ana Horvat" }, { value: 2, label: "Marko Babić" }, { value: 3, label: "Iva Knežević" }] },
-  { key: "followup", icon: "mailLine", label: t("leads.filters.followup"), type: "select", options: (["overdue", "today", "none"] as const).map((value) => ({ value, label: t(`leads.filters.${value === "none" ? "without" : value}`) })) },
+  { key: "followup", icon: "mailLine", label: t("leads.filters.followup"), type: "select", options: [{ value: "overdue", label: t("leads.filters.overdue") }, { value: "today", label: t("leads.filters.today") }, { value: "none", label: t("leads.filters.without") }] },
   { key: "phase", icon: "fileTextLine", label: t("leads.filters.phase"), type: "select", placement: "panel", options: ["open", "1", "2", "3", "4", "5", "6", "7_bought", "7_rejected"].map((value) => ({ value, label: t(`leads.phases.${value}`) })) },
 ]);
 
 const leads = useCollection(list, {
   columns,
   filters,
-  views: computed(() => [{ key: "all" as const, label: t("leads.views.all") }, { key: "mine" as const, label: t("leads.views.mine") }]),
+  views: computed<ViewDescriptor<"all" | "mine">[]>(() => [{ key: "all", label: t("leads.views.all") }, { key: "mine", label: t("leads.views.mine") }]),
   state: { kind: "url", key: "query" },
   recordRoute: recordOf,
   savedViews,
@@ -51,13 +52,14 @@ const leads = useCollection(list, {
   linked: { params: { followup: "followup", phase: "phase", mine: { filter: "assigned_to", value: () => "1" } } },
 });
 
+// Call and e-mail for the channels the lead has, then the record.
 function rowActions(lead: Lead): RowAction[] {
+  const actions: RowAction[] = [];
   const phone = lead.mobile_phone?.replace(/\s+/g, "");
-  return [
-    ...(phone ? [{ key: "call", label: t("leads.call"), icon: "phoneLine", href: `tel:${phone}`, tone: "positive", section: "contact" } as const] : []),
-    ...(lead.email ? [{ key: "email", label: t("leads.email"), icon: "mailLine", href: `mailto:${lead.email}`, tone: "info", section: "contact" } as const] : []),
-    { key: "view", label: t("leads.details"), icon: "fileTextLine", section: "record", onSelect: () => void router.push(recordOf(lead)) },
-  ];
+  if (phone) actions.push({ key: "call", label: t("leads.call"), icon: "phoneLine", href: `tel:${phone}`, tone: "positive", section: "contact" });
+  if (lead.email) actions.push({ key: "email", label: t("leads.email"), icon: "mailLine", href: `mailto:${lead.email}`, tone: "info", section: "contact" });
+  actions.push({ key: "view", label: t("leads.details"), icon: "fileTextLine", section: "record", onSelect: () => void router.push(recordOf(lead)) });
+  return actions;
 }
 </script>
 

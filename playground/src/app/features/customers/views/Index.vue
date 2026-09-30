@@ -38,12 +38,12 @@ const actions = computed<PageAction[]>(() =>
 
 // Row shortcuts: call and e-mail for the channels the customer has, then the record.
 function rowActions(customer: Customer): RowAction[] {
+  const actions: RowAction[] = [];
   const phone = customer.phone?.replace(/\s+/g, "");
-  return [
-    ...(phone ? [{ key: "call", label: t("customers.call"), icon: "phoneLine", href: `tel:${phone}`, tone: "positive", section: "contact" } as const] : []),
-    ...(customer.email ? [{ key: "email", label: t("customers.email"), icon: "mailLine", href: `mailto:${customer.email}`, tone: "info", section: "contact" } as const] : []),
-    { key: "view", label: t("customers.details"), icon: "fileTextLine", section: "record", onSelect: () => void router.push(recordOf(customer)) },
-  ];
+  if (phone) actions.push({ key: "call", label: t("customers.call"), icon: "phoneLine", href: `tel:${phone}`, tone: "positive", section: "contact" });
+  if (customer.email) actions.push({ key: "email", label: t("customers.email"), icon: "mailLine", href: `mailto:${customer.email}`, tone: "info", section: "contact" });
+  actions.push({ key: "view", label: t("customers.details"), icon: "fileTextLine", section: "record", onSelect: () => void router.push(recordOf(customer)) });
+  return actions;
 }
 </script>
 

@@ -24,8 +24,7 @@ function go(neighbor: Neighbor | null) {
   if (neighbor) void router.push(neighbor.to);
 }
 
-// j / k as in mail clients and GitHub; the arrows for everyone else. They act only while there is
-// somewhere to go, so a held key stops at the list's end.
+// j / k as in mail clients and GitHub; the arrows for everyone else. They act only while there is somewhere to go.
 const step = (key: string, direction: "next" | "previous") =>
   useKeyboardShortcut({ key }, () => {
     const target = props.neighbors[direction].value;
