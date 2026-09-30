@@ -2,7 +2,7 @@ import { fireEvent, screen, within } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, onMounted, onUnmounted } from "vue";
 import { defineFeature, type ShellContribution } from "../app";
-import { usePageChrome, usePageChromeContext } from "../page";
+import { BottomTabBar, usePageChrome, usePageChromeContext } from "../page";
 import { AppRouterView } from "../router";
 import { mockMedia } from "../testing/media";
 import AccountMenuItem from "./AccountMenuItem.vue";
@@ -145,6 +145,13 @@ describe("BackofficeShell on a wide screen", () => {
     expect(tally.mounts).toBe(1);
   });
 
+  it("takes a page's tab bar into the dock, which the shell keeps beside the sidebar", async () => {
+    const tabs = defineComponent({ render: () => h(BottomTabBar, { label: "Sections", items: [{ value: "a", label: "General", active: true }, { value: "b", label: "Notes", active: false }] }) });
+    await startShell(backofficeShell(), { features: [defineFeature({ id: "tabs", routes: [{ name: "tabs", path: "/tabs", component: tabs }] })], session, extra, location: "/tabs" });
+
+    expect(within(document.querySelector<HTMLElement>("[data-bottom-dock]")!).getByRole("navigation", { name: "Sections" })).toBeTruthy();
+  });
+
   it("renders the bottom dock beside the sidebar (from md up)", async () => {
     await startShell(backofficeShell(), { session, extra });
     expect(document.querySelector("[data-bottom-dock]")!.className).toContain("md:left-64");
@@ -182,6 +189,16 @@ describe("BackofficeShell signed out", () => {
     expect(screen.getByText("Help host")).toBeTruthy();
     expect(sidebar()).toBeNull();
     expect(topBar()).toBeTruthy();
+  });
+
+  it("shows the authenticated contributions only once someone has signed in", async () => {
+    const { platform } = await startShell(backofficeShell(), { features: [always], session: null, location: "/login", extra });
+    expect(screen.queryByText("Private host")).toBeNull();
+
+    platform.session.establish(session as never);
+    await settle();
+
+    expect(screen.getByText("Private host")).toBeTruthy();
   });
 
   it("the end of the top bar takes extra content", async () => {
