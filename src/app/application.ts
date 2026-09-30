@@ -14,7 +14,7 @@ import { createFormatting, formattingKey, installFormatting, type Formatters, ty
 import { coreMessages, createMessageRuntime, type MessageNamespace } from "../i18n";
 import { iconSetKey } from "../icon/environment";
 import { installIcons, type IconSet } from "../icon";
-import { bottomDockKey, installBottomDock, installPageChrome, pageChromeKey } from "../page";
+import { bottomDockKey, installBottomDock, installPageChrome, pageChromeKey, type PageChrome } from "../page";
 import { installPlatform, platformKey, type Platform, type SessionSnapshot } from "../platform";
 import { AppRouterView, createRouteAccess, routeAccessKey } from "../router/access";
 import { createAppHistory } from "../router/history";
@@ -276,9 +276,12 @@ export function createApplication(options: ApplicationOptions): Application {
     await messages.load(unique([...needed, ...alwaysNamespaces, ...(authenticated ? authenticatedNamespaces : [])]));
   }
 
-  function applyTitle(to: RouteLocationNormalized): void {
+  // The page chrome is installed with the Vue app below; a page registers its own tab title there (a record's name).
+  let pageChrome: PageChrome | null = null;
+  // `fromPage`: the page on screen registered a tab title of its own. Not right after a navigation, when what is mounted is still the previous page.
+  function applyTitle(to: RouteLocationNormalized, fromPage = false): void {
     const key = to.meta.titleKey;
-    const page = key && composer.te(key) ? composer.t(key) : null;
+    const page = (fromPage ? pageChrome?.documentTitle.value : null) ?? (key && composer.te(key) ? composer.t(key) : null);
     const title = (options.router?.documentTitle ?? defaultDocumentTitle)(page, platform.config.appName);
     if (title !== "") document.title = title;
   }
@@ -303,7 +306,7 @@ export function createApplication(options: ApplicationOptions): Application {
   installPlatform(app, platform);
   app.use(i18n);
   installFormatting(app, formatting);
-  installPageChrome(app);
+  pageChrome = installPageChrome(app);
   installBottomDock(app);
   if (options.icons) installIcons(app, options.icons);
   app.provide(applicationKey, environment);
@@ -343,11 +346,16 @@ export function createApplication(options: ApplicationOptions): Application {
         login,
         home,
         prepare,
-        afterNavigation: applyTitle,
+        afterNavigation: (to) => applyTitle(to),
         progress: options.router?.progress,
         onError: (error) => report({ source: "router", error }),
       }),
     );
+
+    // A page that registers its tab title after it loaded (a record), or leaves: the tab follows.
+    const titleScope = effectScope();
+    titleScope.run(() => watch(() => pageChrome?.documentTitle.value, () => applyTitle(router.currentRoute.value, true)));
+    undo.push(() => titleScope.stop());
 
     // The page's language and title follow the locale (`lang` is what screen readers and hyphenation go by).
     const scope = effectScope();
@@ -356,7 +364,7 @@ export function createApplication(options: ApplicationOptions): Application {
         () => composer.locale.value,
         (locale) => {
           document.documentElement.lang = locale;
-          applyTitle(router.currentRoute.value);
+          applyTitle(router.currentRoute.value, true);
         },
         { immediate: true },
       ),
