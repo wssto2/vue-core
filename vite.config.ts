@@ -20,6 +20,7 @@ const entries: Record<string, string> = {
   "format/index": "src/format/index.ts",
   "router/index": "src/router/index.ts",
   "app/index": "src/app/index.ts",
+  "shell/index": "src/shell/index.ts",
 };
 
 // Peers and runtime dependencies stay external: the consumer installs one copy of each (a second
