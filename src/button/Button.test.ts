@@ -66,7 +66,7 @@ describe("Button", () => {
     afterEach(() => vi.useRealTimers());
 
     it("shows a spinner in place of the icon only once the wait lasted 0.3 s", async () => {
-      const { rerender, container } = render(Button, { props: { icon: "save" as never }, slots: { default: "Save" } });
+      const { rerender, container } = render(Button, { props: { icon: "save" }, slots: { default: "Save" } });
       await rerender({ processing: true });
       expect(container.querySelector('[data-test="button-spinner"]')).toBeNull();
 

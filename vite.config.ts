@@ -8,6 +8,7 @@ const entries: Record<string, string> = {
   index: "src/index.ts",
   "icon/index": "src/icon/index.ts",
   "button/index": "src/button/index.ts",
+  "controls/index": "src/controls/index.ts",
   "i18n/index": "src/i18n/index.ts",
 };
 

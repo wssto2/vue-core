@@ -11,7 +11,8 @@
     "types": ["node", "vitest/globals"]
   },
   "vueCompilerOptions": {
-    "strictTemplates": true
+    "strictTemplates": true,
+    "dataAttributes": ["data-*"]
   },
   "include": ["src/**/*", "vite.config.ts", "vite.styles.config.ts"]
 }
