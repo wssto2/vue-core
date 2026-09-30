@@ -1,0 +1,33 @@
+{
+  "title": "Zapisi",
+  "dealers": "Koncesionari",
+  "customers": "Kupci",
+  "leads": "Leadovi",
+  "dealer": "Koncesionar",
+  "customer": "Kupac",
+  "lead": "Lead",
+  "index": {
+    "intro": "Tri stranice zapisa nad jednim lažnim API-jem: koncesionar (sekcije uz sadržaj), kupac (jedna sekcija, listanje kroz popis) i lead (vlastiti raspored). Zapis 999 ne postoji.",
+    "missing": "Zapis koji ne postoji"
+  },
+  "sections": {
+    "label": "Dijelovi zapisa",
+    "general": "Osnovni podaci",
+    "locations": "Lokacije",
+    "settings": "Postavke",
+    "audit": "Dnevnik promjena",
+    "timeline": "Povijest"
+  },
+  "groups": { "dealer": "Koncesionar", "settings": "Postavke" },
+  "status": { "active": "Aktivan", "inactive": "Neaktivan" },
+  "fields": { "name": "Naziv", "code": "Šifra", "city": "Grad", "phone": "Telefon", "email": "E-pošta", "company": "Tvrtka", "message": "Poruka" },
+  "actions": { "rename": "Preimenuj (sporo spremanje, pokušajte napustiti zapis)", "saving": "Spremam…", "call": "Nazovi", "mail": "E-pošta" },
+  "dealerLocations": "Lokacije: {name}",
+  "location": "Lokacija {id}",
+  "backToLocations": "Natrag na lokacije",
+  "lead_phases": { "1": "Zaprimljen", "2": "Kontaktiran", "3": "Ponuda poslana" },
+  "comments": { "title": "Komentari", "empty": "Još nema komentara", "add": "Dodaj komentar", "placeholder": "Napišite komentar" },
+  "history": { "title": "Povijest faza", "empty": "Još nema povijesti", "outage": "Pokvari povijest", "commentsOutage": "Pokvari komentare" },
+  "aside": { "customer": "Kontakt" },
+  "pager": { "back": "Kupci" }
+}

@@ -1,0 +1,33 @@
+{
+  "title": "Records",
+  "dealers": "Dealers",
+  "customers": "Customers",
+  "leads": "Leads",
+  "dealer": "Dealer",
+  "customer": "Customer",
+  "lead": "Lead",
+  "index": {
+    "intro": "Three record pages on one fake API: a dealer (sections beside the content), a customer (one section, paged through a list) and a lead (a layout of its own). Record 999 does not exist.",
+    "missing": "A record that does not exist"
+  },
+  "sections": {
+    "label": "Parts of the record",
+    "general": "General data",
+    "locations": "Locations",
+    "settings": "Settings",
+    "audit": "Audit log",
+    "timeline": "History"
+  },
+  "groups": { "dealer": "Dealer", "settings": "Settings" },
+  "status": { "active": "Active", "inactive": "Inactive" },
+  "fields": { "name": "Name", "code": "Code", "city": "City", "phone": "Phone", "email": "Email", "company": "Company", "message": "Message" },
+  "actions": { "rename": "Rename (slow save, try leaving the record)", "saving": "Saving…", "call": "Call", "mail": "Email" },
+  "dealerLocations": "Locations of {name}",
+  "location": "Location {id}",
+  "backToLocations": "Back to the locations",
+  "lead_phases": { "1": "Received", "2": "Contacted", "3": "Offer sent" },
+  "comments": { "title": "Comments", "empty": "No comments yet", "add": "Add a comment", "placeholder": "Write a comment" },
+  "history": { "title": "Phase history", "empty": "No history yet", "outage": "Make the history fail", "commentsOutage": "Make the comments fail" },
+  "aside": { "customer": "Contact" },
+  "pager": { "back": "Customers" }
+}
