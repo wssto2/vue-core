@@ -50,6 +50,9 @@
       },
       "unavailable": "Pri nalaganju podatkov je prišlo do napake. Poskusite znova.",
       "offline": "Strežnika ni mogoče doseči. Preverite povezavo in poskusite znova."
+    },
+    "sections": {
+      "label": "Razdelki"
     }
   }
 }

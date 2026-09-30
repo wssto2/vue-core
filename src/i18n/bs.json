@@ -50,6 +50,9 @@
       },
       "unavailable": "Dogodila se greška prilikom učitavanja podataka. Molimo pokušajte ponovo.",
       "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo."
+    },
+    "sections": {
+      "label": "Sekcije"
     }
   }
 }

@@ -20,5 +20,10 @@ export {
   type PageChromeRegistration,
 } from "./chrome";
 export { pageSectionBackKey, usePageSectionBack } from "./sectionBack";
+export { provideSectionIndex, sectionId, useSectionAnchor, useSectionIndex } from "./sectionIndex";
+export type { IndexedSection, SectionIndex } from "./sectionIndex";
+export { default as SectionJumper } from "./SectionJumper.vue";
+export { default as SectionList } from "./SectionList.vue";
+export { default as SectionPanel } from "./SectionPanel.vue";
 export { useLargeTitle } from "./useLargeTitle";
 export type { PageAction, PageBack, PagePathItem, PageSectionBack, QuickAction } from "./types";

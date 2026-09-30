@@ -50,6 +50,9 @@
       },
       "unavailable": "An error occurred while loading data. Please try again.",
       "offline": "The server could not be reached. Check your connection and try again."
+    },
+    "sections": {
+      "label": "Sections"
     }
   }
 }
