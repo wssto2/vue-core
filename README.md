@@ -287,7 +287,7 @@ Dark mode is the `dark` class on `<html>`; nothing is decided for you. An app th
 
 ## Texts and locales
 
-The library's own texts are under the `core` namespace in English, Croatian, Bosnian and Slovenian (`t("core.actions.cancel")`). `createApplication` merges them into its vue-i18n instance; override any key with `i18n.messages` and restrict the offered locales with `locale.supported`. A feature's texts are a namespace (`localeMessages("tickets", { en: () => import("./i18n/en.json") })`, used as `t("tickets.title")`) loaded per locale on demand. A locale switch (the account menu has one) loads every namespace in use first, so nothing shows a raw key; `onLocaleChange` lets you save the choice on the user.
+The library's own texts are under the `core` namespace in English, Croatian, Bosnian and Slovenian (`t("core.actions.cancel")`). `createApplication` merges them into its vue-i18n instance; override any key with `i18n.messages` and restrict the offered locales with `locale.supported`. A feature's texts are a namespace (`localeMessages("tickets", { en: () => import("./i18n/en.json") })`, used as `t("tickets.title")`) loaded per locale on demand. A locale switch (the account menu has one) loads every namespace in use first, so nothing shows a raw key; `locale.onChange` lets you save the choice on the user.
 
 ## Recipes
 

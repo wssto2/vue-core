@@ -37,9 +37,12 @@ export const application = createApplication({
   features: [sessionFeature, defineFeature({ id: "push", effects: [pushCleanup] })],
 
   // Locales: the server's choice when offered, else `fallback`. The library ships en, hr, bs and sl.
-  locale: { supported: ["hr", "en"], fallback: "en" },
-  // After a switch committed (not for the start locale, nor a superseded switch): save it on the user.
-  onLocaleChange: async (locale) => void (await platform.http.put("/profile/locale", { locale })),
+  locale: {
+    supported: ["hr", "en"],
+    fallback: "en",
+    // After a switch committed (not for the start locale, nor a superseded switch): save it on the user.
+    onChange: async (locale) => void (await platform.http.put("/profile/locale", { locale })),
+  },
 
   // Your texts per locale, merged over the library's `core` messages (any of its keys can be overridden).
   i18n: { messages: { en: { core: { shell: { account: { sign_out: "Log out" } } } } } },
@@ -89,7 +92,7 @@ export const pushCleanup: SessionEffect = {
 
 ## Locales and texts
 
-The start locale is the server's (`config.locale`) when it is among `locale.supported`, else `locale.fallback`. `application.setLocale(code)` loads the namespaces in use for the new locale and only then switches, so a switch never shows a raw key; a slower earlier switch that finishes late is dropped. `onLocaleChange(locale)` is called once after each switch that committed, for persisting it on the user; its failure goes to `onError` with `source: "locale"` and does not undo the switch.
+The start locale is the server's (`config.locale`) when it is among `locale.supported`, else `locale.fallback`. `application.setLocale(code)` loads the namespaces in use for the new locale and only then switches, so a switch never shows a raw key; a slower earlier switch that finishes late is dropped. `locale.onChange(locale)` is called once after each switch that committed, for persisting it on the user; its failure goes to `onError` with `source: "locale"` and does not undo the switch.
 
 ## Startup and errors
 

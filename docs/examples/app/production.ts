@@ -31,9 +31,12 @@ export const application = createApplication({
   features: [sessionFeature, defineFeature({ id: "push", effects: [pushCleanup] })],
 
   // Locales: the server's choice when offered, else `fallback`. The library ships en, hr, bs and sl.
-  locale: { supported: ["hr", "en"], fallback: "en" },
-  // After a switch committed (not for the start locale, nor a superseded switch): save it on the user.
-  onLocaleChange: async (locale) => void (await platform.http.put("/profile/locale", { locale })),
+  locale: {
+    supported: ["hr", "en"],
+    fallback: "en",
+    // After a switch committed (not for the start locale, nor a superseded switch): save it on the user.
+    onChange: async (locale) => void (await platform.http.put("/profile/locale", { locale })),
+  },
 
   // Your texts per locale, merged over the library's `core` messages (any of its keys can be overridden).
   i18n: { messages: { en: { core: { shell: { account: { sign_out: "Log out" } } } } } },
