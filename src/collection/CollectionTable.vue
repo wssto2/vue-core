@@ -111,6 +111,9 @@ const hasActionsColumn = computed(() => !!slots.actions || hasRecordLinks.value 
 const moreLabel = (item: Row) => (props.rowLabel ? `${t("core.page.more_actions")}: ${props.rowLabel(item)}` : t("core.page.more_actions"));
 const hasActions = (item: Row) => interactions.actionsOf(item).length > 0;
 
+// The search text marks where it matched in an identity cell.
+const search = computed(() => props.collection.query.value.search);
+
 // --- views -------------------------------------------------------------------------------
 
 const tabs = computed(() => props.collection.views.value.map((view) => ({ value: view.key, label: view.label, icon: view.icon, badge: view.count })));
@@ -242,15 +245,15 @@ const message = computed(() => {
                       <!-- A provided cell slot renders as is, even empty (a meta that has nothing to say); a column without one shows its standard cell. -->
                       <template v-for="column in primary" :key="String(column.key)">
                         <!-- @vue-ignore -->
-                        <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="link(item)" />
-                        <span v-else class="block truncate text-row-title"><CollectionCell :column="column" :item="item" :compact="true" :to="link(item)" /></span>
+                        <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="link(item)" :search="search" />
+                        <span v-else class="block truncate text-row-title"><CollectionCell :column="column" :item="item" :compact="true" :to="link(item)" :search="search" /></span>
                       </template>
                     </div>
                     <div v-if="accessory.length || (moreInColumn && hasActions(item))" class="flex shrink-0 items-center gap-2 pt-0.5">
                       <template v-for="column in accessory" :key="String(column.key)">
                         <!-- @vue-ignore -->
-                        <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="link(item)" />
-                        <CollectionCell v-else :column="column" :item="item" :compact="true" :to="link(item)" />
+                        <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="link(item)" :search="search" />
+                        <CollectionCell v-else :column="column" :item="item" :compact="true" :to="link(item)" :search="search" />
                       </template>
                       <button v-if="moreInColumn && hasActions(item)" type="button" data-test="collection-row-more" :aria-label="moreLabel(item)"
                         class="hit-target -my-1 -mr-1 flex size-8 cursor-pointer items-center justify-center rounded-full text-content-muted active:bg-fill"
@@ -262,8 +265,8 @@ const message = computed(() => {
                   <div v-if="meta.length" class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-row-meta">
                     <template v-for="column in meta" :key="String(column.key)">
                       <!-- @vue-ignore -->
-                      <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="link(item)" />
-                      <span v-else-if="!isBlank(cellValue(item, column))" class="truncate"><CollectionCell :column="column" :item="item" :compact="true" :to="link(item)" /></span>
+                      <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="link(item)" :search="search" />
+                      <span v-else-if="!isBlank(cellValue(item, column))" class="truncate"><CollectionCell :column="column" :item="item" :compact="true" :to="link(item)" :search="search" /></span>
                     </template>
                   </div>
                 </div>
@@ -335,7 +338,7 @@ const message = computed(() => {
                   <td v-for="(column, columnIndex) in columns" :key="String(column.key)" :class="cellClass(column)">
                     <!-- @vue-ignore -->
                     <slot :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="false" :to="link(item)">
-                      <CollectionCell :column="column" :item="item" :compact="false" :to="link(item)">
+                      <CollectionCell :column="column" :item="item" :compact="false" :to="link(item)" :search="search">
                         <template v-if="slots.leading && columnIndex === 0" #leading><slot name="leading" :item="item" :compact="false" /></template>
                       </CollectionCell>
                     </slot>

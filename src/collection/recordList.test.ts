@@ -1,4 +1,3 @@
-/* eslint-disable vue/one-component-per-file -- test fixtures */
 import { fireEvent, render, screen } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { defineComponent, h } from "vue";

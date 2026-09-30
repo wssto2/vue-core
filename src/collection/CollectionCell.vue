@@ -18,6 +18,8 @@ const props = defineProps<{
   compact: boolean;
   /** The record's link, carrying the list's state. */
   to: RouteLocationRaw | null;
+  /** The list's search text: marked in an identity's title. */
+  search?: string | null;
 }>();
 
 defineSlots<{
@@ -36,9 +38,9 @@ const asNumber = computed(() => (typeof value.value === "number" ? value.value :
   <template v-if="props.column.kind === 'identity'">
     <div v-if="!props.compact && $slots.leading" class="flex items-center gap-3">
       <slot name="leading" />
-      <RecordIdentity :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" subtitle-selectable />
+      <RecordIdentity :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" :highlight="props.search" subtitle-selectable />
     </div>
-    <RecordIdentity v-else :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" subtitle-selectable />
+    <RecordIdentity v-else :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" :highlight="props.search" subtitle-selectable />
   </template>
 
   <template v-else-if="props.column.kind === 'timestamp'">

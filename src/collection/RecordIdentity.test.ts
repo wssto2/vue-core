@@ -36,4 +36,17 @@ describe("RecordIdentity", () => {
     const { container } = render(RecordIdentity, { props: { title: "Ada Lovelace" }, global: { plugins: [router] } });
     expect(container.querySelector(".text-row-subtitle")).toBeNull();
   });
+
+  it("marks where the search matched the title, for the link and the plain title alike", () => {
+    const { container } = render(RecordIdentity, { props: { title: "Ada Lovelace", to: { name: "lead", params: { leadID: 7 } }, highlight: " LOVE ada " }, global: { plugins: [router] } });
+    expect([...container.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual(["Ada", "Love"]);
+    expect(screen.getByRole("link").textContent).toBe("Ada Lovelace");
+  });
+
+  it("marks nothing without a search or a match", () => {
+    const { container } = render(RecordIdentity, { props: { title: "Ada Lovelace", highlight: "zzz" }, global: { plugins: [router] } });
+    expect(container.querySelector("mark")).toBeNull();
+    const plain = render(RecordIdentity, { props: { title: "Ada Lovelace" }, global: { plugins: [router] } });
+    expect(plain.container.querySelector("mark")).toBeNull();
+  });
 });

@@ -258,6 +258,21 @@ describe("sorting, search and paging", () => {
     }
   });
 
+  it("marks the search text in the identity cell's title, on the table and the phone row", async () => {
+    const { list } = await mountList({ state: "memory" });
+    list.search("ana HOR");
+    await flush();
+    expect([...document.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual(["Ana", "Hor"]);
+    expect(document.querySelector("mark")!.closest("a")!.textContent?.trim()).toBe("Ana Horvat"); // the name is still one link
+
+    restoreViewport = viewport(true);
+    document.body.innerHTML = "";
+    const phone = await mountList({ state: "memory" });
+    phone.list.search("kov");
+    await flush();
+    expect([...document.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual(["Kov"]);
+  });
+
   it("the slash key focuses the search, and is left alone while typing", async () => {
     await mountList();
     const field = screen.getByRole("textbox", { name: "Search" });
