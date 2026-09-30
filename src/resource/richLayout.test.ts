@@ -8,7 +8,7 @@ import { pageSectionBackKey } from "../page/sectionBack";
 import { createAccessClient, platformKey, type AccessSnapshot, type Platform } from "../platform";
 import { accessOf } from "../platform/testing";
 import { AppRouterView, createRouteAccess, routeAccessKey } from "../router/access";
-import { AsyncSection } from "../state";
+import { AsyncSection, EmptyState } from "../state";
 import { createTestI18n } from "../testing/i18n";
 import { mockMedia } from "../testing/media";
 import { useResource } from "./resource";
@@ -48,25 +48,26 @@ function LeadPage(reads: Reads) {
   return defineComponent({
     setup() {
       const lead = useRouteResource({ param: "leadID", load: (id) => reads.lead(id) });
-      const history = useResource({ for: () => lead.id.value, load: (id) => reads.history(id) });
+      const history = useResource({ for: lead, load: (id) => reads.history(id) });
       return () =>
         h(AdaptivePageShell, { title: lead.data.value?.name ?? "Lead" }, {
-          header: () =>
-            lead.state.value.status === "failed"
-              ? h(AsyncSection, { state: lead.state.value, onRetry: () => void lead.reload() })
-              : lead.data.value
-                ? h(RecordHeader, { title: lead.data.value.name })
-                : null,
-          default: () => [
-            h("div", { "data-region": "track" }, [
-              h(AsyncSection, { state: history.state.value, skeletonRows: 1, onRetry: () => void history.reload() }, { default: ({ value }: { value: string[] }) => h("ol", value.map((phase) => h("li", phase))) }),
-            ]),
-            h("div", { class: "grid", "data-region": "columns" }, [
-              lead.data.value ? h("aside", { class: "max-lg:order-2", "data-region": "aside" }, `aside of ${lead.data.value.name}`) : null,
-              h(SectionNavigator, { label: "Sections", class: "max-lg:order-1", "data-region": "sections" }, { default: () => h(AppRouterView) }),
-              lead.data.value ? h(Comments, { leadId: lead.data.value.id, read: reads.comments, class: "max-lg:order-3" }) : null,
-            ]),
-          ],
+          ...(lead.data.value ? { header: () => h(RecordHeader, { title: lead.data.value!.name }) } : {}),
+          default: () => {
+            const state = lead.state.value;
+            // The record's own failure replaces the whole body: one state, nothing of the record page.
+            if (state.status === "failed" && state.reason === "notFound") return h(EmptyState, { title: "Not found", "data-region": "missing" });
+            if (!lead.data.value) return h(AsyncSection, { state, onRetry: () => void lead.reload() });
+            return [
+              h("div", { "data-region": "track" }, [
+                h(AsyncSection, { state: history.state.value, skeletonRows: 1, onRetry: () => void history.reload() }, { default: ({ value }: { value: string[] }) => h("ol", value.map((phase) => h("li", phase))) }),
+              ]),
+              h("div", { class: "grid", "data-region": "columns" }, [
+                h("aside", { class: "max-lg:order-2", "data-region": "aside" }, `aside of ${lead.data.value.name}`),
+                h(SectionNavigator, { label: "Sections", class: "max-lg:order-1", "data-region": "sections" }, { default: () => h(AppRouterView) }),
+                h(Comments, { leadId: lead.data.value.id, read: reads.comments, class: "max-lg:order-3" }),
+              ]),
+            ];
+          },
         });
     },
   });
@@ -166,11 +167,34 @@ describe("a lead-like record on the same resource state", () => {
     expect([all.lead.mock.calls.length, all.history.mock.calls.length, all.comments.mock.calls.length]).toEqual([1, 1, 2]);
   });
 
-  it("shows the lead's own failure in the header and renders no region that needs the lead", async () => {
-    await openLead(reads({ lead: async () => { throw new ApiError({ kind: "notFound", message: "no", status: 404 }); } }));
-    expect(document.querySelector('[data-async="failed"]')).toBeTruthy();
-    expect(region("aside")).toBeNull();
-    expect(region("comments")).toBeNull();
+  it("shows a missing lead as one not-found state that replaces the whole record body, and reads no region", async () => {
+    const all = { lead: async () => { throw new ApiError({ kind: "notFound", message: "no", status: 404 }); }, history: vi.fn(reads().history), comments: vi.fn(reads().comments) };
+    await openLead(all);
+    expect(document.querySelectorAll('[data-region="missing"]')).toHaveLength(1);
+    expect(document.querySelectorAll("[data-async]")).toHaveLength(0);
+    for (const name of ["track", "aside", "comments", "columns"]) expect(region(name)).toBeNull();
+    expect(document.querySelector('[data-test="section-navigator"]')).toBeNull();
+    expect(all.history).not.toHaveBeenCalled();
+    expect(all.comments).not.toHaveBeenCalled();
+  });
+
+  it("shows a failed lead as one retryable state and no other region, and reads the regions once it loads", async () => {
+    let failing = true;
+    const all = { lead: vi.fn(async (id: number) => {
+      if (failing) throw new ApiError({ kind: "server", message: "down", status: 500 });
+      return { id, name: `Lead ${id}` };
+    }), history: vi.fn(reads().history), comments: vi.fn(reads().comments) };
+    await openLead(all);
+    expect(document.querySelectorAll("[data-async=failed]")).toHaveLength(1);
+    expect(region("track")).toBeNull();
+    expect(all.history).not.toHaveBeenCalled();
+
+    failing = false;
+    await fireEvent.click(document.querySelector("[data-async=failed] button")!);
+    await settle();
+    expect(document.querySelector("[data-async=failed]")).toBeNull();
+    expect(region("track")?.textContent).toContain("received 5");
+    expect(all.history).toHaveBeenCalledTimes(1);
   });
 
   it("follows the lead to the next one: every region clears and reads again, and a response for the lead that was left is dropped", async () => {
