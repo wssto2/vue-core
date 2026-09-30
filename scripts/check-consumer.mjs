@@ -36,8 +36,8 @@ const [packed] = JSON.parse(
 );
 renameSync(join(packDir, packed.filename), join(packDir, "vue-core.tgz"));
 const shipped = packed.files.map((file) => file.path);
-const stray = shipped.filter((path) => !/^(dist\/|src\/styles\/|package\.json$)/.test(path));
-if (stray.length > 0) fail(`tarball ships files outside dist/ and src/styles/: ${stray.join(", ")}`);
+const stray = shipped.filter((path) => !/^(dist\/|src\/styles\/|package\.json$|README\.md$)/.test(path));
+if (stray.length > 0) fail(`tarball ships files outside dist/, src/styles/, package.json and README.md: ${stray.join(", ")}`);
 if (shipped.some((path) => /\.test\.|^src\/(?!styles\/)/.test(path))) fail("tarball ships sources or tests");
 console.log(`${shipped.length} files, ${(packed.size / 1024).toFixed(0)} kB packed`);
 
