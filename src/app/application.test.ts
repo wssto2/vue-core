@@ -214,6 +214,22 @@ describe("mount", () => {
   });
 });
 
+describe("the locale", () => {
+  const localeOf = (config: Record<string, unknown>, locale?: { initial?: string }) => {
+    const { platform } = fakeBackend(null, config);
+    const application = createApplication(options(platform, [loginFeature], "/login", locale ? { locale } : {}));
+    mounted.push(application);
+    return application.locale.value;
+  };
+
+  it("starts in the server's locale when the application supports it (ARV ignored `ba`), else in the fallback", () => {
+    expect(localeOf({ locale: "hr" })).toBe("hr");
+    expect(localeOf({ locale: "bs" })).toBe("bs");
+    expect(localeOf({ locale: "de" })).toBe("en");
+    expect(localeOf({ locale: "hr" }, { initial: "sl" })).toBe("sl");
+  });
+});
+
 describe("the title", () => {
   const messages = { en: { tickets: { title: "Tickets" }, login: { title: "Sign in" } } };
 
