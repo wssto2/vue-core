@@ -1,5 +1,6 @@
 import { shallowRef, type ShallowRef } from "vue";
 import type { AccessSnapshot } from "./access";
+import type { NavigationNode } from "./navigation";
 
 /** The minimal projection of the signed-in user the platform needs; an application's own user type extends it. */
 export interface SessionUser {
@@ -12,6 +13,8 @@ export interface SessionSnapshot<U extends SessionUser = SessionUser> {
   /** When the session's access token expires, if the server says; renewing it is the application's effect. */
   readonly expiresAt: Date | null;
   readonly access: AccessSnapshot;
+  /** The menu the server built for this user; absent when the adapter's backend has none. */
+  readonly navigation?: readonly NavigationNode[];
 }
 
 /**

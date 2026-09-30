@@ -36,6 +36,20 @@ describe("parseSessionPayload", () => {
     expect(bad).toThrow(/expires_at: expected an ISO date-time string/);
   });
 
+  it("carries the server's menu tree, keeping only what a menu needs", () => {
+    const navigation = [
+      { i18n: "navigation.crm", children: [{ i18n: "navigation.crm_lead", icon: "userLine", route: "crm.lead", policies: ["crm.lead.view"] }] },
+      { i18n: "navigation.home", route: "home", children: null },
+    ];
+    expect(parseSessionPayload({ ...mePayload(1), navigation }).navigation).toEqual([
+      { i18n: "navigation.crm", children: [{ i18n: "navigation.crm_lead", icon: "userLine", route: "crm.lead" }] },
+      { i18n: "navigation.home", route: "home" },
+    ]);
+    expect(parseSessionPayload({ ...mePayload(1), navigation: undefined }).navigation).toBeUndefined();
+    expect(() => parseSessionPayload({ ...mePayload(1), navigation: [{ route: "x" }, "y"] })).toThrow(/navigation\[0\]: expected an object with an i18n key; navigation\[1\]/);
+    expect(() => parseSessionPayload({ ...mePayload(1), navigation: {} })).toThrow(/navigation: expected an array/);
+  });
+
   it("throws a malformed ApiError naming every problem", async () => {
     const error = await failureOf(() => parseSessionPayload({ user: { name: "x" }, access: { permissions: 1 } }));
     expect(error.kind).toBe("malformed");

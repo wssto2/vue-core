@@ -3,6 +3,8 @@ export type { AccessClient, AccessClientOptions, AccessClause, AccessQualifier, 
 export { BootstrapError, BootstrapFields, parseBootstrap, readBootstrap } from "./bootstrap";
 export type { BootstrapConfig, ReadBootstrapOptions } from "./bootstrap";
 export { defineFeatureContext, MissingContextError } from "./context";
+export { parseNavigation } from "./navigation";
+export type { NavigationNode } from "./navigation";
 export { httpSessionAdapter, parseSessionPayload } from "./httpSession";
 export type { HttpSessionOptions, UserParser } from "./httpSession";
 export { createPlatform, installPlatform, platformKey, usePlatform } from "./platform";

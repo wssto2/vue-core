@@ -1,5 +1,6 @@
 import { ApiError, isApiError, type HttpClient } from "../client";
 import { parseAccessSnapshot } from "./access";
+import { parseNavigation } from "./navigation";
 import type { SessionAdapter, SessionSnapshot, SessionUser } from "./session";
 
 export interface HttpSessionOptions {
@@ -21,7 +22,7 @@ export const parseSessionUser: UserParser<SessionUser> = (raw) => {
 };
 
 /**
- * Reads go-core's session payload `{ user, expires_at?, access }` (the answer of `/auth/me`, and of a login).
+ * Reads go-core's session payload `{ user, expires_at?, access, navigation? }` (the answer of `/auth/me`, and of a login).
  * Throws an `ApiError` of kind `malformed` naming what is wrong.
  */
 export function parseSessionPayload<U extends SessionUser = SessionUser>(
@@ -48,8 +49,9 @@ export function parseSessionPayload<U extends SessionUser = SessionUser>(
 
   const access = parseAccessSnapshot(raw.access);
   issues.push(...access.issues);
+  const navigation = raw.navigation === undefined || raw.navigation === null ? undefined : parseNavigation(raw.navigation, issues);
   if (user === null || issues.length > 0) throw malformed(issues);
-  return { user, expiresAt, access: access.snapshot };
+  return { user, expiresAt, access: access.snapshot, ...(navigation && { navigation }) };
 }
 
 const malformed = (issues: readonly string[]) =>
