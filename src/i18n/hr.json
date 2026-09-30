@@ -185,7 +185,8 @@
         "no_matches": "Nema rezultata",
         "loading": "Učitavanje…",
         "clear": "Očisti",
-        "done": "Gotovo"
+        "done": "Gotovo",
+        "failed": "Pretraga nije uspjela. Pokušajte ponovno."
       },
       "number": {
         "invalid": "Unesite broj."
@@ -203,6 +204,37 @@
       "no": "Ne",
       "otp": {
         "label": "Kod za potvrdu, {length} znamenki"
+      },
+      "months": {
+        "long": {
+          "1": "siječanj",
+          "2": "veljača",
+          "3": "ožujak",
+          "4": "travanj",
+          "5": "svibanj",
+          "6": "lipanj",
+          "7": "srpanj",
+          "8": "kolovoz",
+          "9": "rujan",
+          "10": "listopad",
+          "11": "studeni",
+          "12": "prosinac"
+        },
+        "short": {
+          "1": "sij",
+          "2": "velj",
+          "3": "ožu",
+          "4": "tra",
+          "5": "svi",
+          "6": "lip",
+          "7": "srp",
+          "8": "kol",
+          "9": "ruj",
+          "10": "lis",
+          "11": "stu",
+          "12": "pro"
+        },
+        "with_year": "{month} {year}."
       }
     }
   }

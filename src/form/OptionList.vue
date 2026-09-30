@@ -1,0 +1,105 @@
+<script setup lang="ts" generic="Value extends string | number">
+import { computed, ref, useId, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
+import { Icon } from "../icon";
+import { groupOptions, matchOptions, type SelectOption } from "./options";
+
+/**
+ * The options of a select as a list to pick from, with a search box once there are many: finger-height rows, a
+ * check on the chosen one, groups, arrow-key navigation. The select opens it in a popover on wide screens and in
+ * a sheet on phones; a filter drill-down or your own picker can use it the same way.
+ *
+ *   <OptionList :options="statuses" :model-value="status" @select="status = $event" />
+ *
+ * Single: picking emits the value. `multiple`: rows toggle and emit the toggled value.
+ */
+const props = withDefaults(defineProps<{
+  options: readonly SelectOption<Value>[];
+  /** The chosen value, or the chosen values when `multiple`. */
+  modelValue?: Value | null | readonly Value[];
+  multiple?: boolean;
+  /** Shows the search box from this many options. */
+  searchFrom?: number;
+  /** A first row meaning "no value". */
+  noneLabel?: string;
+  /** `grouped` lists sit on the canvas of a sheet; `plain` in a popover. */
+  presentation?: "grouped" | "plain";
+}>(), { modelValue: null, multiple: false, searchFrom: 9, noneLabel: undefined, presentation: "grouped" });
+
+const emit = defineEmits<{ select: [value: Value | null] }>();
+
+const { t } = useI18n();
+const query = ref("");
+const listId = useId();
+const root = useTemplateRef<HTMLElement>("root");
+
+const showSearch = computed(() => props.options.length >= props.searchFrom);
+const visible = computed(() => groupOptions(matchOptions(props.options, query.value)));
+const chosen = (option: SelectOption<Value>) => (props.multiple ? Array.isArray(props.modelValue) && (props.modelValue as readonly Value[]).includes(option.value) : props.modelValue === option.value);
+const nothingChosen = computed(() => (props.multiple ? false : props.modelValue === null));
+
+function move(event: KeyboardEvent) {
+  const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
+  if (!keys.includes(event.key)) return;
+  const items = [...(root.value?.querySelectorAll<HTMLElement>("[data-option]:not([disabled])") ?? [])];
+  if (items.length === 0) return;
+  const at = items.indexOf(document.activeElement as HTMLElement);
+  const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowDown" ? Math.min(at + 1, items.length - 1) : Math.max(at - 1, 0);
+  // From the search box, ArrowDown enters the list; ArrowUp from the first row returns to the box.
+  if (event.key === "ArrowUp" && at <= 0) root.value?.querySelector<HTMLElement>("[data-option-search]")?.focus();
+  else items[at === -1 && event.key === "ArrowDown" ? 0 : next]?.focus();
+  event.preventDefault();
+}
+
+const grouped = computed(() => props.presentation === "grouped");
+</script>
+
+<template>
+  <div ref="root" data-test="option-list" @keydown="move">
+    <div v-if="showSearch" class="sticky top-0 z-10 pb-2" :class="grouped ? 'bg-surface-page pt-1' : 'bg-surface-cell'">
+      <label class="flex min-h-9 items-center gap-1.5 rounded-control bg-fill px-2.5 text-content-muted focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-border-focus">
+        <Icon name="search" :size="16" class="shrink-0" />
+        <input v-model="query" data-option-search type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" :aria-label="t('core.form.select.search')"
+          :placeholder="t('core.form.select.search')" class="min-w-0 flex-1 border-0 bg-transparent p-0 text-body text-content-strong outline-none placeholder:text-content-disabled focus:ring-0" />
+      </label>
+    </div>
+
+    <ul class="flex flex-col" :class="grouped ? 'gap-group-gap' : 'gap-2'" role="listbox" :aria-multiselectable="props.multiple || undefined">
+      <li v-if="props.noneLabel && query === ''" role="presentation">
+        <ul role="group" :class="grouped ? 'rounded-group bg-surface-cell shadow-group' : ''">
+          <li role="option" :aria-selected="nothingChosen">
+            <button type="button" data-option class="flex min-h-row w-full cursor-pointer items-center gap-3 px-row-inset text-left text-body hover:bg-fill focus-visible:bg-fill focus-visible:outline-none active:bg-fill"
+              :class="[nothingChosen ? 'text-content-strong' : 'text-content-muted', grouped ? 'rounded-group' : 'rounded-control']" @click="emit('select', null)">
+              <span class="flex-1 py-2">{{ props.noneLabel }}</span>
+              <Icon v-if="nothingChosen" name="checkCustom" :size="18" class="shrink-0 text-content-link" />
+            </button>
+          </li>
+        </ul>
+      </li>
+
+      <li v-for="(section, sectionIndex) in visible" :key="section.title ?? sectionIndex" role="presentation">
+        <p v-if="section.title" :id="`${listId}-${sectionIndex}`" class="px-row-inset pb-1.5 text-footnote uppercase tracking-wide text-content-muted">{{ section.title }}</p>
+        <ul role="group" :aria-labelledby="section.title ? `${listId}-${sectionIndex}` : undefined" :class="grouped ? 'rounded-group bg-surface-cell shadow-group' : ''">
+          <li v-for="option in section.options" :key="String(option.value)" role="option" :aria-selected="chosen(option)" class="group/option">
+            <button type="button" data-option data-test="option" :disabled="option.disabled"
+              class="flex w-full cursor-pointer items-stretch gap-3 pl-row-inset text-left text-body hover:bg-fill focus-visible:bg-fill focus-visible:outline-none active:bg-fill disabled:cursor-not-allowed disabled:opacity-45"
+              :class="grouped ? 'group-first/option:rounded-t-group group-last/option:rounded-b-group' : 'rounded-control'" @click="emit('select', option.value)">
+              <span v-if="props.multiple" aria-hidden="true" class="flex shrink-0 items-center">
+                <span class="flex size-5.5 items-center justify-center rounded-full border" :class="chosen(option) ? 'border-control-on bg-control-on text-white' : 'border-border-control'">
+                  <Icon v-if="chosen(option)" name="checkCustom" :size="12" />
+                </span>
+              </span>
+              <span class="flex min-h-row min-w-0 flex-1 items-center gap-3 py-2 pr-row-inset" :class="grouped ? 'border-t border-border-separator group-first/option:border-t-0' : ''">
+                <span class="min-w-0 flex-1 text-content-strong">{{ option.label }}</span>
+                <span v-if="option.description" class="shrink-0 text-footnote text-content-muted">{{ option.description }}</span>
+                <Icon v-if="!props.multiple && chosen(option)" name="checkCustom" :size="18" class="shrink-0 text-content-link" />
+              </span>
+            </button>
+          </li>
+        </ul>
+      </li>
+
+      <li v-if="visible.length === 0" class="px-4 py-6 text-center text-subheadline text-content-muted">{{ t("core.form.select.no_matches") }}</li>
+    </ul>
+  </div>
+</template>

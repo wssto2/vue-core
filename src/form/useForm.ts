@@ -15,6 +15,20 @@ export interface FieldBinding<Value> {
   readonly "data-field-key": string;
 }
 
+/** What `MonthYearField` needs: a month and a year, two numbers of the form. */
+export interface MonthYearBinding {
+  readonly month: number | null;
+  readonly year: number | null;
+  readonly "onUpdate:month": (value: number | null) => void;
+  readonly "onUpdate:year": (value: number | null) => void;
+  readonly error: string | undefined;
+  /** Both keys, so an error on either counts as shown. */
+  readonly "data-field-key": string;
+}
+
+/** The keys of `Values` that hold exactly `Held`. */
+export type KeysHolding<Values, Held> = { [Key in keyof Values & string]: [Values[Key]] extends [Held] ? ([Held] extends [Values[Key]] ? Key : never) : never }[keyof Values & string];
+
 /**
  * Why a submit did not succeed, as a closed set:
  *
@@ -89,6 +103,8 @@ export interface Form<Values extends object, Output = Values> {
   readonly unplaced: ComputedRef<readonly { readonly field: string; readonly message: string }[]>;
   /** The value, the error and the marker of one field: `<TextField v-bind="form.bind('email')" />`. Misspelled names and wrong value types are compile errors. */
   bind<Key extends keyof Values & string>(key: Key): FieldBinding<Values[Key]>;
+  /** The two number fields of a month and a year, for `MonthYearField`: `<MonthYearField v-bind="form.bindMonthYear('regMonth', 'regYear')" />`. */
+  bindMonthYear<MonthKey extends KeysHolding<Values, number | null>, YearKey extends KeysHolding<Values, number | null>>(monthKey: MonthKey, yearKey: YearKey): MonthYearBinding;
   /** Takes new values as both draft and baseline and clears errors and the failure: a record was loaded. */
   hydrate(next: Values): void;
   /** Puts the baseline back in the draft and clears errors and the failure (Cancel). */
@@ -280,6 +296,29 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
           return errors.first(field);
         },
         "data-field-key": field,
+      };
+    },
+    bindMonthYear(monthKey, yearKey) {
+      const numbers = values as Record<string, number | null>;
+      return {
+        get month() {
+          return numbers[monthKey] ?? null;
+        },
+        get year() {
+          return numbers[yearKey] ?? null;
+        },
+        "onUpdate:month"(value) {
+          numbers[monthKey] = value;
+          errors.clear(monthKey);
+        },
+        "onUpdate:year"(value) {
+          numbers[yearKey] = value;
+          errors.clear(yearKey);
+        },
+        get error() {
+          return errors.first(monthKey) ?? errors.first(yearKey);
+        },
+        "data-field-key": `${monthKey} ${yearKey}`,
       };
     },
     hydrate(next) {

@@ -9,7 +9,9 @@ const CONTROLS = "input:not([type=hidden]):not([disabled]), textarea:not([disabl
  * first. Returns whether there was one. Nothing moves while the user is typing: call it from the submit's answer, not from a watcher.
  */
 export async function focusFirstError(root: ParentNode = document, sections?: SectionIndex | null): Promise<boolean> {
-  const row = root.querySelector<HTMLElement>("[data-field-error]");
+  const rows = [...root.querySelectorAll<HTMLElement>("[data-field-error]")];
+  // The first field with something to focus: a locked one cannot take focus, so the next one does.
+  const row = rows.find((each) => each.matches(CONTROLS) || each.querySelector(CONTROLS)) ?? rows[0];
   if (!row) return false;
   const section = sections?.sections.value.find((each) => each.element.contains(row));
   if (section) {
