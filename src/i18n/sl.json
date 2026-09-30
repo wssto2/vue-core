@@ -42,6 +42,14 @@
       "session": "Strežnik ni dosegljiv, zato seje ni bilo mogoče preveriti. Preverite povezavo in poskusite znova.",
       "messages": "Besedil aplikacije ni bilo mogoče naložiti. Preverite povezavo in poskusite znova.",
       "other": "Pri zagonu je prišlo do napake. Poskusite znova."
+    },
+    "resource": {
+      "not_found": {
+        "title": "Ni najdeno",
+        "body": "Zahtevanega zapisa ni mogoče najti."
+      },
+      "unavailable": "Pri nalaganju podatkov je prišlo do napake. Poskusite znova.",
+      "offline": "Strežnika ni mogoče doseči. Preverite povezavo in poskusite znova."
     }
   }
 }

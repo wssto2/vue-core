@@ -42,6 +42,14 @@
       "session": "The server could not be reached, so your session could not be checked. Check your connection and try again.",
       "messages": "The application texts could not be loaded. Check your connection and try again.",
       "other": "Something went wrong while starting. Try again."
+    },
+    "resource": {
+      "not_found": {
+        "title": "Not found",
+        "body": "The record could not be found."
+      },
+      "unavailable": "An error occurred while loading data. Please try again.",
+      "offline": "The server could not be reached. Check your connection and try again."
     }
   }
 }

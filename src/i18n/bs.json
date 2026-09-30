@@ -42,6 +42,14 @@
       "session": "Server nije dostupan pa se sesija nije mogla provjeriti. Provjerite vezu i pokušajte ponovo.",
       "messages": "Tekstovi aplikacije nisu se mogli učitati. Provjerite vezu i pokušajte ponovo.",
       "other": "Nešto je pošlo naopako prilikom pokretanja. Pokušajte ponovo."
+    },
+    "resource": {
+      "not_found": {
+        "title": "Nije pronađeno",
+        "body": "Traženi zapis nije pronađen."
+      },
+      "unavailable": "Dogodila se greška prilikom učitavanja podataka. Molimo pokušajte ponovo.",
+      "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo."
     }
   }
 }
