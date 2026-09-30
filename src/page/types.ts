@@ -64,3 +64,9 @@ export interface QuickAction {
 export interface PageSectionBack extends PageBack {
   path?: readonly PagePathItem[];
 }
+
+/** What a long form says about one of its sections: fields with an error, and its required fields (the page's section list shows both). */
+export interface SectionFormState {
+  readonly errors: number;
+  readonly required: { readonly total: number; readonly filled: number };
+}

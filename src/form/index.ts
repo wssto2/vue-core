@@ -48,3 +48,7 @@ export type { FieldGroups, RecordGroupsContext, RecordGroupsOptions } from "./re
 export { default as RecordGroupScope } from "./RecordGroupScope.vue";
 export { useGroupSheet } from "./useGroupSheet";
 export type { GroupSheetForm, GroupSheetOptions, GroupSheetState } from "./useGroupSheet";
+export { default as EditorPage } from "./EditorPage.vue";
+export { useSectionStates } from "./sectionStates";
+export { useSaveChrome } from "./useSaveChrome";
+export type { SaveChromeOptions } from "./useSaveChrome";
