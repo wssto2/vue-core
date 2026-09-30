@@ -19,7 +19,7 @@ Everything §6–7 says a shared piece must *not* do (no frontend DI container, 
 
 ## Rules for every phase
 
-1. **Extract, don't invent.** Every component / composable starts from its arv-next source (`/Users/josipzlimen/Projects/arv-next/frontend/…`). Keep its behavior, markup, classes and look. Port its existing tests (`arv-next/frontend/tests`, co-located `*.test.ts`) along with it.
+1. **Start from arv-next, then make it right — never copy blindly.** Every component / composable starts from its arv-next source (`/Users/josipzlimen/Projects/arv-next/frontend/…`) because that behavior is proven and the look is approved. Before moving it, review it: fix bugs, remove accidental complexity, dead props and ARV workarounds, and reshape the API to the design principles below. Keep the approved *look* (Emerald Native) and intended *behavior*; the *code and API* are yours to improve. A change to how something looks or a deliberate behavior change is an open question for the owner, not a silent decision. Port the existing tests (`arv-next/frontend/tests`, co-located `*.test.ts`) and add one for every bug you fix. Every phase report lists **bugs found in arv-next** (file:line, symptom, fix) so the owner can fix them in ARV too, and **API changes vs arv-next** with a one-line reason each.
 2. **arv-next is read-only.** Never edit, build, or run npm in arv-next. Read it to copy from.
 3. **No ARV knowledge in the library.** No imports of ARV `@/stores`, `@/features`, `@/generated`, ARV global types (`Route`, `IconKey`, `MessageSchema`, `UserResponse`), vehicle / dealer / VAT / KM / Croatian business wording. What a component needed from ARV comes in as a prop, a typed option, or a typed Vue injection key the app installs. Fail with a descriptive error when a required provider is missing — no silent defaults, no `any`.
 4. **No service locator.** No `resolve<T>()`, no string-keyed registry, no global mutable singletons, no import-time side effects (no requests, timers, listeners at module load).
@@ -29,6 +29,20 @@ Everything §6–7 says a shared piece must *not* do (no frontend DI container, 
 8. **Styling:** Tailwind v4 with the ARV tokens moved into `src/styles/` as semantic tokens (`@theme inline`), brand accent overridable by CSS variables. No parallel styling system.
 9. **Commits:** one commit per step inside a phase, conventional messages (`feat(collection): …`). Targeted checks per step; the full gate (`npm run check`) once at the end of the phase. Never mark a check passed that did not run.
 10. **Stop at the phase boundary.** Report: what was extracted from where, what was changed and why, what was left out, gate output, open questions. Do not start the next phase.
+
+## API design principles (the SwiftUI / UIKit bar)
+
+The library should read like Apple's frameworks: small, expressive, declarative, hard to misuse.
+
+- **Declarative composition.** Build screens from nested components and typed slots (SwiftUI view builders), not giant option objects or config arrays. `<Page title="Tickets"><Section title="Contact">…</Section></Page>`.
+- **Names read like sentences.** `useCollection(tickets)`, `list.refresh()`, `sheet.present()`, `sheet.dismiss()`, `resource.reload()`. Components are nouns (`Page`, `Section`, `List`, `Sheet`, `Toolbar`), props are adjectives or roles. No `do`/`handle`/`manager`/`util` names, no abbreviations, no Croatian.
+- **Semantic, not visual.** Like `Button(role: .destructive)`: `role="destructive" | "cancel"`, `tone="positive" | "warning" | "critical"`, `prominence="primary"`. The component decides the pixels; the call site states intent.
+- **Progressive disclosure.** The common case is one line with good defaults; customization comes through slots and optional props, and the unusual case composes lower-level pieces. Never make the simple case pay for the complex one.
+- **One way to do each thing.** No two components or props that overlap; no boolean props that combine into impossible states — use a union (`size="compact" | "regular"`, not `small` + `large`).
+- **State is explicit and typed.** Async state is a discriminated union (`{ status: "loading" } | { status: "loaded", value } | { status: "failed", error }`), not a pile of booleans. Slots receive loaded values as non-null.
+- **Environment, not globals.** App-wide values (locale, access, icon set, transport, brand) flow like SwiftUI's `Environment`: typed injection keys installed once by the app, overridable for a subtree, with a clear error when missing.
+- **Built-in behavior you don't re-implement.** Focus, keyboard, accessibility labels, reduced motion, safe areas, stale-response protection and dirty/discard guards come for free.
+- **Fully typed.** Generics flow from the data (row type from the loader, field keys from the form values). No `any`, no casts needed at the call site; misuse is a `vue-tsc` error.
 
 ## Layout
 
