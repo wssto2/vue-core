@@ -135,8 +135,8 @@ const Content = () => [
 </script>
 
 <template>
-  <RouterLink v-if="props.to !== undefined" :to="props.to" custom v-slot="{ href, navigate }">
-    <a ref="element" :href="inactive ? undefined : href" :class="classes" v-bind="state" :tabindex="inactive ? -1 : undefined"
+  <RouterLink v-if="props.to !== undefined" :to="props.to" custom v-slot="{ href: target, navigate }">
+    <a ref="element" :href="inactive ? undefined : target" :class="classes" v-bind="state" :tabindex="inactive ? -1 : undefined"
       @click="onClick($event, navigate)"><Content /></a>
   </RouterLink>
   <a v-else-if="props.href !== undefined" ref="element" :href="inactive ? undefined : props.href" :class="classes" v-bind="state"
