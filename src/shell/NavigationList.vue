@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useId } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, type RouteLocationRaw } from "vue-router";
 import { Icon } from "../icon";
@@ -30,6 +30,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ select: [to: RouteLocationRaw] }>();
 
 const { t } = useI18n();
+const uid = useId();
 const fromApplication = props.items === undefined ? useNavigation() : null;
 const known = useKnownIcon();
 const groups = computed(() => groupNavigation(props.items ?? fromApplication?.value ?? []));
@@ -51,7 +52,8 @@ const RAIL = {
   iconActive: "text-primary-400",
   iconInactive: "text-gray-400 group-hover:text-gray-200",
   heading: "px-2 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-gray-400",
-  separator: "mx-2 my-2.5 border-t border-white/10",
+  // A hairline above the group, inset like the rows.
+  separator: "before:mx-2 before:my-2.5 before:block before:border-t before:border-white/10",
 };
 const DRAWER = {
   item: `${ROW} min-h-[2.875rem] cursor-pointer gap-3.5 rounded-group px-3 text-left text-body duration-motion-fast`,
@@ -60,7 +62,7 @@ const DRAWER = {
   iconActive: "",
   iconInactive: "",
   heading: "px-3 pt-4.5 pb-1.5 text-subheadline text-content-muted",
-  separator: "mx-3 my-3 border-t border-border-separator",
+  separator: "before:mx-3 before:my-3 before:block before:border-t before:border-border-separator",
 };
 const look = computed(() => (props.appearance === "rail" ? RAIL : DRAWER));
 const iconSize = computed(() => (props.appearance === "rail" ? (16 as const) : (22 as const)));
@@ -68,22 +70,24 @@ const iconSize = computed(() => (props.appearance === "rail" ? (16 as const) : (
 
 <template>
   <nav :aria-label="label ?? t('core.shell.menu')" data-shell-navigation :data-appearance="appearance">
-    <ul :class="appearance === 'rail' ? 'space-y-0.5' : ''">
-      <template v-for="(group, index) in groups" :key="group.key">
-        <li v-if="group.heading" role="presentation" :class="[look.heading, appearance === 'rail' ? (index > 0 ? 'pt-4' : 'pt-1') : '']">{{ group.heading }}</li>
-        <li v-else-if="group.separated" role="separator" :class="look.separator"></li>
-        <li v-for="destination in group.items" :key="destination.key">
-          <RouterLink custom :to="destination.to" v-slot="{ href, navigate }">
-            <a :href="href" :aria-current="destination.active ? 'page' : undefined" data-shell-destination
-              :class="[look.item, destination.active ? look.active : look.inactive]"
-              @click="follow($event, navigate, destination.to)">
-              <Icon v-if="known(destination.icon)" :name="known(destination.icon)!" :size="iconSize"
-                :class="destination.active ? look.iconActive : look.iconInactive" />
-              <span class="min-w-0 flex-1 truncate">{{ destination.label }}</span>
-            </a>
-          </RouterLink>
-        </li>
-      </template>
+    <!-- A list of groups; a group with a heading is a list of its own, named by it. -->
+    <ul>
+      <li v-for="(group, index) in groups" :key="group.key" :data-separated="group.separated || undefined" :class="group.separated ? look.separator : ''">
+        <p v-if="group.heading" :id="`${uid}-${index}`" :class="[look.heading, appearance === 'rail' ? (index > 0 ? 'pt-4' : 'pt-1') : '']">{{ group.heading }}</p>
+        <ul :aria-labelledby="group.heading ? `${uid}-${index}` : undefined" :class="appearance === 'rail' ? 'space-y-0.5' : ''">
+          <li v-for="destination in group.items" :key="destination.key">
+            <RouterLink custom :to="destination.to" v-slot="{ href, navigate }">
+              <a :href="href" :aria-current="destination.active ? 'page' : undefined" data-shell-destination
+                :class="[look.item, destination.active ? look.active : look.inactive]"
+                @click="follow($event, navigate, destination.to)">
+                <Icon v-if="known(destination.icon)" :name="known(destination.icon)!" :size="iconSize"
+                  :class="destination.active ? look.iconActive : look.iconInactive" />
+                <span class="min-w-0 flex-1 truncate">{{ destination.label }}</span>
+              </a>
+            </RouterLink>
+          </li>
+        </ul>
+      </li>
     </ul>
   </nav>
 </template>

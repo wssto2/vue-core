@@ -81,9 +81,9 @@ describe("NavigationList", () => {
     expect(links.map((link) => link.textContent?.trim())).toEqual(["Appraisals", "Takeovers", "Catalogue"]);
     expect(links.map((link) => link.getAttribute("href"))).toEqual(["/a", "/t", "/c"]);
     expect(links.map((link) => link.getAttribute("aria-current"))).toEqual(["page", null, null]);
-    expect(screen.getByText("Used")).toBeTruthy(); // a heading over two links
+    expect(screen.getByRole("list", { name: "Used" }).querySelectorAll("a")).toHaveLength(2); // a heading over two links names their list
     expect(screen.queryByText("Market")).toBeNull(); // none over one
-    expect(screen.getAllByRole("separator")).toHaveLength(1);
+    expect(document.querySelectorAll("[data-separated]")).toHaveLength(1);
   });
 
   it("draws the icons the application has and quietly skips the ones it lacks", async () => {
