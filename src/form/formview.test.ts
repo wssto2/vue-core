@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick } from "vue";
 import { ApiError } from "../client";
+import { provideSectionIndex, type SectionIndex } from "../page";
 import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
 import { fieldKey, focusFirstError } from "./focus";
@@ -175,6 +176,22 @@ describe("FormGroup and FormRow", () => {
   it("does not say it when nothing is locked", () => {
     render(FormGroup, { props: { lockedFooter: "These come from the import." }, slots: { default: () => h(TextField, { modelValue: "x", label: "VIN" }) }, global });
     expect(screen.queryByText("These come from the import.")).toBeNull();
+  });
+
+  it("a group with `section` is listed in the page's section index under its header", async () => {
+    const captured: { index?: SectionIndex } = {};
+    const Page = defineComponent({
+      setup() {
+        captured.index = provideSectionIndex();
+        return () => h("div", [h(FormGroup, { header: "Contact details", section: true }, () => h(TextField, { modelValue: "x", label: "Email" })), h(FormGroup, { header: "Address", section: true }, () => h(TextField, { modelValue: "y", label: "Street" }))]);
+      },
+    });
+    render(Page, { global });
+    await settle();
+    expect(captured.index?.sections.value.map((section) => [section.id, section.label])).toEqual([
+      ["contact-details", "Contact details"],
+      ["address", "Address"],
+    ]);
   });
 
   it("a custom row shows a value and its own error", () => {

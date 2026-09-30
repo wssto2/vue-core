@@ -13,6 +13,7 @@ import FormGroup from "./FormGroup.vue";
 import FormView from "./FormView.vue";
 import MoneyField from "./MoneyField.vue";
 import MonthYearField from "./MonthYearField.vue";
+import NumberCell from "./NumberCell.vue";
 import NumberField from "./NumberField.vue";
 import OtpInput from "./OtpInput.vue";
 import SegmentedField from "./SegmentedField.vue";
@@ -221,6 +222,19 @@ describe("NumberField", () => {
   });
 });
 
+describe("NumberCell", () => {
+  it("keeps what is typed to digits between the limits, and empty is null", async () => {
+    const { update } = mount(NumberCell, { modelValue: null, label: "Split, March", max: 50 });
+    const input = screen.getByLabelText("Split, March") as HTMLInputElement;
+    await fireEvent.update(input, "1a2");
+    expect(update).toHaveBeenLastCalledWith(12);
+    await fireEvent.update(input, "999");
+    expect(update).toHaveBeenLastCalledWith(50);
+    await fireEvent.update(input, "");
+    expect(update).toHaveBeenLastCalledWith(null);
+  });
+});
+
 describe("SwitchField", () => {
   it("toggles a boolean and says its state to assistive technology", async () => {
     const { update } = mount(SwitchField, { modelValue: false, label: "Newsletter" });
@@ -356,6 +370,18 @@ describe("OtpInput", () => {
     const input = screen.getByLabelText(/Verification code/);
     await fireEvent.paste(input, { clipboardData: { getData: () => "123-456" } });
     expect(update).toHaveBeenLastCalledWith("123456");
+  });
+});
+
+describe("OtpInput states", () => {
+  it("marks the input invalid and disabled when asked, and a cleared model empties the cells", async () => {
+    const { rerender, container } = render(OtpInput, { props: { modelValue: "123", invalid: true, disabled: true, label: "Code" }, global: { plugins } });
+    const input = screen.getByLabelText("Code") as HTMLInputElement;
+    expect(input.disabled).toBe(true);
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    await rerender({ modelValue: "" });
+    expect(input.value).toBe("");
+    expect(container.querySelectorAll("[data-test='otp-input-cell']")[0]?.textContent?.trim()).toBe("");
   });
 });
 
