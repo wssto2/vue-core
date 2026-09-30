@@ -5,7 +5,11 @@
      @import "@wssto2/vue-core/tailwind.css";
      @import "@wssto2/vue-core/fonts.css";
 
-   An app that does not author Tailwind utilities imports the prebuilt
+   The `@source` below makes the app's own Tailwind generate the utilities the library's
+   components use (it scans the built package), so there is one CSS build and no duplicated
+   rules. An app that does not author Tailwind utilities imports the prebuilt
    "@wssto2/vue-core/styles.css" instead (this, the fonts and Tailwind's base). */
 @import "./theme.css";
 @import "./base.css";
+@import "./components.css";
+@source "../../dist";

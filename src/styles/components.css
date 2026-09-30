@@ -1,0 +1,15 @@
+/* Rules that belong to components rather than to the tokens: the bottom dock and the toasts.
+   Utilities the components use are generated from their sources (see tailwind.css). */
+
+/*
+ * Bottom dock (BottomDock). Only the bar touching the bottom edge pads for the iPhone
+ * home indicator: when a tab bar is docked it is that bar, so the bars stacked above it
+ * drop their inset.
+ */
+@utility dock-safe-area {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+[data-bottom-dock]:has(.dock-tab-bar) .dock-safe-area:not(.dock-tab-bar) {
+  padding-bottom: 0;
+}
