@@ -15,7 +15,7 @@ export const both: AsyncState<string[]> = { status: "loading", error: "x" };
 h(Badge, { tone: "critical" });
 // @ts-expect-error tones are meanings (positive, critical…), not colours or ARV's old names
 h(Badge, { tone: "danger" });
-// @ts-expect-error
+// @ts-expect-error success is called positive
 h(Banner, { tone: "success" });
 // @ts-expect-error a colour is not a tone
 h(Banner, { tone: "red" });
