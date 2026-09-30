@@ -22,6 +22,7 @@ export {
 export { pageSectionBackKey, usePageSectionBack } from "./sectionBack";
 export { provideSectionIndex, sectionId, useSectionAnchor, useSectionIndex } from "./sectionIndex";
 export type { IndexedSection, SectionIndex } from "./sectionIndex";
+export { default as SectionNavigator } from "./SectionNavigator.vue";
 export { default as SectionJumper } from "./SectionJumper.vue";
 export { default as SectionList } from "./SectionList.vue";
 export { default as SectionPanel } from "./SectionPanel.vue";
