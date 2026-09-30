@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import { version } from "@wssto2/vue-core";
+import Showcase from "./Showcase.vue";
 
 const accent = ref<"emerald" | "violet">("emerald");
 const dark = ref(false);
@@ -12,7 +13,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <main class="mx-auto flex max-w-readable flex-col gap-section-gap p-screen-padding">
+  <main class="mx-auto flex max-w-content flex-col gap-section-gap p-screen-padding">
     <header class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-large-title font-semibold text-content-strong">vue-core playground</h1>
@@ -60,6 +61,8 @@ watchEffect(() => {
       <span class="rounded-md bg-status-danger-surface px-2 py-0.5 text-footnote text-status-danger-content">Danger</span>
       <span class="rounded-md bg-status-info-surface px-2 py-0.5 text-footnote text-status-info-content">Info</span>
     </section>
+
+    <Showcase />
 
     <p class="text-footnote text-content-muted">
       Status colours stay fixed when the accent changes; the prebuilt stylesheet is checked in

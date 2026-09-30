@@ -122,7 +122,8 @@ describe("Timestamp", () => {
   });
 
   it("says there is no data for nothing or for a non-date", () => {
-    for (const value of [undefined, null, "", "not a date"]) {
+    // Go's zero time is what a go-core server sends for a date that was never set.
+    for (const value of [undefined, null, "", "not a date", "0001-01-01T00:00:00Z", "0001-01-01", "1970-01-01T00:00:00Z"]) {
       const { container, unmount } = render(Timestamp, { props: { value }, global });
       expect(container.textContent).toBe("No data");
       expect(container.querySelector("time")).toBeNull();

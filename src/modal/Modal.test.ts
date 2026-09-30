@@ -153,6 +153,19 @@ describe("presentation", () => {
     expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)?.textContent).toBe("Test dialog");
   });
 
+  // arv-next pointed aria-labelledby at the title's id whenever a header slot existed, title or not.
+  it("does not label itself by a title that does not exist", async () => {
+    const Owner = defineComponent({
+      components: { Modal },
+      setup: () => ({ modal: ref<InstanceType<typeof Modal> | null>(null) }),
+      template: `<button id="trigger" @click="modal?.present()">o</button><Modal ref="modal" without-footer><template #header><p>Steps</p></template><input /></Modal>`,
+    });
+    render(Owner, { global });
+    await present();
+
+    expect(screen.getByRole("dialog").hasAttribute("aria-labelledby")).toBe(false);
+  });
+
   it("never gives the close button initial focus and closes through it", async () => {
     mountModal('<input id="name" />', { withoutFooter: true });
     await present();
