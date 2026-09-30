@@ -3,11 +3,13 @@ import { toast } from "../overlay";
 import { appUpdates, moduleScripts } from "./appUpdates";
 import { backofficeShell } from "./backofficeShell";
 import { defineFeature } from "../app";
-import { page, settle, startShell } from "./testing";
+import { page, settle, startShell, stopShells } from "./testing";
 import { viewTransitions } from "./viewTransitions";
 
 const pageOf = (...scripts: string[]) => `<!doctype html><html><body><div id="app"></div>${scripts.map((src) => `<script type="module" src="${src}"></script>`).join("")}</body></html>`;
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+afterEach(stopShells);
 
 describe("moduleScripts", () => {
   it("names the module scripts of a page by path, sorted, ignoring classic scripts and the host", () => {

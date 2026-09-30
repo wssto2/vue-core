@@ -9,7 +9,7 @@ import NavigationDrawer from "./NavigationDrawer.vue";
 import NavigationMenuButton from "./NavigationMenuButton.vue";
 import ShellStage from "./ShellStage.vue";
 import { useShellIdentity } from "./identity";
-import { settle, signedIn, startShell } from "./testing";
+import { settle, signedIn, startShell, stopShells } from "./testing";
 
 const session = signedIn(1, [], { navigation: [{ i18n: "nav.sales", children: [{ i18n: "nav.home", route: "home" }, { i18n: "nav.other", route: "other" }] }] });
 const navigation = defineFeature({
@@ -55,6 +55,8 @@ afterEach(() => {
 });
 
 const start = (location = "/") => startShell(stageShell, { features: [navigation], session, location, extra });
+
+afterEach(stopShells);
 
 describe("the phone navigation drawer", () => {
   it("is closed and out of reach until asked: hidden, the page not inert, the button collapsed", async () => {

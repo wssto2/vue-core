@@ -1,5 +1,5 @@
 import { fireEvent, screen, within } from "@testing-library/vue";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, afterEach } from "vitest";
 import { createApp, defineComponent, h, ref } from "vue";
 import { AppRouterView } from "../router";
 import { defineFeature, ShellOutlet } from "../app";
@@ -9,7 +9,7 @@ import AccountMenuItem from "./AccountMenuItem.vue";
 import AccountSheet from "./AccountSheet.vue";
 import HeaderAction from "./HeaderAction.vue";
 import { useShellIdentity } from "./identity";
-import { settle, signedIn, startShell } from "./testing";
+import { settle, signedIn, startShell, stopShells } from "./testing";
 
 const user = { id: 1, name: "Ana Anić", email: "ana@example.com" };
 const session = signedIn(1, [], { user });
@@ -40,6 +40,8 @@ const open = async () => {
   await fireEvent.click(screen.getByRole("button", { name: /Ana Anić/ }));
   await settle();
 };
+
+afterEach(stopShells);
 
 describe("AccountMenu", () => {
   it("shows who is signed in and opens a list with the contributed entries first, then Language and Sign out", async () => {

@@ -12,7 +12,7 @@ import ShellSidebar from "./ShellSidebar.vue";
 import ShellTopBar from "./ShellTopBar.vue";
 import { useShellIdentity } from "./identity";
 import { createNavigationProgress } from "./progress";
-import { settle, signedIn, startShell, label, page } from "./testing";
+import { settle, signedIn, startShell, stopShells, label, page } from "./testing";
 
 const user = { id: 1, name: "Ana Anić", email: "ana@example.com" };
 const session = signedIn(1, [], {
@@ -55,6 +55,8 @@ afterEach(() => {
 
 const sidebar = () => document.querySelector<HTMLElement>("[data-shell-sidebar]");
 const topBar = () => document.querySelector<HTMLElement>("[data-shell-top-bar]");
+
+afterEach(stopShells);
 
 describe("BackofficeShell on a wide screen", () => {
   it("shows the sidebar with the bound destinations of the server's menu, the current one marked, around the page", async () => {

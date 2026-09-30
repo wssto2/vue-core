@@ -1,5 +1,4 @@
 // Fixtures for this folder's tests; the declaration build excludes it.
-import { afterEach } from "vitest";
 import { defineComponent, h, type Component } from "vue";
 import { createApplication, type Application, type ApplicationOptions, type ShellDefinition } from "../app";
 import { defineFeature, type Feature } from "../app/feature";
@@ -9,12 +8,14 @@ import type { SessionSnapshot } from "../platform";
 export { page, settle, signedIn };
 
 const running: { application: Application; target: HTMLElement }[] = [];
-afterEach(() => {
+
+/** Disposes every application `startShell` mounted: call it from an `afterEach`. */
+export function stopShells(): void {
   for (const { application, target } of running.splice(0)) {
     application.dispose();
     target.remove();
   }
-});
+}
 
 /** The routes every shell test needs: a public login page and a home page. */
 export const baseFeature = defineFeature({
