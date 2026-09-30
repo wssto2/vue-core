@@ -1,7 +1,12 @@
 export { createAppHistory, createReplaceOnlyHistory, isIosHomeScreenApp } from "./history";
 export { defineRoutes } from "./defineRoutes";
 export type { DefinedRoutes, RouteDefinition, RouteParams, RouteTarget } from "./defineRoutes";
+export { AppRouterView, firstDenied, routeAccessKey, useRouteAccess } from "./access";
+export type { RouteAccess } from "./access";
+export { installRouterGuards, returnTo } from "./guards";
+export type { RouterGuardOptions } from "./guards";
 export { isAllowed } from "./meta";
+export { default as NoAccess } from "./NoAccess.vue";
 export type { AccessRequirement, RouteSection } from "./meta";
 export { bindNavigation, createNavigation, navigationKey, useNavigation } from "./navigation";
 export type {

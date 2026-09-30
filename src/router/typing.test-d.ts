@@ -43,7 +43,7 @@ routes.pair({ dealerID: 1 });
 // @ts-expect-error the route without parameters is a value, not a function
 routes.index();
 // @ts-expect-error an unknown key has no target
-routes.missing;
+void routes.missing;
 // @ts-expect-error a route without a name cannot be navigated to
 defineRoutes({ anonymous: { path: "/x", component: view } });
 // @ts-expect-error `records` is the result's own key
