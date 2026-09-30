@@ -32,6 +32,16 @@
     },
     "toast": {
       "notifications": "Obvestila"
+    },
+    "no_access": {
+      "title": "Ni dostopa",
+      "body": "Vaše pravice ne vključujejo te strani. Če menite, da je prišlo do napake, se obrnite na skrbnika."
+    },
+    "startup": {
+      "title": "Aplikacije ni bilo mogoče zagnati",
+      "session": "Strežnik ni dosegljiv, zato seje ni bilo mogoče preveriti. Preverite povezavo in poskusite znova.",
+      "messages": "Besedil aplikacije ni bilo mogoče naložiti. Preverite povezavo in poskusite znova.",
+      "other": "Pri zagonu je prišlo do napake. Poskusite znova."
     }
   }
 }

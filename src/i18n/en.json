@@ -32,6 +32,16 @@
     },
     "toast": {
       "notifications": "Notifications"
+    },
+    "no_access": {
+      "title": "No access",
+      "body": "Your access does not include this page. If you believe this is a mistake, contact your administrator."
+    },
+    "startup": {
+      "title": "The application could not start",
+      "session": "The server could not be reached, so your session could not be checked. Check your connection and try again.",
+      "messages": "The application texts could not be loaded. Check your connection and try again.",
+      "other": "Something went wrong while starting. Try again."
     }
   }
 }

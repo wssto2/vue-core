@@ -32,6 +32,16 @@
     },
     "toast": {
       "notifications": "Obavijesti"
+    },
+    "no_access": {
+      "title": "Nemate pristup",
+      "body": "Vaše privilegije ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."
+    },
+    "startup": {
+      "title": "Aplikacija se nije mogla pokrenuti",
+      "session": "Server nije dostupan pa se sesija nije mogla provjeriti. Provjerite vezu i pokušajte ponovo.",
+      "messages": "Tekstovi aplikacije nisu se mogli učitati. Provjerite vezu i pokušajte ponovo.",
+      "other": "Nešto je pošlo naopako prilikom pokretanja. Pokušajte ponovo."
     }
   }
 }
