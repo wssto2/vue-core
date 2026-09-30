@@ -1,0 +1,13 @@
+{
+  "title": "Tiketi",
+  "description": "Sve što su kupci tražili",
+  "create": "Novi tiket",
+  "subject": "Predmet",
+  "status": "Status",
+  "assignee": "Zadužen",
+  "created": "Kreirano",
+  "open": "Otvoren",
+  "closed": "Zatvoren",
+  "record": "Tiket",
+  "details": "Detalji"
+}

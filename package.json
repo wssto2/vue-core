@@ -92,10 +92,12 @@
   "scripts": {
     "lint": "eslint . && node scripts/check-src-imports.mjs",
     "typecheck": "vue-tsc --noEmit",
+    "typecheck:docs": "vue-tsc --noEmit -p docs/examples/tsconfig.json",
     "test": "vitest run",
     "build": "vite build && vite build -c vite.styles.config.ts && vue-tsc -p tsconfig.build.json",
     "check:consumer": "node scripts/check-consumer.mjs",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build && npm run check:consumer"
+    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run check:docs && npm run test && npm run build && npm run check:consumer",
+    "check:docs": "node scripts/check-docs.mjs"
   },
   "peerDependencies": {
     "vue": "^3.5.0",

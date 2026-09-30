@@ -1,0 +1,13 @@
+{
+  "title": "Tickets",
+  "description": "Everything customers asked for",
+  "create": "New ticket",
+  "subject": "Subject",
+  "status": "Status",
+  "assignee": "Assignee",
+  "created": "Created",
+  "open": "Open",
+  "closed": "Closed",
+  "record": "Ticket",
+  "details": "Details"
+}
