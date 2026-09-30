@@ -13,4 +13,5 @@
 @import "./base.css";
 @import "./components.css";
 @import "./collection.css";
+@import "./shell.css";
 @source "../../dist";

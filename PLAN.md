@@ -89,6 +89,13 @@ playground/    Vite app consuming the package ONLY through its public exports
 | V6 | P08.08 | Invalid / direct / 404 / retry / racing-ID / save-after-navigation; first-accessible-section and no-access; nested back; one sidebar; a rich custom layout (lead-like) works on the same resource state |
 | V7 | P08.09 | Wrong field name rejected by `vue-tsc`; duplicate submit, leave/discard, conflict rebase only where enabled, foreign-field errors, first-error focus, failed save keeps the draft, save-succeeded-refresh-failed; full-record vs dedicated-endpoint group saves stay explicit (D22) |
 
+### Follow-ups (small, not yet assigned)
+
+- `installIcons` accepts partial icon sets and merges them (modular sets per feature), still type-checked against `IconRegistry` (V4b Q6).
+- `Icon` size 28 for the top-bar back chevron, to keep ARV's look (V4b Q8).
+- `createApplication({ onLocaleChange })` so an app can persist the chosen locale on the user (ARV does) (V4b Q5).
+- A before-sign-out hook on the session (ARV removes the push subscription while the session still exists) — needed by the notifications module (V4b Q4).
+
 Later (not in this run; they need go-core backend modules first): users & sign-in, roles, notifications, home/dashboard UI modules; switching arv-next onto the package.
 
 ## Progress
@@ -99,7 +106,7 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | V2 | Done | 58efe42…d3f21a0 | Accepted 2026-09-30. Bootstrap wire keys snake_case (go-core JSON); `/auth/me` keeps ARV's `{user, expires_at, access}`; no per-call parser (generated types). 9 ARV bugs listed in the V2 report. |
 | V3 | Done | 8bfdc12…8fe3321 | Accepted 2026-09-30. `tone="critical"` kept (HTML `role` stays free); date/number formatting becomes an app environment in V4; look changes from dropping legacy palettes (Panel radius + hairline, Banner status surfaces, tooltip, skeleton fill, darker muted labels) approved by the owner 2026-09-30 after a before/after comparison; Skeleton sizing fixed on main (caller width/height win). ARV bugs #15–29. |
 | V4 | Done | ddb4446…7165912 | Accepted 2026-09-30. Denied routes render a derived no-access state (URL kept, live on permission refresh); nested outlets must be `AppRouterView`; dates numeric by default via `useFormat` (ARV passes its own); record titles with data come from page chrome (V6); `useAppUpdates` + view transitions go to V4b. ARV bugs #30–38. |
-| V4b | Pending | | |
+| V4b | Done | 5fce035…64091d3 | Accepted 2026-10-01; checked in the browser (desktop sidebar, phone push drawer). Progress bar after 0.3 s (D23), sign-out failure now a toast, tablet sidebar holds still (bug #44). ARV bugs #40–48. |
 | V5 | Pending | | |
-| V6 | Pending | | |
+| V6 | Done (fix pending) | d0a123c…3a96af9, merge be7b4e0 | Accepted 2026-10-01; checked in the browser (dealer sections, lead rich layout). Pending fix: a dependent `useResource({ for })` must wait for its parent (lead not-found showed two banners + sections). ResourcePage defaults to `width="content"`; `steps`/`hub` navigator variants not ported. ARV bugs #80–86. |
 | V7 | Pending | | |

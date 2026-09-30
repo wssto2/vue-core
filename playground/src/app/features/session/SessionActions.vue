@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { usePlatform } from "@wssto2/vue-core/platform";
-import { Button } from "@wssto2/vue-core/button";
+import { toast } from "@wssto2/vue-core/overlay";
+import { HeaderAction } from "@wssto2/vue-core/shell";
 import { useI18n } from "vue-i18n";
 
-// A header contribution of the session feature: shown only while signed in.
-const { session } = usePlatform();
+// A header contribution of the session feature: shown only while signed in. The shell draws it on
+// the sidebar (desktop) or beside the menu button (phone); `HeaderAction` fits both.
 const { t } = useI18n();
 </script>
 
 <template>
-  <Button prominence="plain" @click="session.signOut()">{{ t("session.sign_out") }}</Button>
+  <HeaderAction :label="t('session.notifications', { count: 3 })" icon="informationLine" badge="dot" @click="toast.info(t('session.notifications_empty'))" />
+  <HeaderAction :label="t('session.search')" icon="search" @click="toast.info(t('session.search_soon'))" />
 </template>

@@ -9,6 +9,8 @@ export interface PageChromeRegistration {
   leading: PageAction | null;
   status: string | null;
   navTitle: string | null;
+  /** The browser tab title of the page, for what a route's `titleKey` cannot say: a record's name. */
+  documentTitle?: string | null;
 }
 
 /** Where the focus and scroll of a list page were when the user left it, to give back on return. */
@@ -39,6 +41,8 @@ export interface PageChrome {
   readonly status: ComputedRef<string | null>;
   /** A nav bar title that stays visible (the name of an edit mode). */
   readonly navTitle: ComputedRef<string | null>;
+  /** The tab title the page registered (the last one wins), overriding its route's `titleKey`; null when none. */
+  readonly documentTitle: ComputedRef<string | null>;
   /** Whether a page shell is mounted: the app drops its own page padding while one is, since the shell owns the gutters. */
   readonly hasShell: ComputedRef<boolean>;
   /** Takes ownership of the chrome values of one component. */
@@ -73,7 +77,7 @@ export function createPageChrome(): PageChrome {
 
   const entries = computed(() => Array.from(registrations.value.values()));
   const actions = computed(() => entries.value.flatMap((entry) => entry.actions));
-  const lastOf = <Key extends "leading" | "status" | "navTitle">(key: Key) =>
+  const lastOf = <Key extends "leading" | "status" | "navTitle" | "documentTitle">(key: Key) =>
     computed(() => entries.value.map((entry) => entry[key]).filter((value) => value != null).pop() ?? null);
 
   return {
@@ -84,6 +88,7 @@ export function createPageChrome(): PageChrome {
     leading: lastOf("leading"),
     status: lastOf("status"),
     navTitle: lastOf("navTitle"),
+    documentTitle: lastOf("documentTitle"),
     hasShell: computed(() => shells.value > 0),
     claimShell() {
       shells.value++;
@@ -169,6 +174,8 @@ export interface PageChromeOptions {
   status?: MaybeRefOrGetter<string | null | undefined>;
   /** A nav bar title that stays visible (e.g. "Edit customer" while editing). */
   navTitle?: MaybeRefOrGetter<string | null | undefined>;
+  /** The browser tab title, for a page whose title is data (a record's name) and so cannot come from its route's `titleKey`. */
+  documentTitle?: MaybeRefOrGetter<string | null | undefined>;
 }
 
 /**
@@ -195,6 +202,7 @@ export function usePageChrome(options: PageChromeOptions): void {
       leading: toValue(options.leading) ?? null,
       status: toValue(options.status) ?? null,
       navTitle: toValue(options.navTitle) ?? null,
+      documentTitle: toValue(options.documentTitle) ?? null,
     }),
     (value) => owner.setRegistration(value),
     { immediate: true, deep: true },

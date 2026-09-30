@@ -64,9 +64,17 @@
       "types": "./dist/router/index.d.ts",
       "import": "./dist/router/index.js"
     },
+    "./resource": {
+      "types": "./dist/resource/index.d.ts",
+      "import": "./dist/resource/index.js"
+    },
     "./app": {
       "types": "./dist/app/index.d.ts",
       "import": "./dist/app/index.js"
+    },
+    "./shell": {
+      "types": "./dist/shell/index.d.ts",
+      "import": "./dist/shell/index.js"
     },
     "./format": {
       "types": "./dist/format/index.d.ts",

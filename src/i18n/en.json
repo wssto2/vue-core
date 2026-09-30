@@ -108,6 +108,20 @@
     "toast": {
       "notifications": "Notifications"
     },
+    "shell": {
+      "menu": "Menu",
+      "home": "Home",
+      "account": {
+        "open": "Open user menu",
+        "language": "Language",
+        "sign_out": "Sign out",
+        "sign_out_failed": "The server could not end your session. Try again."
+      },
+      "update": {
+        "available": "A new version of the app is available",
+        "reload": "Reload"
+      }
+    },
     "no_access": {
       "title": "No access",
       "body": "Your access does not include this page. If you believe this is a mistake, contact your administrator."
@@ -117,6 +131,22 @@
       "session": "The server could not be reached, so your session could not be checked. Check your connection and try again.",
       "messages": "The application texts could not be loaded. Check your connection and try again.",
       "other": "Something went wrong while starting. Try again."
+    },
+    "resource": {
+      "not_found": {
+        "title": "Not found",
+        "body": "The record could not be found."
+      },
+      "unavailable": "An error occurred while loading data. Please try again.",
+      "offline": "The server could not be reached. Check your connection and try again.",
+      "pager": {
+        "previous": "Previous record",
+        "next": "Next record",
+        "records": "Records"
+      }
+    },
+    "sections": {
+      "label": "Sections"
     }
   }
 }

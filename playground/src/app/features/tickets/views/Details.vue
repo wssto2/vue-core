@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { AdaptivePageShell } from "@wssto2/vue-core/page";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import { ticketRoutes } from "../routes";
@@ -8,6 +9,8 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <h1 class="text-large-title font-semibold text-content-strong">{{ t("tickets.record", { id: route.params.ticketID }) }}</h1>
-  <RouterLink :to="ticketRoutes.index" class="text-content-link">{{ t("tickets.back") }}</RouterLink>
+  <!-- a record page: the back leads to the list, on the desktop toolbar and in the phone's top bar -->
+  <AdaptivePageShell :title="t('tickets.record', { id: route.params.ticketID })" :back="{ label: t('tickets.title'), to: ticketRoutes.index }" width="content">
+    <p class="text-content-muted">{{ t("tickets.back") }}</p>
+  </AdaptivePageShell>
 </template>

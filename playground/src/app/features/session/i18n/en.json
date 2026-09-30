@@ -1,1 +1,7 @@
-{ "login": { "title": "Sign in", "submit": "Sign in as Ana" }, "sign_out": "Sign out" }
+{
+  "login": { "title": "Sign in", "submit": "Sign in as Ana" },
+  "notifications": "Notifications, {count} unread",
+  "notifications_empty": "No new notifications in the playground",
+  "search": "Search",
+  "search_soon": "Search is not part of the playground"
+}

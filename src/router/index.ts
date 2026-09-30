@@ -6,6 +6,8 @@ export type { RouteAccess } from "./access";
 export { installRouterGuards, returnTo } from "./guards";
 export type { RouterGuardOptions } from "./guards";
 export { isAllowed } from "./meta";
+export { useRouteSections } from "./sections";
+export type { RouteSections, SectionLink } from "./sections";
 export { default as NoAccess } from "./NoAccess.vue";
 export type { AccessRequirement, RouteSection } from "./meta";
 export { bindNavigation, createNavigation, navigationKey, useNavigation } from "./navigation";

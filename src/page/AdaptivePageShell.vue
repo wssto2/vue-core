@@ -37,6 +37,11 @@ import type { PageAction, PageBack, PagePathItem, PageSectionBack } from "./type
  */
 const props = withDefaults(defineProps<{
   title: string;
+  /**
+   * The browser tab title when the page's title is data (a record's name) and its route's `titleKey`
+   * cannot say it; the app's tab title format still applies. By default the route's own.
+   */
+  documentTitle?: string | null;
   description?: string;
   icon?: IconName;
   count?: number | null;
@@ -50,6 +55,7 @@ const props = withDefaults(defineProps<{
   path?: readonly PagePathItem[] | null;
   width?: "full" | "content" | "readable";
 }>(), {
+  documentTitle: undefined,
   description: undefined,
   icon: undefined,
   count: undefined,
@@ -104,7 +110,11 @@ const toolbarPath = computed<readonly PagePathItem[] | null | undefined>(() => {
 // The shell's own chrome: its `actions` prop and its back. (Registered through the owner directly:
 // a component cannot inject what it provides itself.)
 const owner = chrome.claim();
-watch(() => props.actions, (actions) => owner.setRegistration({ actions, leading: null, status: null, navTitle: null }), { immediate: true });
+watch(
+  () => [props.actions, props.documentTitle] as const,
+  ([actions, documentTitle]) => owner.setRegistration({ actions, leading: null, status: null, navTitle: null, documentTitle: documentTitle ?? null }),
+  { immediate: true },
+);
 watch(back, (value) => owner.setBack(value), { immediate: true });
 onBeforeUnmount(() => {
   owner.clearRegistration();

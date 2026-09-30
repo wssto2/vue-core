@@ -108,6 +108,20 @@
     "toast": {
       "notifications": "Obavijesti"
     },
+    "shell": {
+      "menu": "Izbornik",
+      "home": "Početna",
+      "account": {
+        "open": "Otvori korisnički izbornik",
+        "language": "Jezik",
+        "sign_out": "Odjava",
+        "sign_out_failed": "Poslužitelj nije završio vašu sesiju. Pokušajte ponovno."
+      },
+      "update": {
+        "available": "Dostupna je nova verzija aplikacije",
+        "reload": "Osvježi"
+      }
+    },
     "no_access": {
       "title": "Nemate pristup",
       "body": "Vaše ovlasti ne uključuju ovu stranicu. Ako mislite da je došlo do pogreške, obratite se administratoru."
@@ -117,6 +131,22 @@
       "session": "Poslužitelj nije dostupan pa se sesija nije mogla provjeriti. Provjerite vezu i pokušajte ponovno.",
       "messages": "Tekstovi aplikacije nisu se mogli učitati. Provjerite vezu i pokušajte ponovno.",
       "other": "Nešto je pošlo po zlu prilikom pokretanja. Pokušajte ponovno."
+    },
+    "resource": {
+      "not_found": {
+        "title": "Nije pronađeno",
+        "body": "Traženi zapis nije pronađen."
+      },
+      "unavailable": "Dogodila se greška prilikom učitavanja podataka. Molimo pokušajte ponovno.",
+      "offline": "Poslužitelj nije dostupan. Provjerite vezu i pokušajte ponovno.",
+      "pager": {
+        "previous": "Prethodni zapis",
+        "next": "Sljedeći zapis",
+        "records": "Zapisi"
+      }
+    },
+    "sections": {
+      "label": "Sekcije"
     }
   }
 }

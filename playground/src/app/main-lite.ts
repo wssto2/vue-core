@@ -3,16 +3,17 @@ import { createApplication } from "@wssto2/vue-core/app";
 import { createWebHashHistory } from "vue-router";
 import "../app.css";
 import { appIcons } from "../icons";
+import { shellIcons } from "./icons";
 import { createDemoPlatform } from "./platform";
-import Shell from "./Shell.vue";
+import { backofficeShell } from "@wssto2/vue-core/shell";
 import { sessionFeature } from "./features/session/feature";
 import { createTicketsFeature } from "./features/tickets/feature";
 
 const application = createApplication({
   platform: createDemoPlatform(),
   router: { history: createWebHashHistory() },
-  shell: { component: Shell, slots: ["headerActions"] },
-  icons: appIcons,
+  shell: backofficeShell(),
+  icons: { ...appIcons, ...shellIcons },
   i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports" } } } },
   features: [sessionFeature, createTicketsFeature({ list: () => [{ id: 1, subject: "Printer on fire" }] })],
 });

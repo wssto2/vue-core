@@ -1,0 +1,54 @@
+/*
+ * Screen transitions on phones and tablets (shell/viewTransitions.ts). The router marks the
+ * direction on <html>; the top bar, the sidebar and the bottom dock have their own names, so they
+ * stay in place while the page slides under or beside them.
+ */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  [data-shell-top-bar] {
+    view-transition-name: app-top-bar;
+  }
+
+  [data-shell-sidebar] {
+    view-transition-name: app-sidebar;
+  }
+
+  html[data-nav-direction]::view-transition-old(root),
+  html[data-nav-direction]::view-transition-new(root) {
+    animation-duration: var(--app-motion-normal);
+    animation-timing-function: var(--app-motion-standard-easing);
+    mix-blend-mode: normal;
+  }
+
+  html[data-nav-direction="forward"]::view-transition-old(root) {
+    animation-name: app-screen-out-left;
+  }
+
+  html[data-nav-direction="forward"]::view-transition-new(root) {
+    animation-name: app-screen-in-right;
+  }
+
+  html[data-nav-direction="back"]::view-transition-old(root) {
+    z-index: 1;
+    animation-name: app-screen-out-right;
+  }
+
+  html[data-nav-direction="back"]::view-transition-new(root) {
+    animation-name: app-screen-in-left;
+  }
+}
+
+@keyframes app-screen-in-right {
+  from { transform: translateX(100%); }
+}
+
+@keyframes app-screen-out-left {
+  to { transform: translateX(-25%); opacity: 0.7; }
+}
+
+@keyframes app-screen-in-left {
+  from { transform: translateX(-25%); opacity: 0.7; }
+}
+
+@keyframes app-screen-out-right {
+  to { transform: translateX(100%); }
+}

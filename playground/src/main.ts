@@ -8,6 +8,7 @@ import { createI18n } from "vue-i18n";
 import { createRouter, createWebHashHistory } from "vue-router";
 import App from "./App.vue";
 import "./app.css";
+import { shellIcons } from "./app/icons";
 import { appIcons } from "./icons";
 import { platform } from "./platform";
 
@@ -20,7 +21,7 @@ const i18n = createI18n({ legacy: false, locale: "en", fallbackLocale: "en", mes
 app.use(i18n);
 installFormatting(app, createFormatting({ locale: () => i18n.global.locale.value }));
 app.use(createRouter({ history: createWebHashHistory(), routes: [{ path: "/:rest(.*)*", component: { render: () => null } }] }));
-installIcons(app, appIcons);
+installIcons(app, { ...appIcons, ...shellIcons });
 installPageChrome(app);
 installBottomDock(app);
 
