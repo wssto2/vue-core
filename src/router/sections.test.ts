@@ -146,6 +146,15 @@ describe("useFirstSectionRedirect", () => {
     expect(page.router.currentRoute.value.name).toBe("record.general");
   });
 
+  it("moves away from a section whose permission was taken away even when the number of sections stays the same (ARV re-checked only when the count changed)", async () => {
+    const page = await mountAt("/records/3/notes", ["notes:view"], redirecting);
+    await settle();
+    expect(page.sections().sections.value.map((section) => section.name)).toEqual(["record.general", "record.notes"]);
+    await page.grant("audit:view"); // notes revoked, audit granted: still two sections
+    expect(page.sections().sections.value.map((section) => section.name)).toEqual(["record.general", "record.audit"]);
+    expect(page.router.currentRoute.value.name).toBe("record.general");
+  });
+
   it("does not move a route that is not a section, and stays put when the session may open no section at all (no loop)", async () => {
     const plain = await mountAt("/records/3/print", [], redirecting);
     await settle();
