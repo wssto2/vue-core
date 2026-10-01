@@ -2,8 +2,8 @@
 import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
+import CountryFlag from "../internal/CountryFlag.vue";
 import { useAnchoredPosition } from "../overlay/anchored";
-import CountryFlag from "./CountryFlag.vue";
 import { allCountries, countryName, dialCode, searchCountries, type PhoneCountry } from "./phone";
 
 /**

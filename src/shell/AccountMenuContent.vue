@@ -5,6 +5,7 @@ import { ShellOutlet } from "../app/contributions";
 import { useShellContributions } from "../app/contributions";
 import { useApplication } from "../app/environment";
 import { Icon } from "../icon";
+import CountryFlag from "../internal/CountryFlag.vue";
 import { toast } from "../overlay";
 import { usePlatform } from "../platform/platform";
 import AccountMenuItem from "./AccountMenuItem.vue";
@@ -41,6 +42,7 @@ const languageName = (code: string): string => {
   }
 };
 const currentLanguage = computed(() => languageName(application.locale.value));
+const flagOf = (code: string): string | undefined => application.localeFlags[code];
 
 async function signOut() {
   try {
@@ -66,12 +68,14 @@ const GROUP = sheet ? "overflow-hidden rounded-group bg-surface-cell shadow-grou
           @click="localesOpen = !localesOpen">
           <Icon name="translate" :size="sheet ? 22 : 16" class="shrink-0 text-content-muted" />
           <span class="min-w-0 flex-1 truncate">{{ t("core.shell.account.language") }}</span>
-          <span class="shrink-0 text-content-muted" :class="sheet ? '' : 'text-xs'">{{ currentLanguage }}</span>
+          <span class="flex shrink-0 items-center gap-1.5 text-content-muted" :class="sheet ? '' : 'text-xs'">
+            <CountryFlag v-if="flagOf(application.locale.value)" :country="flagOf(application.locale.value)!" />{{ currentLanguage }}
+          </span>
           <Icon name="arrowDownSLine" :size="sheet ? 18 : 16" class="shrink-0 text-content-disabled transition-transform duration-motion-fast" :class="localesOpen ? 'rotate-180' : ''" />
         </button>
       </div>
       <div v-show="localesOpen" :id="localesId" :class="sheet ? '' : 'space-y-0.5 pl-4'">
-        <AccountMenuItem v-for="code in application.locales" :key="code" :label="languageName(code)" :selected="code === application.locale.value"
+        <AccountMenuItem v-for="code in application.locales" :key="code" :label="languageName(code)" :flag="flagOf(code)" :selected="code === application.locale.value"
           @click="application.setLocale(code)" />
       </div>
     </div>

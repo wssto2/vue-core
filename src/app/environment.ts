@@ -19,6 +19,8 @@ export interface ApplicationEnvironment {
   /** The active locale. */
   readonly locale: Readonly<Ref<string>>;
   readonly locales: readonly string[];
+  /** The flag country of each locale that has one (`{ en: "GB" }`); a locale without one shows no flag. */
+  readonly localeFlags: Readonly<Record<string, string>>;
   /** Switches the locale once the texts in use exist in it; see `MessageRuntime.setLocale`. */
   setLocale(locale: string): Promise<boolean>;
   /** Tries the start again after a failed one. */

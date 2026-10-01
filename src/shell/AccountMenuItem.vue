@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { RouterLink, type RouteLocationRaw } from "vue-router";
 import { Icon, type IconName } from "../icon";
+import CountryFlag from "../internal/CountryFlag.vue";
 import { useAccountMenu } from "./accountMenu";
 
 /**
@@ -27,7 +28,9 @@ const props = withDefaults(defineProps<{
   /** Makes the row a choice; the chosen one has a tick. */
   selected?: boolean;
   tone?: "critical";
-}>(), { icon: undefined, to: undefined, checked: undefined, selected: undefined, tone: undefined });
+  /** A country flag (ISO 3166-1 code) in place of the icon: the row of a language. */
+  flag?: string;
+}>(), { icon: undefined, to: undefined, checked: undefined, selected: undefined, tone: undefined, flag: undefined });
 
 const emit = defineEmits<{ click: [] }>();
 
@@ -53,7 +56,8 @@ function choose() {
     <component :is="to ? RouterLink : 'button'" v-bind="to ? { to } : { type: 'button' }" :class="[sheet ? SHEET_ROW : POPOVER_ROW, critical ? 'text-content-destructive' : 'text-content-strong', sheet && critical ? 'justify-center' : '']"
       :role="checked !== undefined ? 'switch' : undefined" :aria-checked="checked" :aria-current="selected ? 'true' : undefined"
       data-account-menu-item @click="choose">
-      <Icon v-if="icon && !(sheet && critical)" :name="icon" :size="sheet ? 22 : 16" class="shrink-0" :class="critical ? '' : 'text-content-muted'" />
+      <CountryFlag v-if="flag" :country="flag" />
+      <Icon v-else-if="icon && !(sheet && critical)" :name="icon" :size="sheet ? 22 : 16" class="shrink-0" :class="critical ? '' : 'text-content-muted'" />
       <span class="min-w-0 truncate" :class="sheet && critical ? '' : 'flex-1'">{{ label }}</span>
       <span v-if="checked !== undefined" aria-hidden="true" class="relative inline-flex shrink-0 rounded-full transition-colors duration-motion-fast"
         :class="[checked ? 'bg-control-on' : 'bg-fill-strong', sheet ? 'h-switch-height w-switch-width' : 'h-5 w-9']">
