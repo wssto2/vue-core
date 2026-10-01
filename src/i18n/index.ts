@@ -61,6 +61,15 @@ export type CoreMessages = {
       title: string;
       body: string;
     };
+    shortcuts: {
+      title: string;
+      or: string;
+      hint: string;
+      show_help: string;
+      focus_search: string;
+      open_filters: string;
+      groups: { general: string; list: string; record: string };
+    };
     errors: {
       unauthenticated: string;
       forbidden: string;

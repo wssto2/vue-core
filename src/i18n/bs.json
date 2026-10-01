@@ -339,6 +339,19 @@
       "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
       "cancelled": "Zahtjev je otkazan.",
       "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo."
+    },
+    "shortcuts": {
+      "title": "Prečice na tastaturi",
+      "or": "ili",
+      "hint": "Prečice ne rade dok pišete u polje ili je otvoren prozor.",
+      "show_help": "Prikaži prečice",
+      "focus_search": "Pretraži popis",
+      "open_filters": "Otvori filtere",
+      "groups": {
+        "general": "Općenito",
+        "list": "Popis",
+        "record": "Zapis"
+      }
     }
   }
 }

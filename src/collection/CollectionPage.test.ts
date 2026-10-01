@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { computed, defineComponent, h, nextTick, type PropType } from "vue";
 import { createMemoryHistory, createRouter, RouterView } from "vue-router";
+import { useShortcutRegistry } from "../button";
 import { ApiError } from "../client";
 import { createTestI18n } from "../testing/i18n";
 import { testFormatting } from "../testing/format";
@@ -283,6 +284,12 @@ describe("sorting, search and paging", () => {
     other.focus();
     await fireEvent.keyDown(other, { key: "/" });
     expect(document.activeElement).toBe(other);
+  });
+
+  it("lists the list's own shortcuts for a help dialog, in the app's language", async () => {
+    await mountList();
+    const rows = useShortcutRegistry().value;
+    expect(rows).toContainEqual({ group: "list", label: "Search the list", keys: [["/"]] });
   });
 
   it("does not intercept Tab or the browser's Find shortcut", async () => {

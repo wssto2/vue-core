@@ -339,6 +339,19 @@
       "offline": "Strežnik ni dosegljiv. Preverite povezavo in poskusite znova.",
       "cancelled": "Zahteva je bila preklicana.",
       "unexpected": "Prišlo je do nepričakovane napake. Poskusite znova."
+    },
+    "shortcuts": {
+      "title": "Bližnjice na tipkovnici",
+      "or": "ali",
+      "hint": "Bližnjice ne delujejo med vnosom v polje ali ko je odprto okno.",
+      "show_help": "Prikaži bližnjice",
+      "focus_search": "Išči po seznamu",
+      "open_filters": "Odpri filtre",
+      "groups": {
+        "general": "Splošno",
+        "list": "Seznam",
+        "record": "Zapis"
+      }
     }
   }
 }

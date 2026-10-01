@@ -339,6 +339,19 @@
       "offline": "Poslužitelj nije dostupan. Provjerite vezu i pokušajte ponovno.",
       "cancelled": "Zahtjev je otkazan.",
       "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovno."
+    },
+    "shortcuts": {
+      "title": "Tipkovni prečaci",
+      "or": "ili",
+      "hint": "Prečaci ne rade dok pišete u polje ili je otvoren prozor.",
+      "show_help": "Prikaži prečace",
+      "focus_search": "Pretraži popis",
+      "open_filters": "Otvori filtere",
+      "groups": {
+        "general": "Općenito",
+        "list": "Popis",
+        "record": "Zapis"
+      }
     }
   }
 }

@@ -96,12 +96,12 @@ const panelButton = useTemplateRef<HTMLButtonElement>("panelButton");
 
 // Hidden lists (an inactive tab, a collapsed section) take no shortcuts.
 const shown = (element: HTMLElement | null) => !!element && (typeof element.checkVisibility !== "function" || element.checkVisibility());
-useKeyboardShortcut({ key: "/" }, () => {
+useKeyboardShortcut({ key: "/", group: "list", label: () => t("core.shortcuts.focus_search") }, () => {
   if (!shown(field.value)) return false;
   field.value?.focus();
   field.value?.select();
 });
-useKeyboardShortcut({ key: "f" }, () => {
+useKeyboardShortcut({ key: "f", group: "list", label: () => (panelFilters.value.length > 0 ? t("core.shortcuts.open_filters") : "") }, () => {
   if (panelFilters.value.length === 0 || !shown(panelButton.value)) return false;
   panel.value?.present();
 });

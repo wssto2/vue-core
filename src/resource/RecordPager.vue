@@ -20,7 +20,7 @@ const router = useRouter();
 
 // j / k as in mail clients and GitHub; the arrows for everyone else. They act only while there is somewhere to go.
 const step = (key: string, direction: "next" | "previous") =>
-  useKeyboardShortcut({ key }, () => {
+  useKeyboardShortcut({ key, group: "record", label: () => t(`core.resource.pager.${direction}`) }, () => {
     const target = props.neighbors[direction];
     if (!target) return false;
     void router.push(target);

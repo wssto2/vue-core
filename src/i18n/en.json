@@ -339,6 +339,19 @@
       "offline": "The server could not be reached. Check your connection and try again.",
       "cancelled": "The request was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "or": "or",
+      "hint": "Shortcuts are off while you type in a field or a dialog is open.",
+      "show_help": "Show shortcuts",
+      "focus_search": "Search the list",
+      "open_filters": "Open filters",
+      "groups": {
+        "general": "General",
+        "list": "List",
+        "record": "Record"
+      }
     }
   }
 }
