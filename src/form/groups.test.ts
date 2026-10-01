@@ -13,7 +13,7 @@ import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
 import LeaveGuardRoot from "./LeaveGuardRoot.vue";
 import { provideRecordGroups } from "./recordGroups";
 import RecordGroupScope from "./RecordGroupScope.vue";
-import { settle } from "./testing";
+import { settle } from "../testing";
 import TextField from "./TextField.vue";
 import { useGroupSheet } from "./useGroupSheet";
 import { useResourceForm } from "./useResourceForm";
@@ -31,7 +31,7 @@ interface Values {
   phone: string;
 }
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const customer = (over: Partial<Customer> = {}): Customer => ({ id: 1, name: "Ann", email: "ann@x.test", phone: "111", version: 1, ...over });
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

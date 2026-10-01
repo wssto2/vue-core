@@ -6,7 +6,7 @@ import { lateLeaveTransition } from "../testing/transition";
 import { mockMedia } from "../testing/media";
 import Sheet from "./Sheet.vue";
 
-const global = { plugins: [createTestI18n("en")], stubs: { transition: false as boolean | Component } };
+const global = { plugins: [createTestI18n()], stubs: { transition: false as boolean | Component } };
 
 function mountSheet(props: Record<string, unknown> = {}, footer = false) {
   const Owner = defineComponent({

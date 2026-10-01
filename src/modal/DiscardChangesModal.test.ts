@@ -4,7 +4,7 @@ import { defineComponent, nextTick, ref } from "vue";
 import { createTestI18n } from "../testing/i18n";
 import DiscardChangesModal from "./DiscardChangesModal.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 
 function mountDiscard(handlers: Record<string, unknown> = {}) {
   const Owner = defineComponent({

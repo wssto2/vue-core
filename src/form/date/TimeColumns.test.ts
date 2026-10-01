@@ -6,7 +6,7 @@ import TimeColumns from "./TimeColumns.vue";
 
 function mount(props: Record<string, unknown> = {}) {
   const update = vi.fn();
-  const view = render(TimeColumns, { props: { ...props, "onUpdate:modelValue": update }, global: { plugins: [createTestI18n("en")] } });
+  const view = render(TimeColumns, { props: { ...props, "onUpdate:modelValue": update }, global: { plugins: [createTestI18n()] } });
   return { ...view, update };
 }
 const options = (label: string) => Array.from(screen.getByRole("listbox", { name: label }).querySelectorAll("[role=option]")).map((option) => option.textContent!.trim());

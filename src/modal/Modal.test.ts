@@ -7,7 +7,7 @@ import { lateLeaveTransition } from "../testing/transition";
 import Modal from "./Modal.vue";
 
 // Real transitions (not test-utils stubs): the dialog stays mounted until its leave transition ends.
-const global = { plugins: [createTestI18n("en")], stubs: { transition: false as boolean | Component } };
+const global = { plugins: [createTestI18n()], stubs: { transition: false as boolean | Component } };
 
 /**
  * Modal teleports into <body>, so these mount attached to the document: focus, `inert` and

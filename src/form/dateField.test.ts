@@ -17,7 +17,7 @@ const settle = async () => {
 
 /** The field in a Host holding its value, as a form would. */
 function mountField(component: Component, props: Record<string, unknown> = {}, options: { locale?: "en" | "hr"; plugins?: unknown[]; initial?: string | null } = {}) {
-  const i18n = createTestI18n(options.locale ?? "hr");
+  const i18n = createTestI18n({ locale: options.locale ?? "hr" });
   const value = ref<string | null>(options.initial ?? null);
   const changes: (string | null)[] = [];
   const Host = defineComponent({
@@ -112,7 +112,7 @@ describe("DateField typed entry", () => {
   });
 
   it("reads the typed order off the app's formatter, not the locale", async () => {
-    const i18n = createTestI18n("hr");
+    const i18n = createTestI18n({ locale: "hr" });
     const american = { install: (app: import("vue").App) => installFormatting(app, createFormatting({ locale: () => "hr", formatters: { date: (value) => `${value.getMonth() + 1}/${value.getDate()}/${value.getFullYear()}` } })) };
     const { value } = mountField(DateField, { label: "Due" }, { plugins: [i18n, american] });
     const input = await type("Due", "10/15/2026");
@@ -293,7 +293,7 @@ describe("DateField on a phone", () => {
 
 describe("DateField in a form", () => {
   it("reads in the app's format with no shift across time zones", () => {
-    const i18n = createTestI18n("en");
+    const i18n = createTestI18n();
     const Host = defineComponent({ setup: () => () => h(FormView, { editable: false }, () => h(FormGroup, {}, () => h(DateField, { modelValue: "2026-03-01", label: "When" }))) });
     const { container } = render(Host, { global: { plugins: [i18n, testFormatting(i18n)] } });
     expect(container.textContent).toMatch(/0?3\/0?1\/2026/);

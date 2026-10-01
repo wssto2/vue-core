@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHttpClient } from "../client";
-import { json, scripted } from "../client/testing";
+import { jsonResponse, scriptedTransport } from "../testing";
 import { httpList, listParams, readListPage } from "./http";
 import { defineCollection } from "./definition";
 
@@ -42,7 +42,7 @@ describe("listParams and httpList", () => {
   });
 
   it("calls the endpoint with the query and the signal, and normalizes the answer", async () => {
-    const { transport, calls } = scripted(json(200, { success: true, data: [{ id: 1 }], meta: { total: 1, page: 1, per_page: 25, last_page: 1, from: 1, to: 1 } }));
+    const { transport, calls } = scriptedTransport(jsonResponse(200, { success: true, data: [{ id: 1 }], meta: { total: 1, page: 1, per_page: 25, last_page: 1, from: 1, to: 1 } }));
     const http = createHttpClient({ baseUrl: "/api", transport });
     const definition = defineCollection({ id: "t", stateVersion: 1, load: httpList<{ id: number }>(http, "/tickets"), key: (row) => row.id });
     const controller = new AbortController();

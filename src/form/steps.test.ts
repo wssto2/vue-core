@@ -5,7 +5,7 @@ import { deferred } from "../platform/testing";
 import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
 import { readDraft } from "./stepDraft";
 import { useStepForm, type StepDefinition, type StepFormOptions } from "./steps";
-import { settle, withSetup } from "./testing";
+import { createTestApp, settle, withSetup } from "../testing";
 import { useForm } from "./useForm";
 import type { FormValidator } from "./validation";
 
@@ -48,7 +48,7 @@ function make(extra: Extra = {}) {
     const form = useForm({ defaults: empty, validator });
     const flow = useStepForm(form, { steps, submit, submitLabel: "Create", ...extra });
     return { form, flow };
-  }, [plugin]);
+  }, createTestApp({ plugins: [plugin] }));
   return { ...host.result, submit, unmount: host.unmount };
 }
 

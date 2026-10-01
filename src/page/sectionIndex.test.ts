@@ -9,7 +9,7 @@ import SectionJumper from "./SectionJumper.vue";
 import SectionList from "./SectionList.vue";
 import SectionPanel from "./SectionPanel.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const settle = async () => {
   for (let index = 0; index < 4; index++) await new Promise((resolve) => setTimeout(resolve, 0));
 };

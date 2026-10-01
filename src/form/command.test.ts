@@ -10,11 +10,11 @@ import FormGroup from "./FormGroup.vue";
 import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
 import LeaveGuardRoot from "./LeaveGuardRoot.vue";
 import SelectField from "./SelectField.vue";
-import { settle } from "./testing";
+import { settle } from "../testing";
 import TextField from "./TextField.vue";
 import { useCommand } from "./useCommand";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 afterEach(() => {

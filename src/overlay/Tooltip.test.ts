@@ -117,7 +117,7 @@ describe("Tooltip", () => {
       components: { Modal, Tooltip },
       template: `<Modal ref="modal" title="Edit" without-footer><Tooltip text="Hint"><button id="hinted">?</button></Tooltip></Modal><button id="o" @click="$refs.modal.present()">o</button>`,
     });
-    render(Owner, { global: { plugins: [createTestI18n("en")] } });
+    render(Owner, { global: { plugins: [createTestI18n()] } });
     await fireEvent.click(document.querySelector("#o")!);
     await settle();
     await fireEvent.focusIn(document.querySelector("#hinted")!);

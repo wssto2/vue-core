@@ -29,7 +29,7 @@ interface Reads {
   comments: (id: number) => Promise<string[]>;
 }
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const settle = async () => {
   for (let index = 0; index < 6; index++) await new Promise((resolve) => setTimeout(resolve, 0));
 };

@@ -8,7 +8,7 @@ import Calendar from "./Calendar.vue";
 const NOW = new Date(2026, 9, 15, 12, 0); // Thursday, 15 October 2026
 
 function mount(props: Record<string, unknown> = {}, locale: "en" | "hr" = "hr") {
-  const i18n = createTestI18n(locale);
+  const i18n = createTestI18n({ locale });
   const update = vi.fn();
   const view = render(Calendar, { props: { ...props, "onUpdate:modelValue": update }, global: { plugins: [i18n, testFormatting(i18n)] } });
   return { ...view, update };
@@ -39,7 +39,7 @@ describe("Calendar", () => {
   });
 
   it("starts the week on Sunday where the locale does", () => {
-    const i18n = createTestI18n("en");
+    const i18n = createTestI18n();
     render(Calendar, { props: { modelValue: null }, global: { plugins: [i18n, testFormatting(i18n)] } });
     expect(screen.getAllByRole("columnheader")[0]!.textContent).toBe("Su");
   });

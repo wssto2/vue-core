@@ -7,7 +7,7 @@ import { checkFile, formatBytes } from "./file";
 import FileField from "./FileField.vue";
 import PhotoField from "./PhotoField.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const global = { plugins: [i18n, testFormatting(i18n)] };
 
 afterEach(() => {

@@ -3,7 +3,7 @@ import { ref, type App } from "vue";
 import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
 import { useDirtySnapshot, useSheetDiscardGuard } from "./dirty";
 import { cloneValue, sameValue } from "./snapshot";
-import { withSetup } from "./testing";
+import { createTestApp, withSetup } from "../testing";
 
 describe("useDirtySnapshot", () => {
   it("is never dirty before the first markClean, so a page that is still loading never asks", () => {
@@ -33,7 +33,7 @@ describe("useSheetDiscardGuard", () => {
     const guard = createLeaveGuard();
     guard.attach();
     const name = ref("");
-    const { result } = withSetup(() => useSheetDiscardGuard(() => name.value), [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
+    const { result } = withSetup(() => useSheetDiscardGuard(() => name.value), createTestApp({ plugins: [{ install: (app: App) => app.provide(leaveGuardKey, guard) }] }));
     return { guard, name, sheet: result };
   };
 

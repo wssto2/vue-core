@@ -8,7 +8,7 @@ import type { FilterDescriptor } from "./filters";
 describe("useDatePresetFilter", () => {
   it("offers go-core's date presets with translated labels", () => {
     let filter!: FilterDescriptor<"created_at">;
-    const i18n = createTestI18n("hr");
+    const i18n = createTestI18n({ locale: "hr" });
     render(defineComponent({ setup() { filter = useDatePresetFilter("created_at"); return () => h("div"); } }), { global: { plugins: [i18n] } });
     expect(filter.key).toBe("created_at");
     expect(filter.type).toBe("select");

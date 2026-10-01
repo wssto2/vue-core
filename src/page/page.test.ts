@@ -32,7 +32,7 @@ function makeRouter() {
   });
 }
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const settle = async () => {
   await nextTick();
   await nextTick();

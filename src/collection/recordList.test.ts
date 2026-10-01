@@ -42,7 +42,7 @@ async function openRecord(id: number) {
     ],
   });
   await router.push(`/records/${id}?from=${from}`);
-  render(defineComponent({ render: () => h(RouterView) }), { global: { plugins: [router, createTestI18n("en")] }, container: document.body.appendChild(document.createElement("div")) });
+  render(defineComponent({ render: () => h(RouterView) }), { global: { plugins: [router, createTestI18n()] }, container: document.body.appendChild(document.createElement("div")) });
   await flush();
   return { router, from };
 }

@@ -12,7 +12,7 @@ import MicroLabel from "./MicroLabel.vue";
 import Panel from "./Panel.vue";
 import Timestamp from "./Timestamp.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const global = { plugins: [i18n, testFormatting(i18n)] };
 
 describe("initialsFor and Avatar", () => {

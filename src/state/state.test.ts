@@ -13,7 +13,7 @@ import Skeleton from "./Skeleton.vue";
 import StatusLine from "./StatusLine.vue";
 import type { AsyncState } from "./async";
 
-const global = { plugins: [createTestI18n("en")] };
+const global = { plugins: [createTestI18n()] };
 
 describe("Badge", () => {
   it("is a label on the status surface of its tone with a hairline in the tone colour", () => {

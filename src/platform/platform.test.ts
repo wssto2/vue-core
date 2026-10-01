@@ -1,7 +1,7 @@
 import { render } from "@testing-library/vue";
 import { createApp, defineComponent, h } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { json, scripted } from "../client/testing";
+import { jsonResponse, scriptedTransport } from "../testing";
 import { parseBootstrap } from "./bootstrap";
 import { MissingContextError } from "./context";
 import { createPlatform, installPlatform, usePlatform } from "./platform";
@@ -46,7 +46,7 @@ describe("createPlatform has no side effects", () => {
   });
 
   it("asks for the session only when told to", async () => {
-    const { transport, calls } = scripted(json(200, mePayload(3, { "crm.lead:view": held("organization", undefined) })));
+    const { transport, calls } = scriptedTransport(jsonResponse(200, mePayload(3, { "crm.lead:view": held("organization", undefined) })));
     const platform = createPlatform({ config: config(), transport });
     expect(platform.session.state.value.status).toBe("unknown");
     expect(platform.access.can("crm.lead:view")).toBe(false);
@@ -59,8 +59,8 @@ describe("createPlatform has no side effects", () => {
 
 describe("two platforms share nothing", () => {
   it("keep their own transport, session, access and config", async () => {
-    const a = scripted(json(200, mePayload(1, { "a:view": held("organization", undefined) })));
-    const b = scripted(json(401, { success: false, error: "none" }));
+    const a = scriptedTransport(jsonResponse(200, mePayload(1, { "a:view": held("organization", undefined) })));
+    const b = scriptedTransport(jsonResponse(401, { success: false, error: "none" }));
     const first = createPlatform({ config: config({ app_name: "A" }), transport: a.transport });
     const second = createPlatform({ config: config({ app_name: "B" }), transport: b.transport });
     await Promise.all([first.session.restore(), second.session.restore()]);
@@ -83,8 +83,8 @@ describe("two platforms share nothing", () => {
   it("one expiry does not renew or expire the other", async () => {
     const onExpiredA = vi.fn();
     const onExpiredB = vi.fn();
-    const a = createPlatform({ config: config(), transport: scripted(json(401, { success: false, error: "x" })).transport, onSessionExpired: onExpiredA });
-    const b = createPlatform({ config: config(), transport: scripted(json(200, { success: true })).transport, onSessionExpired: onExpiredB });
+    const a = createPlatform({ config: config(), transport: scriptedTransport(jsonResponse(401, { success: false, error: "x" })).transport, onSessionExpired: onExpiredA });
+    const b = createPlatform({ config: config(), transport: scriptedTransport(jsonResponse(200, { success: true })).transport, onSessionExpired: onExpiredB });
     a.session.establish(snapshotOf(1));
     b.session.establish(snapshotOf(2));
     await a.http.get("/x").catch(() => undefined);
@@ -95,11 +95,11 @@ describe("two platforms share nothing", () => {
 });
 
 describe("401 handling", () => {
-  const expired = () => json(401, { success: false, error: "expired" });
+  const expired = () => jsonResponse(401, { success: false, error: "expired" });
 
   it("expires a signed-in session and lets the request fail; the application decides what happens next", async () => {
     const onSessionExpired = vi.fn();
-    const platform = createPlatform({ config: config(), transport: scripted(expired()).transport, onSessionExpired });
+    const platform = createPlatform({ config: config(), transport: scriptedTransport(expired()).transport, onSessionExpired });
     platform.session.establish(snapshotOf(1, { "a:view": held("organization", undefined) }));
     await expect(platform.http.get("/leads")).rejects.toMatchObject({ kind: "unauthorized" });
     expect(platform.session.state.value).toEqual({ status: "anonymous", reason: "expired" });
@@ -109,7 +109,7 @@ describe("401 handling", () => {
 
   it("leaves a session that is not signed in alone (a public page's 401 is not an expiry)", async () => {
     const onSessionExpired = vi.fn();
-    const platform = createPlatform({ config: config(), transport: scripted(expired()).transport, onSessionExpired });
+    const platform = createPlatform({ config: config(), transport: scriptedTransport(expired()).transport, onSessionExpired });
     await expect(platform.http.get("/public")).rejects.toMatchObject({ kind: "unauthorized" });
     expect(platform.session.state.value.status).toBe("unknown");
     expect(onSessionExpired).not.toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe("401 handling", () => {
   it("renews once for concurrent 401s and retries each request, which ARV never did", async () => {
     const renewed = deferred<boolean>();
     let token = "old";
-    const { transport, calls } = scripted(() => (token === "old" ? expired() : json(200, { success: true, data: "ok" })));
+    const { transport, calls } = scriptedTransport(() => (token === "old" ? expired() : jsonResponse(200, { success: true, data: "ok" })));
     const renewSession = vi.fn(() => {
       token = "new";
       return renewed.promise;
@@ -137,7 +137,7 @@ describe("401 handling", () => {
 
   it("expires the session when renewal is refused or throws", async () => {
     for (const renewSession of [async () => false, async () => Promise.reject(new Error("refresh failed"))]) {
-      const platform = createPlatform({ config: config(), transport: scripted(expired()).transport, renewSession });
+      const platform = createPlatform({ config: config(), transport: scriptedTransport(expired()).transport, renewSession });
       platform.session.establish(snapshotOf(1));
       await expect(platform.http.get("/a")).rejects.toMatchObject({ kind: "unauthorized" });
       expect(platform.session.state.value).toEqual({ status: "anonymous", reason: "expired" });
@@ -146,16 +146,16 @@ describe("401 handling", () => {
 
   it("does not treat the session request's own 401 as an expiry", async () => {
     const onSessionExpired = vi.fn();
-    const platform = createPlatform({ config: config(), transport: scripted(expired()).transport, onSessionExpired });
+    const platform = createPlatform({ config: config(), transport: scriptedTransport(expired()).transport, onSessionExpired });
     expect((await platform.session.restore()).status).toBe("anonymous");
     expect(onSessionExpired).not.toHaveBeenCalled();
   });
 
   it("hands the session to renewSession so it can refresh it", async () => {
     let answered = 0;
-    const { transport } = scripted(() => {
+    const { transport } = scriptedTransport(() => {
       answered++;
-      return answered === 1 ? expired() : json(200, mePayload(1));
+      return answered === 1 ? expired() : jsonResponse(200, mePayload(1));
     });
     const platform = createPlatform({
       config: config(),
@@ -184,7 +184,7 @@ describe("custom adapters", () => {
   });
 
   it("uses the transport for every request, and its headers", async () => {
-    const { transport, calls } = scripted(json(200, { success: true }));
+    const { transport, calls } = scriptedTransport(jsonResponse(200, { success: true }));
     const platform = createPlatform({ config: config(), transport, headers: () => ({ "X-Tenant": "t1" }) });
     await platform.http.post("/x", { a: 1 });
     expect(calls[0]?.headers.get("X-Tenant")).toBe("t1");

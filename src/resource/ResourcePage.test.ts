@@ -16,7 +16,7 @@ interface Ticket {
   readonly subject: string;
 }
 const ticket = (id: number, subject = `Ticket ${id}`): Ticket => ({ id, subject });
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const byTest = (id: string) => document.querySelector(`[data-test="${id}"]`);
 const settle = async () => {
   for (let index = 0; index < 5; index++) await new Promise((resolve) => setTimeout(resolve, 0));

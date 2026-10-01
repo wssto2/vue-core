@@ -10,7 +10,7 @@ import type { SelectOption } from "./options";
 import { completionOf, matchParts, recentChoicesKey, type RecentChoices } from "./suggestions";
 import TextField from "./TextField.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const base = { plugins: [i18n, testFormatting(i18n)], stubs: { transition: false } };
 
 afterEach(() => {

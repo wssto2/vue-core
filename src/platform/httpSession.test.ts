@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHttpClient, isApiError, type ApiError } from "../client";
-import { json, scripted } from "../client/testing";
+import { jsonResponse, scriptedTransport } from "../testing";
 import { httpSessionAdapter, parseSessionPayload } from "./httpSession";
 import { mePayload } from "./testing";
 
@@ -62,7 +62,7 @@ describe("parseSessionPayload", () => {
 
 describe("httpSessionAdapter", () => {
   it("loads from the configurable path, unwrapping an envelope if the server sends one", async () => {
-    const { transport, calls } = scripted(json(200, { success: true, data: mePayload(2) }));
+    const { transport, calls } = scriptedTransport(jsonResponse(200, { success: true, data: mePayload(2) }));
     const adapter = httpSessionAdapter(createHttpClient({ transport, baseUrl: "/api/v1" }), { mePath: "/me" });
     const snapshot = await adapter.load(new AbortController().signal);
     expect(snapshot?.user).toEqual({ id: 2 });
@@ -71,12 +71,12 @@ describe("httpSessionAdapter", () => {
   });
 
   it("reads 401 as nobody signed in, not as an error", async () => {
-    const { transport } = scripted(json(401, { success: false, error: "no session" }));
+    const { transport } = scriptedTransport(jsonResponse(401, { success: false, error: "no session" }));
     expect(await httpSessionAdapter(createHttpClient({ transport })).load(new AbortController().signal)).toBeNull();
   });
 
   it("does not run the client's 401 hook for that answer", async () => {
-    const { transport } = scripted(json(401, { success: false, error: "no session" }));
+    const { transport } = scriptedTransport(jsonResponse(401, { success: false, error: "no session" }));
     let called = false;
     const http = createHttpClient({ transport, onUnauthorized: () => ((called = true), "retry") });
     await httpSessionAdapter(http).load(new AbortController().signal);
@@ -84,14 +84,14 @@ describe("httpSessionAdapter", () => {
   });
 
   it("rejects for other failures and unreadable payloads", async () => {
-    const { transport } = scripted(json(500, { success: false, error: "boom" }), json(200, { user: {} }));
+    const { transport } = scriptedTransport(jsonResponse(500, { success: false, error: "boom" }), jsonResponse(200, { user: {} }));
     const adapter = httpSessionAdapter(createHttpClient({ transport }));
     expect((await failureOf(() => adapter.load(new AbortController().signal))).kind).toBe("server");
     expect((await failureOf(() => adapter.load(new AbortController().signal))).kind).toBe("malformed");
   });
 
   it("passes the abort signal to the request", async () => {
-    const { transport } = scripted(json(200, mePayload(1)));
+    const { transport } = scriptedTransport(jsonResponse(200, mePayload(1)));
     const controller = new AbortController();
     controller.abort();
     const error = await failureOf(() => httpSessionAdapter(createHttpClient({ transport })).load(controller.signal));
@@ -99,7 +99,7 @@ describe("httpSessionAdapter", () => {
   });
 
   it("signs out with a POST to the configured path, and treats 401 as already signed out", async () => {
-    const { transport, calls } = scripted(json(204, undefined), json(401, { success: false, error: "no" }), json(500, { success: false, error: "boom" }));
+    const { transport, calls } = scriptedTransport(jsonResponse(204, undefined), jsonResponse(401, { success: false, error: "no" }), jsonResponse(500, { success: false, error: "boom" }));
     const adapter = httpSessionAdapter(createHttpClient({ transport }), { signOutPath: "/logout" });
     await adapter.signOut();
     await adapter.signOut();

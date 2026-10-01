@@ -6,7 +6,7 @@ import { MissingContextError } from "../platform/context";
 import { createTestI18n } from "../testing/i18n";
 import { createLeaveGuard, leaveGuardKey, MissingLeaveGuardRootError, useLeaveGuard } from "./leaveGuard";
 import LeaveGuardRoot from "./LeaveGuardRoot.vue";
-import { settle, withSetup } from "./testing";
+import { createTestApp, settle, withSetup } from "../testing";
 
 afterEach(() => {
   document.body.innerHTML = "";
@@ -33,7 +33,7 @@ async function openApp(pages: { dirty: () => boolean }[] = []) {
   });
   await router.push("/editor");
   const plugin = { install: (app: App) => app.provide(leaveGuardKey, guard) };
-  const view = render(defineComponent({ render: () => h("div", [h(RouterView), h(LeaveGuardRoot)]) }), { global: { plugins: [router, createTestI18n("en"), plugin] } });
+  const view = render(defineComponent({ render: () => h("div", [h(RouterView), h(LeaveGuardRoot)]) }), { global: { plugins: [router, createTestI18n(), plugin] } });
   return { guard, dirty, router, view };
 }
 
@@ -128,7 +128,7 @@ describe("the leave guard's answers", () => {
   it("asks the browser before the tab closes while dirty, and not when clean", async () => {
     const guard = createLeaveGuard();
     const dirty = ref(true);
-    const { unmount } = withSetup(() => useLeaveGuard(() => dirty.value), [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
+    const { unmount } = withSetup(() => useLeaveGuard(() => dirty.value), createTestApp({ plugins: [{ install: (app: App) => app.provide(leaveGuardKey, guard) }] }));
     await nextTick();
     const event = new Event("beforeunload", { cancelable: true });
     window.dispatchEvent(event);
@@ -142,7 +142,7 @@ describe("the leave guard's answers", () => {
 
   it("confirmDiscard answers true without asking when nothing is dirty", async () => {
     const guard = createLeaveGuard();
-    const { result } = withSetup(() => useLeaveGuard(() => false), [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
+    const { result } = withSetup(() => useLeaveGuard(() => false), createTestApp({ plugins: [{ install: (app: App) => app.provide(leaveGuardKey, guard) }] }));
     expect(await result.confirmDiscard()).toBe(true);
     expect(guard.pending.value).toBeNull();
   });

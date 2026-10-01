@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { ApiError } from "../client";
 import { deferred } from "../platform/testing";
 import { useResource } from "../resource";
-import { settle, withSetup } from "./testing";
+import { settle, withSetup } from "../testing";
 import { useResourceForm } from "./useResourceForm";
 
 interface Ticket {

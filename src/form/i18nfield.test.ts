@@ -6,7 +6,7 @@ import { createTestI18n } from "../testing/i18n";
 import I18nField from "./I18nField.vue";
 import { missingLocales, type I18nText } from "./i18nText";
 
-const i18n = createTestI18n("hr"); // the texts below are the Croatian ones
+const i18n = createTestI18n({ locale: "hr" }); // the texts below are the Croatian ones
 const global = { plugins: [i18n, testFormatting(i18n)] };
 
 afterEach(() => {

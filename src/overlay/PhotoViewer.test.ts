@@ -4,7 +4,7 @@ import { defineComponent, nextTick, ref, type Component } from "vue";
 import { createTestI18n } from "../testing/i18n";
 import PhotoViewer, { type PhotoViewerItem } from "./PhotoViewer.vue";
 
-const global = { plugins: [createTestI18n("en")], stubs: { transition: false as boolean | Component } };
+const global = { plugins: [createTestI18n()], stubs: { transition: false as boolean | Component } };
 const items: PhotoViewerItem[] = [
   { src: "/one.jpg", alt: "Front", downloadName: "front.jpg" },
   { src: "/two.jpg", thumb: "/two-small.jpg", alt: "Side" },

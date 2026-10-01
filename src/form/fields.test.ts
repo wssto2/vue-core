@@ -19,7 +19,7 @@ import TextareaField from "./TextareaField.vue";
 import TextField from "./TextField.vue";
 import { useForm } from "./useForm";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const plugins = [i18n, testFormatting(i18n)];
 
 afterEach(() => {

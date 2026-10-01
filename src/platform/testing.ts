@@ -1,11 +1,8 @@
 // Fixtures for this folder's tests; the declaration build excludes it.
-import type { AccessClause, AccessSnapshot, HeldAccess } from "./access";
+import type { AccessSnapshot, HeldAccess } from "./access";
 import type { SessionSnapshot } from "./session";
 
-export const held = (level: string, id: number | undefined, qualifier: HeldAccess["qualifier"] = "all", clauses?: AccessClause[]): HeldAccess => {
-  const scope = id === undefined ? { level } : { level, id };
-  return { scope, qualifier, clauses: clauses ?? [{ scope, qualifier }] };
-};
+export { heldAccess as held } from "../testing/platform";
 
 export const accessOf = (permissions: Record<string, HeldAccess>, extra: Partial<AccessSnapshot> = {}): AccessSnapshot => ({
   root: false,
@@ -28,12 +25,4 @@ export const mePayload = (id: number, permissions: Record<string, unknown> = {},
   access: { subject: { kind: "user", id }, root: false, permissions, ...extra },
 });
 
-export const deferred = <T>() => {
-  let resolve!: (value: T) => void;
-  let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-};
+export { deferred } from "../testing/async";

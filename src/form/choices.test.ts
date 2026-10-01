@@ -10,10 +10,10 @@ import ComboField from "./ComboField.vue";
 import MultiSelectField from "./MultiSelectField.vue";
 import OptionList from "./OptionList.vue";
 import SelectField from "./SelectField.vue";
-import { settle } from "./testing";
+import { settle } from "../testing";
 import { groupOptions, matchOptions, type SelectOption } from "./options";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const global = { plugins: [i18n, testFormatting(i18n)], stubs: { transition: false } };
 
 afterEach(() => {

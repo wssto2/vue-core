@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { App } from "vue";
 import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
-import { withSetup } from "./testing";
+import { createTestApp, withSetup } from "../testing";
 import { useForm } from "./useForm";
 import { useGroupSheet } from "./useGroupSheet";
 
@@ -11,7 +11,7 @@ const setup = (options: { restore?: readonly ("registered" | "modelYear" | "name
     const form = useForm({ defaults: () => ({ name: "Golf", registered: "2019-05-01" as string, modelYear: 2019 as number, notes: "" }) });
     const sheet = useGroupSheet({ form, group: "vehicle", fields: ["registered"], restore: options.restore, save: async () => ({ ok: true }) });
     return { form, sheet };
-  }, [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
+  }, createTestApp({ plugins: [{ install: (app: App) => app.provide(leaveGuardKey, guard) }] }));
   return result;
 };
 
@@ -53,7 +53,7 @@ describe("useGroupSheet: cross-group derived fields", () => {
     const { result } = withSetup(() => {
       const form = useForm({ defaults: () => ({ a: "" }) });
       return useGroupSheet({ form, group: "g", fields: ["a"] });
-    }, [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]);
+    }, createTestApp({ plugins: [{ install: (app: App) => app.provide(leaveGuardKey, guard) }] }));
     await expect(result.save()).rejects.toThrow("no full-record save()");
   });
 
@@ -63,7 +63,7 @@ describe("useGroupSheet: cross-group derived fields", () => {
       withSetup(() => {
         const form = useForm({ defaults: () => ({ a: "" }) });
         return useGroupSheet({ form, group: "g", fields: ["a"], save: async () => 1, rebase: { reload: async () => undefined, message: () => "" } });
-      }, [{ install: (app: App) => app.provide(leaveGuardKey, guard) }]),
+      }, createTestApp({ plugins: [{ install: (app: App) => app.provide(leaveGuardKey, guard) }] })),
     ).toThrow("needs a record form");
   });
 });

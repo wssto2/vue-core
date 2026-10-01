@@ -16,7 +16,7 @@ interface Ticket {
 const ticket = (id: number, subject = `Ticket ${id}`): Ticket => ({ id, subject });
 const TICKET: InjectionKey<RouteResource<Ticket>> = Symbol("ticket");
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const settle = async () => {
   for (let index = 0; index < 5; index++) await new Promise((resolve) => setTimeout(resolve, 0));
 };

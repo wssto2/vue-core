@@ -42,7 +42,7 @@ const actionsOf = (row: Activity): RowAction[] => [
 </script>
 
 <template>
-  <Panel :title="t('customers.activity.title')" flush data-test="customer-activity">
+  <Panel :title="t('customers.activity.title')" flush>
     <template #actions>
       <button v-for="option in (['all', 'none', 'loading'] as const)" :key="option" type="button" class="rounded px-2 py-1 text-footnote" :class="shown === option ? 'bg-tint-soft text-content-link' : 'text-content-muted'"
         @click="shown = option">{{ t(`customers.activity.show_${option}`) }}</button>

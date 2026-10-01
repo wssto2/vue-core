@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../client";
 import { deferred } from "../platform/testing";
-import { withSetup } from "./testing";
+import { withSetup } from "../testing";
 import { useForm } from "./useForm";
 import type { FormValidator } from "./validation";
 

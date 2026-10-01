@@ -17,7 +17,7 @@ const settle = async () => {
 };
 
 function mountField(component: Component, props: Record<string, unknown> = {}, options: { locale?: "en" | "hr"; plugins?: unknown[]; initial?: string | null } = {}) {
-  const i18n = createTestI18n(options.locale ?? "hr");
+  const i18n = createTestI18n({ locale: options.locale ?? "hr" });
   const value = ref<string | null>(options.initial ?? null);
   const changes: (string | null)[] = [];
   const Host = defineComponent({
@@ -127,7 +127,7 @@ describe("TimeField", () => {
   });
 
   it("reads in the app's time format", () => {
-    const i18n = createTestI18n("hr");
+    const i18n = createTestI18n({ locale: "hr" });
     const plugin = { install: (app: import("vue").App) => installFormatting(app, createFormatting({ locale: () => "hr", formatters: { time: (date) => `${date.getHours()}h${date.getMinutes()}` } })) };
     const Host = defineComponent({ setup: () => () => h(FormView, { editable: false }, () => h(FormGroup, {}, () => h(TimeField, { modelValue: "14:05", label: "Start" }))) });
     const { container } = render(Host, { global: { plugins: [i18n, plugin] } });
@@ -274,7 +274,7 @@ describe("DateTimeField popover", () => {
   });
 
   it("reads in the app's format", () => {
-    const i18n = createTestI18n("hr");
+    const i18n = createTestI18n({ locale: "hr" });
     const plugin = { install: (app: import("vue").App) => installFormatting(app, createFormatting({ locale: () => "hr", formatters: { dateTime: (date) => `DT ${date.getFullYear()}` } })) };
     const Host = defineComponent({ setup: () => () => h(FormView, { editable: false }, () => h(FormGroup, {}, () => h(DateTimeField, { modelValue: "2026-10-15T14:35", label: "Visit" }))) });
     const { container } = render(Host, { global: { plugins: [i18n, plugin] } });

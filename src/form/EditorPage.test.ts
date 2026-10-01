@@ -12,10 +12,10 @@ import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
 import LeaveGuardRoot from "./LeaveGuardRoot.vue";
 import NumberField from "./NumberField.vue";
 import TextField from "./TextField.vue";
-import { settle } from "./testing";
+import { settle } from "../testing";
 import { useForm } from "./useForm";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 
 interface Offer {
   customer: string;

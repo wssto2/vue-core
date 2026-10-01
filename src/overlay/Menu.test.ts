@@ -5,7 +5,7 @@ import Modal from "../modal/Modal.vue";
 import { createTestI18n } from "../testing/i18n";
 import Menu, { type MenuItem } from "./Menu.vue";
 
-const global = { plugins: [createTestI18n("en")], stubs: { transition: false } };
+const global = { plugins: [createTestI18n()], stubs: { transition: false } };
 
 const settle = async () => {
   await nextTick();

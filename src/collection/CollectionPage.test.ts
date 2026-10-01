@@ -3,8 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { computed, defineComponent, h, nextTick, type PropType } from "vue";
 import { createMemoryHistory, createRouter, RouterView } from "vue-router";
 import { ApiError } from "../client";
-import { createTestI18n } from "../testing/i18n";
-import { testFormatting } from "../testing/format";
+import { createTestI18n, mockMedia, testFormatting } from "../testing";
 import type { PageAction } from "../page";
 import CollectionPage from "./CollectionPage.vue";
 import CollectionTable from "./CollectionTable.vue";
@@ -30,18 +29,11 @@ const CUSTOMERS: Customer[] = [
   { id: 2, first_name: "Ivo", last_name: "Kovač", email: null, city: null, created_at: "2026-09-02T08:00:00Z", phase: { label: "Closed" } },
 ];
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 
 /** The phone layout: the table switches to rows below 1024 px. */
 function viewport(narrow: boolean) {
-  const original = window.matchMedia;
-  window.matchMedia = ((query: string) => ({
-    media: query,
-    matches: narrow && query.includes("max-width: 1023px"),
-    addEventListener: () => undefined,
-    removeEventListener: () => undefined,
-  })) as unknown as typeof window.matchMedia;
-  return () => (window.matchMedia = original);
+  return mockMedia({ narrow }).restore;
 }
 
 const columns = [

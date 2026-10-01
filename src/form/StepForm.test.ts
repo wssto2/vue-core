@@ -9,7 +9,7 @@ import StepForm from "./StepForm.vue";
 import StepNavigation from "./StepNavigation.vue";
 import StepProgress from "./StepProgress.vue";
 import { useStepForm } from "./steps";
-import { settle } from "./testing";
+import { settle } from "../testing";
 import TextField from "./TextField.vue";
 import { useForm } from "./useForm";
 import type { FormValidator } from "./validation";
@@ -33,7 +33,7 @@ const validator: FormValidator<Lead> = {
 const guard = createLeaveGuard();
 guard.attach();
 const global = {
-  plugins: [createTestI18n("en"), { install: (app: App) => app.provide(leaveGuardKey, guard) }],
+  plugins: [createTestI18n(), { install: (app: App) => app.provide(leaveGuardKey, guard) }],
   stubs: { transition: false as boolean | Component },
 };
 

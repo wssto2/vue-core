@@ -3,7 +3,7 @@
 // the packed output is clean. Needs `npm run build` first (the tarball ships dist/).
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -71,6 +71,7 @@ run(
     import { createFormatting } from "@wssto2/vue-core/format";
     import { localeMessages } from "@wssto2/vue-core/i18n";
     import { backofficeShell, groupNavigation } from "@wssto2/vue-core/shell";
+    import { createTestPlatform, createTestI18n, routedTransport, jsonResponse } from "@wssto2/vue-core/testing";
     let thrown;
     try { parseSessionPayload("x"); } catch (error) { thrown = error; }
     if (!(thrown instanceof ApiError)) throw new Error("the platform subpath throws its own ApiError class, not the client subpath's");
@@ -83,7 +84,11 @@ run(
     // The shell subpath evaluates in Node too (no window at import) and its definition names what it renders.
     const shell = backofficeShell();
     if (!shell.slots.includes("accountMenu") || typeof shell.progress?.start !== "function" || groupNavigation([]).length !== 0) throw new Error("the shell subpath did not behave");
-    console.log("client, platform, app, router, format, i18n and shell subpaths import; ApiError is one class");
+    // The testing subpath resolves from the tarball, evaluates in Node and builds a working platform with no request.
+    const { transport } = routedTransport({ "GET /ping": jsonResponse(200, { success: true, data: "pong" }) });
+    const test = createTestPlatform({ permissions: ["a:b"], transport });
+    if (!test.access.can("a:b") || (await test.http.get("/ping")).data !== "pong" || createTestI18n().global.t("core.actions.cancel") === "core.actions.cancel") throw new Error("the testing subpath did not behave");
+    console.log("client, platform, app, router, format, i18n, shell and testing subpaths import; ApiError is one class");
     `,
   ],
   playground,
@@ -97,6 +102,10 @@ const forbidden = [
   { pattern: /\bRoute\b/, what: "the ARV global `Route` type" },
   { pattern: /from\s*["']pinia["']/, what: "a pinia import" },
 ];
+// The test helpers live in dist/testing/ and in nothing else: no other entry or shared chunk contains
+// them or imports them, and they import no test runner or testing library (the app brings its own).
+const testCode = /\b(createTestPlatform|createTestApp|scriptedTransport|routedTransport|mockMedia)\b/;
+const testRunners = /from\s*["'](vitest|@testing-library\/[\w-]+|@vue\/test-utils|jest|happy-dom|jsdom)["']/;
 let scanned = 0;
 for (const file of walk(join(installed, "dist"))) {
   if (!/\.(js|d\.ts|css)$/.test(file)) continue;
@@ -105,6 +114,9 @@ for (const file of walk(join(installed, "dist"))) {
   for (const { pattern, what } of forbidden) {
     if (pattern.test(code)) fail(`${relative(installed, file)} contains ${what}`);
   }
+  const inTesting = relative(join(installed, "dist"), file).startsWith(`testing${sep}`);
+  if (!inTesting && file.endsWith(".js") && (testCode.test(code) || /from\s*["'](\.\.?\/)+testing\//.test(code))) fail(`${relative(installed, file)} contains or imports the test helpers`);
+  if (testRunners.test(code)) fail(`${relative(installed, file)} imports a test runner or testing library`);
 }
 console.log(`${scanned} emitted files scanned`);
 

@@ -11,10 +11,10 @@ import FormGroup from "./FormGroup.vue";
 import FormRow from "./FormRow.vue";
 import FormView from "./FormView.vue";
 import TextField from "./TextField.vue";
-import { settle, withSetup } from "./testing";
+import { settle, withSetup } from "../testing";
 import { useForm } from "./useForm";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const global = { plugins: [i18n, testFormatting(i18n)] };
 
 afterEach(() => {

@@ -6,7 +6,7 @@ import { createTestI18n } from "../testing/i18n";
 import { phoneDefaultsKey, type PhoneDefaults } from "./environment";
 import PhoneField from "./PhoneField.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 
 afterEach(() => {
   document.body.innerHTML = "";

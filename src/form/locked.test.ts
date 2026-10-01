@@ -15,7 +15,7 @@ import SelectField from "./SelectField.vue";
 import SwitchField from "./SwitchField.vue";
 import TextField from "./TextField.vue";
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 const global = { plugins: [i18n, testFormatting(i18n)], stubs: { transition: false } };
 
 afterEach(() => {

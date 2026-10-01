@@ -7,7 +7,7 @@ import { lateLeaveTransition } from "../testing/transition";
 import { mockMedia } from "../testing/media";
 import AlertDialog from "./AlertDialog.vue";
 
-const global = { plugins: [createTestI18n("en")], stubs: { transition: false as boolean | Component } };
+const global = { plugins: [createTestI18n()], stubs: { transition: false as boolean | Component } };
 
 /** The wide (alert) presentation unless a test turns compact on. */
 function mountAlert(props: Record<string, unknown> = {}, subject?: unknown) {

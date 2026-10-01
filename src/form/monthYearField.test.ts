@@ -12,7 +12,7 @@ const settle = async () => {
 };
 
 function mountField(props: Record<string, unknown> = {}, initial: { month: number | null; year: number | null } = { month: null, year: null }, locale: "en" | "hr" = "en") {
-  const i18n = createTestI18n(locale);
+  const i18n = createTestI18n({ locale });
   const month = ref(initial.month);
   const year = ref(initial.year);
   const Host = defineComponent({
@@ -111,7 +111,7 @@ describe("MonthYearField", () => {
   });
 
   it("reads as text in a read-only form", () => {
-    const i18n = createTestI18n("en");
+    const i18n = createTestI18n();
     const Host = defineComponent({ setup: () => () => h(FormView, { editable: false }, () => h(FormGroup, {}, () => h(MonthYearField, { month: 3, year: 2021, label: "First registration" }))) });
     const { container } = render(Host, { global: { plugins: [i18n, testFormatting(i18n)] } });
     expect(container.textContent).toContain("March 2021");

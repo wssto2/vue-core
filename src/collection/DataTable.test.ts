@@ -2,8 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick } from "vue";
 import { createMemoryHistory, createRouter } from "vue-router";
-import { testFormatting } from "../testing/format";
-import { createTestI18n } from "../testing/i18n";
+import { createTestI18n, mockMedia, testFormatting } from "../testing";
 import DataTable from "./DataTable.vue";
 import RowActions from "./RowActions.vue";
 import type { RowAction, TableColumns } from "./columns";
@@ -29,17 +28,10 @@ const columns = [
   { key: "placed_at", label: "Placed", kind: "timestamp", precision: "date", hideBelow: "md", mobile: "meta" },
 ] satisfies TableColumns<Order>;
 
-const i18n = createTestI18n("en");
+const i18n = createTestI18n();
 
 function viewport(narrow: boolean) {
-  const original = window.matchMedia;
-  window.matchMedia = ((query: string) => ({
-    media: query,
-    matches: narrow && query.includes("max-width: 1023px"),
-    addEventListener: () => undefined,
-    removeEventListener: () => undefined,
-  })) as unknown as typeof window.matchMedia;
-  return () => (window.matchMedia = original);
+  return mockMedia({ narrow }).restore;
 }
 
 let restore: () => void = () => undefined;

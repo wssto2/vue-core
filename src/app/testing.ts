@@ -2,7 +2,8 @@
 import { defineComponent, h, type Component } from "vue";
 import { createMemoryHistory } from "vue-router";
 import { createPlatform, parseBootstrap, type Platform, type SessionAdapter, type SessionSnapshot } from "../platform";
-import { accessOf, held } from "../platform/testing";
+import { createTestSession } from "../testing";
+import { settle as settleRounds } from "../testing/async";
 import type { ApplicationOptions } from "./application";
 import type { Feature } from "./feature";
 
@@ -39,12 +40,7 @@ export function fakeBackend(initial: SessionSnapshot | null = null, config: Reco
 }
 
 /** A signed-in snapshot of user `id` holding these permissions at the organization. */
-export const signedIn = (id: number, permissions: string[] = [], extra: Partial<SessionSnapshot> = {}): SessionSnapshot => ({
-  user: { id },
-  expiresAt: null,
-  access: accessOf(Object.fromEntries(permissions.map((permission) => [permission, held("organization", undefined)]))),
-  ...extra,
-});
+export const signedIn = (id: number, permissions: string[] = [], extra: Partial<SessionSnapshot> = {}): SessionSnapshot => ({ ...createTestSession({ user: { id }, permissions }), ...extra });
 
 /** Options for `createApplication` over a memory history starting at `location`. */
 export function options(platform: Platform, features: readonly Feature[], location = "/", extra: Partial<ApplicationOptions> = {}): ApplicationOptions {
@@ -54,6 +50,4 @@ export function options(platform: Platform, features: readonly Feature[], locati
 }
 
 /** Lets promises and Vue's scheduler settle. */
-export const settle = async () => {
-  for (let index = 0; index < 10; index++) await new Promise((resolve) => setTimeout(resolve, 0));
-};
+export const settle = () => settleRounds(10);

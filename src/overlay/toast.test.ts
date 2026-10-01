@@ -11,7 +11,7 @@ afterEach(() => {
 
 describe("toast and Toaster", () => {
   it("shows a message in the Toaster, in a region named in the active locale", async () => {
-    const { container } = render(Toaster, { global: { plugins: [createTestI18n("hr")] } });
+    const { container } = render(Toaster, { global: { plugins: [createTestI18n({ locale: "hr" })] } });
     toast.success("Spremljeno");
 
     await vi.waitFor(() => expect(container.textContent ?? document.body.textContent).toContain("Spremljeno"));
@@ -19,7 +19,7 @@ describe("toast and Toaster", () => {
   });
 
   it("carries an action (Undo, Retry) that runs its handler", async () => {
-    render(Toaster, { global: { plugins: [createTestI18n("en")] } });
+    render(Toaster, { global: { plugins: [createTestI18n()] } });
     const undo = vi.fn();
     toast.error("Could not save", { action: { label: "Retry", onClick: undo } });
 
@@ -28,7 +28,7 @@ describe("toast and Toaster", () => {
   });
 
   it("a loading toast is dismissed by its id", async () => {
-    render(Toaster, { global: { plugins: [createTestI18n("en")] } });
+    render(Toaster, { global: { plugins: [createTestI18n()] } });
     const id = toast.loading("Deleting…");
     await screen.findByText("Deleting…");
 
