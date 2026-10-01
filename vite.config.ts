@@ -1,4 +1,5 @@
 import vue from "@vitejs/plugin-vue";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import pkg from "./package.json" with { type: "json" };
 
@@ -28,6 +29,8 @@ const entries: Record<string, string> = {
   "testing/index": "src/testing/index.ts",
 };
 
+const source = fileURLToPath(new URL("src", import.meta.url));
+
 // Peers and runtime dependencies stay external: the consumer installs one copy of each (a second
 // vue-sonner would be a second toast queue).
 const externals = [...Object.keys(pkg.peerDependencies), ...Object.keys(pkg.dependencies)];
@@ -44,6 +47,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "happy-dom",
-    include: ["src/**/*.test.ts"],
+    // The documentation's examples are tested too: they import the library by its public name, so that name points at the source here.
+    include: ["src/**/*.test.ts", "docs/examples/**/*.test.ts"],
+    alias: [
+      { find: /^@wssto2\/vue-core$/, replacement: `${source}/index.ts` },
+      { find: /^@wssto2\/vue-core\/([\w-]+)$/, replacement: `${source}/$1/index.ts` },
+    ],
   },
 });

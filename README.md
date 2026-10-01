@@ -14,10 +14,11 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | `@wssto2/vue-core/app` | `createApplication`, `defineFeature`, shell outlets, effects |
 | `@wssto2/vue-core/shell` | `backofficeShell`, the shell's parts for a custom one |
 | `@wssto2/vue-core/router` | `defineRoutes` (typed targets), guards, navigation |
-| `@wssto2/vue-core/collection` | `defineCollection`, `useCollection`, `CollectionPage`, record neighbors |
+| `@wssto2/vue-core/collection` | `defineCollection`, `useCollection`, `CollectionPage`, `DataTable` (a table over an array), record neighbors |
 | `@wssto2/vue-core/resource`, `/page` | `useRouteResource`, `ResourcePage`, `SectionNavigator`, `AdaptivePageShell` |
 | `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives |
 | `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, formatting, `HttpClient` and `ApiError` |
+| `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
 
 Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vue-i18n`; the library never bundles them.
 
@@ -293,12 +294,13 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 
 ## Recipes
 
-- [List page](docs/recipes/list-page.md): a typed collection, columns, filters, row actions, URL state
+- [List page](docs/recipes/list-page.md): a typed collection, columns, filters, row actions, URL state; a table over an array
 - [Record page](docs/recipes/record-page.md): a simple record, a record with sections, regions that load on their own, previous / next
 - [Shell](docs/recipes/shell.md): the default shell, contributions from features, a custom shell
 - [App setup](docs/recipes/app-setup.md): config, session, effects, locales, errors
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens
+- [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 
 Forms have their own recipe when that phase lands.
 
