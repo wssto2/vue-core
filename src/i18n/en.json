@@ -202,7 +202,8 @@
         "loading": "Loading…",
         "clear": "Clear",
         "done": "Done",
-        "failed": "The search failed. Try again."
+        "failed": "The search failed. Try again.",
+        "load_failed": "The options could not be loaded."
       },
       "number": {
         "invalid": "Enter a number."

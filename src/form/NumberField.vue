@@ -14,6 +14,9 @@ import { numberMarks, parseNumber } from "./number";
  *   <NumberField v-bind="form.bind('quantity')" :label="t('quantity')" suffix="pcs" />
  *   <NumberField v-bind="form.bind('weight')" :decimals="2" suffix="kg" />
  *
+ * `:grouping="false"` writes no thousands separator, shown or typed (a year 2024, a coordinate 45.815123), and then a "."
+ * is always a decimal mark, never a group mark.
+ *
  * Typing "1,5" mid-edit is never rewritten under the cursor: the text is the user's until the field loses focus.
  * Limits (`min`, `max`) are the validator's job; the field only keeps what cannot be a number out.
  */
@@ -22,13 +25,15 @@ const props = withDefaults(
     decimals?: number;
     /** Allows a leading minus sign. */
     negative?: boolean;
+    /** Separates thousands ("1.234.567"); off for years, coordinates and codes. */
+    grouping?: boolean;
     placeholder?: string;
     prefix?: string;
     suffix?: string;
     /** sm 10rem (the default for numbers) · md · lg · full. */
     width?: Exclude<ControlWidth, "content">;
   }>(),
-  { ...fieldDefaults, decimals: 0, negative: false, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
+  { ...fieldDefaults, decimals: 0, negative: false, grouping: true, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
 );
 
 const model = defineModel<number | null>({ default: null });
@@ -39,9 +44,9 @@ const surface = useControlSurface("text", () => (props.error ? "error" : props.d
 const fieldWidth = computed(() => (inRow ? controlWidth(props.width) : "w-full"));
 
 const marks = computed(() => numberMarks(format));
-const shown = (value: number | null) => (value === null ? "" : format.number(value, { minimumFractionDigits: props.decimals, maximumFractionDigits: props.decimals }));
+const shown = (value: number | null) => (value === null ? "" : format.number(value, { minimumFractionDigits: props.decimals, maximumFractionDigits: props.decimals, useGrouping: props.grouping }));
 const editing = (value: number | null) => (value === null ? "" : String(value).replace(".", marks.value.decimal));
-const read = (text: string) => parseNumber(text, { decimals: props.decimals, group: marks.value.group });
+const read = (text: string) => parseNumber(text, { decimals: props.decimals, group: props.grouping ? marks.value.group : "" });
 
 const focused = ref(false);
 const text = ref(shown(model.value));
@@ -50,7 +55,7 @@ watch(model, (value) => {
   if (!focused.value) text.value = shown(value);
   else if (read(text.value) !== value) text.value = editing(value);
 });
-watch(() => [props.decimals, marks.value.decimal], () => {
+watch(() => [props.decimals, props.grouping, marks.value.decimal], () => {
   if (!focused.value) text.value = shown(model.value);
 });
 

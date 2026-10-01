@@ -209,6 +209,34 @@ describe("NumberField", () => {
     expect(zero.container.textContent).toContain("0");
   });
 
+  it(':grouping="false" shows and reads no thousands separator: a year stays 2024, a coordinate keeps its digits', async () => {
+    const year = mount(NumberField, { modelValue: 2024, label: "Year", grouping: false });
+    expect((screen.getByLabelText("Year") as HTMLInputElement).value).toBe("2024");
+    year.unmount();
+    const grouped = mount(NumberField, { modelValue: 2024, label: "Grouped" });
+    expect((screen.getByLabelText("Grouped") as HTMLInputElement).value).toBe("2,024");
+    grouped.unmount();
+
+    const { update } = mount(NumberField, { modelValue: null, label: "Latitude", decimals: 6, grouping: false });
+    const input = screen.getByLabelText("Latitude") as HTMLInputElement;
+    await fireEvent.focus(input);
+    await fireEvent.update(input, "45,815");
+    expect(update).toHaveBeenLastCalledWith(45.815); // with grouping on, a comma followed by three digits is thousands
+    await fireEvent.update(input, "45.815123");
+    expect(update).toHaveBeenLastCalledWith(45.815123);
+  });
+
+  it("keeps the grouping off when the field is left", async () => {
+    const value = ref<number | null>(1234.5);
+    const Host = defineComponent({ setup: () => () => h(NumberField, { modelValue: value.value, "onUpdate:modelValue": (next: number | null) => (value.value = next), label: "Sum", decimals: 1, grouping: false }) });
+    render(Host, { global: { plugins } });
+    const input = screen.getByLabelText("Sum") as HTMLInputElement;
+    expect(input.value).toBe("1234.5");
+    await fireEvent.focus(input);
+    await fireEvent.blur(input);
+    expect(input.value).toBe("1234.5");
+  });
+
   it("MoneyField is a number with two decimals and the currency after it", async () => {
     const { update, container } = mount(MoneyField, { modelValue: 1234.5, label: "Price", currency: "EUR" });
     expect(container.textContent).toContain("EUR");

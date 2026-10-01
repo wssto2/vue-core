@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { focusableWithin } from "../internal/focusable";
 import Modal from "../modal/Modal.vue";
 import { DONE_BEAT_MS } from "../state/useWaitStatus";
 import { focusFirstError } from "./focus";
@@ -17,9 +18,13 @@ import type { Form } from "./useForm";
  *   <CommandDialog :command="assign" :title="t('assign')" :confirm-label="t('assign')" :done-label="t('assigned')">
  *     <FormGroup><ComboField v-bind="assign.form.bind('assignee')" :label="t('assignee')" :search="findUsers" /></FormGroup>
  *   </CommandDialog>
+ *
+ * Another action beside the primary one goes in `#actions`; `run({ addAnother: true })` saves like the primary action and then,
+ * instead of closing, opens the dialog again with fresh inputs (the command's defaults), so the next record can be entered
+ * (the add-a-record recipe, `docs/recipes/forms.md`).
  */
 const props = withDefaults(defineProps<{
-  command: Pick<Command<object, unknown, unknown>, "open" | "run" | "dismiss"> & { readonly form: Pick<Form<object>, "dirty" | "submitting" | "failure" | "errors"> };
+  command: Pick<Command<object, unknown, unknown>, "open" | "run" | "dismiss" | "present"> & { readonly form: Pick<Form<object>, "dirty" | "submitting" | "failure" | "errors"> };
   title: string;
   subtitle?: string;
   /** What the primary action says: exactly what it does ("Assign"). */
@@ -36,7 +41,11 @@ const props = withDefaults(defineProps<{
 }>(), { subtitle: undefined, doneLabel: undefined, busyLabel: undefined, message: undefined, size: "sm", fieldLabel: undefined });
 
 const emit = defineEmits<{ done: [] }>();
-defineSlots<{ default?: () => unknown }>();
+defineSlots<{
+  default?: () => unknown;
+  /** More actions in the footer, beside Cancel and the primary one. */
+  actions?: (scope: { run: (options?: { addAnother?: boolean }) => Promise<void>; busy: boolean }) => unknown;
+}>();
 
 const { t } = useI18n();
 const modal = useTemplateRef<{ present: () => void; dismiss: () => void }>("modal");
@@ -53,15 +62,21 @@ watch(() => props.command.open.value, (open) => {
   } else modal.value?.dismiss();
 });
 
-async function run() {
+async function run(options: { addAnother?: boolean } = {}) {
   const result = await props.command.run();
   if (result.status === "failed") {
     if (result.failure.kind === "invalid") await nextTick().then(() => focusFirstError(body.value ?? document));
     return;
   }
   if (result.status === "aborted") return;
-  done.value = true;
   emit("done");
+  if (options.addAnother) {
+    props.command.present(); // fresh inputs, the dialog stays: the next record
+    await nextTick();
+    focusableWithin(body.value)[0]?.focus();
+    return;
+  }
+  done.value = true;
   closing = setTimeout(() => props.command.dismiss(), DONE_BEAT_MS);
 }
 onBeforeUnmount(() => {
@@ -73,7 +88,10 @@ const status = computed(() => (props.command.form.submitting.value ? "processing
 
 <template>
   <Modal ref="modal" :size="props.size" grouped :title="props.title" :subtitle="props.subtitle" :before-dismiss="confirmDiscard" :primary-label="props.confirmLabel" :status="status"
-    :processing-label="props.busyLabel ?? t('core.actions.saving')" :done-label="props.doneLabel ?? t('core.actions.saved')" @primary="run" @dismissed="props.command.dismiss()">
+    :processing-label="props.busyLabel ?? t('core.actions.saving')" :done-label="props.doneLabel ?? t('core.actions.saved')" @primary="run()" @dismissed="props.command.dismiss()">
+    <template v-if="$slots.actions" #actions>
+      <slot name="actions" :run="run" :busy="props.command.form.submitting.value" />
+    </template>
     <div ref="body" class="flex min-w-0 flex-col gap-group-gap" data-test="command-dialog">
       <p v-if="props.message" class="text-body text-content-muted">{{ props.message }}</p>
       <FormErrors :form="props.command.form" :label="props.fieldLabel" :scope="body" />

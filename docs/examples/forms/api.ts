@@ -23,6 +23,18 @@ export interface TicketBody {
   version: number;
 }
 
+/** A ticket category, an admin record: created and edited in a dialog. */
+export interface Category {
+  readonly id: number;
+  readonly name: string;
+  readonly active: boolean;
+}
+
+export interface CategoryBody {
+  name: string;
+  active: boolean;
+}
+
 export interface ContactBody {
   email: string;
   phone: string;
@@ -38,6 +50,13 @@ export function createTicketFormsApi(http: HttpClient) {
     saveContact: (id: number, body: ContactBody) => http.put<null>(`/tickets/${id}/contact`, body).then(() => undefined),
     create: (body: Omit<TicketBody, "version">, key: string) => http.post<{ id: number }>("/tickets", body, idempotency(key)).then((result) => result.data),
     assign: (id: number, body: { assignee_id: number; note: string }, key: string) => http.post<Ticket>(`/tickets/${id}/assign`, body, idempotency(key)).then((result) => result.data),
+    createCategory: (body: CategoryBody, key: string) => http.post<Category>("/categories", body, idempotency(key)).then((result) => result.data),
+    updateCategory: (id: number, body: CategoryBody, key: string) => http.put<Category>(`/categories/${id}`, body, idempotency(key)).then((result) => result.data),
+    categories: (signal: AbortSignal) =>
+      http.get<Category[]>("/categories", { signal }).then((result) => result.data.map((category): SelectOption<number> => ({ value: category.id, label: category.name }))),
+    /** The queues of one category: what the second select lists once the first has a value. */
+    queues: (categoryId: number, signal: AbortSignal) =>
+      http.get<{ id: number; name: string }[]>(`/categories/${categoryId}/queues`, { signal }).then((result) => result.data.map((queue): SelectOption<number> => ({ value: queue.id, label: queue.name }))),
     cities: (query: string, signal: AbortSignal) =>
       http.get<{ name: string; country: string }[]>("/cities", { query: { search: query }, signal }).then((result) => result.data.map((city): TextSuggestion => ({ text: city.name, detail: city.country }))),
     users: (query: string, signal: AbortSignal) =>
