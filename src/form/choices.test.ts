@@ -118,6 +118,14 @@ describe("SelectField (wide screens)", () => {
     expect(model.value).toBeNull();
   });
 
+  it("lists in a panel at least as wide as the field", async () => {
+    const measure = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({ width: 460, height: 30, x: 0, y: 0, top: 0, left: 0, right: 460, bottom: 30, toJSON: () => ({}) });
+    mountSelect(SelectField, { label: "Status", options: statuses });
+    await fireEvent.click(screen.getByLabelText("Status"));
+    await vi.waitFor(() => expect(screen.getByRole("dialog").style.minWidth).toBe("460px"));
+    measure.mockRestore();
+  });
+
   it("does not open while locked, and reads the label as a value", () => {
     mountSelect(SelectField, { label: "Status", options: statuses, disabled: true }, "open");
     expect((screen.getByLabelText("Status") as HTMLButtonElement).disabled).toBe(true);

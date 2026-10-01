@@ -202,7 +202,8 @@
         "loading": "Učitavanje…",
         "clear": "Očisti",
         "done": "Gotovo",
-        "failed": "Pretraga nije uspjela. Pokušajte ponovno."
+        "failed": "Pretraga nije uspjela. Pokušajte ponovno.",
+        "load_failed": "Opcije nisu učitane."
       },
       "number": {
         "invalid": "Unesite broj."
@@ -327,6 +328,30 @@
         "words": {
           "now": "sada"
         }
+      }
+    },
+    "errors": {
+      "unauthenticated": "Niste prijavljeni. Molimo prijavite se.",
+      "forbidden": "Nemate ovlasti za ovu radnju.",
+      "not_found": "Traženi zapis nije pronađen.",
+      "conflict": "Zapis je promijenjen ili već postoji. Osvježite stranicu i pokušajte ponovno.",
+      "rate_limited": "Previše zahtjeva u kratkom vremenu. Pričekajte minutu pa pokušajte ponovno.",
+      "check_fields": "Provjerite označena polja.",
+      "offline": "Poslužitelj nije dostupan. Provjerite vezu i pokušajte ponovno.",
+      "cancelled": "Zahtjev je otkazan.",
+      "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovno."
+    },
+    "shortcuts": {
+      "title": "Tipkovni prečaci",
+      "or": "ili",
+      "hint": "Prečaci ne rade dok pišete u polje ili je otvoren prozor.",
+      "show_help": "Prikaži prečace",
+      "focus_search": "Pretraži popis",
+      "open_filters": "Otvori filtere",
+      "groups": {
+        "general": "Općenito",
+        "list": "Popis",
+        "record": "Zapis"
       }
     }
   }

@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick, type Component } from "vue";
 import { createMemoryHistory, createRouter, RouterView } from "vue-router";
+import { useShortcutRegistry } from "../button";
 import { ApiError } from "../client";
 import { RecordHeader } from "../page";
 import { deferred } from "../platform/testing";
@@ -168,6 +169,15 @@ describe("ResourcePage", () => {
     expect(pager.textContent).toContain("2 / 9");
     expect(screen.getByRole("link", { name: "Previous record" }).getAttribute("href")).toBe("/tickets/4");
     expect(screen.getByRole("link", { name: "Next record" }).getAttribute("href")).toBe("/tickets/6");
+  });
+
+  it("lists the pager's keys for a help dialog", async () => {
+    const list: RecordListContext = { back: { label: "Tickets", to: "/tickets" }, neighbors: { position: 2, total: 9, previous: "/tickets/4", next: "/tickets/6" } };
+    await openPage("/tickets/5", { load: async (id) => ticket(id), list });
+    await settle();
+    const rows = useShortcutRegistry().value;
+    expect(rows).toContainEqual({ group: "record", label: "Next record", keys: [["J"], ["→"]] });
+    expect(rows).toContainEqual({ group: "record", label: "Previous record", keys: [["K"], ["←"]] });
   });
 
   it("has no pager for a direct link, a back of its own, and a pager slot that replaces the list's", async () => {

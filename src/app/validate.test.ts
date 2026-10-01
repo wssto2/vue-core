@@ -140,5 +140,8 @@ describe("createApplication validates the composition at startup", () => {
     expect(issuesOf([login], { locale: { fallback: "de" } }).map((issue) => issue.message)).toEqual([
       'the fallback locale "de" is not among the supported locales (en, hr, bs, sl).',
     ]);
+    expect(issuesOf([login], { locale: { flags: { en: "GB", de: "DE" } } }).map((issue) => issue.message)).toEqual([
+      'locale.flags names the locale "de", which is not among the supported locales (en, hr, bs, sl).',
+    ]);
   });
 });

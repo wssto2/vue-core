@@ -26,5 +26,16 @@
   "city": "City",
   "title": "Title",
   "badPhone": "Enter a valid phone number.",
-  "titleRequired": "The title is required in Croatian."
+  "titleRequired": "The title is required in Croatian.",
+  "categorySaved": "Category saved.",
+  "newCategory": "New category",
+  "editCategory": "Edit category",
+  "save": "Save",
+  "name": "Name",
+  "active": "Active",
+  "saveAndAddAnother": "Save and add another",
+  "category": "Category",
+  "queue": "Queue",
+  "latitude": "Latitude",
+  "longitude": "Longitude"
 }

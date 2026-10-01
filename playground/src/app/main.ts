@@ -17,6 +17,7 @@ import { createTicketsFeature } from "./features/tickets/feature";
 import { createCustomersFeature } from "./features/customers/feature";
 import { createLeadsFeature } from "./features/leads/feature";
 import { formsFeature } from "./features/forms/feature";
+import { toolsFeature } from "./features/tools/feature";
 import { workflowsFeature } from "./features/workflows/feature";
 
 const platform = createDemoPlatform();
@@ -30,8 +31,10 @@ const application = createApplication({
     ? { component: CustomShell, slots: ["headerActions", "accountMenu", "host"] }
     : backofficeShell({ identity: (user: Employee) => ({ name: user.name, detail: user.email }) }),
   icons: [appIcons, shellIcons],
+  // A flag stands for a language, so the app chooses; Bosnian has none here, to show a row without a flag.
+  locale: { flags: { en: "GB", hr: "HR", sl: "SI" } },
   i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports", records: "Records", customers: "Customers", leads: "Leads" } }, hr: { nav: { work: "Rad", tickets: "Tiketi", reports: "Izvještaji", records: "Zapisi", customers: "Kupci", leads: "Upiti" } } } },
-  navigation: { known: ["tickets", "reports", "records", "customers", "leads", "forms", "workflows"] },
+  navigation: { known: ["tickets", "reports", "records", "customers", "leads", "forms", "tools", "workflows"] },
   features: [
     sessionFeature,
     themeFeature,
@@ -41,6 +44,7 @@ const application = createApplication({
     createLeadsFeature(platform.http),
     recordsFeature,
     formsFeature,
+    toolsFeature,
     workflowsFeature,
     viewTransitions(), // screen transitions on phones and tablets
     appUpdates({ url: "app.html" }), // offers a reload when a new build is served

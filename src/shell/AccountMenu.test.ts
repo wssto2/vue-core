@@ -98,6 +98,21 @@ describe("AccountMenu", () => {
     expect(document.documentElement.lang).toBe("hr");
   });
 
+  it("shows the flag the application mapped to each language, beside the language's own name, and none for an unmapped one", async () => {
+    await startShell(shell, { session, extra: { locale: { flags: { en: "GB", hr: "HR" } } } });
+    await open();
+
+    const language = screen.getByRole("button", { name: /Language/ });
+    expect(language.querySelector("[data-test=flag]")?.getAttribute("data-country")).toBe("GB");
+    expect(language.textContent).toContain("English");
+    await fireEvent.click(language);
+    const choice = (name: string) => screen.getByRole("button", { name });
+    expect(choice("Hrvatski").querySelector("[data-test=flag]")?.getAttribute("data-country")).toBe("HR");
+    expect(choice("English").querySelector("[data-test=flag]")?.getAttribute("data-country")).toBe("GB");
+    expect(choice("Bosanski").querySelector("[data-test=flag]")).toBeNull(); // no mapping, no flag
+    expect(choice("Slovenščina").querySelector("[data-test=flag]")).toBeNull();
+  });
+
   it("offers no language row when the application has one language", async () => {
     await startShell(shell, { session, extra: { locale: { supported: ["en"] } } });
     await open();
@@ -180,6 +195,17 @@ describe("AccountSheet", () => {
     await fireEvent.click(within(sheet).getByRole("button", { name: "Sign out" }));
     await settle();
     expect(backend.signOuts).toBe(1);
+  });
+
+  it("shows the language flags in the sheet too", async () => {
+    await startShell(sheetShell, { session, extra: { locale: { flags: { en: "GB", sl: "SI" } } } });
+    await fireEvent.click(screen.getByRole("button", { name: "account" }));
+    await settle();
+
+    const sheet = screen.getByRole("dialog");
+    await fireEvent.click(within(sheet).getByRole("button", { name: /Language/ }));
+    expect(within(sheet).getByRole("button", { name: "Slovenščina" }).querySelector("[data-test=flag]")?.getAttribute("data-country")).toBe("SI");
+    expect(within(sheet).getByRole("button", { name: "Hrvatski" }).querySelector("[data-test=flag]")).toBeNull();
   });
 });
 

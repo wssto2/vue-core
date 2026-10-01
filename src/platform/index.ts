@@ -26,3 +26,5 @@ export interface PermissionRegistry {}
 
 /** Every permission identifier the application declared; any string until it declares some. */
 export type Permission = keyof PermissionRegistry extends never ? string : Extract<keyof PermissionRegistry, string>;
+export { default as AccessGate } from "./AccessGate.vue";
+export type { AccessGateProps } from "./AccessGate.vue";

@@ -80,6 +80,11 @@ export interface ApplicationLocaleOptions {
   /** The locales the application offers. Default: the library's (`en`, `hr`, `bs`, `sl`). */
   supported?: readonly string[];
   /**
+   * The flag shown beside each locale's name in the language menu, as an ISO 3166-1 country code: `{ en: "GB", sl: "SI" }`.
+   * A flag stands for a language here, so the app chooses (English is not one country). No entry: the name alone.
+   */
+  flags?: Readonly<Record<string, string>>;
+  /**
    * Called after a switch to another locale committed (not for the start locale, a switch to the locale already active, or a
    * switch a later one superseded), so the application can save the choice on the user. Not awaited: the page has already
    * changed; a failure (thrown or rejected) is reported to `onError` with `source: "locale"`.
@@ -181,6 +186,9 @@ export function createApplication(options: ApplicationOptions): Application {
   // --- 1. validate the composition; nothing is built from an invalid one
   const appIssues: CompositionIssue[] = [];
   if (!supportedLocales.includes(fallbackLocale)) appIssues.push({ owner: "application", message: `the fallback locale "${fallbackLocale}" is not among the supported locales (${supportedLocales.join(", ")}).` });
+  for (const code of Object.keys(options.locale?.flags ?? {})) {
+    if (!supportedLocales.includes(code)) appIssues.push({ owner: "application", message: `locale.flags names the locale "${code}", which is not among the supported locales (${supportedLocales.join(", ")}).` });
+  }
   const initialLocale = options.locale?.initial ?? (supportedLocales.includes(platform.config.locale) ? platform.config.locale : fallbackLocale);
   if (!supportedLocales.includes(initialLocale)) appIssues.push({ owner: "application", message: `the initial locale "${initialLocale}" is not among the supported locales (${supportedLocales.join(", ")}).` });
 
@@ -260,6 +268,7 @@ export function createApplication(options: ApplicationOptions): Application {
     state,
     locale: computed(() => composer.locale.value),
     locales: supportedLocales,
+    localeFlags: options.locale?.flags ?? {},
     setLocale: async (locale) => {
       const before = composer.locale.value;
       const committed = await messages.setLocale(locale);

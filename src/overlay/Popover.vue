@@ -31,6 +31,8 @@ const props = withDefaults(defineProps<{
   /** Panel width on wide screens; `auto` is as wide as the content (a date and time picker). */
   width?: "sm" | "md" | "lg" | "auto";
   arrow?: boolean;
+  /** On wide screens the panel is at least as wide as its trigger (a select's list is never narrower than the field); `width` stays its minimum. */
+  matchTriggerWidth?: boolean;
   /** The trigger fills its container (a full-width sidebar row). */
   block?: boolean;
   /** Focus moves into the panel when it opens. `false` where the trigger is a field that keeps being typed into (a date). */
@@ -39,6 +41,7 @@ const props = withDefaults(defineProps<{
   placement: "bottom",
   width: "lg",
   arrow: true,
+  matchTriggerWidth: false,
   block: false,
   autofocus: true,
 });
@@ -72,9 +75,10 @@ const { style, arrowStyle, resolvedPlacement } = useAnchoredPosition(panel, {
   padding: GUTTER,
   arrow: arrowEl,
   fit: (floating, available) => {
+    const trigger = anchor.value?.firstElementChild ?? anchor.value;
     Object.assign(floating.style, window.innerWidth < NARROW_VIEWPORT
-      ? { width: `${window.innerWidth - GUTTER * 2}px`, maxWidth: "" }
-      : { width: "", maxWidth: `${Math.max(0, available.width)}px` });
+      ? { width: `${window.innerWidth - GUTTER * 2}px`, maxWidth: "", minWidth: "" }
+      : { width: "", maxWidth: `${Math.max(0, available.width)}px`, minWidth: props.matchTriggerWidth && trigger ? `${Math.round(trigger.getBoundingClientRect().width)}px` : "" });
   },
 });
 

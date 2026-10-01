@@ -4,7 +4,9 @@ import { defineComponent, nextTick, ref, type Component } from "vue";
 import { mockMedia } from "../testing/media";
 import { createTestI18n } from "../testing/i18n";
 import { lateLeaveTransition } from "../testing/transition";
+import { useOpenDialogCount } from "../overlay";
 import Modal from "./Modal.vue";
+import { modalPlacementKey } from "./placement";
 
 // Real transitions (not test-utils stubs): the dialog stays mounted until its leave transition ends.
 const global = { plugins: [createTestI18n()], stubs: { transition: false as boolean | Component } };
@@ -412,5 +414,58 @@ describe("nested dialogs", () => {
 
     expect(document.body.classList.contains("overflow-hidden")).toBe(false);
     expect([...document.body.children].every((child) => !(child as HTMLElement).inert)).toBe(true);
+  });
+});
+
+describe("placement", () => {
+  const panel = () => document.querySelector<HTMLElement>('[data-part="panel"]')!;
+  const lane = () => panel().parentElement!;
+
+  it("is centred and unshifted by default", async () => {
+    mountModal("<p>Body</p>");
+    await present();
+    expect(lane().classList.contains("items-center")).toBe(true);
+    expect(panel().style.transform).toBe("");
+  });
+
+  it("aligns to the top and shifts sideways when the application says so, following a reactive value", async () => {
+    const offset = ref(-120);
+    const Owner = defineComponent({
+      components: { Modal },
+      setup: () => ({ modal: ref<InstanceType<typeof Modal> | null>(null) }),
+      template: `<div><button id="trigger" @click="modal?.present()">Open</button><Modal ref="modal" title="T"><p>Body</p></Modal></div>`,
+    });
+    render(Owner, { global: { ...global, provide: { [modalPlacementKey as symbol]: () => ({ align: "top", offsetX: offset.value }) } } });
+    await present();
+    expect(lane().classList.contains("items-start")).toBe(true);
+    expect(panel().style.transform).toBe("translateX(-120px)");
+    offset.value = -80;
+    await nextTick();
+    expect(panel().style.transform).toBe("translateX(-80px)");
+  });
+
+  it("a modal's own placement wins over the application's, field by field", async () => {
+    const Owner = defineComponent({
+      components: { Modal },
+      setup: () => ({ modal: ref<InstanceType<typeof Modal> | null>(null) }),
+      template: `<div><button id="trigger" @click="modal?.present()">Open</button><Modal ref="modal" title="T" :placement="{ align: 'center' }"><p>Body</p></Modal></div>`,
+    });
+    render(Owner, { global: { ...global, provide: { [modalPlacementKey as symbol]: { align: "top", offsetX: -50 } } } });
+    await present();
+    expect(lane().classList.contains("items-center")).toBe(true);
+    expect(panel().style.transform).toBe("translateX(-50px)");
+  });
+});
+
+describe("open dialog count", () => {
+  it("counts the dialogs that are open, nested ones included, and goes back to zero", async () => {
+    const count = useOpenDialogCount();
+    expect(count.value).toBe(0);
+    mountModal("<p>Body</p>");
+    await present();
+    expect(count.value).toBe(1);
+    press("Escape");
+    await settle();
+    expect(count.value).toBe(0);
   });
 });

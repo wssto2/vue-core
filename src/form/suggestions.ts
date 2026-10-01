@@ -96,6 +96,45 @@ export function listShows(open: boolean, count: number, status: SuggestionStatus
   return open && (count > 0 || status === "loading" || status === "failed" || (status === "loaded" && emptyMessage));
 }
 
+/**
+ * One load at a time, the latest wins: asking again aborts the older request and its late answer (or late failure) is dropped.
+ * The status is the discriminated state of the wait (`idle` until something is asked). Shared by the suggestions engine and by
+ * `useOptions`, so a typed search and a dependent select race the same way.
+ */
+export function useLatestLoad<Item>() {
+  const items = shallowRef<readonly Item[]>([]);
+  const status = ref<SuggestionStatus>("idle");
+  let version = 0;
+  let controller: AbortController | null = null;
+
+  /** Drops whatever is in flight: its answer will not land. The status is left as it is. */
+  function cancel() {
+    version++;
+    controller?.abort();
+    controller = null;
+  }
+
+  /** `settle` shapes the answer that lands (a limit, a highlighted row); it never runs for a stale one. */
+  async function run(load: (signal: AbortSignal) => Promise<readonly Item[]>, settle: (found: readonly Item[]) => readonly Item[] = (found) => found) {
+    cancel();
+    const mine = version;
+    controller = new AbortController();
+    status.value = "loading";
+    try {
+      const found = await load(controller.signal);
+      if (mine !== version) return;
+      items.value = settle(found);
+      status.value = "loaded";
+    } catch (error) {
+      if (mine !== version || isAborted(error)) return;
+      items.value = [];
+      status.value = "failed";
+    }
+  }
+
+  return { items, status, run, cancel };
+}
+
 export interface SuggestionsOptions<Value extends string | number> {
   source: () => SuggestionSource<Value> | undefined;
   /** The fewest characters before a function source is asked. */
@@ -124,16 +163,14 @@ export interface KeyHooks<Value extends string | number> {
  */
 export function useSuggestions<Value extends string | number>(options: SuggestionsOptions<Value>) {
   const store = inject(recentChoicesKey, browserRecents);
-  const results = shallowRef<readonly SelectOption<Value>[]>([]);
+  const latest = useLatestLoad<SelectOption<Value>>();
+  const { items: results, status } = latest;
   const recent = shallowRef<readonly SelectOption<Value>[]>([]);
-  const status = ref<SuggestionStatus>("idle");
   const open = ref(false);
   const highlighted = ref(0);
   const moved = ref(false);
   let text = "";
-  let version = 0;
   let timer: ReturnType<typeof setTimeout> | null = null;
-  let controller: AbortController | null = null;
 
   /** Recent choices while nothing is asked; otherwise the answer. */
   const items = computed<readonly SelectOption<Value>[]>(() => (status.value === "idle" ? recent.value : results.value));
@@ -141,36 +178,19 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
   const current = computed(() => items.value[highlighted.value]);
 
   function cancel() {
-    version++;
-    controller?.abort();
-    controller = null;
+    latest.cancel();
     if (timer) clearTimeout(timer);
     timer = null;
   }
   onBeforeUnmount(cancel);
 
   function settle(next: readonly SelectOption<Value>[]) {
-    results.value = next.slice(0, options.limit());
     highlighted.value = 0;
     moved.value = false;
+    return next.slice(0, options.limit());
   }
 
-  async function run(query: string, source: Extract<SuggestionSource<Value>, (...args: never[]) => unknown>) {
-    const mine = ++version;
-    controller?.abort();
-    controller = new AbortController();
-    status.value = "loading";
-    try {
-      const found = await source(query, { signal: controller.signal });
-      if (mine !== version) return;
-      settle(found);
-      status.value = "loaded";
-    } catch (error) {
-      if (mine !== version || isAborted(error)) return;
-      results.value = [];
-      status.value = "failed";
-    }
-  }
+  const run = (query: string, source: Extract<SuggestionSource<Value>, (...args: never[]) => unknown>) => latest.run((signal) => source(query, { signal }), settle);
 
   /** The text changed: ask for suggestions for it. */
   function ask(next: string) {
@@ -188,7 +208,7 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
     }
     if (typeof source === "function") timer = setTimeout(() => void run(next, source), options.debounce());
     else {
-      settle(filterLocal(source, next));
+      results.value = settle(filterLocal(source, next));
       status.value = "loaded";
     }
   }

@@ -167,6 +167,89 @@ describe("a command dialog", () => {
   });
 });
 
+describe("a command dialog with another action", () => {
+  function mountRecord(run: (input: { name: string }) => Promise<unknown>, editing = false) {
+    const done = vi.fn();
+    let command!: ReturnType<typeof makeCommand>;
+    const makeCommand = () =>
+      useCommand({
+        defaults: () => ({ name: "" }),
+        validator: { safeParse: (input) => ((input as { name: string }).name === "" ? { success: false, error: { issues: [{ path: ["name"], message: "Enter a name" }] } } : { success: true, data: input as { name: string } }) },
+        run: (input) => run(input),
+        done,
+      });
+    const Host = defineComponent({
+      setup() {
+        command = makeCommand();
+        return () =>
+          h("div", [
+            h("button", { onClick: () => command.present() }, "New"),
+            h(CommandDialog, { command, title: "Category", confirmLabel: "Save" }, {
+              default: () => h(FormGroup, null, () => h(TextField, { ...command.form.bind("name"), label: "Name" })),
+              actions: ({ run: save, busy }: { run: (options?: { addAnother?: boolean }) => Promise<void>; busy: boolean }) =>
+                editing ? undefined : h("button", { disabled: busy, onClick: () => void save({ addAnother: true }) }, "Save and add another"),
+            }),
+            h(LeaveGuardRoot),
+          ]);
+      },
+    });
+    render(Host, { global: { plugins: [i18n, testFormatting(i18n), { install: (app: App) => app.provide(leaveGuardKey, createLeaveGuard()) }], stubs: { transition: false } } });
+    return { done, command: () => command };
+  }
+  const openNew = async () => {
+    await fireEvent.click(screen.getByRole("button", { name: "New" }));
+    await settle();
+  };
+
+  it("saves and, instead of closing, opens again with empty inputs and the first field focused", async () => {
+    const run = vi.fn(async (_input: { name: string }) => ({ ok: true }));
+    const { done } = mountRecord(run);
+    await openNew();
+    await fireEvent.update(dialog().getByLabelText("Name"), "Hardware");
+    await fireEvent.click(dialog().getByRole("button", { name: "Save and add another" }));
+    await settle();
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(run.mock.calls[0]?.[0]).toEqual({ name: "Hardware" });
+    expect(done).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("dialog")).toBeTruthy(); // still open, no "Saved" beat to wait for
+    expect((dialog().getByLabelText("Name") as HTMLInputElement).value).toBe("");
+    expect(document.activeElement).toBe(dialog().getByLabelText("Name"));
+    expect(screen.queryByRole("alertdialog")).toBeNull(); // the saved input is not "unsaved changes"
+
+    await fireEvent.click(dialog().getByRole("button", { name: "Cancel" }));
+    await settle();
+    expect(screen.queryByRole("dialog")).toBeNull(); // and closing the fresh form asks nothing
+  });
+
+  it("keeps the input and stays as it was when the save is refused", async () => {
+    const run = vi.fn(async (_input: { name: string }) => ({ ok: true }));
+    mountRecord(run);
+    await openNew();
+    await fireEvent.click(dialog().getByRole("button", { name: "Save and add another" }));
+    await settle();
+    expect(run).not.toHaveBeenCalled();
+    expect(dialog().getByText("Enter a name")).toBeTruthy();
+  });
+
+  it("the primary action still closes after the done beat", async () => {
+    const { command } = mountRecord(async () => ({ ok: true }));
+    await openNew();
+    await fireEvent.update(dialog().getByLabelText("Name"), "Hardware");
+    await fireEvent.click(dialog().getByRole("button", { name: "Save" }));
+    await settle();
+    expect(dialog().getByRole("button", { name: "Saved" })).toBeTruthy();
+    await sleep(700);
+    await settle();
+    expect(command().open.value).toBe(false);
+  });
+
+  it("offers no extra action when the slot renders nothing (editing)", async () => {
+    mountRecord(async () => ({ ok: true }), true);
+    await openNew();
+    expect(dialog().queryByRole("button", { name: "Save and add another" })).toBeNull();
+  });
+});
+
 describe("a command with nothing to enter", () => {
   function mountClose(run: () => Promise<unknown>) {
     const confirmed = vi.fn();

@@ -1,6 +1,7 @@
 export { default as AsyncSection } from "./AsyncSection.vue";
 export { isEmptyValue, valueOf, type AsyncState } from "./async";
 export { default as Badge } from "./Badge.vue";
+export { HUES, type Hue } from "./hue";
 export { default as Banner } from "./Banner.vue";
 export { default as DrawnCheck } from "./DrawnCheck.vue";
 export { default as EmptyState } from "./EmptyState.vue";
@@ -9,4 +10,5 @@ export { default as ProgressTrack } from "./ProgressTrack.vue";
 export { default as Skeleton } from "./Skeleton.vue";
 export { default as StatusLine } from "./StatusLine.vue";
 export type { Tone } from "./tone";
+export { useLoad, type Load, type LoadContext, type LoadOptions } from "./useLoad";
 export { DONE_BEAT_MS, WAIT_VISIBLE_AFTER_MS, useWaitStatus } from "./useWaitStatus";

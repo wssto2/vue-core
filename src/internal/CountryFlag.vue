@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { flagLoaders } from "./flagLoaders";
-import type { PhoneCountry } from "./phone";
 
 /**
- * The flag of a country as an SVG (Windows draws the emoji flags as two letters). Each flag is its own lazy module, loaded
- * when the flag first scrolls into view, so an app downloads the flags a screen shows and not the 250 of the package.
+ * The flag of a country (ISO 3166-1 alpha-2, upper case) as an SVG (Windows draws the emoji flags as two letters). Each flag is
+ * its own lazy module, loaded when the flag first scrolls into view, so an app downloads the flags a screen shows and not the 250
+ * of the package. Shared by the phone field and the shell's language menu; knows nothing of phone numbers.
  */
-const props = defineProps<{ country: PhoneCountry }>();
+const props = defineProps<{ country: string }>();
 
 const holder = useTemplateRef<HTMLElement>("holder");
 const source = shallowRef<string | null>(null);
 const near = ref(typeof IntersectionObserver === "undefined");
 let observer: IntersectionObserver | null = null;
 
-async function load(country: PhoneCountry) {
+async function load(country: string) {
   const loader = flagLoaders[country];
   if (!loader) return void (source.value = null);
   const { default: svg } = await loader();

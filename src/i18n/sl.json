@@ -202,7 +202,8 @@
         "loading": "Nalaganje…",
         "clear": "Počisti",
         "done": "Končano",
-        "failed": "Iskanje ni uspelo. Poskusite znova."
+        "failed": "Iskanje ni uspelo. Poskusite znova.",
+        "load_failed": "Možnosti niso bile naložene."
       },
       "number": {
         "invalid": "Vnesite število."
@@ -327,6 +328,30 @@
         "words": {
           "now": "zdaj"
         }
+      }
+    },
+    "errors": {
+      "unauthenticated": "Niste prijavljeni. Prijavite se.",
+      "forbidden": "Za to dejanje nimate pooblastil.",
+      "not_found": "Zahtevanega zapisa ni mogoče najti.",
+      "conflict": "Zapis je bil spremenjen ali že obstaja. Osvežite stran in poskusite znova.",
+      "rate_limited": "Preveč zahtev v kratkem času. Počakajte minuto in poskusite znova.",
+      "check_fields": "Preverite označena polja.",
+      "offline": "Strežnik ni dosegljiv. Preverite povezavo in poskusite znova.",
+      "cancelled": "Zahteva je bila preklicana.",
+      "unexpected": "Prišlo je do nepričakovane napake. Poskusite znova."
+    },
+    "shortcuts": {
+      "title": "Bližnjice na tipkovnici",
+      "or": "ali",
+      "hint": "Bližnjice ne delujejo med vnosom v polje ali ko je odprto okno.",
+      "show_help": "Prikaži bližnjice",
+      "focus_search": "Išči po seznamu",
+      "open_filters": "Odpri filtre",
+      "groups": {
+        "general": "Splošno",
+        "list": "Seznam",
+        "record": "Zapis"
       }
     }
   }

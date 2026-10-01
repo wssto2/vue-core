@@ -226,6 +226,29 @@
   --app-status-neutral-surface: #F1F3F2;
   --app-status-neutral-solid: #5B6763;
 
+  /* Categories: nine hues for telling things apart (a lead's source, a kind), never for a state. Each is a
+     content / surface pair like the status roles and is checked for text contrast (AA, 4.5:1) in
+     src/state/categoryHues.test.ts. Red, green, orange-brown and sky blue belong to the status roles above,
+     so no hue here borrows them. Not for the brand to change. */
+  --app-category-amber-content: #766202;
+  --app-category-amber-surface: #F6F0DA;
+  --app-category-lime-content: #466E00;
+  --app-category-lime-surface: #EAF5E0;
+  --app-category-teal-content: #057168;
+  --app-category-teal-surface: #DBF7F3;
+  --app-category-cyan-content: #036E7F;
+  --app-category-cyan-surface: #DAF6FC;
+  --app-category-blue-content: #3260B9;
+  --app-category-blue-surface: #E9F1FE;
+  --app-category-indigo-content: #5E57B9;
+  --app-category-indigo-surface: #EEEFFF;
+  --app-category-violet-content: #7D4BAA;
+  --app-category-violet-surface: #F4ECFE;
+  --app-category-fuchsia-content: #9B4089;
+  --app-category-fuchsia-surface: #FEE9F8;
+  --app-category-pink-content: #A73967;
+  --app-category-pink-surface: #FFEAF0;
+
   /* Icon tiles: brand = the application's programmes and primary status icons
      (tile-brand above), anchor = integrations and navigation (also person and
      record avatars), neutral = system and export */
@@ -342,6 +365,25 @@
   --app-status-neutral-surface: #293530;
   --app-status-neutral-solid: #5B6763;
 
+  --app-category-amber-content: #D6BD5C;
+  --app-category-amber-surface: #362D0D;
+  --app-category-lime-content: #A4CD79;
+  --app-category-lime-surface: #253317;
+  --app-category-teal-content: #4CD7C8;
+  --app-category-teal-surface: #053631;
+  --app-category-cyan-content: #4AD2EC;
+  --app-category-cyan-surface: #04343D;
+  --app-category-blue-content: #9BBEFF;
+  --app-category-blue-surface: #202E47;
+  --app-category-indigo-content: #B4B5FF;
+  --app-category-indigo-surface: #2A2A46;
+  --app-category-violet-content: #D1A9FB;
+  --app-category-violet-surface: #342742;
+  --app-category-fuchsia-content: #EEA0DB;
+  --app-category-fuchsia-surface: #3D2437;
+  --app-category-pink-content: #FC9CBD;
+  --app-category-pink-surface: #42232E;
+
   --app-tile-neutral: #4F5B57;
 
   --app-shadow-group: 0 0 0 1px rgb(210 235 226 / 0.04);
@@ -456,6 +498,24 @@
   --color-status-neutral-content: var(--app-status-neutral-content);
   --color-status-neutral-surface: var(--app-status-neutral-surface);
   --color-status-neutral-solid: var(--app-status-neutral-solid);
+  --color-category-amber-content: var(--app-category-amber-content);
+  --color-category-amber-surface: var(--app-category-amber-surface);
+  --color-category-lime-content: var(--app-category-lime-content);
+  --color-category-lime-surface: var(--app-category-lime-surface);
+  --color-category-teal-content: var(--app-category-teal-content);
+  --color-category-teal-surface: var(--app-category-teal-surface);
+  --color-category-cyan-content: var(--app-category-cyan-content);
+  --color-category-cyan-surface: var(--app-category-cyan-surface);
+  --color-category-blue-content: var(--app-category-blue-content);
+  --color-category-blue-surface: var(--app-category-blue-surface);
+  --color-category-indigo-content: var(--app-category-indigo-content);
+  --color-category-indigo-surface: var(--app-category-indigo-surface);
+  --color-category-violet-content: var(--app-category-violet-content);
+  --color-category-violet-surface: var(--app-category-violet-surface);
+  --color-category-fuchsia-content: var(--app-category-fuchsia-content);
+  --color-category-fuchsia-surface: var(--app-category-fuchsia-surface);
+  --color-category-pink-content: var(--app-category-pink-content);
+  --color-category-pink-surface: var(--app-category-pink-surface);
 
   --color-tile-brand: var(--app-tile-brand);
   --color-tile-brand-foreground: var(--app-tile-brand-foreground);

@@ -34,6 +34,8 @@ export const application = createApplication({
   locale: {
     supported: ["hr", "en"],
     fallback: "en",
+    // A flag beside each language's own name in the account menu; a flag stands for a language, so you choose (English is not one country).
+    flags: { en: "GB", hr: "HR" },
     // After a switch committed (not for the start locale, nor a superseded switch): save it on the user.
     onChange: async (locale) => void (await platform.http.put("/profile/locale", { locale })),
   },

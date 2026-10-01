@@ -129,6 +129,64 @@ export const appearanceFeature = defineFeature({
 
 A contribution is mounted once, wherever the shell draws its outlet. Slots are an interface you can extend by declaration merging (`ShellSlots` in `@wssto2/vue-core/app`) when a custom shell offers more places.
 
+## Keyboard shortcuts
+
+`useKeyboardShortcut(shortcut, run)` (from `@wssto2/vue-core/button`) takes an optional `group` and `label` on the shortcut. A labelled shortcut is listed by `useShortcutRegistry()` while its owner is mounted, and the library's own register theirs: `/` and `f` on a list, the arrows and `J` / `K` of the record pager. `ShortcutHelp` is a small "?" dialog over that list; mount it once in the shell's `host` outlet and every page's shortcuts appear in it, grouped (`general`, `list`, `record` are titled by the library, any other group by `core.shortcuts.groups.<group>` in your messages, else by its name).
+
+<!-- example: docs/examples/shell/shortcuts.ts -->
+```ts
+import { defineFeature } from "@wssto2/vue-core/app";
+import { ShortcutHelp } from "@wssto2/vue-core/modal";
+
+// The "?" dialog, mounted once in the shell's `host` outlet: it lists whatever shortcuts the page registered.
+export const shortcutsFeature = defineFeature({
+  id: "shortcuts",
+  contributions: [{ id: "shortcuts.help", slot: "host", component: ShortcutHelp, scope: "authenticated" }],
+});
+```
+
+<!-- example: docs/examples/shell/newTicketKey.ts -->
+```ts
+import { useI18n } from "vue-i18n";
+import { useKeyboardShortcut } from "@wssto2/vue-core/button";
+
+/** Call it from a page's setup: "n" creates a ticket while the page is mounted, and the "?" dialog lists it. */
+export function useNewTicketKey(create: () => void) {
+  const { t } = useI18n();
+  // A shortcut with a `label` is listed while its owner is mounted. `group` is any name you have a heading for
+  // (`core.shortcuts.groups.<group>` in your messages); the library's own are "general", "list" and "record".
+  // Without Ctrl, Alt or Meta it is ignored while the user types in a field; returning false from the handler leaves the key alone.
+  useKeyboardShortcut({ key: "n", group: "tickets", label: () => t("tickets.shortcuts.new") }, () => create());
+}
+```
+
+For a dialog of your own, read the list: `useShortcutRegistry()` gives rows of `{ group, label, keys }` (a `keys` entry is the keycap texts of one way to press it, `["Ctrl", "S"]`, `["⌘", "K"]` on a Mac), reactive to pages and locale. An empty label is not listed.
+
+## Inside a frame
+
+An application that runs in a frame of another page needs two things from the library and keeps its own protocol: a count of open dialogs (the host grows the frame or dims its chrome while any is open) and a place for dialogs that suits the frame. `useOpenDialogCount()` (from `@wssto2/vue-core/overlay`) is the count: a reactive number, nested dialogs included. `modalPlacementKey` (from `@wssto2/vue-core/modal`) is the placement of every `Modal` on wide screens: `{ align: "top", offsetX: -120 }`, given as a ref or getter so it can follow the host (a `Modal`'s own `placement` prop wins per field; phones keep the page sheet). `Toaster` already takes a `position`.
+
+<!-- example: docs/examples/shell/embedded.ts -->
+```ts
+import type { Application } from "@wssto2/vue-core/app";
+import { modalPlacementKey } from "@wssto2/vue-core/modal";
+import { useOpenDialogCount } from "@wssto2/vue-core/overlay";
+import { ref, watch } from "vue";
+
+/** How much of the frame the host page's own sidebar covers; the host tells the application (its message protocol is yours). */
+export const hostSidebarWidth = ref(0);
+
+/** For an application shown inside a frame of another page: two generic hooks, no protocol. Call it before `mount()`. */
+export function installFrameHooks(application: Application, host: Window, hostOrigin: string) {
+  // Dialogs stand near the top (a tall frame has no useful middle) and away from the host's sidebar.
+  application.app.provide(modalPlacementKey, () => ({ align: "top", offsetX: -hostSidebarWidth.value / 2 }));
+
+  // How many dialogs are open: the host can grow the frame or dim its own chrome while any is.
+  const dialogs = useOpenDialogCount();
+  watch(dialogs, (count) => host.postMessage({ type: "dialogs", count }, hostOrigin));
+}
+```
+
 ## A custom shell
 
 A shell is a component plus the list of slots it renders. Compose it from the library's parts (`ShellStage`, `ShellSidebar`, `ShellTopBar`, `NavigationDrawer`, `AccountSheet`, `BottomDock`) and put a `ShellOutlet` at each place you offer; the outlet adds no element, so you wrap it as your layout needs.

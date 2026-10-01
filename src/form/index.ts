@@ -42,6 +42,8 @@ export { groupOptions, matchOptions } from "./options";
 export { recentChoicesKey } from "./suggestions";
 export type { RecentChoices, SuggestionSource, TextSuggestion } from "./suggestions";
 export type { OptionGroup, SelectOption } from "./options";
+export { useOptions } from "./useOptions";
+export type { AsyncOptions, OptionsContext, OptionsSource } from "./useOptions";
 export { default as OtpInput } from "./OtpInput.vue";
 export { default as PhotoField } from "./PhotoField.vue";
 export { default as SegmentedField } from "./SegmentedField.vue";

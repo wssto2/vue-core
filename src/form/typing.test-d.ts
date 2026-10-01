@@ -1,4 +1,5 @@
 // Type fixtures, checked by `npm run typecheck`: a form's fields, values and payload are typed, not stringly.
+import { useOptions, type AsyncOptions } from "./useOptions";
 import { useForm } from "./useForm";
 import { useResourceForm } from "./useResourceForm";
 import type { FormValidator } from "./validation";
@@ -101,3 +102,18 @@ useGroupSheet({
 useGroupSheet({ form: record, group: "general", fields: ["subject", "nope"] });
 // a rebase needs a form that can take a freshly read record as its base
 useGroupSheet({ form: record, group: "general", fields: ["subject"], rebase: { reload: async () => undefined, message: () => "stale" } });
+
+// options that load: the input `for` yields is what `load` receives, and the options' values stay typed
+const models = useOptions({
+  for: () => form.values.priority,
+  load: async (priority, { signal }) => {
+    const asked: number = priority; // never null: a null input asks nothing
+    void asked;
+    void signal;
+    return [{ value: "a3", label: "A3" }] as const;
+  },
+});
+const loaded: AsyncOptions<"a3"> = models;
+void loaded;
+// @ts-expect-error the loader gets the input, not the whole form
+useOptions({ for: () => form.values.priority, load: async (priority: string) => (void priority, []) });

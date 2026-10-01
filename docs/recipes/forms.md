@@ -6,6 +6,7 @@
 |---|---|---|
 | changes **one group of a record** | `FormGroup` + `GroupSheet` + `useGroupSheet` | the sheet, one save, the page has none |
 | **creates** a record, or edits a justified long form | `EditorPage` + `useForm` (or `useResourceForm`) | the page, one coordinated submit in the page chrome |
+| **creates or edits one record** in a dialog (an admin list) | `useCommand` + `CommandDialog`, with `#actions` for "save and add another" | the dialog, one call; create and edit are the same command |
 | **advances, reassigns, approves, re-prices** | `useCommand` + `CommandDialog` (or `AlertDialog`) | one purpose-specific call with its own confirmation |
 | **creates something over several short screens** | `useStepForm` + `StepForm` (in a `Modal` or on a page) | the last step's button, one submit of the whole form |
 
@@ -186,6 +187,62 @@ const assign = useCommand({
 
 Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
 
+### One record in a dialog (create and edit)
+
+An admin list where each row is a small record is a command whose dialog is used twice: **new** (empty, with "Save and add another") and **edit** (filled with the row). It is a recipe, not a component: about thirty lines on `useCommand` and `CommandDialog`, which already bring the discard guard ("Discard changes?" when closing with typed input, however it is dismissed), the "Saving…" then "Saved" beat before the dialog closes, field errors on the fields with focus on the first, and the failure banner. What the feature adds is which endpoint (`editing`), the success toast and the extra action.
+
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:13-29 -->
+```ts
+const editing = ref<Category | null>(null); // null: a new one
+
+// One command for both: create or edit. The dialog brings the discard guard, the "saved" beat, the field errors and the focus.
+const save = useCommand({
+  defaults: () => ({ name: "", active: true }),
+  validator: { safeParse: (input) => ((input as { name: string }).name.trim() === "" ? { success: false, error: { issues: [{ path: ["name"], message: "Enter a name." }] } } : { success: true, data: input as { name: string; active: boolean } }) },
+  run: (input, { idempotencyKey }) => (editing.value ? api.updateCategory(editing.value.id, input, idempotencyKey) : api.createCategory(input, idempotencyKey)),
+  done: () => {
+    toast.success(t("forms.categorySaved"));
+    emit("saved");
+  },
+});
+
+defineExpose({
+  create: () => ((editing.value = null), save.present()),
+  edit: (category: Category) => ((editing.value = category), save.present({ name: category.name, active: category.active })),
+});
+```
+
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:33-41 -->
+```vue
+  <CommandDialog :command="save" :title="editing ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')">
+    <FormGroup>
+      <TextField v-bind="save.form.bind('name')" :label="t('forms.name')" required />
+      <SwitchField v-bind="save.form.bind('active')" :label="t('forms.active')" />
+    </FormGroup>
+    <template v-if="!editing" #actions="{ run, busy }">
+      <Button :disabled="busy" @click="run({ addAnother: true })">{{ t("forms.saveAndAddAnother") }}</Button>
+    </template>
+  </CommandDialog>
+```
+
+- `create()` and `edit(row)` are what the page calls (`dialog.value?.create()`); `present(initial)` starts from the defaults with what is known laid over them, so an edit never shows what the last dialog left. A record that must be read first (`api.get(id)`) is read by the page, which then calls `edit(record)`.
+- `done` runs after the call went through: the toast and telling the page to reload.
+- The `#actions` slot gets `run` and `busy`. `run({ addAnother: true })` saves exactly like the primary action, calls `done` (so the toast shows), then opens the dialog again with the defaults and focus on the first field, instead of closing. Render the button only for a new record (`v-if="!editing"`); it takes no part in the discard guard because the fresh form is not dirty. A refused save (a field error) behaves as with the primary action: nothing is cleared.
+- Read-only users do not get the button that calls `create()`/`edit()` (`access.can`), not a disabled dialog.
+
+Used from a list, which is the page's own:
+
+<!-- example: docs/examples/forms/views/Categories.vue:13-19 -->
+```vue
+
+<template>
+  <Button prominence="primary" @click="dialog?.create()">{{ t("forms.newCategory") }}</Button>
+  <ul>
+    <li v-for="category in categories" :key="category.id"><Button prominence="link" @click="dialog?.edit(category)">{{ category.name }}</Button></li>
+  </ul>
+  <CategoryDialog ref="dialog" @saved="emit('changed')" />
+```
+
 ## 4. Step-by-step forms
 
 A form in steps is still **one `useForm`**: the steps only decide which fields are on screen and when each is checked. Use it when the user does one thing in a few short screens (a lead in three steps, an appraisal that asks a question at a time), not for a long form that wants sections (that is `EditorPage`) and not for work done over days in any order (that is a record whose sections are workflow steps, see the [record page recipe](record-page.md)).
@@ -297,6 +354,44 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
 - Dates, times and months are [their own fields](#dates-and-times): typed first, a calendar when you would rather pick. None of them has a `Date` value.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
+
+## Options that load
+
+A select whose options come from the server (the queues of the chosen category, the models of a make) takes a `useOptions` where it takes a list. The state is typed (`idle`, `loading`, `loaded`, `failed`) and the field does the rest.
+
+<!-- example: docs/examples/forms/components/RoutingFields.vue:10-12 -->
+```ts
+// The queues load from the category: the latest category wins, and a queue the new category does not have is cleared.
+const categories = useOptions({ load: ({ signal }) => api.categories(signal) });
+const queues = useOptions({ for: () => form.values.category, load: (category, { signal }) => api.queues(category, signal) });
+```
+
+<!-- example: docs/examples/forms/components/RoutingFields.vue:17-18 -->
+```vue
+    <SelectField v-bind="form.bind('category')" :label="t('forms.category')" :options="categories" />
+    <SelectField v-bind="form.bind('queue')" :label="t('forms.queue')" :options="queues" :disabled="form.values.category === null" />
+```
+
+- `for` is a getter of the input the options depend on. `null` or `undefined` asks nothing (the list is empty, `idle`: also set `:disabled`); any other value asks, again whenever it changes. Without `for` the options load once.
+- **Latest input wins.** An answer for an older input is ignored, even if it arrives last, and its request is aborted through the `signal` you pass on to `fetch`/the client. This is the same rule as suggestions while typing (`ComboField`), from the same code.
+- **While it loads** the field stays visible with its label and its value and shows a small spinner in place of the arrows (`aria-busy`). Opened, the list says "Loading…". On a phone the sheet shows the same.
+- **When it fails** the list says the options could not be loaded and has a "Try again" row (`options.reload()`).
+- **A value the options of another input do not contain is cleared** (the field emits `null`, or for `MultiSelectField` drops the missing values), so a queue never stays selected for a category that does not have it. It happens only when options land after the input changed (the user picked another category). The first load never clears and neither does a reload of the same input: a record's saved queue that the list no longer offers (an inactive one) stays selected, and saving does not silently change it.
+- **The label of a saved value** comes with `:selected` (the same prop as `ComboField`: an option, or an array of them for `MultiSelectField`): `<SelectField :options="queues" :selected="{ value: ticket.queueId, label: ticket.queueName }" />`. The field shows it while the options load and when they do not contain the value; without it a value the options do not know shows "Choose…" (but is kept). An option in the answer wins over `selected`.
+- A select of a few options that load once and are shared by several fields can pass the same `useOptions` to each.
+- Searching a long list is `ComboField :search`, not a select.
+
+The desktop list is a popover that is never clipped by a dialog or a scrolling panel, and is at least as wide as the field (never narrower than its own minimum). Phones get the bottom sheet.
+
+### Numbers without a thousands separator
+
+A year, a code or a coordinate is a number that must not read "2.024". `:grouping="false"` writes none, shown or typed, and then a `.` or `,` the user types is always the decimal mark (with grouping on, `1.000` in Croatian is a thousand).
+
+<!-- example: docs/examples/forms/components/RoutingFields.vue:19-20 -->
+```vue
+    <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="6" negative :grouping="false" />
+    <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="6" negative :grouping="false" />
+```
 
 ## Dates and times
 

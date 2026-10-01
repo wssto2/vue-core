@@ -202,7 +202,8 @@
         "loading": "Loading…",
         "clear": "Clear",
         "done": "Done",
-        "failed": "The search failed. Try again."
+        "failed": "The search failed. Try again.",
+        "load_failed": "The options could not be loaded."
       },
       "number": {
         "invalid": "Enter a number."
@@ -327,6 +328,30 @@
         "words": {
           "now": "now"
         }
+      }
+    },
+    "errors": {
+      "unauthenticated": "You are not signed in. Please sign in.",
+      "forbidden": "You are not authorized to perform this action.",
+      "not_found": "The record could not be found.",
+      "conflict": "The record changed or already exists. Reload and try again.",
+      "rate_limited": "Too many requests in a short time. Wait a minute and try again.",
+      "check_fields": "Check the marked fields.",
+      "offline": "The server could not be reached. Check your connection and try again.",
+      "cancelled": "The request was cancelled.",
+      "unexpected": "An unexpected error occurred. Please try again."
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "or": "or",
+      "hint": "Shortcuts are off while you type in a field or a dialog is open.",
+      "show_help": "Show shortcuts",
+      "focus_search": "Search the list",
+      "open_filters": "Open filters",
+      "groups": {
+        "general": "General",
+        "list": "List",
+        "record": "Record"
       }
     }
   }
