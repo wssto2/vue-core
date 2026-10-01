@@ -98,7 +98,7 @@ const placement = computed<ModalPlacement>(() => ({ align: top.value ? "top" : "
 
     <section class="flex flex-col gap-3">
       <h2 class="text-headline font-semibold">Framed-app hooks</h2>
-      <p class="text-body">Open dialogs: <strong data-test="dialog-count">{{ dialogs }}</strong></p>
+      <p class="text-body">Open dialogs: <strong>{{ dialogs }}</strong></p>
       <label class="flex items-center gap-2"><input v-model="top" type="checkbox" /> top-aligned</label>
       <label class="flex items-center gap-2"><input v-model="offset" type="checkbox" /> shifted 120 px left</label>
       <div><Button prominence="primary" @click="modal?.present()">Open a modal</Button></div>
