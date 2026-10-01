@@ -10,7 +10,8 @@ import { useControlSurface } from "./control";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps } from "./field";
 import OptionList from "./OptionList.vue";
-import type { SelectOption } from "./options";
+import type { OptionsSource } from "./useOptions";
+import { useOptionSource } from "./useOptions";
 
 /**
  * One choice from a list. The value is the chosen option's `value`, or `null` for none: a value of `0` or `""`
@@ -21,10 +22,16 @@ import type { SelectOption } from "./options";
  *
  * On wide screens the options open in a popover; on phones and touch screens in a bottom sheet. Lists of nine
  * or more get a search box. `clearable` adds a way back to "no value".
+ *
+ * Options from the server (`useOptions`, say the models of the chosen make) work the same way: the field keeps its label and
+ * value and shows a spinner while they load, the opened list says "Loading…" or offers "Try again", and a value the new options
+ * do not contain is cleared.
+ *
+ *   <SelectField v-bind="form.bind('model')" :label="t('model')" :options="models" />
  */
 const props = withDefaults(
   defineProps<FieldProps & {
-    options: readonly SelectOption<Value>[];
+    options: OptionsSource<Value>;
     placeholder?: string;
     clearable?: boolean;
     /** Shows the search box from this many options. */
@@ -40,7 +47,10 @@ const inRow = !!useFormGroup();
 const sheet = useTemplateRef<{ present: () => void; dismiss: () => void }>("sheet");
 const sheetOpen = ref(false);
 
-const selected = computed(() => props.options.find((option) => option.value === model.value) ?? null);
+const choices = useOptionSource(() => props.options, (arrived) => {
+  if (model.value !== null && !arrived.some((option) => option.value === model.value)) model.value = null;
+});
+const selected = computed(() => choices.known.value.find((option) => option.value === model.value) ?? null);
 const placeholder = computed(() => props.placeholder ?? t("core.form.select.choose"));
 const surface = useControlSurface("popup", () => (props.error ? "error" : props.disabled ? "locked" : "rest"));
 
@@ -60,29 +70,29 @@ const triggerClass = computed(() => [
   <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="selected?.label ?? null">
     <div class="inline-flex max-w-full min-w-0" :class="surface">
       <button v-if="compact" :id="id" type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="sheetOpen" :aria-required="props.required || undefined"
-        :aria-invalid="invalid || undefined" :aria-describedby="describedby" :class="triggerClass" @click="sheet?.present()">
+        :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="sheet?.present()">
         <span class="min-w-0 truncate" :class="selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
-        <Icon name="expandUpDownLine" :size="14" class="shrink-0 text-content-muted" />
+        <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
       </button>
       <Popover v-else :label="props.label ?? placeholder" width="md" placement="bottom-start" :arrow="false">
         <template #trigger="{ toggle, attrs }">
           <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined"
-            :aria-describedby="describedby" :class="triggerClass" @click="toggle">
+            :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="toggle">
             <span class="min-w-0 truncate" :class="selected ? 'text-content-strong' : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
-            <Icon name="expandUpDownLine" :size="14" class="shrink-0 text-content-muted" />
+            <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
           </button>
         </template>
         <template #default="{ dismiss }">
           <div class="max-h-72 overflow-y-auto">
-            <OptionList :options="props.options" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" presentation="plain"
-              @select="(value) => { model = value; dismiss(); }" />
+            <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" presentation="plain"
+              @select="(value) => { model = value; dismiss(); }" @retry="choices.reload()" />
           </div>
         </template>
       </Popover>
     </div>
 
     <Sheet v-if="compact" ref="sheet" :title="props.label ?? placeholder" grouped @presented="sheetOpen = true" @dismissed="sheetOpen = false">
-      <OptionList :options="props.options" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" @select="pick" />
+      <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" @select="pick" @retry="choices.reload()" />
       <template v-if="props.clearable && model !== null" #footer>
         <Button prominence="plain" @click="pick(null)">{{ t("core.form.select.clear") }}</Button>
       </template>

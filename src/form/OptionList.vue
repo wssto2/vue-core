@@ -1,8 +1,9 @@
 <script setup lang="ts" generic="Value extends string | number">
-import { computed, ref, useId, useTemplateRef } from "vue";
+import { computed, nextTick, ref, useId, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
 import { groupOptions, matchOptions, type SelectOption } from "./options";
+import type { SuggestionStatus } from "./suggestions";
 
 /**
  * The options of a select as a list to pick from, with a search box once there are many: finger-height rows, a
@@ -12,6 +13,9 @@ import { groupOptions, matchOptions, type SelectOption } from "./options";
  *   <OptionList :options="statuses" :model-value="status" @select="status = $event" />
  *
  * Single: picking emits the value. `multiple`: rows toggle and emit the toggled value.
+ *
+ * A list that loads (`useOptions`) passes its `status`: while `loading` the list says so instead of listing, and `failed` says
+ * so with a "Try again" row (`@retry`).
  */
 const props = withDefaults(defineProps<{
   options: readonly SelectOption<Value>[];
@@ -24,9 +28,11 @@ const props = withDefaults(defineProps<{
   noneLabel?: string;
   /** `grouped` lists sit on the canvas of a sheet; `plain` in a popover. */
   presentation?: "grouped" | "plain";
-}>(), { modelValue: null, multiple: false, searchFrom: 9, noneLabel: undefined, presentation: "grouped" });
+  /** Where the options are in loading; anything but `loaded` and `idle` replaces the rows with a line saying so. */
+  status?: SuggestionStatus;
+}>(), { modelValue: null, multiple: false, searchFrom: 9, noneLabel: undefined, presentation: "grouped", status: "loaded" });
 
-const emit = defineEmits<{ select: [value: Value | null] }>();
+const emit = defineEmits<{ select: [value: Value | null]; retry: [] }>();
 
 const { t } = useI18n();
 const query = ref("");
@@ -52,6 +58,18 @@ function move(event: KeyboardEvent) {
 }
 
 const grouped = computed(() => props.presentation === "grouped");
+const loading = computed(() => props.status === "loading");
+const failed = computed(() => props.status === "failed");
+
+// A list opened while it loads has nothing to focus yet: when the answer lands, the keyboard moves in (unless the user already went somewhere in it).
+watch(() => props.status, (status, before) => {
+  if (before !== "loading" || status === "loading") return;
+  void nextTick(() => {
+    const active = document.activeElement;
+    const outside = !active || active === document.body || (active.getAttribute("role") === "dialog" && !!root.value && active.contains(root.value));
+    if (outside) root.value?.querySelector<HTMLElement>("[data-option-search], [data-option]:not([disabled])")?.focus({ preventScroll: true });
+  });
+});
 </script>
 
 <template>
@@ -64,7 +82,7 @@ const grouped = computed(() => props.presentation === "grouped");
       </label>
     </div>
 
-    <ul class="flex flex-col" :class="grouped ? 'gap-group-gap' : 'gap-2'" role="listbox" :aria-multiselectable="props.multiple || undefined">
+    <ul class="flex flex-col" :class="grouped ? 'gap-group-gap' : 'gap-2'" role="listbox" :aria-multiselectable="props.multiple || undefined" :aria-busy="loading || undefined">
       <li v-if="props.noneLabel && query === ''" role="presentation">
         <ul role="group" :class="grouped ? 'rounded-group bg-surface-cell shadow-group' : ''">
           <li role="option" :aria-selected="nothingChosen">
@@ -75,6 +93,17 @@ const grouped = computed(() => props.presentation === "grouped");
             </button>
           </li>
         </ul>
+      </li>
+
+      <li v-if="loading" role="presentation" class="flex items-center gap-2.5 px-row-inset py-4 text-subheadline text-content-muted" data-test="options-loading">
+        <Icon name="loader4Line" :size="16" class="shrink-0 animate-spin text-content-link" />
+        <span role="status">{{ t("core.form.select.loading") }}</span>
+      </li>
+      <li v-else-if="failed" role="presentation" class="flex flex-col items-start gap-1 px-row-inset py-3" data-test="options-failed">
+        <span role="alert" class="text-subheadline text-content-destructive">{{ t("core.form.select.load_failed") }}</span>
+        <button type="button" data-option data-test="options-retry" class="-ml-2 cursor-pointer rounded-control px-2 py-1 text-subheadline font-medium text-content-link hover:bg-fill focus-visible:bg-fill focus-visible:outline-none" @click="emit('retry')">
+          {{ t("core.actions.retry") }}
+        </button>
       </li>
 
       <li v-for="(section, sectionIndex) in visible" :key="section.title ?? sectionIndex" role="presentation">
@@ -99,7 +128,7 @@ const grouped = computed(() => props.presentation === "grouped");
         </ul>
       </li>
 
-      <li v-if="visible.length === 0" class="px-4 py-6 text-center text-subheadline text-content-muted">{{ t("core.form.select.no_matches") }}</li>
+      <li v-if="visible.length === 0 && !loading && !failed" class="px-4 py-6 text-center text-subheadline text-content-muted">{{ t("core.form.select.no_matches") }}</li>
     </ul>
   </div>
 </template>

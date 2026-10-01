@@ -202,7 +202,8 @@
         "loading": "Učitavanje…",
         "clear": "Očisti",
         "done": "Gotovo",
-        "failed": "Pretraga nije uspjela. Pokušajte ponovno."
+        "failed": "Pretraga nije uspjela. Pokušajte ponovno.",
+        "load_failed": "Opcije nisu učitane."
       },
       "number": {
         "invalid": "Unesite broj."

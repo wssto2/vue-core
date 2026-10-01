@@ -202,7 +202,8 @@
         "loading": "Nalaganje…",
         "clear": "Počisti",
         "done": "Končano",
-        "failed": "Iskanje ni uspelo. Poskusite znova."
+        "failed": "Iskanje ni uspelo. Poskusite znova.",
+        "load_failed": "Možnosti niso bile naložene."
       },
       "number": {
         "invalid": "Vnesite število."
