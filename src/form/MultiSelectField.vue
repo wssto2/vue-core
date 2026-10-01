@@ -63,7 +63,7 @@ const trigger = "inline-flex min-h-7 cursor-pointer items-center gap-1 rounded-c
         <Icon v-if="choices.loading.value" name="loader4Line" :size="14" class="shrink-0 animate-spin" />
         {{ chosen.length ? t("core.actions.edit") : placeholder }}
       </button>
-      <Popover v-else :label="props.label ?? placeholder" width="md" placement="bottom-start" :arrow="false">
+      <Popover v-else :label="props.label ?? placeholder" width="md" match-trigger-width placement="bottom-start" :arrow="false">
         <template #trigger="{ toggle: open, attrs }">
           <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="trigger" @click="open">
             <Icon v-if="choices.loading.value" name="loader4Line" :size="14" class="shrink-0 animate-spin" />

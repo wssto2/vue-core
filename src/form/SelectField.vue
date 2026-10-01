@@ -74,7 +74,7 @@ const triggerClass = computed(() => [
         <span class="min-w-0 truncate" :class="selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
         <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
       </button>
-      <Popover v-else :label="props.label ?? placeholder" width="md" placement="bottom-start" :arrow="false">
+      <Popover v-else :label="props.label ?? placeholder" width="md" match-trigger-width placement="bottom-start" :arrow="false">
         <template #trigger="{ toggle, attrs }">
           <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined"
             :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="toggle">

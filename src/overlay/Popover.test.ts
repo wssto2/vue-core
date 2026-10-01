@@ -164,4 +164,20 @@ describe("Popover", () => {
     await toggle();
     expect(screen.getByRole("dialog").className).toContain("w-56");
   });
+
+  it("matchTriggerWidth makes the panel at least as wide as its trigger on wide screens, and leaves a narrow trigger at the panel's own width", async () => {
+    const measure = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({ width: 420, height: 30, x: 0, y: 0, top: 0, left: 0, right: 420, bottom: 30, toJSON: () => ({}) });
+    mountPopover('width="md" match-trigger-width');
+    await toggle();
+    await vi.waitFor(() => expect(screen.getByRole("dialog").style.minWidth).toBe("420px"));
+    expect(screen.getByRole("dialog").className).toContain("w-72"); // a field narrower than that keeps the width it had
+    measure.mockRestore();
+  });
+
+  it("has no minimum width unless asked", async () => {
+    mountPopover('width="md"');
+    await toggle();
+    await settle();
+    expect(screen.getByRole("dialog").style.minWidth).toBe("");
+  });
 });
