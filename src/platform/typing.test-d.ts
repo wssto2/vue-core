@@ -2,7 +2,7 @@
 // `@ts-expect-error` line must fail to. Nothing here runs.
 import { createApp } from "vue";
 import { createHttpClient, type ApiErrorKind, type HttpClient, type Transport } from "../client";
-import { createPlatform, defineFeatureContext, httpSessionAdapter, parseBootstrap, type AccessClient, type SessionAdapter } from "./index";
+import { createPlatform, defineFeatureContext, type AccessGateProps, httpSessionAdapter, parseBootstrap, type AccessClient, type SessionAdapter } from "./index";
 
 const config = parseBootstrap({ locale: "hr", country: "HR" }, (fields) => ({ country: fields.string("country") }));
 
@@ -100,3 +100,11 @@ app.provide(TICKETS, { api: 1 });
 export const loaded: Promise<string> = useTickets().api.load(1);
 // @ts-expect-error the context has no such member
 void useTickets().missing;
+
+// --- the access gate takes exactly one requirement
+export const oneGate: AccessGateProps = { permission: "tickets:view" };
+export const anyGate: AccessGateProps = { any: ["a", "b"] };
+// @ts-expect-error two requirements at once are rejected
+export const twoGates: AccessGateProps = { permission: "a", all: ["b"] };
+// @ts-expect-error no requirement is rejected
+export const noGate: AccessGateProps = {};
