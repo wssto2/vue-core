@@ -13,12 +13,16 @@ export type CellSlots<Row, Col extends Column<Row>> = {
   }) => unknown;
 };
 
-/** Every slot of a collection table, and so of `ListPage`, which forwards them. */
-export type CollectionSlots<Row, Col extends Column<Row>> = CellSlots<Row, Col> & {
+/** The slots of the rows themselves: what `DataTable` and, with the page's own, `CollectionTable` offer. */
+export type RowsSlots<Row, Col extends Column<Row>> = CellSlots<Row, Col> & {
   /** A mark that leads the record's identity (an avatar, a tile). Phone rows show it across both lines. */
   leading?: (scope: { item: Row; compact: boolean }) => unknown;
-  /** Replaces the desktop actions cell (the link to the record and the More button). */
+  /** Replaces the desktop actions cell (the link to the record and the More button): a `RowActions` row of buttons. */
   actions?: (scope: { item: Row }) => unknown;
+};
+
+/** Every slot of a collection table, and so of `ListPage`, which forwards them. */
+export type CollectionSlots<Row, Col extends Column<Row>> = RowsSlots<Row, Col> & {
   /** Page controls in the toolbar, after the filters. */
   toolbar?: () => unknown;
   /** What an empty list shows when nothing exists yet (no search or filter applies): a first use that teaches. */

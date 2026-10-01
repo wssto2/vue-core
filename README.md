@@ -174,7 +174,16 @@ Its texts are JSON files under the feature, loaded the first time one of its rou
   "open": "Open",
   "closed": "Closed",
   "record": "Ticket",
-  "details": "Details"
+  "details": "Details",
+  "history": "History",
+  "history_empty": "Nothing has happened yet.",
+  "when": "When",
+  "kind": "Kind",
+  "author": "Author",
+  "note": "Note",
+  "comment": "Comment",
+  "change": "Status change",
+  "remove": "Remove"
 }
 ```
 

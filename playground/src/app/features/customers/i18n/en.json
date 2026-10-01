@@ -12,5 +12,21 @@
   "details": "View details",
   "record": "Customer {id}",
   "back": "Customers",
-  "failed": "The customer could not be loaded."
+  "failed": "The customer could not be loaded.",
+  "activity": {
+    "title": "Activity",
+    "when": "When",
+    "kind": "Kind",
+    "by": "By",
+    "note": "Note",
+    "amount": "Amount",
+    "call": "Call",
+    "visit": "Visit",
+    "offer": "Offer",
+    "remove": "Remove",
+    "empty": "No activity yet.",
+    "show_all": "Rows",
+    "show_none": "Empty",
+    "show_loading": "Loading"
+  }
 }

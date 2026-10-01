@@ -100,6 +100,9 @@ export type Column<Row, Sort extends string = string> = ColumnCommon<Row, Sort> 
  */
 export type CollectionColumns<Row, Sort extends string = string> = readonly Column<Row, Sort>[];
 
+/** The columns of a `DataTable`: the collection's, without a `sort` key (a table over an array keeps its order). */
+export type TableColumns<Row> = readonly Column<Row, never>[];
+
 /** A quick action of a row: swiped in on phones (links only) and listed in the row's context menu. */
 export interface RowAction {
   key: string;

@@ -9,5 +9,14 @@
   "open": "Otvoren",
   "closed": "Zatvoren",
   "record": "Tiket",
-  "details": "Detalji"
+  "details": "Detalji",
+  "history": "Povijest",
+  "history_empty": "Još se ništa nije dogodilo.",
+  "when": "Kada",
+  "kind": "Vrsta",
+  "author": "Autor",
+  "note": "Bilješka",
+  "comment": "Komentar",
+  "change": "Promjena statusa",
+  "remove": "Ukloni"
 }

@@ -5,7 +5,7 @@ export type { Collection, CollectionDisplay, LinkedQuery, SavedViewsHandle, UseC
 export type { CollectionLoader, ListPage, CollectionQuery, CollectionStateSource, LoadContext, SortDirection } from "./types";
 export { httpList, listParams, readListPage } from "./http";
 export { LIST_CONTEXT_PARAM } from "./location";
-export type { CollectionColumns, Column, ColumnKey, ColumnKind, ColumnValue, MobileRole, RowAction, SlotKey } from "./columns";
+export type { CollectionColumns, Column, ColumnKey, ColumnKind, ColumnValue, MobileRole, RowAction, SlotKey, TableColumns } from "./columns";
 export type { FilterDescriptor, FilterOption, ViewDescriptor } from "./filters";
 export { useCollectionNeighbors } from "./neighbors";
 export type { CollectionNeighbors, Neighbor, NeighborOptions } from "./neighbors";
@@ -14,6 +14,8 @@ export type { SavedView, SavedViews, SavedViewState } from "./savedViews";
 export { default as CollectionPage } from "./CollectionPage.vue";
 export { default as CollectionTable } from "./CollectionTable.vue";
 export { default as CollectionCell } from "./CollectionCell.vue";
+export { default as DataTable } from "./DataTable.vue";
+export { default as RowActions } from "./RowActions.vue";
 export { default as RecordIdentity } from "./RecordIdentity.vue";
 export { DATE_PRESETS, useDatePresetFilter } from "./datePresets";
-export type { CellSlots, CollectionSlots } from "./slots";
+export type { CellSlots, CollectionSlots, RowsSlots } from "./slots";

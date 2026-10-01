@@ -3,6 +3,7 @@ import { useCollectionNeighbors } from "@wssto2/vue-core/collection";
 import { ResourcePage, useRouteResource } from "@wssto2/vue-core/resource";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import CustomerActivity from "../components/CustomerActivity.vue";
 import { useCustomers } from "../context";
 import { customerRoutes } from "../routes";
 
@@ -27,6 +28,7 @@ const title = computed(() => {
         <dt class="text-content-muted">{{ t("customers.city") }}</dt><dd>{{ record.city }}</dd>
         <dt class="text-content-muted">E-mail</dt><dd>{{ record.email }}</dd>
       </dl>
+      <CustomerActivity :customer-id="record.id" class="mt-6" />
     </template>
   </ResourcePage>
 </template>

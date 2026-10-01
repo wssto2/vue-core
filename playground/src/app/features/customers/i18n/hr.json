@@ -12,5 +12,21 @@
   "details": "Prikaži detalje",
   "record": "Kupac {id}",
   "back": "Kupci",
-  "failed": "Kupca nije moguće učitati."
+  "failed": "Kupca nije moguće učitati.",
+  "activity": {
+    "title": "Aktivnosti",
+    "when": "Kada",
+    "kind": "Vrsta",
+    "by": "Tko",
+    "note": "Bilješka",
+    "amount": "Iznos",
+    "call": "Poziv",
+    "visit": "Posjet",
+    "offer": "Ponuda",
+    "remove": "Ukloni",
+    "empty": "Još nema aktivnosti.",
+    "show_all": "Redovi",
+    "show_none": "Prazno",
+    "show_loading": "Učitavanje"
+  }
 }
