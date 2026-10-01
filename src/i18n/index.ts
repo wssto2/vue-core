@@ -61,6 +61,17 @@ export type CoreMessages = {
       title: string;
       body: string;
     };
+    errors: {
+      unauthenticated: string;
+      forbidden: string;
+      not_found: string;
+      conflict: string;
+      rate_limited: string;
+      check_fields: string;
+      offline: string;
+      cancelled: string;
+      unexpected: string;
+    };
     startup: {
       title: string;
       session: string;
@@ -88,3 +99,5 @@ export { localeMessages } from "./messages";
 export type { LocaleMessagesOptions, MessageLoader, MessageNamespace, Messages } from "./messages";
 export { createMessageRuntime } from "./runtime";
 export type { MessageFailure, MessageRuntime, MessageRuntimeOptions, MessageTarget } from "./runtime";
+export { useDescribeError } from "./describeError";
+export type { DescribeError, DescribeErrorOptions } from "./describeError";

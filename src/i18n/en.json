@@ -328,6 +328,17 @@
           "now": "now"
         }
       }
+    },
+    "errors": {
+      "unauthenticated": "You are not signed in. Please sign in.",
+      "forbidden": "You are not authorized to perform this action.",
+      "not_found": "The record could not be found.",
+      "conflict": "The record changed or already exists. Reload and try again.",
+      "rate_limited": "Too many requests in a short time. Wait a minute and try again.",
+      "check_fields": "Check the marked fields.",
+      "offline": "The server could not be reached. Check your connection and try again.",
+      "cancelled": "The request was cancelled.",
+      "unexpected": "An unexpected error occurred. Please try again."
     }
   }
 }
