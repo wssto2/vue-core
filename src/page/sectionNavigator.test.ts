@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/vue";
+import { fireEvent, render, screen } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
 import { defineComponent, h, nextTick, ref, shallowRef } from "vue";
 import { createI18n } from "vue-i18n";
@@ -295,5 +295,82 @@ describe("SectionNavigator nested pages", () => {
     page.unmount();
     await nextTick();
     expect(page.back.value).toBeNull();
+  });
+});
+
+describe("SectionNavigator as a workflow's steps", () => {
+  const steps = {
+    "record.general": { done: true, sub: "12 400 €" },
+    "record.notes": { done: false, sub: "Missing: market comparison", shortSub: "Missing data", tone: "warning" as const },
+  };
+  const tile = (name: string) => document.querySelector<HTMLElement>(`[data-test="section-${name}"]`)!;
+
+  it.each([true, false])("shows large tiles in order on every width (wide: %s), the shown one marked", async (wide) => {
+    const page = await mountRecord(wide, { props: { steps } });
+    expect(page.navigator()?.dataset.variant).toBe("steps");
+    expect(document.querySelectorAll('[data-test="section-steps"] li')).toHaveLength(3);
+    expect(tile("record.notes").getAttribute("aria-current")).toBeNull();
+    expect(tile("record.general").getAttribute("aria-current")).toBe("step");
+    expect(tile("record.general").className).toContain("bg-tint-soft");
+    expect(page.content()).toBe("general content");
+  });
+
+  it("shows ✓ and a screen-reader note on a done step, its number on the others", async () => {
+    await mountRecord(true, { props: { steps } });
+    expect(tile("record.general").getAttribute("data-done")).toBe("true");
+    expect(tile("record.general").textContent).toContain("done");
+    expect(tile("record.general").querySelector("svg")).not.toBeNull();
+    expect(tile("record.notes").textContent).toMatch(/^2/);
+    expect(tile("record.audit").textContent).toMatch(/^3/);
+    expect(tile("record.audit").getAttribute("data-done")).toBeNull();
+  });
+
+  it("says in one line where a step stands, in its tone, with a shorter line for phones; a step without a state has none", async () => {
+    await mountRecord(true, { props: { steps } });
+    const sub = tile("record.notes").querySelector('[data-test="section-step-sub"]')!;
+    expect(sub.className).toContain("text-status-warning-content");
+    const [full, short] = sub.querySelectorAll("span");
+    expect(full!.textContent).toBe("Missing: market comparison");
+    expect(full!.className).toContain("compact:hidden");
+    expect(short!.textContent).toBe("Missing data");
+    expect(tile("record.general").querySelector('[data-test="section-step-sub"]')!.className).toContain("text-content-muted");
+    expect(tile("record.audit").querySelector('[data-test="section-step-sub"]')).toBeNull();
+  });
+
+  it("gives the tone of each state", async () => {
+    await mountRecord(true, { props: { steps: { "record.general": { done: true, sub: "ok", tone: "positive" }, "record.notes": { done: false, sub: "late", tone: "critical" } } } });
+    expect(tile("record.general").querySelector('[data-test="section-step-sub"]')!.className).toContain("text-status-success-content");
+    expect(tile("record.notes").querySelector('[data-test="section-step-sub"]')!.className).toContain("text-status-danger-content");
+  });
+
+  it("uses the short label on phones and the full one beside it", async () => {
+    await mountRecord(false, { props: { steps } });
+    const label = tile("record.general").querySelector("span.truncate")!;
+    expect([...label.querySelectorAll("span")].map((part) => part.textContent)).toEqual(["General data", "General"]);
+  });
+
+  it("the steps are links in any order: choosing one opens its section", async () => {
+    const page = await mountRecord(true, { props: { steps } });
+    await fireEvent.click(tile("record.audit"));
+    await settle();
+    expect(page.router.currentRoute.value.name).toBe("record.audit");
+    expect(page.content()).toBe("audit content");
+    expect(tile("record.audit").getAttribute("aria-current")).toBe("step");
+  });
+
+  it("lists the sections of a long form inside a step beside it on wide screens only", async () => {
+    await mountRecord(true, { props: { steps }, path: "/records/3/notes" });
+    const form = document.querySelector('[data-test="section-steps-form"]')!;
+    expect([...form.querySelectorAll('aside [data-test="section-list"] a')].map((link) => link.textContent?.trim())).toEqual(["Identification", "Contact", "Equipment"]);
+    expect(form.querySelector("[data-test='section-list']")!.closest("nav")).not.toBeNull();
+    document.body.innerHTML = "";
+    await mountRecord(false, { props: { steps }, path: "/records/3/notes" });
+    expect(document.querySelector('[data-test="section-steps-form"]')).toBeNull();
+  });
+
+  it("has no aside beside a step without sections of its own", async () => {
+    await mountRecord(true, { props: { steps } });
+    expect(document.querySelector('[data-test="section-steps-form"]')).toBeNull();
+    expect(document.querySelectorAll("aside")).toHaveLength(0);
   });
 });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { IconTile } from "../controls";
 import { Icon } from "../icon";
@@ -10,6 +11,7 @@ import { pageSectionBackKey } from "./sectionBack";
 import { provideSectionIndex } from "./sectionIndex";
 import SectionJumper from "./SectionJumper.vue";
 import SectionList from "./SectionList.vue";
+import type { SectionStep } from "./types";
 
 /**
  * The sections of a record page, from its child routes' `meta.section` (see `useRouteSections`): one
@@ -28,6 +30,16 @@ import SectionList from "./SectionList.vue";
  * | compact | `compact="rows"` | drill-in rows at the top of the first section; every other section goes back to it |
  * | compact | `compact="auto"` | segmented up to five sections, rows beyond |
  *
+ * `steps` makes the record a workflow instead: the sections are large tiles in order, on every width (the `desktop` and `compact` variants
+ * do not apply). Each tile is the section's link with its number (a ✓ once done), its label (short on phones), one line saying where the step
+ * stands, in a tone, and the shown step tinted. They are links in any order, not a wizard: the work goes on over days, by several people.
+ * A long form inside a step lists its own sections beside it on wide screens.
+ *
+ *   <SectionNavigator :label="t('appraisal.steps')" :steps="{
+ *     'appraisal.valuation': { done: true, sub: '12 400 €' },
+ *     'appraisal.report': { done: false, sub: 'Missing: market comparison', shortSub: 'Missing data', tone: 'warning' },
+ *   }" />
+ *
  * `#summary` sits above the links in the same sidebar (wide) and before the links (compact): one
  * sidebar, never a second one next to it. A page inside a section (`meta.sectionParent`) keeps the section
  * active and gets a back to it on every width. One section renders no navigation. A record whose
@@ -44,11 +56,14 @@ const props = withDefaults(defineProps<{
   backLabel?: string;
   /** A quiet count per section route name ("Locations 4"). */
   counts?: Readonly<Record<string, string | number>>;
+  /** The record is a workflow: each section route's state, as tiles (see above). A section without an entry is not done and has no line. */
+  steps?: Readonly<Record<string, SectionStep>>;
 }>(), {
   desktop: "segments",
   compact: "segmented",
   backLabel: undefined,
   counts: () => ({}),
+  steps: undefined,
 });
 
 defineSlots<{
@@ -57,6 +72,7 @@ defineSlots<{
   summary?: () => unknown;
 }>();
 
+const { t } = useI18n();
 const state = useRouteSections();
 useFirstSectionRedirect(state);
 const { sections, active, first, subPage } = state;
@@ -65,11 +81,15 @@ const routeAccess = useRouteAccess();
 
 // The same breakpoint as the tables and tabs.
 const wide = useMediaQuery("(min-width: 64rem)");
-const variant = computed(() => (wide.value ? props.desktop : props.compact === "auto" ? (sections.value.length > 5 ? "rows" : "segmented") : props.compact));
+const variant = computed(() => (props.steps ? "steps" : wide.value ? props.desktop : props.compact === "auto" ? (sections.value.length > 5 ? "rows" : "segmented") : props.compact));
 const hasNav = computed(() => sections.value.length > 1);
 const noAccess = computed(() => state.declared.value > 0 && sections.value.length === 0);
 const onFirst = computed(() => !!active.value && active.value.name === first.value?.name && !subPage.value);
 const hasList = computed(() => index.sections.value.length > 1);
+// A long form inside a step lists its own sections beside it.
+const stepsAside = computed(() => variant.value === "steps" && wide.value && hasList.value);
+const stepOf = (name: string): SectionStep => props.steps?.[name] ?? { done: false };
+const STEP_TONE = { positive: "text-status-success-content", warning: "text-status-warning-content", critical: "text-status-danger-content" } as const;
 
 // A page inside a section goes back to the section on every width, with the record and the section
 // as the desktop path. Drill-in rows: a nested section goes back to the first one.
@@ -162,6 +182,31 @@ const segmentLabel = (section: SectionLink) => (variant.value === "segments" && 
     <!-- The summary sits with the navigation: above the segments, and with the rows on the first section. -->
     <div v-if="$slots.summary && (variant !== 'rows' || onFirst || !hasNav)" data-test="section-summary"><slot name="summary" /></div>
 
+    <!-- A workflow's steps: the number or a check, the label, where it stands, the shown step tinted -->
+    <nav v-if="hasNav && variant === 'steps'" :aria-label="props.label" data-test="section-steps">
+      <ol class="flex gap-2.5 compact:gap-1.5">
+        <li v-for="(section, position) in sections" :key="section.name" class="flex min-w-0 flex-1">
+          <RouterLink v-slot="{ href, navigate }" :to="section.to" custom>
+            <a :href="href" :aria-current="section.active ? 'step' : undefined" :data-test="`section-${section.name}`" :data-done="stepOf(section.name).done ? 'true' : undefined"
+              class="flex min-w-0 flex-1 items-center gap-3 rounded-group px-4 py-3 transition-colors duration-motion-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus compact:flex-col compact:items-start compact:gap-1.5 compact:p-2"
+              :class="section.active ? 'bg-tint-soft ring-2 ring-tint ring-inset' : 'bg-surface-cell shadow-group hover:bg-fill'" @click="navigate">
+              <span v-if="stepOf(section.name).done" class="flex size-6.5 shrink-0 items-center justify-center rounded-full bg-control-on text-white"><Icon name="checkCustom" :size="14" /></span>
+              <span v-else class="flex size-6.5 shrink-0 items-center justify-center rounded-full text-footnote font-semibold"
+                :class="section.active ? 'bg-tint text-content-on-tint' : 'text-content-muted ring-2 ring-fill-strong ring-inset'">{{ position + 1 }}</span>
+              <span class="flex min-w-0 flex-col">
+                <span class="truncate text-headline compact:text-footnote" :class="section.active || stepOf(section.name).done ? 'font-semibold text-content-strong' : 'font-medium text-content-muted'">
+                  <span class="compact:hidden">{{ section.label }}</span><span class="hidden compact:inline">{{ section.shortLabel }}</span>
+                </span>
+                <span v-if="stepOf(section.name).sub" data-test="section-step-sub" class="truncate text-footnote compact:text-caption"
+                  :class="stepOf(section.name).tone ? STEP_TONE[stepOf(section.name).tone!] : 'text-content-muted'"><span :class="stepOf(section.name).shortSub ? 'compact:hidden' : ''">{{ stepOf(section.name).sub }}</span><span v-if="stepOf(section.name).shortSub" class="hidden compact:inline">{{ stepOf(section.name).shortSub }}</span></span>
+                <span v-if="stepOf(section.name).done" class="sr-only">{{ t("core.steps.done") }}</span>
+              </span>
+            </a>
+          </RouterLink>
+        </li>
+      </ol>
+    </nav>
+
     <!-- A segmented control: full labels on wide screens, short ones on compact screens. -->
     <div v-if="hasNav && (variant === 'segments' || variant === 'segmented')"
       :class="variant === 'segmented' ? 'z-20 -mx-screen-padding bg-surface-page/90 px-screen-padding py-2 backdrop-blur-xl max-md:sticky max-md:top-[calc(max(0.25rem,env(safe-area-inset-top))+var(--app-bar-height)+0.25rem+1px)]' : ''">
@@ -204,7 +249,11 @@ const segmentLabel = (section: SectionLink) => (variant.value === "segments" && 
       </section>
     </nav>
 
-    <slot />
+    <!-- The wrappers stay mounted either way (`contents`), so the routed page never remounts when its sections register and the aside appears. -->
+    <div :class="stepsAside ? 'grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,14rem)] items-start gap-7' : 'contents'" :data-test="stepsAside ? 'section-steps-form' : undefined">
+      <div :class="stepsAside ? 'min-w-0' : 'contents'"><slot /></div>
+      <aside v-if="stepsAside" class="sticky top-[calc(var(--app-bar-height)+1rem)] min-w-0 self-start"><SectionList standalone /></aside>
+    </div>
 
     <!-- A long page's own sections on compact screens: the floating jumper. -->
     <SectionJumper v-if="!wide && index.sections.value.length > 2" />
