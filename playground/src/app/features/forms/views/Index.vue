@@ -31,6 +31,9 @@ const actions = computed<PageAction[]>(() => [{ id: "new-offer", label: t("forms
         <FormGroup :header="t('forms.accounts')" :footer="t('forms.accountsHint')">
           <FormRow v-for="account in value" :key="account.id" :label="account.name" :sub="`${account.city} · ${t(`forms.status.${account.status}`)}`" :to="formsRoutes.account({ accountID: account.id })" layout="setting" />
         </FormGroup>
+        <FormGroup :header="t('forms.dates.title')">
+          <FormRow :label="t('forms.dates.link')" :sub="t('forms.dates.intro')" :to="formsRoutes.dates" layout="setting" />
+        </FormGroup>
       </template>
     </AsyncSection>
   </AdaptivePageShell>

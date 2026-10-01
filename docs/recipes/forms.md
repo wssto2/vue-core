@@ -187,12 +187,105 @@ Field errors land on the fields, a conflict or no permission is said in the bann
 
 ## Fields
 
-One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `MonthYearField`, `FileField`, `PhotoField`, and `OtpInput`; `Field` itself for a control of your own.
+One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `TimeField`, `MonthYearField`, `FileField`, `PhotoField`, and `OtpInput`; `Field` itself for a control of your own.
 
-- A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
+- A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a time `"14:35"`, a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
-- Dates use the browser's own controls (no calendar dependency); the typed `Date` of a calendar widget is not offered.
+- Dates, times and months are [their own fields](#dates-and-times): typed first, a calendar when you would rather pick. None of them has a `Date` value.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
+
+## Dates and times
+
+`DateField`, `DateTimeField`, `TimeField` and `MonthYearField` have no dependency: the calendar is the library's own, and the values are text a form can carry and a server can read, with no time zone to drift through.
+
+| Field | Value | Example |
+|---|---|---|
+| `DateField` | a day, `string \| null` | `"2026-09-30"` |
+| `DateTimeField` | a day and a time on the user's clock, no zone | `"2026-09-30T14:35"` |
+| `TimeField` | a time of day | `"14:35"` |
+| `MonthYearField` | two numbers, `month` 1 to 12 and `year` | `3`, `2019` |
+
+An empty field is `null`, never `""`. Turning a wall-clock date-time into an instant (and back) is the record mapping's job, as for every field.
+
+<!-- example: docs/examples/forms/components/DeliveryFields.vue:8-16 -->
+```ts
+const form = useForm({
+  defaults: () => ({
+    deliveryOn: null as string | null,
+    visitAt: null as string | null,
+    shiftStart: null as string | null,
+    firstMonth: null as number | null,
+    firstYear: null as number | null,
+  }),
+});
+```
+
+<!-- example: docs/examples/forms/components/DeliveryFields.vue:28-33 -->
+```vue
+  <FormGroup>
+    <DateField v-bind="form.bind('deliveryOn')" :label="t('forms.deliveryOn')" min="2026-01-01" :quick-picks="['today', 'tomorrow', { label: t('forms.nextDelivery'), day: nextDeliveryDay }]" />
+    <DateTimeField v-bind="form.bind('visitAt')" :label="t('forms.visitAt')" min="2026-10-01T08:00" :minute-step="15" />
+    <TimeField v-bind="form.bind('shiftStart')" :label="t('forms.shiftStart')" />
+    <MonthYearField v-bind="form.bindMonthYear('firstMonth', 'firstYear')" :label="t('forms.firstRegistration')" />
+  </FormGroup>
+```
+
+### Typing comes first
+
+The text field is the main way in, and it is forgiving. It is read in the order the app writes dates, which the library finds by asking the app's own formatter (`installFormatting` / `createApplication({ formatting })`), so `DD.MM.YYYY.` in one market and `MM/DD/YYYY` in another need nothing here.
+
+| Typed | Means |
+|---|---|
+| `30.09.2026.`, `30. 9. 2026`, `2026-09-30` | that day (any separator, the trailing dot is optional) |
+| `30.9.` | 30 September of this year |
+| `15` | the 15th of this month |
+| `3009`, `300926`, `30092026` | the parts written without separators |
+| `+7`, `-1` | days from today |
+| `today`, `tomorrow`, `yesterday` (and the same words of the app's language) | those days |
+| `1435`, `14.35`, `14:35`, `14h35`, `935`, `14`, `9.5` | a time (14:35, 09:35, 14:00, 09:05) |
+| `now` (and the word of the language) | the time now |
+
+A date-time field reads a date and a time (`15.10.2026. 14:35`, `danas 14.35`); a date alone keeps the value's time (or takes the time now), a time alone keeps its day.
+
+Text that is not what it looks like is never repaired: `29.2.2027.` is not rolled into March, `45.13.` is not a day. It stays in the field next to its message ("Enter a date, for example 01. 10. 2026.", "This date is not available." outside `min` / `max` / `disabledDates`, "Use minutes in steps of 15."), the field's `aria-invalid` is set, and the value is `null` until the text is a real one, so a form never submits the old value under text that says something else. The server's own error for the field still wins over the typed message.
+
+### The calendar
+
+On a wide screen a calendar opens in a popover from a click on the field, from the calendar button, or from the Down arrow. A click leaves the focus in the field, so typing goes on while the calendar follows what is typed; the Down arrow and the button move focus into the calendar. Escape closes it and returns focus to the field.
+
+- The week starts on the locale's first weekday (`Intl`), the month title is live for screen readers, the grid is labelled and the chosen day is `aria-selected`.
+- Keys: arrows move by a day or a week, Page Up and Page Down by a month (with Shift a year), Home and End to the week's ends, Enter or Space picks.
+- An empty field opens on today's month (or `openOn`), never on `min`'s; days outside `min` and `max`, or in `disabledDates`, cannot be picked or typed.
+- The month title (a date field's) opens twelve months under a year header; clicking the year opens twelve years to jump through.
+
+`disabledDates` takes days, `{ from, to }` ranges, or a function. The calendar can also stand on its own:
+
+<!-- example: docs/examples/forms/components/ClosedDaysCalendar.vue:5-7 -->
+```ts
+const day = ref<string | null>(null);
+// Single days and { from, to } ranges (both included); a function `(day) => boolean` says anything else.
+const closed = [{ from: "2026-12-24", to: "2026-12-26" }, "2026-12-31"];
+```
+
+### Quick picks
+
+A date field offers shortcuts under its calendar: Today, Tomorrow, In 7 days and End of month on a wide screen; Today, Tomorrow and Next working day on a phone. `quickPicks` replaces them: a name of the library's (`today`, `tomorrow`, `week`, `month-end`, `next-working-day`, in the language of the app) or `{ label, day: (today) => day }`, which is how an app puts its own working-day rule in (the library skips Saturdays and Sundays only; it does not know public holidays). A pick the field does not allow is disabled. `DateTimeField` has no day shortcuts unless it is given some, and a time field has `quickTimes` (`"now"`, `"08:00"`, `{ label, time }`).
+
+### Time
+
+Every minute is offered by default: an hour list 00 to 23 and a minute list 00 to 59 beside the typed time. `minute-step` limits both the lists and the typed minutes (a minute off the step is refused with a message, never moved).
+
+### On a phone
+
+Where the app is in its compact presentation (a narrow or touch screen) the field is a button that opens a half sheet: the quick picks, the calendar with large days, and hour and minute wheels that snap (they turn with a finger, with the arrow keys, and without animation for people who ask for reduced motion). The sheet edits a draft: **Done** puts it in the field, **Clear** empties the field, and swiping the sheet away, its backdrop or Escape leave the field as it was. A required field has no Clear.
+
+### Month and year
+
+`MonthYearField` keeps ARV's look: year arrows and twelve month pills. Clicking the year opens a grid of twelve years (with arrows by twelve), so a first registration in 2008 is two clicks away. `minYear` and `maxYear` bound it.
+
+### Reading
+
+Read mode shows the value the way the app formats it (`useFormat().date`, `.dateTime`, `.time`), so an app that writes `DD.MM.YYYY.` keeps it. A locked field is the field's `disabled`, as for every field.
 
 ## Testing
 

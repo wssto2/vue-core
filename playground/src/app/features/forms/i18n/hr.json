@@ -88,5 +88,21 @@
       "urgent": "Hitno"
     }
   },
-  "nav": "Obrasci"
+  "nav": "Obrasci",
+  "dates": {
+    "title": "Datumi i vremena",
+    "intro": "Prvo tipkanje (probajte 30.9., +7, danas, 1435); kalendar u skočnom prozoru na širokim ekranima i polulist s kotačima na telefonu.",
+    "delivery": "Isporuka",
+    "deliveryHint": "Dan isporuke: upisan ili odabran; prečaci uključuju i aplikacijski.",
+    "deliveryOn": "Datum isporuke",
+    "nextDelivery": "Sljedeći dan isporuke",
+    "visitAt": "Probna vožnja",
+    "slotAt": "Termin (svakih 15 minuta)",
+    "timeAndMonth": "Vrijeme i mjesec",
+    "shiftStart": "Početak smjene",
+    "firstRegistration": "Prva registracija",
+    "values": "Vrijednosti",
+    "editing": "Uređivanje",
+    "link": "Datumi i vremena"
+  }
 }

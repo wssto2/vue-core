@@ -88,5 +88,21 @@
       "urgent": "Urgent"
     }
   },
-  "nav": "Forms"
+  "nav": "Forms",
+  "dates": {
+    "title": "Dates and times",
+    "intro": "Typed entry first (try 30.9., +7, today, 1435); a calendar popover on wide screens and a half sheet with wheels on phones.",
+    "delivery": "Delivery",
+    "deliveryHint": "Delivery day: typed, or picked; the shortcuts include the app's own.",
+    "deliveryOn": "Delivery date",
+    "nextDelivery": "Next delivery day",
+    "visitAt": "Test drive",
+    "slotAt": "Slot (every 15 minutes)",
+    "timeAndMonth": "Time and month",
+    "shiftStart": "Shift start",
+    "firstRegistration": "First registration",
+    "values": "Values",
+    "editing": "Editing",
+    "link": "Dates and times"
+  }
 }
