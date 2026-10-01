@@ -2,7 +2,7 @@
 
 Shared Vue 3 library for go-core applications: the app shell, list / record / form pages and their controls, extracted from arv-next's frontend. First consumers: arv-next (later) and the new application (next month). Design authority is arv-next's UI system (`/Users/josipzlimen/Projects/arv-next/documentation/ui-system/`, "Emerald Native"); the long-form rationale is §6–7 of `/Users/josipzlimen/Projects/arv-next/documentation/GO_CORE_PLATFORM_IMPLEMENTATION_PLAN.md`.
 
-Package name: `@wssto2/vue-core` (not published; consumed locally until the owner decides).
+Package name: `@wssto2/vue-core`, published to npm from https://github.com/wssto2/vue-core (public).
 
 ## Relation to the platform plan
 

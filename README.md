@@ -4,7 +4,7 @@ The shared Vue 3 frontend library for go-core applications: the **app shell** (s
 
 It is the extraction of the ARV frontend (design: "Emerald Native"). It has no business knowledge: permissions, menu destinations, icons and the user are **yours**, declared to the type system once.
 
-Not published yet. Its plan and rules are in [PLAN.md](PLAN.md); the ARV bugs found while building it are in [docs/arv-bugs.md](docs/arv-bugs.md).
+Its plan and rules are in [PLAN.md](PLAN.md); the ARV bugs found while building it are in [docs/arv-bugs.md](docs/arv-bugs.md).
 
 ## What you get
 
@@ -23,19 +23,12 @@ Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vu
 
 ## Install
 
-Until it is published, use it from a checkout, next to your application:
-
 ```bash
-cd vue-core && npm install && npm run build && npm pack   # writes wssto2-vue-core-0.0.0.tgz
-cd ../my-app && npm install ../vue-core/wssto2-vue-core-0.0.0.tgz
-```
-
-(`"@wssto2/vue-core": "file:../vue-core"` works too, after `npm run build`.) Your app also needs the peers and a Vite + Tailwind v4 build:
-
-```bash
-npm install vue vue-router vue-i18n
+npm install @wssto2/vue-core vue vue-router vue-i18n
 npm install -D vite @vitejs/plugin-vue tailwindcss @tailwindcss/vite typescript vue-tsc
 ```
+
+To try a change to the library in an app before it is released, build it and install the packed file: `npm run build && npm pack` here, then `npm install ../vue-core/wssto2-vue-core-<version>.tgz` in the app.
 
 <!-- example: docs/examples/vite.config.ts -->
 ```ts
