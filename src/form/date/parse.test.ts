@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectOrder, parseDayText, splitDateTime, type DateParseContext } from "./parse";
+import { detectOrder, parseDayText, splitTypedDateTime, type DateParseContext } from "./parse";
 import { minutesOf, parseTimeText, timeNow } from "./time";
 
 const words = { today: ["danas", "today"], tomorrow: ["sutra", "tomorrow"], yesterday: ["jučer", "yesterday"] };
@@ -78,15 +78,15 @@ describe("a typed date", () => {
 
 describe("a typed date and time", () => {
   it("splits the time off", () => {
-    expect(splitDateTime("15.10.2026. 14:35")).toEqual({ date: "15.10.2026.", time: "14:35" });
-    expect(splitDateTime("15. 10. 2026. 14:35")).toEqual({ date: "15. 10. 2026.", time: "14:35" });
-    expect(splitDateTime("danas 14.35")).toEqual({ date: "danas", time: "14.35" });
-    expect(splitDateTime("2026-10-15T14:35")).toEqual({ date: "2026-10-15", time: "14:35" });
-    expect(splitDateTime("14:35")).toEqual({ date: null, time: "14:35" });
-    expect(splitDateTime("15.10.2026.")).toEqual({ date: "15.10.2026.", time: null });
-    expect(splitDateTime("1.10")).toEqual({ date: "1.10", time: null }); // one token: a date
-    expect(splitDateTime("15. 10.")).toEqual({ date: "15. 10.", time: null });
-    expect(splitDateTime("")).toEqual({ date: null, time: null });
+    expect(splitTypedDateTime("15.10.2026. 14:35")).toEqual({ date: "15.10.2026.", time: "14:35" });
+    expect(splitTypedDateTime("15. 10. 2026. 14:35")).toEqual({ date: "15. 10. 2026.", time: "14:35" });
+    expect(splitTypedDateTime("danas 14.35")).toEqual({ date: "danas", time: "14.35" });
+    expect(splitTypedDateTime("2026-10-15T14:35")).toEqual({ date: "2026-10-15", time: "14:35" });
+    expect(splitTypedDateTime("14:35")).toEqual({ date: null, time: "14:35" });
+    expect(splitTypedDateTime("15.10.2026.")).toEqual({ date: "15.10.2026.", time: null });
+    expect(splitTypedDateTime("1.10")).toEqual({ date: "1.10", time: null }); // one token: a date
+    expect(splitTypedDateTime("15. 10.")).toEqual({ date: "15. 10.", time: null });
+    expect(splitTypedDateTime("")).toEqual({ date: null, time: null });
   });
 });
 

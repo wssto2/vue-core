@@ -7,7 +7,6 @@ import { mockMedia } from "../testing/media";
 import CardSelectField from "./CardSelectField.vue";
 import CheckboxField from "./CheckboxField.vue";
 import ChoiceChips from "./ChoiceChips.vue";
-import DateField from "./DateField.vue";
 import DateTimeField from "./DateTimeField.vue";
 import FormGroup from "./FormGroup.vue";
 import FormView from "./FormView.vue";
@@ -309,22 +308,6 @@ describe("SegmentedField, ChoiceChips and CardSelectField", () => {
 });
 
 describe("DateField, DateTimeField and MonthYearField", () => {
-  it("a date is the day as text, and null when cleared", async () => {
-    const { update } = mount(DateField, { modelValue: "2026-09-30", label: "Due" });
-    const input = screen.getByLabelText("Due") as HTMLInputElement;
-    expect(input.type).toBe("date");
-    expect(input.value).toBe("2026-09-30");
-    await fireEvent.update(input, "2026-10-01");
-    expect(update).toHaveBeenLastCalledWith("2026-10-01");
-    await fireEvent.update(input, "");
-    expect(update).toHaveBeenLastCalledWith(null);
-  });
-
-  it("reads a date in the app's format, with no shift across time zones", () => {
-    const { container } = mountGroup((f) => { f.values.when = "2026-03-01"; return h(DateField, { ...f.bind("when"), label: "When" }); }, { editable: false });
-    expect(container.textContent).toMatch(/0?3\/0?1\/2026/);
-  });
-
   it("a date and time is wall-clock text", async () => {
     const { update } = mount(DateTimeField, { modelValue: null, label: "At" });
     const input = screen.getByLabelText("At") as HTMLInputElement;

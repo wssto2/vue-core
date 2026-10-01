@@ -63,3 +63,12 @@ export function parseTimeText(text: string, step = 1): TimeParse {
   if (!time) return { error: "invalid" };
   return step > 1 && minute % step !== 0 ? { error: "step" } : { time };
 }
+
+/** `"2026-09-30T14:35"` from its two parts. */
+export const joinDateTime = (day: string, time: Time): string => `${day}T${time}`;
+
+/** The day and the time of `"2026-09-30T14:35"`; either is null where the text has no such part. */
+export function splitDateTime(value: string | null | undefined): { day: string | null; time: Time | null } {
+  const match = value ? /^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?/.exec(value) : null;
+  return { day: match?.[1] ?? null, time: match?.[2] ?? null };
+}

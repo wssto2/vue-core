@@ -99,7 +99,7 @@ function pick(parts: readonly DatePart[], values: string[]): Partial<Record<Date
 }
 
 /** A typed date and time: `15.10.2026. 14:35`, `danas 14.35`, a bare `14:35` (time only) or just a date. Either part may be null. */
-export function splitDateTime(text: string): { date: string | null; time: string | null } {
+export function splitTypedDateTime(text: string): { date: string | null; time: string | null } {
   const tokens = text.trim().replace(/^(\d{4}-\d{2}-\d{2})T/, "$1 ").split(/\s+/).filter(Boolean);
   const last = tokens[tokens.length - 1];
   if (last === undefined) return { date: null, time: null };
@@ -107,4 +107,13 @@ export function splitDateTime(text: string): { date: string | null; time: string
   if (!isTime) return { date: tokens.join(" "), time: null };
   const date = tokens.slice(0, -1).join(" ");
   return { date: date === "" ? null : date, time: last };
+}
+
+/** A short way to write a day in the app's order, from today: `1.10.` for `01.10.2026.` (a placeholder's example). */
+export function shortExample(format: (day: Day) => string, order: readonly DatePart[], today: Day): string {
+  const written = format(today);
+  const separator = /\D+/.exec(written)?.[0].trim() ?? ".";
+  const trailing = /\D+$/.test(written) ? separator : "";
+  const values = { d: String(Number(today.slice(8))), m: String(Number(today.slice(5, 7))), y: "" };
+  return order.filter((part) => part !== "y").map((part) => values[part]).join(separator) + trailing;
 }
