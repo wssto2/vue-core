@@ -146,6 +146,26 @@
     "sections": {
       "label": "Sekcije"
     },
+    "steps": {
+      "label": "Napredak",
+      "position": "Korak {current} od {total}",
+      "next_named": "Dalje: {step}",
+      "done": "dovršeno",
+      "draft_saved": "nacrt spremljen",
+      "restored": "Nastavljate sa spremljenim nacrtom.",
+      "start_over": "Počni ispočetka"
+    },
+    "viewer": {
+      "label": "Pregled fotografija",
+      "counter": "{current} / {total}",
+      "zoom_in": "Uvećaj",
+      "zoom_out": "Umanji",
+      "zoom_percent": "{percent} %",
+      "rotate": "Zakreni",
+      "download": "Preuzmi",
+      "previous": "Prethodna fotografija",
+      "next": "Sljedeća fotografija"
+    },
     "form": {
       "unsaved_changes": "Nespremljene promjene",
       "failure": {

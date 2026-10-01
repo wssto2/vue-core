@@ -146,6 +146,26 @@
     "sections": {
       "label": "Sections"
     },
+    "steps": {
+      "label": "Progress",
+      "position": "Step {current} of {total}",
+      "next_named": "Next: {step}",
+      "done": "done",
+      "draft_saved": "draft saved",
+      "restored": "Continuing your saved draft.",
+      "start_over": "Start over"
+    },
+    "viewer": {
+      "label": "Photo viewer",
+      "counter": "{current} / {total}",
+      "zoom_in": "Zoom in",
+      "zoom_out": "Zoom out",
+      "zoom_percent": "{percent}%",
+      "rotate": "Rotate",
+      "download": "Download",
+      "previous": "Previous photo",
+      "next": "Next photo"
+    },
     "form": {
       "unsaved_changes": "Unsaved changes",
       "failure": {
