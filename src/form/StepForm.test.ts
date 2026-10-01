@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick, ref, type App, type Component } from "vue";
 import Modal from "../modal/Modal.vue";
+import Sheet from "../modal/Sheet.vue";
 import { createTestI18n } from "../testing/i18n";
 import { createLeaveGuard, leaveGuardKey } from "./leaveGuard";
 import StepForm from "./StepForm.vue";
@@ -47,7 +48,7 @@ function mountFlow(template: string, options: { draftKey?: string; onSaved?: () 
   const cancelled = vi.fn();
   let handles!: { form: ReturnType<typeof useForm<Lead>>; flow: ReturnType<typeof useStepForm<Lead, Lead, "customer" | "vehicle" | "review", string>>; modal: { value: { present: () => void } | null } };
   const Host = defineComponent({
-    components: { StepForm, StepNavigation, StepProgress, TextField, Modal },
+    components: { StepForm, StepNavigation, StepProgress, TextField, Modal, Sheet },
     setup() {
       const form = useForm({ defaults: (): Lead => ({ name: "", email: "", make: "" }), validator });
       const flow = useStepForm(form, {
@@ -226,6 +227,20 @@ describe("StepForm in a dialog", () => {
     guard.pending.value!.resolve(false);
     await settle();
     expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+  });
+
+  it("works in a Sheet, its buttons in the sheet's footer", async () => {
+    const { modal, flow } = mountFlow(`<Sheet ref="modal" title="New lead"><StepForm :flow="flow" navigation="host">${STEPS}</StepForm><template #footer><StepNavigation :flow="flow" @cancel="cancelled" /></template></Sheet>`);
+    modal.value!.present();
+    await settle();
+    const sheet = document.querySelector('[role="dialog"]')!;
+    expect(sheet.querySelector('[data-test="step-bar"]')).not.toBeNull();
+    await type("Name", "Ana");
+    await type("E-mail", "a@b.c");
+    await fireEvent.click(sheet.querySelector('[data-test="step-next"]')!);
+    await settle();
+    expect(flow.current.value.name).toBe("vehicle");
+    expect(sheet.querySelector('[data-test="step-back"]')!.textContent).toContain("Customer");
   });
 
   it("has no buttons of its own when the host owns them", () => {
