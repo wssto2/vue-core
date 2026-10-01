@@ -184,6 +184,47 @@ const activity = useResource({ for: account, load: (id, { signal }) => api.activ
 
 `AsyncSection` is the region's frame: a skeleton while loading, the error with a retry, the empty state, and the value (non-null) once loaded, kept on screen while it refreshes.
 
+### A region with nothing to be identified by
+
+A list, a page's settings or a block that is not about this record has no id to wait for: `useLoad(({ signal }) => …)` is the same region without one. The latest load wins (an older one is aborted and its answer dropped), `reload()` keeps the rows on screen while it runs, `update(value)` puts in what a save returned and counts as the latest result (a reload that started before it cannot bring the older state back), and nothing lands after the page is left. Its `state` is the `AsyncState` that `AsyncSection` takes.
+
+<!-- example: docs/examples/accounts/components/Plans.vue -->
+```vue
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
+import { Panel } from "@wssto2/vue-core/content";
+import { usePlatform } from "@wssto2/vue-core/platform";
+import { AsyncSection, useLoad } from "@wssto2/vue-core/state";
+
+interface Plan {
+  readonly id: number;
+  readonly name: string;
+}
+
+const { t } = useI18n();
+const { http } = usePlatform();
+
+// A region with nothing to be identified by (a list, a page's settings): one load, latest wins, and the state
+// is the same AsyncState the frame takes. `reload()` keeps the rows on screen while it runs; `plans.update(rows)`
+// puts in what a save returned and drops any load still on its way.
+const plans = useLoad(({ signal }) => http.get<Plan[]>("/plans", { signal }).then((result) => result.data));
+</script>
+
+<template>
+  <Panel :title="t('accounts.plans')">
+    <AsyncSection :state="plans.state.value" @retry="plans.reload()">
+      <template #default="{ value }">
+        <ul class="flex flex-col gap-2">
+          <li v-for="plan in value" :key="plan.id">{{ plan.name }}</li>
+        </ul>
+      </template>
+    </AsyncSection>
+  </Panel>
+</template>
+```
+
+`useLoad(load, { watch })` starts over from nothing when a source changes (a route parameter, a selected tab); `{ immediate: false }` waits for `reload()`. A failure is worded by `describeError` (see [app setup](app-setup.md)) unless you pass `errorMessage`.
+
 ## 4. A layout of your own
 
 When the record is not "header, then content" (a lead with a phase track, a contact panel, comments beside sections), compose the same parts: `AdaptivePageShell` for the chrome, `RecordHeader`, `SectionNavigator` anywhere in your grid, and the same resource. The playground's lead page does this and is the reference: `playground/src/app/features/records/views/LeadRecord.vue`. Its pager is `RecordPager` (from `@wssto2/vue-core/resource`) in the shell's `#pager` slot, fed by `neighbors.context.neighbors`.

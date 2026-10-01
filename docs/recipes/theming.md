@@ -73,10 +73,40 @@ Write your features with the same roles and they follow the theme in both modes 
 | Content | `text-content`, `text-content-strong`, `text-content-muted`, `text-content-destructive`, `text-content-link` |
 | Type | `text-large-title`, `text-headline`, `text-body`, `text-footnote` (they grow to iOS sizes on phones) |
 | Status | `bg-status-warning-surface text-status-warning-content`, and likewise `success`, `danger`, `info`, `neutral` |
+| Category | `bg-category-violet-surface text-category-violet-content`, and likewise the other hues of `Badge` |
 | Shape and spacing | `rounded-group`, `rounded-control`, `gap-section-gap`, `gap-group-gap` |
 | Variants | `dark:`, `compact:` (phones and touch-first screens) |
 
 Do not hard-code palette colors (`bg-gray-100`) or add a parallel system next to this one: extend the theme (`@theme inline`, `@custom-variant`) instead. Components take *meaning*, never pixels or colors: `tone="critical"`, `prominence="primary"`, `role="destructive"`.
+
+## Statuses and categories
+
+A `Badge` says one of two things. **A state** is a `tone` (`neutral`, `info`, `positive`, `warning`, `critical`, or `context` for information that is not a state): red, green, orange and sky blue belong to these and mean something. **A kind** is a `hue`: nine colours (`amber`, `lime`, `teal`, `cyan`, `blue`, `indigo`, `violet`, `fuchsia`, `pink`) for telling things apart, such as where a lead came from. A hue never reuses a status colour, so a category cannot be mistaken for a warning. The label always shows; colour is never the only carrier.
+
+<!-- example: docs/examples/app/Sources.vue -->
+```vue
+<script setup lang="ts">
+import { Badge, type Hue } from "@wssto2/vue-core/state";
+
+defineProps<{ source: string }>();
+
+// Your categories map to hues in one place. A hue says "of this kind", never "in this state": statuses keep `tone`.
+const HUE_OF_SOURCE: Record<string, Hue> = { instagram: "violet", facebook: "blue", referral: "teal", website: "cyan", fair: "amber" };
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <!-- Tinted: the label in the hue on its tint. -->
+    <Badge :hue="HUE_OF_SOURCE[source] ?? 'indigo'">{{ source }}</Badge>
+    <!-- Dot: a neutral label with the hue as a dot, quieter in a dense table. -->
+    <Badge :hue="HUE_OF_SOURCE[source] ?? 'indigo'" appearance="dot">{{ source }}</Badge>
+    <!-- A state next to it keeps its own colours. -->
+    <Badge tone="positive" dot>Active</Badge>
+  </div>
+</template>
+```
+
+Every hue has `category-<hue>-content` and `category-<hue>-surface` roles in the theme, in light and dark, with a text contrast of at least 5:1 on the tint (AA asks 4.5:1; `src/state/categoryHues.test.ts` checks the shipped values). Use them in your own markup like the status roles: `bg-category-teal-surface text-category-teal-content`. The hues are not part of the brand accent and do not change with it. Map your categories to hues in one place, as the example does.
 
 ## Motion
 

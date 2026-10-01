@@ -10,14 +10,14 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 
 | Import | For |
 |---|---|
-| `@wssto2/vue-core/platform` | `readBootstrap`, `createPlatform` (HTTP client, session, access), typed contexts |
+| `@wssto2/vue-core/platform` | `readBootstrap`, `createPlatform` (HTTP client, session, access), `AccessGate`, typed contexts |
 | `@wssto2/vue-core/app` | `createApplication`, `defineFeature`, shell outlets, effects |
 | `@wssto2/vue-core/shell` | `backofficeShell`, the shell's parts for a custom one |
 | `@wssto2/vue-core/router` | `defineRoutes` (typed targets), guards, navigation |
 | `@wssto2/vue-core/collection` | `defineCollection`, `useCollection`, `CollectionPage`, record neighbors |
 | `@wssto2/vue-core/resource`, `/page` | `useRouteResource`, `ResourcePage`, `SectionNavigator`, `AdaptivePageShell` |
 | `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives |
-| `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, formatting, `HttpClient` and `ApiError` |
+| `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, `useDescribeError`, formatting, `HttpClient` and `ApiError` |
 
 Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vue-i18n`; the library never bundles them.
 
@@ -285,11 +285,11 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 ## Recipes
 
 - [List page](docs/recipes/list-page.md): a typed collection, columns, filters, row actions, URL state
-- [Record page](docs/recipes/record-page.md): a simple record, a record with sections, regions that load on their own, previous / next
-- [Shell](docs/recipes/shell.md): the default shell, contributions from features, a custom shell
-- [App setup](docs/recipes/app-setup.md): config, session, effects, locales, errors
+- [Record page](docs/recipes/record-page.md): a simple record, a record with sections, regions that load on their own (`useResource`, `useLoad`), previous / next
+- [Shell](docs/recipes/shell.md): the default shell, contributions from features, keyboard shortcuts and their help, running inside a frame, a custom shell
+- [App setup](docs/recipes/app-setup.md): config, session, effects, locales and flags, permissions in the UI, error sentences, startup errors
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
-- [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens
+- [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 
 Forms have their own recipe when that phase lands.
 
