@@ -157,6 +157,7 @@
     },
     "viewer": {
       "label": "Photo viewer",
+      "open": "View photo",
       "counter": "{current} / {total}",
       "zoom_in": "Zoom in",
       "zoom_out": "Zoom out",

@@ -157,6 +157,7 @@
     },
     "viewer": {
       "label": "Pregled fotografij",
+      "open": "Poglej fotografijo",
       "counter": "{current} / {total}",
       "zoom_in": "Povečaj",
       "zoom_out": "Pomanjšaj",
