@@ -4,7 +4,7 @@ The shared Vue 3 frontend library for go-core applications: the **app shell** (s
 
 It is the extraction of the ARV frontend (design: "Emerald Native"). It has no business knowledge: permissions, menu destinations, icons and the user are **yours**, declared to the type system once.
 
-Its plan and rules are in [PLAN.md](PLAN.md); the ARV bugs found while building it are in [docs/arv-bugs.md](docs/arv-bugs.md).
+Its plan and rules are in [PLAN.md](PLAN.md).
 
 ## What you get
 
