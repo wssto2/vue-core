@@ -76,6 +76,17 @@ describe("Popover", () => {
     await vi.waitFor(() => expect(document.activeElement?.id).toBe("trigger"));
   });
 
+  it("while it fades out it lets clicks through to what is underneath", async () => {
+    mountPopover();
+    await toggle();
+    const panel = screen.getByRole("dialog");
+    press("Escape");
+    await nextTick();
+    // Still in the document during its leave transition: a click there belongs to the page below.
+    expect(panel.isConnected).toBe(true);
+    expect(panel.className).toContain("pointer-events-none");
+  });
+
   it("closes on a press outside, without stealing focus", async () => {
     mountPopover();
     await toggle();

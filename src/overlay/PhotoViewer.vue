@@ -298,7 +298,7 @@ const label = computed(() => props.title ?? t("core.viewer.label"));
   <Teleport to="body">
     <div v-if="isMounted" class="relative z-9999">
       <transition appear enter-active-class="transition-opacity duration-motion-normal ease-motion-standard" enter-from-class="opacity-0"
-        leave-active-class="transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0" @after-leave="unmountIfClosed">
+        leave-active-class="pointer-events-none transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0" @after-leave="unmountIfClosed">
         <div v-if="isOpen" ref="panel" role="dialog" aria-modal="true" :aria-label="label" tabindex="-1" data-part="panel" data-test="photo-viewer"
           class="fixed inset-0 flex flex-col bg-[#0b1210] text-[#f1f5f3] outline-none" @keydown="onKeydown">
           <div class="flex items-center gap-2 px-4 pt-[max(0.875rem,var(--app-safe-top))] pb-3.5 md:px-4.5">

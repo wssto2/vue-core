@@ -140,13 +140,13 @@ defineExpose({ present, dismiss });
     <div v-if="isMounted" class="relative z-10000" role="alertdialog" aria-modal="true" :aria-labelledby="titleId"
       :aria-describedby="props.message ? messageId : undefined" :data-presentation="isActionSheet ? 'action-sheet' : 'alert'">
       <Transition appear enter-active-class="transition-opacity duration-motion-normal ease-motion-standard" enter-from-class="opacity-0"
-        leave-active-class="transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0">
+        leave-active-class="pointer-events-none transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0">
         <div v-if="isOpen" class="fixed inset-0 bg-scrim" aria-hidden="true" @click="isActionSheet ? cancel() : undefined" />
       </Transition>
 
       <!-- Compact action sheet -->
       <Transition v-if="isActionSheet" appear enter-active-class="transition-transform duration-motion-sheet ease-motion-sheet"
-        enter-from-class="translate-y-[120%]" leave-active-class="transition-transform duration-motion-normal ease-motion-standard"
+        enter-from-class="translate-y-[120%]" leave-active-class="pointer-events-none transition-transform duration-motion-normal ease-motion-standard"
         leave-to-class="translate-y-[120%]" @after-leave="unmountIfClosed">
         <div v-if="isOpen" ref="panel" tabindex="-1"
           class="fixed inset-x-2 bottom-[max(0.5rem,var(--app-safe-bottom))] mx-auto flex max-w-md flex-col gap-2 outline-none">
@@ -174,7 +174,7 @@ defineExpose({ present, dismiss });
       <!-- Alert -->
       <div v-else class="fixed inset-0 flex items-center justify-center p-4" :class="isOpen ? '' : 'pointer-events-none'">
         <Transition appear enter-active-class="transition duration-motion-normal ease-motion-standard" enter-from-class="opacity-0 scale-105"
-          leave-active-class="transition duration-motion-fast ease-motion-standard" leave-to-class="opacity-0"
+          leave-active-class="pointer-events-none transition duration-motion-fast ease-motion-standard" leave-to-class="opacity-0"
           @after-leave="unmountIfClosed">
           <div v-if="isOpen" ref="panel" tabindex="-1"
             class="flex w-full max-w-[19rem] flex-col items-center gap-2.5 rounded-menu bg-surface-overlay/95 px-4.5 pt-5 pb-4 text-center shadow-float outline-none backdrop-blur-xl compact:max-w-[17rem]">

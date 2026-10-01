@@ -171,13 +171,13 @@ defineExpose({ present, dismiss: async () => dialog.dismiss() });
     <div v-if="isMounted" class="relative z-9999" :aria-labelledby="hasHeader && props.title ? titleId : undefined" role="dialog" aria-modal="true"
       :data-presentation="isCompact ? 'sheet' : 'dialog'">
       <transition appear enter-active-class="transition-opacity duration-motion-normal ease-motion-standard" enter-from-class="opacity-0"
-        leave-active-class="transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0">
+        leave-active-class="pointer-events-none transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0">
         <div v-if="isOpen" class="fixed inset-0 bg-scrim" :style="drag.backdropStyle.value" aria-hidden="true"></div>
       </transition>
 
       <!-- Compact: page sheet -->
       <transition v-if="isCompact" appear enter-active-class="transition-transform duration-motion-sheet ease-motion-sheet"
-        enter-from-class="translate-y-full" leave-active-class="transition-transform duration-motion-normal ease-motion-standard"
+        enter-from-class="translate-y-full" leave-active-class="pointer-events-none transition-transform duration-motion-normal ease-motion-standard"
         leave-to-class="translate-y-full" @after-leave="unmountIfClosed">
         <div v-if="isOpen" ref="panel" tabindex="-1" data-part="panel"
           class="fixed inset-x-0 bottom-0 top-[calc(var(--app-safe-top)+0.625rem)] mx-auto flex w-full max-w-readable flex-col overflow-hidden rounded-t-sheet text-content-strong shadow-dialog outline-none"
@@ -232,7 +232,7 @@ defineExpose({ present, dismiss: async () => dialog.dismiss() });
       <div v-else class="fixed inset-0 z-10 w-screen overflow-y-auto [scrollbar-gutter:stable_both-edges]" :class="isOpen ? '' : 'pointer-events-none'">
         <div class="flex min-h-full items-center justify-center p-4">
           <transition appear enter-active-class="transition duration-motion-normal ease-motion-standard"
-            enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-motion-fast ease-motion-standard"
+            enter-from-class="opacity-0 scale-95" leave-active-class="pointer-events-none transition duration-motion-fast ease-motion-standard"
             leave-to-class="opacity-0 scale-95" @after-leave="unmountIfClosed">
             <div v-if="isOpen" ref="panel" tabindex="-1" data-part="panel"
               class="relative my-8 w-full rounded-dialog text-left text-content-strong shadow-dialog outline-none transition-transform duration-motion-sheet ease-motion-sheet"

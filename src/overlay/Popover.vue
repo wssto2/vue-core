@@ -153,7 +153,7 @@ defineExpose({ present, dismiss: () => dismiss(), toggle });
 
     <!-- Opacity only: a scale transform would skew the size floating-ui measures. -->
     <Transition enter-active-class="transition-opacity duration-motion-fast ease-motion-standard" enter-from-class="opacity-0"
-      leave-active-class="transition-opacity duration-motion-fast ease-motion-standard" leave-to-class="opacity-0">
+      leave-active-class="pointer-events-none transition-opacity duration-motion-fast ease-motion-standard" leave-to-class="opacity-0">
       <div v-if="isOpen" :id="panelId" ref="panel" role="dialog" :aria-label="props.label" tabindex="-1"
         class="z-1000 rounded-menu bg-surface-overlay p-3 text-content-strong shadow-float outline-none"
         :class="WIDTH[props.width]" :style="style">

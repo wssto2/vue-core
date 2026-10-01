@@ -91,13 +91,13 @@ defineExpose({ present, dismiss });
   <Teleport to="body">
     <div v-if="isMounted" class="relative z-9999" role="dialog" aria-modal="true" :aria-labelledby="props.title ? titleId : undefined">
       <Transition appear enter-active-class="transition-opacity duration-motion-normal ease-motion-standard" enter-from-class="opacity-0"
-        leave-active-class="transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0">
+        leave-active-class="pointer-events-none transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0">
         <div v-if="isOpen" class="fixed inset-0 bg-scrim" :style="drag.backdropStyle.value" aria-hidden="true" @click="dismiss" />
       </Transition>
 
       <Transition appear enter-active-class="transition-transform duration-motion-sheet ease-motion-sheet"
         :enter-from-class="isBottomSheet ? 'translate-y-full' : 'translate-x-full'"
-        leave-active-class="transition-transform duration-motion-normal ease-motion-standard"
+        leave-active-class="pointer-events-none transition-transform duration-motion-normal ease-motion-standard"
         :leave-to-class="isBottomSheet ? 'translate-y-full' : 'translate-x-full'" @after-leave="unmountIfClosed">
         <div v-if="isOpen" ref="panel" tabindex="-1" data-part="panel"
           class="fixed flex flex-col text-content-strong shadow-dialog outline-none"

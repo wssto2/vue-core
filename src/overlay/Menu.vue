@@ -224,7 +224,7 @@ defineExpose({ present, presentAt, dismiss: () => dismiss(), toggle });
 
   <Teleport to="body">
     <Transition enter-active-class="transition-opacity duration-motion-fast ease-motion-standard" enter-from-class="opacity-0"
-      leave-active-class="transition-opacity duration-motion-fast ease-motion-standard" leave-to-class="opacity-0">
+      leave-active-class="pointer-events-none transition-opacity duration-motion-fast ease-motion-standard" leave-to-class="opacity-0">
       <div v-if="isOpen" :id="menuId" ref="panel" role="menu" :aria-label="props.label" v-bind="{ [INERT_SKIP_ATTR]: '' }" :style="style"
         class="z-10001 min-w-52 max-w-[calc(100vw-1rem)] overflow-y-auto rounded-menu bg-surface-overlay p-1.5 text-content-strong shadow-float outline-none compact:min-w-60 compact:p-0"
         @keydown="onPanelKeydown">
