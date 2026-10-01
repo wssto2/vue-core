@@ -28,8 +28,9 @@ export function groupOptions<Value extends string | number>(options: readonly Se
 
 /** Options whose label contains the text, ignoring case and accents. */
 export function matchOptions<Value extends string | number>(options: readonly SelectOption<Value>[], query: string): readonly SelectOption<Value>[] {
-  const needle = fold(query.trim());
-  return needle === "" ? options : options.filter((option) => fold(option.label).includes(needle) || (option.description !== undefined && fold(option.description).includes(needle)));
+  const needle = foldText(query.trim());
+  return needle === "" ? options : options.filter((option) => foldText(option.label).includes(needle) || (option.description !== undefined && foldText(option.description).includes(needle)));
 }
 
-const fold = (text: string): string => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase();
+/** The text without case and accents: what matching compares. */
+export const foldText = (text: string): string => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase();

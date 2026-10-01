@@ -230,6 +230,11 @@
           "12": "dec"
         },
         "with_year": "{month} {year}"
+      },
+      "suggestions": {
+        "recent": "Nedavno",
+        "keys_complete": "Tab sprejme · ↑↓ izbira · Esc zapre",
+        "keys_pick": "↑↓ izbira · Enter potrdi · Esc zapre"
       }
     }
   }

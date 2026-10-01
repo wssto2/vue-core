@@ -33,6 +33,8 @@ export { default as MultiSelectField } from "./MultiSelectField.vue";
 export { default as NumberField } from "./NumberField.vue";
 export { default as OptionList } from "./OptionList.vue";
 export { groupOptions, matchOptions } from "./options";
+export { recentChoicesKey } from "./suggestions";
+export type { RecentChoices, SuggestionSource, TextSuggestion } from "./suggestions";
 export type { OptionGroup, SelectOption } from "./options";
 export { default as OtpInput } from "./OtpInput.vue";
 export { default as PhotoField } from "./PhotoField.vue";

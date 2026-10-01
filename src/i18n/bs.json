@@ -230,6 +230,11 @@
           "12": "dec"
         },
         "with_year": "{month} {year}."
+      },
+      "suggestions": {
+        "recent": "Nedavno",
+        "keys_complete": "Tab prihvata · ↑↓ bira · Esc zatvara",
+        "keys_pick": "↑↓ bira · Enter odabira · Esc zatvara"
       }
     }
   }

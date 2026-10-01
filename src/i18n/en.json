@@ -230,6 +230,11 @@
           "12": "Dec"
         },
         "with_year": "{month} {year}"
+      },
+      "suggestions": {
+        "recent": "Recent",
+        "keys_complete": "Tab accepts · ↑↓ chooses · Esc closes",
+        "keys_pick": "↑↓ chooses · Enter picks · Esc closes"
       }
     }
   }
