@@ -1,6 +1,6 @@
 {
   "name": "@wssto2/vue-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared Vue 3 library for go-core applications: app shell, list / record / form pages and their controls.",
   "keywords": [
     "vue",

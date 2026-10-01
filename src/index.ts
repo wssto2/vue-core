@@ -1,2 +1,2 @@
 /** The version of @wssto2/vue-core (kept equal to package.json by index.test.ts). */
-export const version = "0.1.0";
+export const version = "0.2.0";
