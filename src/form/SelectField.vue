@@ -10,8 +10,8 @@ import { useControlSurface } from "./control";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps } from "./field";
 import OptionList from "./OptionList.vue";
-import type { OptionsSource } from "./useOptions";
-import { useOptionSource } from "./useOptions";
+import type { SelectOption } from "./options";
+import { useOptionSource, type OptionsSource } from "./useOptions";
 
 /**
  * One choice from a list. The value is the chosen option's `value`, or `null` for none: a value of `0` or `""`
@@ -25,19 +25,22 @@ import { useOptionSource } from "./useOptions";
  *
  * Options from the server (`useOptions`, say the models of the chosen make) work the same way: the field keeps its label and
  * value and shows a spinner while they load, the opened list says "Loading…" or offers "Try again", and a value the new options
- * do not contain is cleared.
+ * do not contain is cleared, but only once the options of a different input land: a saved value the first answer lacks (a
+ * discontinued model) stays, and shows `selected`'s label.
  *
- *   <SelectField v-bind="form.bind('model')" :label="t('model')" :options="models" />
+ *   <SelectField v-bind="form.bind('model')" :label="t('model')" :options="models" :selected="record.modelOption" />
  */
 const props = withDefaults(
   defineProps<FieldProps & {
     options: OptionsSource<Value>;
+    /** The option of the current value when the caller already has it (a saved record's model): its label shows before the options arrive, or when they do not contain it. */
+    selected?: SelectOption<Value> | null;
     placeholder?: string;
     clearable?: boolean;
     /** Shows the search box from this many options. */
     searchFrom?: number;
   }>(),
-  { ...fieldDefaults, placeholder: undefined, clearable: false, searchFrom: 9 },
+  { ...fieldDefaults, selected: null, placeholder: undefined, clearable: false, searchFrom: 9 },
 );
 
 const model = defineModel<Value | null>({ default: null });
@@ -50,7 +53,7 @@ const sheetOpen = ref(false);
 const choices = useOptionSource(() => props.options, (arrived) => {
   if (model.value !== null && !arrived.some((option) => option.value === model.value)) model.value = null;
 });
-const selected = computed(() => choices.known.value.find((option) => option.value === model.value) ?? null);
+const selected = computed(() => choices.known.value.find((option) => option.value === model.value) ?? (props.selected?.value === model.value ? props.selected : null));
 const placeholder = computed(() => props.placeholder ?? t("core.form.select.choose"));
 const surface = useControlSurface("popup", () => (props.error ? "error" : props.disabled ? "locked" : "rest"));
 

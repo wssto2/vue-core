@@ -23,7 +23,7 @@ afterEach(() => {
 type Answer = { input: string; signal: AbortSignal; answer: ReturnType<typeof deferred<readonly SelectOption<number>[]>> };
 
 /** The two selects of the owner's case: the models load from the make; each ask is a promise the test settles. */
-function mountModels(options: { component?: Component; model?: unknown; make?: string | null } = {}) {
+function mountModels(options: { component?: Component; model?: unknown; make?: string | null; selected?: unknown } = {}) {
   const asks: Answer[] = [];
   const make = ref<string | null>(options.make === undefined ? "audi" : options.make);
   const model = ref<unknown>(options.model ?? (options.component === MultiSelectField ? [] : null));
@@ -37,7 +37,7 @@ function mountModels(options: { component?: Component; model?: unknown; make?: s
           return answer.promise;
         },
       });
-      return () => h(options.component ?? SelectField, { label: "Model", options: models, modelValue: model.value, "onUpdate:modelValue": (value: unknown) => (model.value = value) });
+      return () => h(options.component ?? SelectField, { label: "Model", options: models, ...(options.selected !== undefined ? { selected: options.selected } : {}), modelValue: model.value, "onUpdate:modelValue": (value: unknown) => (model.value = value) });
     },
   });
   return { ...render(Host, { global }), asks, make, model };
@@ -153,12 +153,71 @@ describe("a select with options that load", () => {
     expect(trigger().textContent).toContain("Choose…");
   });
 
-  it("clears the value when a first load lands without it (a saved value the list no longer offers)", async () => {
+  it("keeps a saved value the first answer lacks (a discontinued model): clearing it would be saved over the record", async () => {
     const { asks, model } = mountModels({ model: 99 });
-    expect(model.value).toBe(99);
     asks[0]!.answer.resolve([a3]);
     await settle();
+    expect(model.value).toBe(99);
+  });
+
+  it("clears it only when options land for another input: the user picked another make", async () => {
+    const { asks, make, model } = mountModels({ model: 99 });
+    asks[0]!.answer.resolve([a3]);
+    await settle();
+    expect(model.value).toBe(99);
+    make.value = "vw";
+    await settle();
+    expect(model.value).toBe(99); // not before the answer
+    asks[1]!.answer.resolve([golf]);
+    await settle();
     expect(model.value).toBeNull();
+  });
+
+  it("keeps it when the same input is asked again (Try again, a reload)", async () => {
+    const { asks, model } = mountModels({ model: 99 });
+    asks[0]!.answer.reject(new Error("down"));
+    await settle();
+    await fireEvent.click(trigger());
+    await settle();
+    await fireEvent.click(within(dialog()).getByRole("button", { name: "Try again" }));
+    await settle();
+    asks[1]!.answer.resolve([a3]);
+    await settle();
+    expect(model.value).toBe(99);
+  });
+
+  it("a hydrated record: the make arriving after the model is not a change of input", async () => {
+    const { asks, make, model } = mountModels({ make: null, model: 99 });
+    make.value = "audi";
+    await settle();
+    asks[0]!.answer.resolve([a3]);
+    await settle();
+    expect(model.value).toBe(99);
+  });
+
+  it("shows the label it was given for the value while the options load, and when they do not contain it", async () => {
+    const { asks } = mountModels({ model: 99, selected: { value: 99, label: "A2 (discontinued)" } });
+    expect(trigger().textContent).toContain("A2 (discontinued)");
+    expect(trigger().getAttribute("aria-busy")).toBe("true");
+    asks[0]!.answer.resolve([a3]);
+    await settle();
+    expect(trigger().textContent).toContain("A2 (discontinued)");
+  });
+
+  it("without a label for a value the options do not know, it says Choose… (the value is still kept)", async () => {
+    const { asks, model } = mountModels({ model: 99 });
+    expect(trigger().textContent).toContain("Choose…");
+    asks[0]!.answer.resolve([a3]);
+    await settle();
+    expect(model.value).toBe(99);
+  });
+
+  it("prefers the option from the answer over the label it was given", async () => {
+    const { asks } = mountModels({ model: 1, selected: { value: 1, label: "A3 (old name)" } });
+    asks[0]!.answer.resolve([a3]);
+    await settle();
+    expect(trigger().textContent).toContain("A3");
+    expect(trigger().textContent).not.toContain("old name");
   });
 
   it("asks nothing while the input it depends on is empty, and empties the list and the value when it becomes empty", async () => {
@@ -213,6 +272,15 @@ describe("a multiple select with options that load", () => {
     asks[1]!.answer.resolve([a4, golf]);
     await settle();
     expect(model.value).toEqual([2]);
+  });
+
+  it("shows the chips it was given before the options arrive and keeps values the first answer lacks", async () => {
+    const { asks, model, container } = mountModels({ component: MultiSelectField, model: [1, 99], selected: [{ value: 1, label: "A3" }, { value: 99, label: "A2 (discontinued)" }] });
+    expect([...container.querySelectorAll("[data-test=chip]")].map((chip) => chip.textContent?.trim())).toEqual(["A3", "A2 (discontinued)"]);
+    asks[0]!.answer.resolve([a3]);
+    await settle();
+    expect(model.value).toEqual([1, 99]);
+    expect([...container.querySelectorAll("[data-test=chip]")].map((chip) => chip.textContent?.trim())).toEqual(["A3", "A2 (discontinued)"]);
   });
 
   it("opens to a loading row and a retry row", async () => {

@@ -9,6 +9,7 @@ import Popover from "../overlay/Popover.vue";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, type FieldProps } from "./field";
 import OptionList from "./OptionList.vue";
+import type { SelectOption } from "./options";
 import { useOptionSource, type OptionsSource } from "./useOptions";
 
 /**
@@ -23,8 +24,14 @@ import { useOptionSource, type OptionsSource } from "./useOptions";
  * A few independent on/off choices shown all at once are `ChoiceChips`.
  */
 const props = withDefaults(
-  defineProps<FieldProps & { options: OptionsSource<Value>; placeholder?: string; searchFrom?: number }>(),
-  { ...fieldDefaults, placeholder: undefined, searchFrom: 9 },
+  defineProps<FieldProps & {
+    options: OptionsSource<Value>;
+    /** The options of the current values when the caller already has them (a saved record's equipment): their labels show before the options arrive, or when they do not contain them. */
+    selected?: readonly SelectOption<Value>[];
+    placeholder?: string;
+    searchFrom?: number;
+  }>(),
+  { ...fieldDefaults, selected: () => [], placeholder: undefined, searchFrom: 9 },
 );
 
 const model = defineModel<Value[]>({ default: () => [] });
@@ -37,7 +44,10 @@ const choices = useOptionSource(() => props.options, (arrived) => {
   const kept = model.value.filter((value) => arrived.some((option) => option.value === value));
   if (kept.length !== model.value.length) model.value = kept;
 });
-const chosen = computed(() => model.value.flatMap((value) => choices.known.value.filter((option) => option.value === value)));
+const chosen = computed(() => model.value.flatMap((value) => {
+  const option = choices.known.value.find((each) => each.value === value) ?? props.selected.find((each) => each.value === value);
+  return option ? [option] : [];
+}));
 const placeholder = computed(() => props.placeholder ?? t("core.form.select.choose"));
 
 function toggle(value: Value | null) {
