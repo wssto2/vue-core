@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Time only, month and year</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 760px; height: 600px; box-sizing: border-box; padding: 40px 48px; background: #F1F4F2; font-family: Inter, system-ui, sans-serif; color: #0D1714; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5B6763">Samo vrijeme</p>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 4px 16px">
+<div style="display: flex; align-items: center; min-height: 44px">
+<label for="t1" style="flex-grow: 1; font-size: 15px; color: #2B3632">Početak smjene</label>
+<div style="display: flex; align-items: center; gap: 6px; background: #EDEFEE; border-radius: 7px; padding: 6px 10px; box-shadow: 0 0 0 2px #047857">
+<input id="t1" value="07:45" style="width: 52px; border: 0; background: transparent; font: inherit; font-size: 15px; color: #0D1714; outline: none; font-variant-numeric: tabular-nums">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+</div>
+</div>
+</div>
+<div style="align-self: flex-end; width: 200px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(13,23,20,0.16), 0 0 0 1px rgba(18,38,32,0.08); padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 6px; height: 196px">
+<div role="listbox" aria-label="Sat" style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; overflow: hidden">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="7"><button type="button" role="option" style="{{h.style}}">{{h.v}}</button></sc-for>
+</div>
+<div role="listbox" aria-label="Minute" style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; overflow: hidden">
+<sc-for list="{{minutes}}" as="m" hint-placeholder-count="7"><button type="button" role="option" style="{{m.style}}">{{m.v}}</button></sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<button type="button" style="border: 0; font: inherit; font-size: 13px; font-weight: 500; padding: 5px 9px; border-radius: 999px; background: #E6F2EE; color: #047857">Sada</button>
+<button type="button" style="border: 0; font: inherit; font-size: 13px; font-weight: 500; padding: 5px 9px; border-radius: 999px; background: #EDEFEE; color: #2B3632">8:00</button>
+<button type="button" style="border: 0; font: inherit; font-size: 13px; font-weight: 500; padding: 5px 9px; border-radius: 999px; background: #EDEFEE; color: #2B3632">12:00</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5B6763">Mjesec i godina</p>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 4px 16px">
+<div style="display: flex; align-items: center; min-height: 44px">
+<p style="margin: 0; flex-grow: 1; font-size: 15px; color: #2B3632">Prva registracija</p>
+<button type="button" style="border: 0; font: inherit; font-size: 15px; background: #EDEFEE; border-radius: 7px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 0 2px #047857">ožujak 2019.<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6763" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button>
+</div>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<div style="width: 220px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(13,23,20,0.16), 0 0 0 1px rgba(18,38,32,0.08); padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center">
+<button type="button" aria-label="2018" style="width: 30px; height: 30px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg></button>
+<button type="button" style="flex-grow: 1; border: 0; background: transparent; font: inherit; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums">2019 <span style="font-size: 11px; color: #047857">▾</span></button>
+<button type="button" aria-label="2020" style="width: 30px; height: 30px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px">
+<sc-for list="{{months}}" as="m" hint-placeholder-count="12"><button type="button" style="{{m.style}}">{{m.v}}</button></sc-for>
+</div>
+</div>
+<div style="flex-grow: 1; background: #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(13,23,20,0.16), 0 0 0 1px rgba(18,38,32,0.08); padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; text-align: center; font-size: 14px; font-weight: 600">2010 – 2021</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px">
+<sc-for list="{{years}}" as="y" hint-placeholder-count="12"><button type="button" style="{{y.style}}">{{y.v}}</button></sc-for>
+</div>
+</div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.45; color: #5B6763">Kao u ARV-u: godina strelicama, 12 mjeseci. Novo: klik na godinu otvara popis godina, pa je 2008. dva klika, a ne jedanaest.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":760,"height":600}}'>
+class Component extends DCLogic {
+renderVals() {
+const cell = 'min-height: 26px; border: 0; font: inherit; font-size: 14px; border-radius: 6px; font-variant-numeric: tabular-nums;';
+const col = (values, pick) => values.map((v) => ({ v, style: cell + (v === pick ? 'background: #047857; color: #FFFFFF; font-weight: 600;' : 'background: transparent; color: #2B3632;') }));
+const pill = 'min-height: 34px; border: 0; font: inherit; font-size: 13px; border-radius: 999px; padding: 0 4px;';
+const months = ['sij', 'velj', 'ožu', 'tra', 'svi', 'lip', 'srp', 'kol', 'ruj', 'lis', 'stu', 'pro'].map((v, i) => ({ v, style: pill + (i === 2 ? 'background: #047857; color: #FFFFFF; font-weight: 600;' : 'background: #EDEFEE; color: #0D1714;') }));
+const years = [];
+for (let y = 2010; y <= 2021; y++) years.push({ v: String(y), style: pill + (y === 2019 ? 'background: #047857; color: #FFFFFF; font-weight: 600;' : 'background: #EDEFEE; color: #0D1714;') + ' font-variant-numeric: tabular-nums;' });
+return {
+hours: col(['04', '05', '06', '07', '08', '09', '10'], '07'),
+minutes: col(['42', '43', '44', '45', '46', '47', '48'], '45'),
+months,
+years,
+};
+}
+}
+</script>
+</body>
+</html>

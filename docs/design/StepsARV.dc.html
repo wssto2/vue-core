@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Steps in ARV today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1360px; height: 600px; box-sizing: border-box; padding: 32px 40px; background: #F1F4F2; font-family: Inter, system-ui, sans-serif; color: #0D1714; display: flex; flex-direction: column; gap: 20px">
+<p style="margin: 0; font-size: 22px; font-weight: 700">ARV danas: tri načina prikaza koraka</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<img src="/_blob/9e50f74b61d64c206962fbcb53ae2d8b" alt="ARV: Novi lead, traka koraka" style="width: 100%; border-radius: 8px; box-shadow: 0 0 0 1px rgba(18,38,32,0.12)">
+<p style="margin: 0; font-size: 15px; font-weight: 600">A · Traka s nazivima (Novi lead)</p>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #2B3632">Fiksni koraci s imenom, unaprijed se vidi što slijedi. Gotovi koraci su klikabilni. Jedan sjedeći unos u modalu.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<img src="/_blob/1dd7ac9e1719f744b84963202cca6c18" alt="ARV: Nova procjena, točkice" style="width: 100%; border-radius: 8px; box-shadow: 0 0 0 1px rgba(18,38,32,0.12)">
+<p style="margin: 0; font-size: 15px; font-weight: 600">B · Točkice, jedno pitanje po ekranu (Nova procjena)</p>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #2B3632">Broj koraka se mijenja prema VIN-u, pa nazivi unaprijed ne bi bili točni. Veliki naslov pitanja, prijelaz naprijed/natrag.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<img src="/_blob/bb283c938d6ab52d36d93874e706a04a" alt="ARV: zapis procjene, pločice koraka" style="width: 100%; border-radius: 8px; box-shadow: 0 0 0 1px rgba(18,38,32,0.12)">
+<p style="margin: 0; font-size: 15px; font-weight: 600">C · Pločice tijeka (zapis procjene)</p>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #2B3632">Nije čarobnjak: posao kroz dane, više ljudi, bilo kojim redom. Svaka pločica ima stanje u jednom retku („Nedostaje: tržišna usporedba”).</p>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":600}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Per-language text field</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 760px; height: 600px; box-sizing: border-box; padding: 40px 48px; background: #F1F4F2; font-family: Inter, system-ui, sans-serif; color: #0D1714; display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5B6763">Opis oglasa</p>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 12px">
+<label for="t1" style="flex-grow: 1; font-size: 15px; color: #2B3632">Naslov <span style="color: #B42318">*</span></label>
+<div role="tablist" aria-label="Jezik" style="display: flex; gap: 2px; background: #EDEFEE; border-radius: 8px; padding: 2px">
+<sc-for list="{{langs}}" as="l" hint-placeholder-count="4"><button type="button" role="tab" aria-selected="{{l.selected}}" style="{{l.style}}">{{l.code}}<span style="{{l.dot}}"></span></button></sc-for>
+</div>
+</div>
+<input id="t1" value="Golf 8 1.5 TSI, prvi vlasnik, servisna knjiga" style="border: 0; border-radius: 7px; background: #EDEFEE; font: inherit; font-size: 15px; padding: 9px 10px; color: #0D1714; box-shadow: 0 0 0 2px #047857; outline: none">
+<div style="display: flex; align-items: center; gap: 8px">
+<p style="margin: 0; flex-grow: 1; font-size: 13px; color: #9A4A07">Nedostaje engleski i slovenski prijevod.</p>
+<button type="button" style="border: 0; font: inherit; font-size: 13px; font-weight: 500; padding: 6px 10px; border-radius: 7px; background: #E6F2EE; color: #047857">Kopiraj HR u prazne</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5B6763">Pregled</p>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 4px 16px">
+<div style="padding: 10px 0; border-bottom: 1px solid rgba(18,38,32,0.11)"><p style="margin: 0; font-size: 13px; color: #5B6763">Naslov · HR</p><p style="margin: 2px 0 0; font-size: 15px">Golf 8 1.5 TSI, prvi vlasnik, servisna knjiga</p></div>
+<div style="padding: 10px 0; display: flex; align-items: center; gap: 8px"><p style="margin: 0; flex-grow: 1; font-size: 13px; color: #5B6763">Još 3 jezika · 1 popunjen</p><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6763" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></div>
+</div>
+</div>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 14px 16px; align-self: end; display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0; font-size: 15px; font-weight: 600">Što se mijenja</p>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #2B3632">Jezici kao segmenti uz oznaku, točka pokazuje koji je popunjen. Obavezan jezik (dolazi iz postavki) javlja grešku i kad je odabran drugi.</p>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":760,"height":600}}'>
+class Component extends DCLogic {
+renderVals() {
+const tab = 'border: 0; font: inherit; font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 6px; display: flex; align-items: center; gap: 5px;';
+const dot = (filled) => 'width: 6px; height: 6px; border-radius: 3px; background: ' + (filled ? '#047857' : '#D8DDDB') + ';';
+const langs = [
+{ code: 'HR', selected: 'true', style: tab + 'background: #FFFFFF; color: #0D1714; box-shadow: 0 1px 2px rgba(13,23,20,0.12);', dot: dot(true) },
+{ code: 'BS', selected: 'false', style: tab + 'background: transparent; color: #5B6763;', dot: dot(true) },
+{ code: 'EN', selected: 'false', style: tab + 'background: transparent; color: #5B6763;', dot: dot(false) },
+{ code: 'SL', selected: 'false', style: tab + 'background: transparent; color: #5B6763;', dot: dot(false) },
+];
+return { langs };
+}
+}
+</script>
+</body>
+</html>

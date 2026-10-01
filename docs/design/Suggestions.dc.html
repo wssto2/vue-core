@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Suggestions while typing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 760px; height: 600px; box-sizing: border-box; padding: 40px 48px; background: #F1F4F2; font-family: Inter, system-ui, sans-serif; color: #0D1714; display: flex; gap: 32px">
+<div style="width: 360px; display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5B6763">Adresa</p>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 4px 16px">
+<div style="display: flex; align-items: center; min-height: 44px; gap: 12px">
+<label for="s1" style="width: 72px; font-size: 15px; color: #2B3632">Grad</label>
+<div style="flex-grow: 1; position: relative; background: #EDEFEE; border-radius: 7px; box-shadow: 0 0 0 2px #047857; padding: 6px 10px; font-size: 15px">
+<input id="s1" value="Zagr" role="combobox" aria-expanded="true" aria-controls="s1-list" style="border: 0; background: transparent; font: inherit; width: 40px; padding: 0; color: #0D1714; outline: none"><span style="color: #98A39F">eb</span>
+</div>
+</div>
+</div>
+<div id="s1-list" role="listbox" style="background: #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(13,23,20,0.16), 0 0 0 1px rgba(18,38,32,0.08); padding: 6px; margin-left: 84px">
+<sc-for list="{{items}}" as="i" hint-placeholder-count="4"><div role="option" style="{{i.style}}"><p style="margin: 0; font-size: 15px"><strong style="font-weight: 600">{{i.match}}</strong>{{i.rest}}</p><p style="margin: 1px 0 0; font-size: 12px; color: #5B6763">{{i.detail}}</p></div></sc-for>
+<div style="border-top: 1px solid rgba(18,38,32,0.11); margin-top: 4px; padding: 8px 10px 4px; font-size: 12px; color: #5B6763">Tab prihvaća · ↑↓ bira · Esc zatvara</div>
+</div>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 28px">
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 15px; font-weight: 600">Što se mijenja</p>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #2B3632">Jedno polje za oba slučaja: slobodan tekst s prijedlozima (grad, model) i odabir zapisa (kupac). ARV ih je imao razdvojene u TextField i ComboField.</p>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #2B3632">Siva dopuna u polju (Tab prihvaća) ostaje iz ARV-a; popis istakne pogođeni dio.</p>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #2B3632">Zadnji odabiri pojave se prije tipkanja, ispod naslova „Nedavno”.</p>
+</div>
+<div style="background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 6px">
+<p style="margin: 0; padding: 6px 10px; font-size: 12px; font-weight: 600; color: #98A39F">NEDAVNO</p>
+<div style="padding: 8px 10px; font-size: 15px; display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#98A39F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Split</div>
+<div style="padding: 8px 10px; font-size: 15px; display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#98A39F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Sarajevo</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":760,"height":600}}'>
+class Component extends DCLogic {
+renderVals() {
+const row = 'padding: 8px 10px; border-radius: 7px;';
+const items = [
+{ match: 'Zagr', rest: 'eb', detail: 'Hrvatska · 10 000', style: row + 'background: #E6F2EE;' },
+{ match: 'Zagr', rest: 'ebačka', detail: 'Ulica u Osijeku', style: row + 'background: transparent;' },
+{ match: 'Zagr', rest: 'ad', detail: 'Šibenik', style: row + 'background: transparent;' },
+];
+return { items };
+}
+}
+</script>
+</body>
+</html>

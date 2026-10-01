@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Date and time, desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 760px; height: 600px; box-sizing: border-box; padding: 40px 48px; background: #F1F4F2; font-family: Inter, system-ui, sans-serif; color: #0D1714; display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5B6763">Termin</p>
+<div style="width: 420px; background: #FFFFFF; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,0.08); padding: 4px 16px">
+<div style="display: flex; align-items: center; min-height: 44px">
+<label for="dt1" style="width: 120px; font-size: 15px; color: #2B3632">Probna vožnja</label>
+<div style="flex-grow: 1; display: flex; align-items: center; gap: 8px; background: #EDEFEE; border-radius: 7px; padding: 6px 10px; box-shadow: 0 0 0 2px #047857">
+<input id="dt1" value="15.10.2026. 14:35" style="border: 0; background: transparent; font: inherit; font-size: 15px; width: 100%; color: #0D1714; outline: none; font-variant-numeric: tabular-nums">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+</div>
+</div>
+</div>
+<div style="margin-left: 136px; width: 492px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 16px 40px rgba(13,23,20,0.16), 0 0 0 1px rgba(18,38,32,0.08); display: flex">
+<div style="width: 300px; padding: 14px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid rgba(18,38,32,0.11)">
+<div style="display: flex; align-items: center; gap: 4px">
+<p style="margin: 0 0 0 6px; flex-grow: 1; font-size: 16px; font-weight: 600">Listopad 2026</p>
+<button type="button" aria-label="Prethodni mjesec" style="width: 32px; height: 32px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg></button>
+<button type="button" aria-label="Sljedeći mjesec" style="width: 32px; height: 32px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center">
+<sc-for list="{{weekdays}}" as="w" hint-placeholder-count="7"><div style="font-size: 11px; font-weight: 600; color: #98A39F; padding: 4px 0">{{w}}</div></sc-for>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="35"><button type="button" style="{{d.style}}">{{d.n}}</button></sc-for>
+</div>
+</div>
+<div style="flex-grow: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px">
+<label for="tm" style="font-size: 12px; font-weight: 600; color: #5B6763">Vrijeme</label>
+<input id="tm" value="14:35" style="border: 0; border-radius: 7px; background: #EDEFEE; font: inherit; font-size: 20px; font-weight: 600; text-align: center; padding: 6px; color: #0D1714; font-variant-numeric: tabular-nums; outline: none">
+<div style="display: flex; gap: 6px; height: 196px">
+<div role="listbox" aria-label="Sat" style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; overflow: hidden">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="7"><button type="button" role="option" style="{{h.style}}">{{h.v}}</button></sc-for>
+</div>
+<div role="listbox" aria-label="Minute" style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; overflow: hidden">
+<sc-for list="{{minutes}}" as="m" hint-placeholder-count="7"><button type="button" role="option" style="{{m.style}}">{{m.v}}</button></sc-for>
+</div>
+</div>
+<button type="button" style="border: 0; font: inherit; font-size: 13px; font-weight: 500; padding: 6px 10px; border-radius: 999px; background: #E6F2EE; color: #047857">Sada</button>
+</div>
+</div>
+<p style="margin: 8px 0 0 136px; width: 492px; font-size: 13px; line-height: 1.45; color: #5B6763">Svaka minuta je dostupna: tipkanje „1435” ili „14.35” postaje 14:35, stupci se pomiču kotačićem ili strelicama. Korak minuta (npr. 5) je opcija polja, ne pravilo.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":760,"height":600}}'>
+class Component extends DCLogic {
+renderVals() {
+const base = 'height: 34px; border: 0; font: inherit; font-size: 14px; border-radius: 999px; font-variant-numeric: tabular-nums;';
+const days = [];
+[28, 29, 30].forEach((n) => days.push({ n, style: base + 'background: transparent; color: #C3CAC7;' }));
+for (let n = 1; n <= 31; n++) {
+const weekday = (n + 2) % 7;
+let style = base + 'background: transparent; color: ' + (weekday >= 5 ? '#5B6763' : '#0D1714') + ';';
+if (n === 1) style = base + 'background: transparent; color: #047857; font-weight: 700; box-shadow: inset 0 0 0 1.5px #047857;';
+if (n === 15) style = base + 'background: #047857; color: #FFFFFF; font-weight: 600;';
+days.push({ n, style });
+}
+days.push({ n: 1, style: base + 'background: transparent; color: #C3CAC7;' });
+const cell = 'min-height: 26px; border: 0; font: inherit; font-size: 14px; border-radius: 6px; font-variant-numeric: tabular-nums;';
+const col = (values, pick) => values.map((v) => ({ v, style: cell + (v === pick ? 'background: #047857; color: #FFFFFF; font-weight: 600;' : 'background: transparent; color: #2B3632;') }));
+return {
+weekdays: ['Po', 'Ut', 'Sr', 'Če', 'Pe', 'Su', 'Ne'],
+days,
+hours: col(['11', '12', '13', '14', '15', '16', '17'], '14'),
+minutes: col(['32', '33', '34', '35', '36', '37', '38'], '35'),
+};
+}
+}
+</script>
+</body>
+</html>
