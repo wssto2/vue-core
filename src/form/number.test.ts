@@ -27,6 +27,11 @@ describe("parseNumber", () => {
     expect(parseNumber("1,5", en)).toBe(1.5);
   });
 
+  it("with no grouping mark (grouping off), a single mark is always the decimal mark", () => {
+    expect(parseNumber("1.000", { decimals: 3, group: "" })).toBe(1);
+    expect(parseNumber("45,815123", { decimals: 6, group: "" })).toBe(45.815123);
+  });
+
   it("rounds to the decimals", () => expect(parseNumber("1,239", { decimals: 2, group: "." })).toBe(1.24));
 
   it("takes marks as grouping when no decimals are allowed", () => {
