@@ -1,4 +1,4 @@
-import { createI18n } from "vue-i18n";
+import { createI18n, type I18n } from "vue-i18n";
 import { coreMessages } from "../i18n";
 
 /** Messages per locale: `{ en: { tickets: { title: "Tickets" } } }`. */
@@ -28,8 +28,9 @@ function merge(target: Record<string, unknown>, source: Record<string, unknown>)
  *
  *   const i18n = createTestI18n({ messages: { en: { tickets: { title: "Tickets" } } } });
  */
-export function createTestI18n(options: TestI18nOptions = {}) {
+export function createTestI18n(options: TestI18nOptions = {}): I18n<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, string, false> {
   const messages: Record<string, Record<string, unknown>> = { ...coreMessages };
   for (const [locale, own] of Object.entries(options.messages ?? {})) messages[locale] = merge(messages[locale] ?? {}, own);
-  return createI18n({ legacy: false, locale: options.locale ?? "en", fallbackLocale: "en", messages: messages as unknown as typeof coreMessages }); // typed as the library's, so `global.locale` is the composition API's ref
+  // Typed as the library's messages so vue-i18n infers the composition API; returned as the loose type any locale of yours fits.
+  return createI18n({ legacy: false, locale: options.locale ?? "en", fallbackLocale: "en", messages: messages as unknown as typeof coreMessages }) as unknown as ReturnType<typeof createTestI18n>;
 }
