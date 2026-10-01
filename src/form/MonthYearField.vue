@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { Icon } from "../icon";
 import DateButton from "../controls/DateButton.vue";
+import { Icon } from "../icon";
 import Popover from "../overlay/Popover.vue";
+import MonthYearPanel from "./date/MonthYearPanel.vue";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, type FieldProps } from "./field";
 
 /**
- * A month and a year shown as one date button, kept as two numbers (`month` 1 to 12, `year`), the way a record stores
- * a first registration. The button opens a popover with a year stepper and the twelve months. Bind both:
+ * A month and a year shown as one date button, kept as two numbers (`month` 1 to 12, `year`), the way a record stores a
+ * first registration. The button opens a popover with the year (arrows step it; clicking it opens a grid of twelve years,
+ * so 2008 is two clicks away) and the twelve months. Bind both:
  *
  *   <MonthYearField v-bind="form.bindMonthYear('regMonth', 'regYear')" :label="t('firstRegistration')" />
  *
@@ -32,16 +34,9 @@ const shown = computed(() => {
   return hasMonth.value ? name(month.value as number, "long") : "";
 });
 
-const now = new Date().getFullYear();
-const viewYear = ref(year.value ?? Math.min(Math.max(now, props.minYear), props.maxYear));
-watch(year, (value) => {
-  if (value !== null) viewYear.value = value;
-});
-const step = (by: number) => (viewYear.value = Math.min(props.maxYear, Math.max(props.minYear, viewYear.value + by)));
-
-function pick(value: number, dismiss: () => void) {
-  month.value = value;
-  year.value = viewYear.value;
+function pick(value: { month: number; year: number }, dismiss: () => void) {
+  month.value = value.month;
+  year.value = value.year;
   dismiss();
 }
 function clear(dismiss: () => void) {
@@ -55,26 +50,13 @@ function clear(dismiss: () => void) {
   <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="shown || null">
     <Popover :label="props.label ?? shown" width="sm" placement="bottom-start" :arrow="false">
       <template #trigger="{ toggle, presented }">
-        <DateButton v-bind="{ id, 'aria-describedby': describedby }" :expanded="presented" :disabled="props.disabled" :invalid="invalid" @click="toggle">{{ shown }}</DateButton>
+        <DateButton v-bind="{ id, 'aria-describedby': describedby }" :expanded="presented" :disabled="props.disabled" :invalid="invalid" @click="toggle">
+          <template v-if="shown">{{ shown }}<Icon name="calendarLine" :size="16" class="ml-2 shrink-0 text-content-muted" /></template>
+        </DateButton>
       </template>
       <template #default="{ dismiss }">
-        <div class="flex flex-col gap-2" data-test="month-year-picker">
-          <div class="flex items-center justify-between">
-            <button type="button" :disabled="viewYear <= props.minYear" :aria-label="String(viewYear - 1)" class="flex size-8 cursor-pointer items-center justify-center rounded-control hover:bg-fill disabled:opacity-40" @click="step(-1)">
-              <Icon name="arrowLeftSLine" :size="18" />
-            </button>
-            <span class="text-body font-semibold tabular-nums">{{ viewYear }}</span>
-            <button type="button" :disabled="viewYear >= props.maxYear" :aria-label="String(viewYear + 1)" class="flex size-8 cursor-pointer items-center justify-center rounded-control hover:bg-fill disabled:opacity-40" @click="step(1)">
-              <Icon name="arrowRightSLine" :size="18" />
-            </button>
-          </div>
-          <div class="grid grid-cols-3 gap-1">
-            <button v-for="value in 12" :key="value" type="button" :aria-pressed="month === value && year === viewYear"
-              class="min-h-9 cursor-pointer rounded-control px-1 text-body focus-visible:outline-2 focus-visible:outline-border-focus"
-              :class="month === value && year === viewYear ? 'bg-tint-soft font-semibold text-content-link' : 'hover:bg-fill'" @click="pick(value, dismiss)">
-              {{ name(value, "short") }}
-            </button>
-          </div>
+        <div class="flex flex-col gap-2">
+          <MonthYearPanel :month="month" :year="year" :min-year="props.minYear" :max-year="props.maxYear" @pick="pick($event, dismiss)" />
           <button v-if="hasMonth || year !== null" type="button" class="cursor-pointer self-start rounded-control px-1 text-footnote text-content-link" @click="clear(dismiss)">{{ t("core.form.select.clear") }}</button>
         </div>
       </template>

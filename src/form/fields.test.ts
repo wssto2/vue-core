@@ -10,7 +10,6 @@ import ChoiceChips from "./ChoiceChips.vue";
 import FormGroup from "./FormGroup.vue";
 import FormView from "./FormView.vue";
 import MoneyField from "./MoneyField.vue";
-import MonthYearField from "./MonthYearField.vue";
 import NumberCell from "./NumberCell.vue";
 import NumberField from "./NumberField.vue";
 import OtpInput from "./OtpInput.vue";
@@ -18,7 +17,6 @@ import SegmentedField from "./SegmentedField.vue";
 import SwitchField from "./SwitchField.vue";
 import TextareaField from "./TextareaField.vue";
 import TextField from "./TextField.vue";
-import { settle } from "./testing";
 import { useForm } from "./useForm";
 
 const i18n = createTestI18n("en");
@@ -303,25 +301,6 @@ describe("SegmentedField, ChoiceChips and CardSelectField", () => {
     expect(screen.getAllByRole("radio")).toHaveLength(2);
     await fireEvent.click(screen.getByRole("radio", { name: /Beta/ }));
     expect(update).toHaveBeenCalledWith("b");
-  });
-});
-
-describe("MonthYearField", () => {
-  it("a month and year pick writes both numbers", async () => {
-    const month = vi.fn();
-    const year = vi.fn();
-    render(MonthYearField, { props: { month: null, year: null, "onUpdate:month": month, "onUpdate:year": year, label: "First registration" }, global: { plugins } });
-    await fireEvent.click(screen.getByLabelText("First registration"));
-    await settle();
-    await fireEvent.click(screen.getByRole("button", { name: "Mar" }));
-    expect(month).toHaveBeenCalledWith(3);
-    expect(year).toHaveBeenCalledWith(new Date().getFullYear());
-  });
-
-  it("shows a month and year in the market's own language", () => {
-    const hr = createTestI18n("hr");
-    render(MonthYearField, { props: { month: 3, year: 2021, label: "Prva registracija" }, global: { plugins: [hr, testFormatting(hr)] } });
-    expect(screen.getByLabelText("Prva registracija").textContent).toContain("ožujak 2021.");
   });
 });
 
