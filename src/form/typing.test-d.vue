@@ -9,6 +9,7 @@ import MonthYearField from "./MonthYearField.vue";
 import MultiSelectField from "./MultiSelectField.vue";
 import NumberField from "./NumberField.vue";
 import ComboField from "./ComboField.vue";
+import PhoneField from "../phone/PhoneField.vue";
 import SegmentedField from "./SegmentedField.vue";
 import SelectField from "./SelectField.vue";
 import SwitchField from "./SwitchField.vue";
@@ -27,6 +28,7 @@ const form = useForm({
     mode: "a" as "a" | "b",
     title: {} as Record<string, string>,
     customerId: null as number | null,
+    mobile: "",
   }),
 });
 const statuses = [
@@ -48,11 +50,16 @@ const tagOptions: readonly SelectOption<string>[] = [{ value: "a", label: "A" }]
   <SegmentedField v-bind="form.bind('mode')" :options="[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]" />
   <MonthYearField v-bind="form.bindMonthYear('month', 'year')" />
   <I18nField v-bind="form.bind('title')" :required-locales="['hr']" />
+  <PhoneField v-bind="form.bind('mobile')" default-country="BA" :common-countries="['DE', 'AT']" />
   <!-- free text stays a string whatever it suggests; a record pick keeps its id type -->
   <TextField v-bind="form.bind('name')" :suggestions="['Zagreb', { text: 'Split', detail: 'Croatia' }]" recents="city" />
   <TextField v-bind="form.bind('name')" :suggestions="async (query: string) => [query]" />
   <ComboField v-bind="form.bind('customerId')" :search="async () => [{ value: 7, label: 'Ann' }]" recents="customer" />
 
+  <!-- @vue-expect-error a phone number is stored as text -->
+  <PhoneField v-bind="form.bind('age')" />
+  <!-- @vue-expect-error a country is an ISO code libphonenumber knows -->
+  <PhoneField v-bind="form.bind('mobile')" default-country="XX" />
   <!-- @vue-expect-error a text in several languages is a record by locale, not one string -->
   <I18nField v-bind="form.bind('name')" />
   <!-- @vue-expect-error a text field cannot edit a record by locale -->

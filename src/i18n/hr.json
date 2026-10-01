@@ -244,6 +244,27 @@
         "required": "Obavezno za: {languages}.",
         "copy": "Kopiraj {language} u prazne",
         "more": "Još jezika: {count} · popunjeno: {filled}"
+      },
+      "phone": {
+        "country": "Država: {country}",
+        "countries": "Države",
+        "search": "Upišite državu ili pozivni broj…",
+        "common": "Često",
+        "all": "Sve države",
+        "no_match": "Nema države koja odgovara.",
+        "too_short": "Broj je prekratak za: {country}.",
+        "too_long": "Broj je predug za: {country}.",
+        "invalid": "Ovo nije ispravan broj za: {country}.",
+        "invalid_any": "Ovo nije ispravan telefonski broj.",
+        "kind_mobile": "Mobilni broj",
+        "kind_landline": "Fiksni broj",
+        "kind_toll_free": "Besplatni broj",
+        "kind_premium_rate": "Broj s posebnom tarifom",
+        "kind_voip": "Internetski (VoIP) broj",
+        "call": "Nazovi",
+        "message": "Poruka",
+        "copy": "Kopiraj",
+        "copied": "Kopirano"
       }
     }
   }

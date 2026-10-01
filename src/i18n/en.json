@@ -244,6 +244,27 @@
         "required": "Required in {languages}.",
         "copy": "Copy {language} into empty ones",
         "more": "{count} more languages · {filled} written"
+      },
+      "phone": {
+        "country": "Country: {country}",
+        "countries": "Countries",
+        "search": "Type a country or dial code…",
+        "common": "Common",
+        "all": "All countries",
+        "no_match": "No country matches.",
+        "too_short": "The number is too short for {country}.",
+        "too_long": "The number is too long for {country}.",
+        "invalid": "This is not a valid number for {country}.",
+        "invalid_any": "This is not a valid phone number.",
+        "kind_mobile": "Mobile number",
+        "kind_landline": "Landline number",
+        "kind_toll_free": "Toll-free number",
+        "kind_premium_rate": "Premium-rate number",
+        "kind_voip": "Internet (VoIP) number",
+        "call": "Call",
+        "message": "Message",
+        "copy": "Copy",
+        "copied": "Copied"
       }
     }
   }
