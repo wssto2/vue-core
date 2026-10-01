@@ -4,7 +4,7 @@ export { default as Popover } from "./Popover.vue";
 export { default as Toaster } from "./Toaster.vue";
 export { default as Tooltip } from "./Tooltip.vue";
 export { toast, type ToastAction, type ToastId, type ToastOptions } from "./toast";
-export { INERT_SKIP_ATTR } from "./dialogStack";
+export { INERT_SKIP_ATTR, useOpenDialogCount } from "./dialogStack";
 export { INITIAL_FOCUS_SKIP_ATTR, useDialog, type DialogOptions } from "./useDialog";
 export { COMPACT_MEDIA_QUERY, useCompactPresentation } from "../internal/mediaQuery";
 export { default as PhotoViewer, type PhotoViewerItem } from "./PhotoViewer.vue";

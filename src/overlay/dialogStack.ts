@@ -88,3 +88,16 @@ export function useDialogStack(root: Ref<HTMLElement | null>): {
 
   return { isTop, activate, deactivate };
 }
+
+/**
+ * How many dialogs are open in the document (Modal, Sheet, AlertDialog, PhotoViewer; nested ones
+ * count each), as a reactive value. An application shown inside a frame uses it to tell the page
+ * around it that something covers the viewport (to grow the frame, to dim its own chrome).
+ *
+ *   const open = useOpenDialogCount();
+ *   watch(open, (count) => host.postMessage({ dialogs: count }));
+ */
+export function useOpenDialogCount(): ComputedRef<number> {
+  const state = stack();
+  return computed(() => state.entries.value.length);
+}

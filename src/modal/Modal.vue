@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId, useSlots, watch } from "vue";
+import { computed, inject, ref, useId, useSlots, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
 import { Icon, type IconName } from "../icon";
@@ -8,6 +8,7 @@ import { useDialog } from "../overlay/useDialog";
 import { useSheetDrag } from "../overlay/useSheetDrag";
 import DrawnCheck from "../state/DrawnCheck.vue";
 import ProgressTrack from "../state/ProgressTrack.vue";
+import { modalPlacementKey, resolvePlacement, type ModalPlacement } from "./placement";
 import { useSheetStack } from "./sheetStack";
 
 /**
@@ -65,6 +66,8 @@ const props = withDefaults(defineProps<{
   cancellableWhileProcessing?: boolean;
   /** A hairline along the top (0–100); `complete` fills it. Null or undefined draws none. */
   progress?: { value: number; complete?: boolean } | null;
+  /** Wide screens: where the dialog stands, over the application's `modalPlacementKey` default. */
+  placement?: ModalPlacement;
 }>(), {
   title: undefined,
   subtitle: undefined,
@@ -81,6 +84,7 @@ const props = withDefaults(defineProps<{
   doneLabel: undefined,
   cancellableWhileProcessing: false,
   progress: undefined,
+  placement: undefined,
 });
 
 // `presented` once the dialog is open and has taken focus; `dismissed` once it has closed,
@@ -104,6 +108,8 @@ const panel = ref<HTMLElement | null>(null);
 const body = ref<HTMLElement | null>(null);
 const titleId = useId();
 const isCompact = useCompactPresentation();
+const appPlacement = inject(modalPlacementKey, undefined);
+const placed = computed(() => resolvePlacement(appPlacement, props.placement));
 
 const dialog = useDialog(panel, {
   beforeDismiss: () => props.beforeDismiss?.() ?? true,
@@ -230,14 +236,14 @@ defineExpose({ present, dismiss: async () => dialog.dismiss() });
            dialog jumped sideways whenever its content grew past the viewport (a dropdown opening,
            a toggle revealing fields) and the scrollbar appeared. -->
       <div v-else class="fixed inset-0 z-10 w-screen overflow-y-auto [scrollbar-gutter:stable_both-edges]" :class="isOpen ? '' : 'pointer-events-none'">
-        <div class="flex min-h-full items-center justify-center p-4">
+        <div class="flex min-h-full justify-center p-4" :class="placed.align === 'top' ? 'items-start pt-10' : 'items-center'">
           <transition appear enter-active-class="transition duration-motion-normal ease-motion-standard"
             enter-from-class="opacity-0 scale-95" leave-active-class="pointer-events-none transition duration-motion-fast ease-motion-standard"
             leave-to-class="opacity-0 scale-95" @after-leave="unmountIfClosed">
             <div v-if="isOpen" ref="panel" tabindex="-1" data-part="panel"
               class="relative my-8 w-full rounded-dialog text-left text-content-strong shadow-dialog outline-none transition-transform duration-motion-sheet ease-motion-sheet"
               :class="[SIZES[props.size], props.grouped ? 'bg-surface-page' : 'bg-surface-cell', covered ? '-translate-y-4' : '', stacked ? 'translate-y-4 scale-96' : '']"
-              :data-covered="covered || undefined">
+              :data-covered="covered || undefined" :style="placed.offsetX ? { transform: `translateX(${placed.offsetX}px)` } : undefined">
               <div v-if="props.progress" class="absolute inset-x-0 top-0 z-20 overflow-hidden rounded-t-dialog">
                 <ProgressTrack hairline :value="props.progress.value" :done="props.progress.complete" />
               </div>
