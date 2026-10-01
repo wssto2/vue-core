@@ -23,7 +23,8 @@ export interface PhotoViewerItem {
  * and a strip of thumbnails. It is a dialog like `Modal`: the page behind is inert, Tab stays inside, Escape closes and focus goes back
  * to what opened it. Under reduced motion nothing animates.
  *
- * Keys: ← → photos, + − zoom, 0 fits the screen again, R rotates, Esc closes.
+ * Keys: ← → photos, + − zoom, 0 fits the screen again, R rotates, Esc closes. `#actions` (given the photo on show) adds your own buttons to the header:
+ * "Make cover", "Delete".
  *
  *   <PhotoViewer ref="viewer" :items="photos" title="VW Golf 8" />
  *   <button @click="viewer?.present(index)">…</button>        viewer.value?.dismiss()
@@ -37,6 +38,11 @@ const props = withDefaults(defineProps<{
 /** The photograph on show (0-based). */
 const index = defineModel<number>("index", { default: 0 });
 const emit = defineEmits<{ presented: []; dismissed: [] }>();
+
+defineSlots<{
+  /** Next to the zoom buttons: what the app does with the photo on show (make it the cover, delete it). */
+  actions?: (scope: { item: PhotoViewerItem; index: number }) => unknown;
+}>();
 
 const { t } = useI18n();
 const panel = ref<HTMLElement | null>(null);
@@ -300,6 +306,7 @@ const label = computed(() => props.title ?? t("core.viewer.label"));
               <span v-if="props.title">{{ props.title }} · </span><span aria-live="polite" data-test="photo-counter">{{ t("core.viewer.counter", { current: index + 1, total: props.items.length }) }}</span>
             </h2>
             <div class="grow"></div>
+            <slot v-if="item" name="actions" :item="item" :index="index"></slot>
             <button type="button" :class="[BUTTON, 'compact:hidden']" :aria-label="t('core.viewer.zoom_out')" :aria-disabled="!zoomed" data-test="zoom-out" @click="zoomBy(-1)"><Icon name="zoomOut" :size="18" /></button>
             <p class="w-13 text-center text-subheadline tabular-nums compact:hidden" data-test="zoom-percent">{{ t("core.viewer.zoom_percent", { percent }) }}</p>
             <button type="button" :class="[BUTTON, 'compact:hidden']" :aria-label="t('core.viewer.zoom_in')" :aria-disabled="zoom >= MAX_ZOOM" data-test="zoom-in" @click="zoomBy(1)"><Icon name="zoomIn" :size="18" /></button>

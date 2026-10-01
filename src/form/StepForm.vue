@@ -59,7 +59,8 @@ watch(() => props.flow.refusals.value, async () => {
       <Button prominence="link" size="sm" @click="props.flow.restart()">{{ t("core.steps.start_over") }}</Button>
     </div>
 
-    <FormErrors :form="props.flow" />
+    <!-- Keyed by the step: which fields are on screen (and so which errors are "not shown") changes with it. -->
+    <FormErrors :key="props.flow.current.value.name" :form="props.flow" />
 
     <!-- Keyed by the step, so each one is its own element that slides in. -->
     <form :key="props.flow.current.value.name" ref="body" tabindex="-1" novalidate data-test="step-body"

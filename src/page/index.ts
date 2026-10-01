@@ -27,4 +27,4 @@ export { default as SectionJumper } from "./SectionJumper.vue";
 export { default as SectionList } from "./SectionList.vue";
 export { default as SectionPanel } from "./SectionPanel.vue";
 export { useLargeTitle } from "./useLargeTitle";
-export type { PageAction, PageBack, PagePathItem, PageSectionBack, QuickAction, SectionFormState } from "./types";
+export type { PageAction, PageBack, PagePathItem, PageSectionBack, QuickAction, SectionFormState, SectionStep } from "./types";

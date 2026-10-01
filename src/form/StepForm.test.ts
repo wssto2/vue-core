@@ -266,3 +266,20 @@ describe("a restored draft", () => {
     expect(q("step-restored")).toBeNull();
   });
 });
+
+describe("errors that belong to another step", () => {
+  it("do not claim to be hidden once the step that has them is on screen", async () => {
+    const { flow, form } = mountFlow(PAGE);
+    await type("Name", "Ana");
+    await type("E-mail", "a@b.c");
+    await flow.next();
+    await settle();
+    form.errors.set({ email: ["Already in use"] }); // the server's answer arrives while the user is on the vehicle step
+    await settle();
+    expect(document.querySelector('[data-test="form-errors-hidden"]')).not.toBeNull(); // its field is on another step
+    flow.back();
+    await settle();
+    expect(screen.getByLabelText("E-mail")).toBeTruthy();
+    expect(document.querySelector('[data-test="form-errors-hidden"]')).toBeNull();
+  });
+});
