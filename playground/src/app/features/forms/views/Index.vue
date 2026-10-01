@@ -33,6 +33,7 @@ const actions = computed<PageAction[]>(() => [{ id: "new-offer", label: t("forms
         </FormGroup>
         <FormGroup :header="t('forms.dates.title')">
           <FormRow :label="t('forms.dates.link')" :sub="t('forms.dates.intro')" :to="formsRoutes.dates" layout="setting" />
+          <FormRow :label="t('forms.options.link')" :sub="t('forms.options.intro')" :to="formsRoutes.options" layout="setting" />
         </FormGroup>
       </template>
     </AsyncSection>
