@@ -56,3 +56,8 @@ export { default as CommandDialog } from "./CommandDialog.vue";
 export { useCommand } from "./useCommand";
 export type { Command, CommandOptions } from "./useCommand";
 export { default as NumberCell } from "./NumberCell.vue";
+export { useStepForm } from "./steps";
+export type { StepDefinition, StepDialogBinding, StepDraftOptions, StepFlow, StepFormOptions, StepState } from "./steps";
+export { default as StepForm } from "./StepForm.vue";
+export { default as StepNavigation } from "./StepNavigation.vue";
+export { default as StepProgress } from "./StepProgress.vue";
