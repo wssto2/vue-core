@@ -235,6 +235,15 @@
         "recent": "Recent",
         "keys_complete": "Tab accepts · ↑↓ chooses · Esc closes",
         "keys_pick": "↑↓ chooses · Enter picks · Esc closes"
+      },
+      "i18n": {
+        "languages": "Language",
+        "tab_written": "{language}, written",
+        "tab_empty": "{language}, empty",
+        "missing": "Not written yet: {languages}.",
+        "required": "Required in {languages}.",
+        "copy": "Copy {language} into empty ones",
+        "more": "{count} more languages · {filled} written"
       }
     }
   }

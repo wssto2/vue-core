@@ -235,6 +235,15 @@
         "recent": "Nedavno",
         "keys_complete": "Tab sprejme · ↑↓ izbira · Esc zapre",
         "keys_pick": "↑↓ izbira · Enter potrdi · Esc zapre"
+      },
+      "i18n": {
+        "languages": "Jezik",
+        "tab_written": "{language}, izpolnjeno",
+        "tab_empty": "{language}, prazno",
+        "missing": "Še ni napisano: {languages}.",
+        "required": "Obvezno za: {languages}.",
+        "copy": "Kopiraj {language} v prazna polja",
+        "more": "Še jezikov: {count} · izpolnjenih: {filled}"
       }
     }
   }
