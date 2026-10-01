@@ -100,7 +100,7 @@ const wheelClass = (position: number) =>
 
 <template>
   <div v-if="props.variant === 'list'" ref="scroller" role="listbox" tabindex="0" :aria-label="props.label" :aria-activedescendant="index >= 0 ? optionId(props.values[index]!) : undefined"
-    class="flex min-w-0 grow flex-col gap-0.5 overflow-y-auto rounded-control [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-border-focus [&::-webkit-scrollbar]:hidden" @keydown="onKeydown">
+    class="relative flex min-w-0 grow flex-col gap-0.5 overflow-y-auto rounded-control [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-border-focus [&::-webkit-scrollbar]:hidden" @keydown="onKeydown">
     <div v-for="value in props.values" :id="optionId(value)" :key="value" role="option" :aria-selected="value === model" :data-value="value"
       class="flex min-h-6.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-body tabular-nums transition-colors duration-motion-fast"
       :class="value === model ? 'bg-tint font-semibold text-content-on-tint' : 'text-content-strong hover:bg-fill'" @click="pick(value)">

@@ -265,6 +265,16 @@ describe("DateField on a phone", () => {
     await vi.waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   });
 
+  it("gives focus back to the button when the sheet closes", async () => {
+    mountField(DateField, { label: "Due" });
+    const button = screen.getByRole("button", { name: "Due" });
+    button.focus();
+    await fireEvent.click(button);
+    await settle();
+    await fireEvent.click(screen.getByRole("button", { name: "Gotovo" }));
+    await vi.waitFor(() => expect(document.activeElement).toBe(button));
+  });
+
   it("dismissing the sheet keeps the value, Clear empties it", async () => {
     const { value } = mountField(DateField, { label: "Due" }, { initial: "2026-10-15" });
     await fireEvent.click(screen.getByRole("button", { name: "Due" }));
