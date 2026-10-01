@@ -70,3 +70,14 @@ export interface SectionFormState {
   readonly errors: number;
   readonly required: { readonly total: number; readonly filled: number };
 }
+
+/**
+ * Where one step of a workflow record stands, for the `steps` of `SectionNavigator`: done, and one line under its label
+ * ("Missing: market comparison") in a tone. `shortSub` is the line on phones when `sub` is too long for a tile.
+ */
+export interface SectionStep {
+  readonly done: boolean;
+  readonly sub?: string;
+  readonly shortSub?: string;
+  readonly tone?: "positive" | "warning" | "critical";
+}

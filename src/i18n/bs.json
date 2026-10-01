@@ -146,6 +146,27 @@
     "sections": {
       "label": "Sekcije"
     },
+    "steps": {
+      "label": "Napredak",
+      "position": "Korak {current} od {total}",
+      "next_named": "Dalje: {step}",
+      "done": "završeno",
+      "draft_saved": "nacrt sačuvan",
+      "restored": "Nastavljate sa sačuvanim nacrtom.",
+      "start_over": "Počni ispočetka"
+    },
+    "viewer": {
+      "label": "Pregled fotografija",
+      "open": "Pogledaj fotografiju",
+      "counter": "{current} / {total}",
+      "zoom_in": "Uvećaj",
+      "zoom_out": "Umanji",
+      "zoom_percent": "{percent} %",
+      "rotate": "Rotiraj",
+      "download": "Preuzmi",
+      "previous": "Prethodna fotografija",
+      "next": "Sljedeća fotografija"
+    },
     "form": {
       "unsaved_changes": "Nespremljene promjene",
       "failure": {
@@ -230,6 +251,41 @@
           "12": "dec"
         },
         "with_year": "{month} {year}."
+      },
+      "suggestions": {
+        "recent": "Nedavno",
+        "keys_complete": "Tab prihvata · ↑↓ bira · Esc zatvara",
+        "keys_pick": "↑↓ bira · Enter odabira · Esc zatvara"
+      },
+      "i18n": {
+        "languages": "Jezik",
+        "tab_written": "{language}, popunjeno",
+        "tab_empty": "{language}, prazno",
+        "missing": "Još nije napisano: {languages}.",
+        "required": "Obavezno za: {languages}.",
+        "copy": "Kopiraj {language} u prazne",
+        "more": "Još jezika: {count} · popunjeno: {filled}"
+      },
+      "phone": {
+        "country": "Država: {country}",
+        "countries": "Države",
+        "search": "Upišite državu ili pozivni broj…",
+        "common": "Često",
+        "all": "Sve države",
+        "no_match": "Nema države koja odgovara.",
+        "too_short": "Broj je prekratak za: {country}.",
+        "too_long": "Broj je predug za: {country}.",
+        "invalid": "Ovo nije ispravan broj za: {country}.",
+        "invalid_any": "Ovo nije ispravan telefonski broj.",
+        "kind_mobile": "Mobilni broj",
+        "kind_landline": "Fiksni broj",
+        "kind_toll_free": "Besplatni broj",
+        "kind_premium_rate": "Broj s posebnom tarifom",
+        "kind_voip": "Internetski (VoIP) broj",
+        "call": "Nazovi",
+        "message": "Poruka",
+        "copy": "Kopiraj",
+        "copied": "Kopirano"
       },
       "date": {
         "calendar": "Kalendar",

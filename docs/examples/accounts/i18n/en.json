@@ -4,6 +4,22 @@
   "plan": "Plan",
   "active": "Active",
   "inactive": "Inactive",
-  "sections": { "label": "Parts of the account", "general": "General", "activity": "Activity" },
-  "activity": { "empty": "Nothing happened yet." }
+  "sections": {
+    "label": "Parts of the account",
+    "general": "General",
+    "activity": "Activity"
+  },
+  "activity": {
+    "empty": "Nothing happened yet."
+  },
+  "onboarding": {
+    "label": "Steps of the onboarding",
+    "complete": "Complete",
+    "profileOpen": "To be filled in",
+    "missing": "Missing: {what}",
+    "missingShort": "Missing data",
+    "documentsCount": "{count} documents"
+  },
+  "photos": "Photographs",
+  "makeCover": "Make cover"
 }

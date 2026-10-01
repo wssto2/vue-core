@@ -12,5 +12,19 @@
   "assign": "Assign…",
   "assignee": "Assignee",
   "note": "Note",
-  "stale": "The ticket was changed by someone else. It was read again; check your changes and save again."
+  "stale": "The ticket was changed by someone else. It was read again; check your changes and save again.",
+  "newTicket": "New ticket",
+  "review": "Review",
+  "subjectRequired": "Enter a subject.",
+  "triage": "Triage",
+  "reason": "Reason",
+  "subjectQuestion": "What is it about?",
+  "priorityQuestion": "How urgent is it?",
+  "reasonQuestion": "Why is it so urgent?",
+  "mobile": "Mobile",
+  "landline": "Landline",
+  "city": "City",
+  "title": "Title",
+  "badPhone": "Enter a valid phone number.",
+  "titleRequired": "The title is required in Croatian."
 }

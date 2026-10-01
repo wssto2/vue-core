@@ -116,6 +116,23 @@ describe("PhotoField", () => {
     expect(image.getAttribute("onerror")).toBeNull();
   });
 
+  it("opens the picture in the viewer when it is tapped, in the form and in read mode", async () => {
+    const view = render(PhotoField, { props: { modelValue: "https://x.test/a.png", label: "Photo" }, global });
+    expect(document.querySelector("[data-test='photo-viewer']")).toBeNull();
+    await fireEvent.click(screen.getByRole("button", { name: "View photo" }));
+    await nextTick();
+    const viewer = document.querySelector("[data-test='photo-viewer']");
+    expect(viewer?.querySelector("[data-test='photo']")?.getAttribute("src")).toBe("https://x.test/a.png");
+    expect(viewer?.querySelector("[data-test='photo']")?.getAttribute("alt")).toBe("Photo");
+    expect(viewer?.querySelector("[data-test='next']")).toBeNull(); // one picture: no arrows
+    view.unmount();
+    document.body.innerHTML = "";
+    render(PhotoField, { props: { modelValue: "https://x.test/a.png", label: "Photo", editable: false }, global });
+    await fireEvent.click(screen.getByRole("button", { name: "View photo" }));
+    await nextTick();
+    expect(document.querySelector("[data-test='photo-viewer']")).not.toBeNull();
+  });
+
   it("refuses what is not a picture, and removes the one it has", async () => {
     const update = vi.fn();
     render(PhotoField, { props: { modelValue: "https://x.test/a.png", label: "Photo", "onUpdate:modelValue": update }, global });

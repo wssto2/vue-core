@@ -44,6 +44,8 @@ defineSlots<{
   readonly?: () => unknown;
   /** A row action after the control (a per-row Save). */
   trailing?: () => unknown;
+  /** At the end of the label's line while editing (the language tabs of `I18nField`). */
+  labelTrailing?: () => unknown;
 }>();
 
 const { t } = useI18n();
@@ -96,12 +98,16 @@ const progress = computed(() =>
     </div>
     <span v-if="locked && props.lockedReason" class="sr-only">{{ props.lockedReason }}</span>
     <template v-if="editable && slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="editable && slots.labelTrailing" #label-trailing><slot name="labelTrailing" /></template>
   </FormRow>
 
   <div v-else-if="!group" v-bind="progress" :data-field-error="props.error ? 'true' : undefined" class="flex min-w-0 flex-col gap-1">
-    <label v-if="props.label" :for="editable ? controlId : undefined" class="text-footnote font-medium text-content-muted">
-      {{ props.label }}<span v-if="editable && props.required" class="text-content-destructive" aria-hidden="true"> *</span>
-    </label>
+    <div v-if="props.label || (editable && slots.labelTrailing)" class="flex items-center justify-between gap-3">
+      <label v-if="props.label" :for="editable ? controlId : undefined" class="text-footnote font-medium text-content-muted">
+        {{ props.label }}<span v-if="editable && props.required" class="text-content-destructive" aria-hidden="true"> *</span>
+      </label>
+      <slot v-if="editable" name="labelTrailing" />
+    </div>
     <slot v-if="editable" :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" />
     <slot v-else-if="slots.readonly" name="readonly" />
     <span v-else class="text-body" :class="hasValue ? 'text-content-strong' : 'text-content-disabled'">{{ hasValue ? `${props.prefix ?? ""}${shown}${props.suffix ?? ""}` : t("core.state.no_value") }}</span>

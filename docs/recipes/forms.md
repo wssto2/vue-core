@@ -1,12 +1,13 @@
 # Forms
 
-`@wssto2/vue-core/form` has three compositions, one per user task. Pick by the task, not by the widget.
+`@wssto2/vue-core/form` has four compositions, one per user task. Pick by the task, not by the widget.
 
 | The user… | Compose | Who saves |
 |---|---|---|
 | changes **one group of a record** | `FormGroup` + `GroupSheet` + `useGroupSheet` | the sheet, one save, the page has none |
 | **creates** a record, or edits a justified long form | `EditorPage` + `useForm` (or `useResourceForm`) | the page, one coordinated submit in the page chrome |
 | **advances, reassigns, approves, re-prices** | `useCommand` + `CommandDialog` (or `AlertDialog`) | one purpose-specific call with its own confirmation |
+| **creates something over several short screens** | `useStepForm` + `StepForm` (in a `Modal` or on a page) | the last step's button, one submit of the whole form |
 
 A screen with group sheets has no global Save. A command is never a field autosave.
 
@@ -185,9 +186,112 @@ const assign = useCommand({
 
 Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
 
+## 4. Step-by-step forms
+
+A form in steps is still **one `useForm`**: the steps only decide which fields are on screen and when each is checked. Use it when the user does one thing in a few short screens (a lead in three steps, an appraisal that asks a question at a time), not for a long form that wants sections (that is `EditorPage`) and not for work done over days in any order (that is a record whose sections are workflow steps, see the [record page recipe](record-page.md)).
+
+`useStepForm(form, { steps, submit })` holds the flow. Each step names the **fields it owns**, so Next checks only those (with the form's own validator), the step counts their errors, and an error the validator or the server sends for a field of an earlier step takes the user back to it. A step without fields (an overview) is never refused. Field names are checked against the form, and `StepForm` takes one slot per step, named after it: a typo in either does not compile.
+
+### In a dialog, with a bar
+
+<!-- example: docs/examples/forms/components/NewTicketSteps.vue:24-36 -->
+```ts
+// Each step names the fields it owns: Next checks those and nothing else, the step counts their errors, and an error
+// the server sends for one of them takes the user back to the step.
+const flow = useStepForm(form, {
+  steps: [
+    { name: "details", label: t("forms.details"), fields: ["subject", "priority"] },
+    { name: "contact", label: t("forms.contact"), fields: ["email", "phone"] },
+    { name: "review", label: t("forms.review") },
+  ],
+  submit: (payload, { idempotencyKey }) => api.create({ subject: payload.subject, priority: payload.priority, due_on: null, email: payload.email, phone: payload.phone }, idempotencyKey),
+  submitLabel: t("forms.create"),
+  onSaved: () => void modal.value?.dismiss(),
+  draft: { key: "tickets:new" }, // survives a reload; removed on submit and on discard
+});
+```
+
+<!-- example: docs/examples/forms/components/NewTicketSteps.vue:41-64 -->
+```vue
+<template>
+  <!-- The dialog takes its subtitle ("Step 2 of 3 · Contact"), its primary button ("Next: Review"), the wait and the
+       "Discard changes?" question from the flow; the bar goes in its header and Back, named after its target, in its footer. -->
+  <Modal ref="modal" :title="t('forms.newTicket')" grouped size="md" v-bind="flow.bindDialog()" @primary="flow.next()" @dismissed="flow.restart()">
+    <template #header><StepProgress :flow="flow" /></template>
+    <template #timestamp><Button v-if="flow.backLabel.value" prominence="plain" icon="arrowLeftSLine" @click="flow.back()">{{ flow.backLabel.value }}</Button></template>
+
+    <StepForm :flow="flow" progress="none" navigation="host">
+      <template #details>
+        <FormGroup>
+          <TextField v-bind="form.bind('subject')" :label="t('forms.subject')" required />
+          <NumberField v-bind="form.bind('priority')" :label="t('forms.priority')" />
+        </FormGroup>
+      </template>
+      <template #contact>
+        <FormGroup>
+          <TextField v-bind="form.bind('email')" type="email" :label="t('forms.email')" />
+          <TextField v-bind="form.bind('phone')" type="tel" :label="t('forms.phone')" />
+        </FormGroup>
+      </template>
+      <template #review><p>{{ form.values.subject }}</p></template>
+    </StepForm>
+  </Modal>
+</template>
+```
+
+What the flow does for you:
+
+- **Progress.** `StepProgress` (or `StepForm progress="bar"`, the default) draws one segment per step with its number and name; a step that is done gets a ✓, a step with errors shows how many fields are wrong, and a step already passed is a button that goes back to it. `progress="dots"` draws one dot per step with the current one wide: for steps that depend on answers, whose names cannot be told in advance.
+- **Words.** `flow.subtitle` is "Step 2 of 3 · Contact" (and "· draft saved"); the buttons name their target: Back is the previous step's label, Next is "Next: Review", a step may set its own `nextLabel` ("Confirm"), and the last step's button is the `submitLabel`.
+- **Checks.** Next checks the current step only. A step may add `beforeNext`, an async check or lookup that resolves false to keep the user there (the button waits, `flow.busy`). Back checks nothing and loses nothing: values and the other steps' errors stay. Going forward by clicking a step re-checks every step on the way.
+- **Sending.** The last step's Next sends the whole form with `submit`; the validator's or the server's refusal puts the user on the first step with an error, a failure that is not about a field (a conflict, no permission) is said in the banner and the user stays, and the draft is kept in every case. On success `onSaved` runs and the draft is gone.
+- **Leaving.** Closing the dialog (Escape, the close button, the scrim) with something entered asks "Discard changes?" through the app's leave guard: `bindDialog()` hands the dialog the question as its `before-dismiss`. On a page the leave guard asks on navigation by itself.
+- **Draft.** With `draft: { key }` what was entered, the step and the steps passed are kept in `sessionStorage` (or `storage: "local"`) a moment after each change, and put back after a reload; the step form says "Continuing your saved draft" and offers "Start over". It is removed on submit and on discard. Change `version` when the form's shape changes: a draft of another version is ignored, and only keys the form has, holding the same kind of value, are restored. Values must be JSON (a file is never kept). A browser that blocks storage simply has no draft.
+- **Motion.** A step slides in from the side the user came from; under reduced motion it fades. Focus follows the step (to the step itself, never into a field, which would raise a phone's keyboard) and goes to the first field in error after a refused Next. Enter inside a field is Next.
+
+### On a page, with dots, and steps that change
+
+<!-- example: docs/examples/forms/views/Triage.vue:11-25 -->
+```ts
+const form = useForm({ defaults: () => ({ subject: "", urgent: null as number | null, reason: "" }) });
+const asksReason = computed(() => (form.values.urgent ?? 0) > 2);
+
+// The steps depend on an answer: a high urgency adds a question. The user stays on their step by name, and the
+// dots count what is asked now (a bar of names could not say in advance).
+const flow = useStepForm(form, {
+  steps: () => [
+    { name: "subject" as const, label: t("forms.subject"), fields: ["subject" as const] },
+    { name: "urgent" as const, label: t("forms.priority"), fields: ["urgent" as const] },
+    ...(asksReason.value ? [{ name: "reason" as const, label: t("forms.reason"), fields: ["reason" as const] }] : []),
+    { name: "review" as const, label: t("forms.review") },
+  ],
+  submit: async () => undefined,
+  onSaved: () => void router.push("/"),
+});
+```
+
+<!-- example: docs/examples/forms/views/Triage.vue:28-38 -->
+```vue
+<template>
+  <!-- On a page the flow draws its own Back, Cancel and Next under the step. -->
+  <AdaptivePageShell :title="t('forms.triage')" :description="flow.subtitle.value" width="content">
+    <StepForm :flow="flow" progress="dots" @cancel="router.push('/')">
+      <template #subject><h3 class="text-center text-title font-bold">{{ t("forms.subjectQuestion") }}</h3><TextField v-bind="form.bind('subject')" :label="t('forms.subject')" /></template>
+      <template #urgent><h3 class="text-center text-title font-bold">{{ t("forms.priorityQuestion") }}</h3><NumberField v-bind="form.bind('urgent')" :label="t('forms.priority')" /></template>
+      <template #reason><h3 class="text-center text-title font-bold">{{ t("forms.reasonQuestion") }}</h3><TextField v-bind="form.bind('reason')" :label="t('forms.reason')" /></template>
+      <template #review><p class="text-center">{{ form.values.subject }}</p></template>
+    </StepForm>
+  </AdaptivePageShell>
+</template>
+```
+
+`steps` may be a getter or a ref: steps can be added or removed while the flow runs. The user stays on their step **by name**; if it goes away they land on the one that took its place, and the steps after the current one are no longer counted as done (the answers they stood on may have changed). A step's slot content is your own: a large title for one question per screen, a `FormGroup` for a few fields.
+
+`StepForm` has `navigation="inline"` (default: Back, Cancel and Next under the step, `@cancel` for the page to answer) or `"host"` when a `Modal` or a footer of your own owns the buttons: a `Modal` takes `flow.bindDialog()`, a `Sheet` or a page footer renders `<StepNavigation :flow="flow" @cancel="…" />`. A `Sheet` has no `before-dismiss`, so use a `Modal` for a flow that must ask before it is closed.
+
 ## Fields
 
-One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `TimeField`, `MonthYearField`, `FileField`, `PhotoField`, and `OtpInput`; `Field` itself for a control of your own.
+One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `TimeField`, `MonthYearField`, `FileField`, `PhotoField` (tap the picture to look at it in the photo viewer), `I18nField`, `PhoneField` (its own subpath, below), and `OtpInput`; `Field` itself for a control of your own.
 
 - A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a time `"14:35"`, a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
@@ -286,6 +390,91 @@ Where the app is in its compact presentation (a narrow or touch screen) the fiel
 ### Reading
 
 Read mode shows the value the way the app formats it (`useFormat().date`, `.dateTime`, `.time`), so an app that writes `DD.MM.YYYY.` keeps it. A locked field is the field's `disabled`, as for every field.
+
+## Phone numbers
+
+`PhoneField` is in its own subpath, `@wssto2/vue-core/phone`, because it brings the phone metadata of libphonenumber-js (about 225 kB minified, 55 kB compressed, with the mobile / landline data): an app without phone fields does not download it. It is a country picker with the flag and dial code (common countries first, then all, searchable by name or dial code) and a number that is formatted as it is typed. The value is a string in E.164, `+38591234567`, or `""`.
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:35-36 -->
+```vue
+    <PhoneField v-bind="form.bind('mobile')" :label="t('forms.mobile')" />
+    <PhoneField v-bind="form.bind('landline')" :label="t('forms.landline')" default-country="BA" />
+```
+
+- A number typed without a dial code belongs to the shown country (`091 234 5678` and `91 234 5678` are the same), a number pasted with a plus or `00` switches the country (`+387 61 234 567` makes it Bosnia and Herzegovina), and changing the country in the picker keeps the digits.
+- When the user leaves the field it says what is wrong ("The number is too short for Bosnia & Herzegovina.", too long, not valid for the country) and, when the metadata can tell, what the number is (mobile, landline, toll-free). A number the field cannot place (a US number may be either) says nothing.
+- The field reports; only a validator stops the save. `isValidPhone(value)` and `phoneProblem(value)` (the reason and the country) are the same check, for the form's schema; `phoneKind(value)` says mobile or landline, for a rule such as "a mobile number is required".
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:24-25 -->
+```ts
+      // The phone field says what is wrong once it is left; only a validator stops the save.
+      for (const field of ["mobile", "landline"] as const) if (!isValidPhone(values[field])) issues.push({ path: [field], message: t("forms.badPhone") });
+```
+
+The default country is the field's `default-country`, else what the app provides once, else Croatia; the same place says which countries the picker lists first:
+
+<!-- example: docs/examples/forms/environment.ts:5-9 -->
+```ts
+/** Once, in the composition root: what the app says about its phone numbers and, if not the browser's `localStorage`, where recent choices are kept. */
+export function installFieldDefaults(app: App, recents?: RecentChoices) {
+  app.provide(phoneDefaultsKey, { defaultCountry: "HR", commonCountries: ["HR", "BA", "SI", "RS", "AT", "DE"] });
+  if (recents) app.provide(recentChoicesKey, recents);
+}
+```
+
+A stored value that is not E.164 (legacy data such as `091 234 5678`) is read as a number of the default country and is not rewritten until the user edits it. Country names come from the browser (`Intl.DisplayNames`) in the app's language; the flags are SVGs, loaded one by one when they scroll into view (Windows draws emoji flags as two letters).
+
+Read mode shows the number in international form with Call (`tel:`), Message (`sms:`) and Copy. WhatsApp and the like are the app's own actions, in the `actions` slot:
+
+<!-- example: docs/examples/forms/components/PhoneRead.vue:8-15 -->
+```vue
+<template>
+  <FormGroup :editable="false">
+    <PhoneField :model-value="mobile" label="Mobile">
+      <!-- Call, Message and Copy come with the field; WhatsApp is the app's own action. -->
+      <template #actions="{ number }"><a :href="`https://wa.me/${number.slice(1)}`" class="rounded-full bg-tint-soft px-3 py-1.5 text-footnote text-content-link">WhatsApp</a></template>
+    </PhoneField>
+  </FormGroup>
+</template>
+```
+
+## Suggestions
+
+One engine suggests while typing, in two fields. `TextField :suggestions` keeps the value free text (a `string`: the user may ignore every suggestion); `ComboField` picks a record and keeps its id type. Both take a minimum length, a debounce and a limit, and neither does a request itself: the source is a function from the feature's `api.ts`.
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:37-38 -->
+```vue
+    <TextField v-bind="form.bind('city')" :label="t('forms.city')" :suggestions="(query, { signal }) => props.api.cities(query, signal)" recents="city" />
+    <ComboField v-bind="form.bind('assignee')" :label="t('forms.assignee')" :search="(query, { signal }) => props.api.users(query, signal)" recents="assignee" />
+```
+
+- A suggestion is a string, or `{ text, detail }` (the detail is the second line of the row: "Croatia · 10 000"). A list is filtered as the user types, the best matches (those that start with the text) first; a function is asked after `suggestions-debounce` ms (default 300) once the text has `suggestions-min-length` characters (default 2), the older request is aborted and an answer for older text is dropped.
+- The best match shows grey after the typed text and **Tab** accepts it; the list marks the matched part. Down and Up move, Enter picks a row the user moved to (a first suggestion nobody moved to does not steal Enter: in a pick-only `ComboField` it does), Escape closes without closing the dialog around it. A pick keeps the focus. The list says when it is loading or failed; a free-text field says nothing when nothing matches (a new street is not an error), a `ComboField` says "No matches".
+- `recents="city"` lists the last five picks under "Recent" before the user types, kept per id. The default store is `localStorage` (a refusing or full store is ignored); an app that keeps them elsewhere provides a `RecentChoices` (`read(id)`, `write(id, choices)`) under `recentChoicesKey`, once.
+
+<!-- example: docs/examples/forms/environment.ts:11-15 -->
+```ts
+/** An adapter that keeps recent choices in memory (for tests, or a store the app fills from its own settings). */
+export function memoryRecents(): RecentChoices {
+  const kept = new Map<string, readonly SelectOption<string | number>[]>();
+  return { read: (id) => kept.get(id) ?? [], write: (id, choices) => void kept.set(id, choices) };
+}
+```
+
+A free-text field with suggestions is left-aligned on phones, where other fields right-align their value: the grey completion needs the text to start at one edge. `TextField` emits `picked` with the `{ text, detail }` chosen, for filling a postcode from the city.
+
+## Text in several languages
+
+`I18nField` edits one text in each language of the app: the title of an advert, a product name. The value is `Record<locale, string>` (`{ hr: "Naslov", en: "Title" }`, `""` is not written yet); a locale the field does not list is kept as it is.
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:39-39 -->
+```vue
+    <I18nField v-bind="form.bind('title')" :label="t('forms.title')" :required-locales="['hr']" />
+```
+
+- A segment per language sits next to the label, a dot on it says whether that language is written. The languages are the app's (`createApplication`'s `locale.supported`) unless `locales` says otherwise; the first (or `default-locale`) is the one **Copy HR into empty ones** copies from. It opens in the app's current language. `multiline` is the textarea variant.
+- `required-locales` says which languages must be written. Leaving the field while one is empty says so under it ("Required in Croatian."), whichever tab is open; a language that is not required but empty is a gentle line ("Not written yet: English."). `missingLocales(value, ['hr'])` is the same check for the schema, as in the form above.
+- Reading shows the current language (or the default's, or the first written) with its code in the label (`Title · HR`) and "3 more languages · 1 written" under it, which opens the others.
 
 ## Testing
 

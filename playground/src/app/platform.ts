@@ -45,6 +45,7 @@ export function createDemoPlatform() {
           expires_at: new Date(Date.now() + 3_600_000).toISOString(),
           navigation: [
             { i18n: "nav.work", children: [{ i18n: "nav.tickets", route: "tickets", icon: "carLine" }, { i18n: "nav.reports", route: "reports", icon: "fileTextLine" }, { i18n: "nav.records", route: "records", icon: "box2Line" }, { i18n: "nav.customers", route: "customers" }, { i18n: "nav.leads", route: "leads" }, { i18n: "forms.nav", route: "forms" }] },
+            { i18n: "workflows.nav", route: "workflows" },
           ],
           access: {
             root: false,

@@ -40,7 +40,15 @@ const stageShell = {
 const drawer = () => document.querySelector<HTMLElement>("[data-shell-drawer]")!;
 const stage = () => document.querySelector<HTMLElement>("[data-shell-stage]")!;
 const menuButton = () => screen.getByRole("button", { name: "Menu", expanded: undefined });
-const afterClose = () => new Promise((resolve) => setTimeout(resolve, 80));
+// The drawer has closed once the page behind it is interactive and in place again; polled, not timed,
+// so a busy machine does not fail the test.
+const afterClose = () =>
+  vi.waitFor(
+    () => {
+      if (stage().hasAttribute("inert") || stage().style.transform !== "") throw new Error("the drawer is still closing");
+    },
+    { timeout: 2000, interval: 10 },
+  );
 
 let media: ReturnType<typeof mockMedia>;
 const widthOf = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetWidth");

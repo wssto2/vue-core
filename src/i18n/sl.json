@@ -146,6 +146,27 @@
     "sections": {
       "label": "Razdelki"
     },
+    "steps": {
+      "label": "Napredek",
+      "position": "Korak {current} od {total}",
+      "next_named": "Naprej: {step}",
+      "done": "končano",
+      "draft_saved": "osnutek shranjen",
+      "restored": "Nadaljujete s shranjenim osnutkom.",
+      "start_over": "Začni znova"
+    },
+    "viewer": {
+      "label": "Pregled fotografij",
+      "open": "Poglej fotografijo",
+      "counter": "{current} / {total}",
+      "zoom_in": "Povečaj",
+      "zoom_out": "Pomanjšaj",
+      "zoom_percent": "{percent} %",
+      "rotate": "Zasukaj",
+      "download": "Prenesi",
+      "previous": "Prejšnja fotografija",
+      "next": "Naslednja fotografija"
+    },
     "form": {
       "unsaved_changes": "Neshranjene spremembe",
       "failure": {
@@ -230,6 +251,41 @@
           "12": "dec"
         },
         "with_year": "{month} {year}"
+      },
+      "suggestions": {
+        "recent": "Nedavno",
+        "keys_complete": "Tab sprejme · ↑↓ izbira · Esc zapre",
+        "keys_pick": "↑↓ izbira · Enter potrdi · Esc zapre"
+      },
+      "i18n": {
+        "languages": "Jezik",
+        "tab_written": "{language}, izpolnjeno",
+        "tab_empty": "{language}, prazno",
+        "missing": "Še ni napisano: {languages}.",
+        "required": "Obvezno za: {languages}.",
+        "copy": "Kopiraj {language} v prazna polja",
+        "more": "Še jezikov: {count} · izpolnjenih: {filled}"
+      },
+      "phone": {
+        "country": "Država: {country}",
+        "countries": "Države",
+        "search": "Vnesite državo ali klicno kodo…",
+        "common": "Pogosto",
+        "all": "Vse države",
+        "no_match": "Nobena država ne ustreza.",
+        "too_short": "Številka je prekratka za: {country}.",
+        "too_long": "Številka je predolga za: {country}.",
+        "invalid": "To ni veljavna številka za: {country}.",
+        "invalid_any": "To ni veljavna telefonska številka.",
+        "kind_mobile": "Mobilna številka",
+        "kind_landline": "Stacionarna številka",
+        "kind_toll_free": "Brezplačna številka",
+        "kind_premium_rate": "Številka s posebno tarifo",
+        "kind_voip": "Internetna (VoIP) številka",
+        "call": "Pokliči",
+        "message": "Sporočilo",
+        "copy": "Kopiraj",
+        "copied": "Kopirano"
       },
       "date": {
         "calendar": "Koledar",

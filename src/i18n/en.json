@@ -146,6 +146,27 @@
     "sections": {
       "label": "Sections"
     },
+    "steps": {
+      "label": "Progress",
+      "position": "Step {current} of {total}",
+      "next_named": "Next: {step}",
+      "done": "done",
+      "draft_saved": "draft saved",
+      "restored": "Continuing your saved draft.",
+      "start_over": "Start over"
+    },
+    "viewer": {
+      "label": "Photo viewer",
+      "open": "View photo",
+      "counter": "{current} / {total}",
+      "zoom_in": "Zoom in",
+      "zoom_out": "Zoom out",
+      "zoom_percent": "{percent}%",
+      "rotate": "Rotate",
+      "download": "Download",
+      "previous": "Previous photo",
+      "next": "Next photo"
+    },
     "form": {
       "unsaved_changes": "Unsaved changes",
       "failure": {
@@ -230,6 +251,41 @@
           "12": "Dec"
         },
         "with_year": "{month} {year}"
+      },
+      "suggestions": {
+        "recent": "Recent",
+        "keys_complete": "Tab accepts · ↑↓ chooses · Esc closes",
+        "keys_pick": "↑↓ chooses · Enter picks · Esc closes"
+      },
+      "i18n": {
+        "languages": "Language",
+        "tab_written": "{language}, written",
+        "tab_empty": "{language}, empty",
+        "missing": "Not written yet: {languages}.",
+        "required": "Required in {languages}.",
+        "copy": "Copy {language} into empty ones",
+        "more": "{count} more languages · {filled} written"
+      },
+      "phone": {
+        "country": "Country: {country}",
+        "countries": "Countries",
+        "search": "Type a country or dial code…",
+        "common": "Common",
+        "all": "All countries",
+        "no_match": "No country matches.",
+        "too_short": "The number is too short for {country}.",
+        "too_long": "The number is too long for {country}.",
+        "invalid": "This is not a valid number for {country}.",
+        "invalid_any": "This is not a valid phone number.",
+        "kind_mobile": "Mobile number",
+        "kind_landline": "Landline number",
+        "kind_toll_free": "Toll-free number",
+        "kind_premium_rate": "Premium-rate number",
+        "kind_voip": "Internet (VoIP) number",
+        "call": "Call",
+        "message": "Message",
+        "copy": "Copy",
+        "copied": "Copied"
       },
       "date": {
         "calendar": "Calendar",

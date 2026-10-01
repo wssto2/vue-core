@@ -1,5 +1,5 @@
 import type { HttpClient } from "@wssto2/vue-core/client";
-import type { SelectOption } from "@wssto2/vue-core/form";
+import type { SelectOption, TextSuggestion } from "@wssto2/vue-core/form";
 
 /** What the server sends. The form never edits this: it edits a draft (see form.ts) that is mapped to and from it. */
 export interface Ticket {
@@ -38,6 +38,8 @@ export function createTicketFormsApi(http: HttpClient) {
     saveContact: (id: number, body: ContactBody) => http.put<null>(`/tickets/${id}/contact`, body).then(() => undefined),
     create: (body: Omit<TicketBody, "version">, key: string) => http.post<{ id: number }>("/tickets", body, idempotency(key)).then((result) => result.data),
     assign: (id: number, body: { assignee_id: number; note: string }, key: string) => http.post<Ticket>(`/tickets/${id}/assign`, body, idempotency(key)).then((result) => result.data),
+    cities: (query: string, signal: AbortSignal) =>
+      http.get<{ name: string; country: string }[]>("/cities", { query: { search: query }, signal }).then((result) => result.data.map((city): TextSuggestion => ({ text: city.name, detail: city.country }))),
     users: (query: string, signal: AbortSignal) =>
       http.get<{ id: number; name: string }[]>("/users", { query: { search: query }, signal }).then((result) => result.data.map((user): SelectOption<number> => ({ value: user.id, label: user.name }))),
   };

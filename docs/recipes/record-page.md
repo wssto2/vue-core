@@ -187,3 +187,59 @@ const activity = useResource({ for: account, load: (id, { signal }) => api.activ
 ## 4. A layout of your own
 
 When the record is not "header, then content" (a lead with a phase track, a contact panel, comments beside sections), compose the same parts: `AdaptivePageShell` for the chrome, `RecordHeader`, `SectionNavigator` anywhere in your grid, and the same resource. The playground's lead page does this and is the reference: `playground/src/app/features/records/views/LeadRecord.vue`. Its pager is `RecordPager` (from `@wssto2/vue-core/resource`) in the shell's `#pager` slot, fed by `neighbors.context.neighbors`.
+
+## 5. A workflow record, and the photo viewer
+
+Some records are not read but **worked through**: an appraisal goes over days, several people take part, the steps can be done in any order. That is not a wizard (a step form is for one sitting). Give `SectionNavigator` a `steps` object and the sections become large tiles: the step's number or a ✓ once done, its label, **one line saying where it stands** in a tone, and the step you are on tinted. They are links, so any step opens at any time.
+
+<!-- example: docs/examples/accounts/views/Onboarding.vue:10-17 -->
+```ts
+// A record that is worked on over days, by several people, in any order: each section is a step with one line saying where it
+// stands. The keys are the sections' route names; a section without an entry is simply not done and has no line.
+const steps = computed<Record<string, SectionStep>>(() => ({
+  "accounts.onboarding.profile": props.profileDone ? { done: true, sub: t("accounts.onboarding.complete") } : { done: false, sub: t("accounts.onboarding.profileOpen") },
+  "accounts.onboarding.documents": props.missing.length > 0
+    ? { done: false, sub: t("accounts.onboarding.missing", { what: props.missing.join(", ") }), shortSub: t("accounts.onboarding.missingShort"), tone: "warning" }
+    : { done: true, sub: t("accounts.onboarding.documentsCount", { count: props.documents }) },
+}));
+```
+
+<!-- example: docs/examples/accounts/views/Onboarding.vue:20-24 -->
+```vue
+<template>
+  <SectionNavigator :label="t('accounts.onboarding.label')" :steps="steps">
+    <AppRouterView />
+  </SectionNavigator>
+</template>
+```
+
+The routes are the same child routes with `meta.section` as in section 2; `steps` is keyed by their names. The line is the page's to compute from its record (from a derived workflow read model, ideally: the server knows what is missing), so the tile and the data never disagree. `tone` is `positive`, `warning` or `critical`; `shortSub` is the line on phones when `sub` is too long for a tile. The tiles are the navigation on every width (`desktop` and `compact` do not apply), with the short label on phones. A long form inside a step lists its own sections (`SectionPanel`) beside it on wide screens and in the floating jumper on phones, as it does under the other variants.
+
+### Photographs
+
+`PhotoViewer` (in `@wssto2/vue-core/overlay`) is a full-screen dark viewer for a set of pictures: zoom (buttons, wheel, pinch, double tap or double click, 100 to 500 %), drag a zoomed picture with a mini-map showing where you are, rotate, download, previous and next (buttons, swipe, arrow keys) and a strip of thumbnails. It is a dialog like `Modal`: the page behind is inert, Tab stays inside, Escape closes and focus goes back to what opened it; under reduced motion nothing animates. Keys: ← → pictures, + − zoom, 0 fits the screen again, R rotates, Esc closes. `PhotoField` opens it when its picture is tapped; for a gallery you give it typed items and call `present(index)`:
+
+<!-- example: docs/examples/accounts/components/Gallery.vue:11-12 -->
+```ts
+// Typed items: the picture, an optional small one for the strip, what it shows, the file name Download suggests.
+const items = (): PhotoViewerItem[] => props.photos.map((photo) => ({ src: photo.url, thumb: photo.small, alt: photo.caption, downloadName: `${photo.caption}.jpg` }));
+```
+
+<!-- example: docs/examples/accounts/components/Gallery.vue:16-27 -->
+```vue
+<template>
+  <ul class="grid grid-cols-4 gap-2">
+    <li v-for="(photo, at) in props.photos" :key="photo.id">
+      <button type="button" :aria-label="photo.caption" @click="viewer?.present(at)"><img :src="photo.small" alt="" class="aspect-8/5 w-full object-cover" /></button>
+    </li>
+  </ul>
+
+  <PhotoViewer ref="viewer" :items="items()" :title="t('accounts.photos')">
+    <!-- Your own buttons next to zoom, rotate and download, given the photo on show. -->
+    <template #actions="{ index }"><Button prominence="plain" @click="emit('makeCover', props.photos[index]!.id)">{{ t("accounts.makeCover") }}</Button></template>
+  </PhotoViewer>
+</template>
+```
+
+`#actions` puts your own buttons (make it the cover, delete it) next to zoom, rotate and download, given the picture on show. The pictures are the app's: the viewer loads `src` as an image, never as markup, and Download only keeps `downloadName` for a picture served from this origin.
+
