@@ -90,7 +90,7 @@ export function useDialogStack(root: Ref<HTMLElement | null>): {
 }
 
 /**
- * How many dialogs are open in the document (Modal, Sheet, AlertDialog, PhotoViewer; nested ones
+ * How many dialogs are open in the document (Modal, Sheet, AlertDialog, PhotoViewer, the phone navigation drawer; nested ones
  * count each), as a reactive value. An application shown inside a frame uses it to tell the page
  * around it that something covers the viewport (to grow the frame, to dim its own chrome).
  *
