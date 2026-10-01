@@ -67,9 +67,10 @@ const GROUP = sheet ? "overflow-hidden rounded-group bg-surface-cell shadow-grou
           :class="sheet ? 'min-h-row px-row-inset py-2 text-body active:bg-fill' : 'rounded-md px-2 py-1.5 text-sm hover:bg-fill'"
           @click="localesOpen = !localesOpen">
           <Icon name="translate" :size="sheet ? 22 : 16" class="shrink-0 text-content-muted" />
-          <span class="min-w-0 flex-1 truncate">{{ t("core.shell.account.language") }}</span>
-          <span class="flex shrink-0 items-center gap-1.5 text-content-muted" :class="sheet ? '' : 'text-xs'">
-            <CountryFlag v-if="flagOf(application.locale.value)" :country="flagOf(application.locale.value)!" />{{ currentLanguage }}
+          <!-- The label stays whole; the current language gives way (the menu is narrow on desktop). -->
+          <span class="flex-1 whitespace-nowrap">{{ t("core.shell.account.language") }}</span>
+          <span class="flex min-w-0 items-center gap-1.5 text-content-muted" :class="sheet ? '' : 'text-xs'">
+            <CountryFlag v-if="flagOf(application.locale.value)" :country="flagOf(application.locale.value)!" /><span class="truncate">{{ currentLanguage }}</span>
           </span>
           <Icon name="arrowDownSLine" :size="sheet ? 18 : 16" class="shrink-0 text-content-disabled transition-transform duration-motion-fast" :class="localesOpen ? 'rotate-180' : ''" />
         </button>
