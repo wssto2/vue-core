@@ -9,6 +9,7 @@ import { AdaptivePageShell, BottomDock, RecordHeader, ResourceHeader, type PageA
 import {
   AsyncSection,
   Badge,
+  HUES,
   Banner,
   EmptyState,
   FieldNote,
@@ -137,6 +138,8 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
           <Badge v-for="tone in tones" :key="tone" :tone="tone" dot>{{ tone }}</Badge>
           <Badge tone="context" dot>context</Badge>
         </div>
+        <div class="flex flex-wrap gap-2"><Badge v-for="hue in HUES" :key="hue" :hue="hue">{{ hue }}</Badge></div>
+        <div class="flex flex-wrap gap-2"><Badge v-for="hue in HUES" :key="hue" :hue="hue" appearance="dot">{{ hue }}</Badge></div>
         <Banner v-for="tone in tones" :key="tone" :tone="tone">A {{ tone }} banner, announced to match.</Banner>
         <FieldNote tone="warning">A note under one field.</FieldNote>
         <EmptyState title="No leads yet" description="Add the first one." icon="fileTextLine">
