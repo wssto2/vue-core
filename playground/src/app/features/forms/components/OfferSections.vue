@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  ChoiceChips, ComboField, DateField, fieldKey, FormGroup, MoneyField, NumberField, SegmentedField, SwitchField, TextareaField, TextField, type Form, type SelectOption,
+  ChoiceChips, ComboField, DateField, fieldKey, FormGroup, I18nField, MoneyField, NumberField, SegmentedField, SwitchField, TextareaField, TextField, type Form, type SelectOption,
 } from "@wssto2/vue-core/form";
 import { Button } from "@wssto2/vue-core/button";
 import { SectionPanel } from "@wssto2/vue-core/page";
@@ -37,6 +37,8 @@ const error = (path: string) => props.form.errors.first(path);
   <SectionPanel :title="t('forms.offer.sections.customer')" number="01" presentation="section">
     <FormGroup>
       <ComboField v-bind="bind('customerId')" :label="t('forms.offer.customer')" :search="findCustomers" :placeholder="t('forms.offer.customerPlaceholder')" required width="lg" />
+      <!-- One title in each language of the app; Croatian must be written (the schema says so too). -->
+      <I18nField v-bind="bind('title')" :label="t('forms.offer.title')" default-locale="hr" :required-locales="['hr']" />
       <DateField v-bind="bind('deliveryOn')" :label="t('forms.offer.deliveryOn')" />
       <SegmentedField v-bind="bind('channel')" :label="t('forms.offer.channel')" :options="channels" required />
     </FormGroup>

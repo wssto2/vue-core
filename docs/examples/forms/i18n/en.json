@@ -20,5 +20,11 @@
   "reason": "Reason",
   "subjectQuestion": "What is it about?",
   "priorityQuestion": "How urgent is it?",
-  "reasonQuestion": "Why is it so urgent?"
+  "reasonQuestion": "Why is it so urgent?",
+  "mobile": "Mobile",
+  "landline": "Landline",
+  "city": "City",
+  "title": "Title",
+  "badPhone": "Enter a valid phone number.",
+  "titleRequired": "The title is required in Croatian."
 }

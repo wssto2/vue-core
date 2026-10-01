@@ -41,7 +41,8 @@
     "status": "Status",
     "customerId": "Kupac",
     "lines": "Stavke",
-    "extras": "Dodaci"
+    "extras": "Dodaci",
+    "mobile": "Mobitel"
   },
   "offer": {
     "create": "Izradi ponudu",
@@ -85,8 +86,11 @@
       "extras": "Dodaci",
       "deliveryOn": "Isporuka",
       "note": "Napomena",
-      "urgent": "Hitno"
-    }
+      "urgent": "Hitno",
+      "title": "Naslov"
+    },
+    "title": "Naslov",
+    "titleRequired": "Naslov je obavezan na hrvatskom."
   },
   "nav": "Obrasci"
 }

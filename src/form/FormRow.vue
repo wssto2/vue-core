@@ -58,6 +58,8 @@ const slots = defineSlots<{
   trailing?: () => unknown;
   /** A rich subtitle (a status colour); `sub` for plain text. */
   sub?: () => unknown;
+  /** Beside the label, at the end of its line (language tabs over a stacked control). */
+  "label-trailing"?: () => unknown;
 }>();
 
 const inherited = useFormRowIndent();
@@ -95,9 +97,12 @@ const hasValue = computed(() => props.value !== undefined && props.value !== nul
     <div class="row-body min-h-row min-w-0 flex-1 border-t border-border-separator py-2 pr-row-inset">
       <div class="min-w-0" :class="bodyLayout">
         <div v-if="props.label || props.sub || slots.sub" :class="[props.layout === 'setting' ? 'min-w-min flex-1' : 'min-w-0', props.labelAlign === 'top' ? 'self-start pt-1' : '']">
-          <component :is="props.for ? 'label' : 'span'" :for="props.for" class="break-words" :class="[labelClass, props.labelLines ? LABEL_LINES[props.labelLines] : 'block']">
-            {{ props.label }}<span v-if="props.required" class="text-content-destructive" aria-hidden="true"> *</span>
-          </component>
+          <div :class="slots['label-trailing'] ? 'flex items-center justify-between gap-3' : ''">
+            <component :is="props.for ? 'label' : 'span'" :for="props.for" class="break-words" :class="[labelClass, props.labelLines ? LABEL_LINES[props.labelLines] : 'block']">
+              {{ props.label }}<span v-if="props.required" class="text-content-destructive" aria-hidden="true"> *</span>
+            </component>
+            <slot name="label-trailing" />
+          </div>
           <small v-if="props.sub || slots.sub" :id="props.subId" class="mt-0.5 block text-footnote text-content-muted"><slot name="sub">{{ props.sub }}</slot></small>
         </div>
 

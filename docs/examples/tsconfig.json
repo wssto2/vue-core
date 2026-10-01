@@ -8,5 +8,5 @@
       "@wssto2/vue-core/*": ["../../src/*/index.ts"]
     }
   },
-  "include": ["./**/*"]
+  "include": ["./**/*", "../../src/phone/*.d.ts"]
 }
