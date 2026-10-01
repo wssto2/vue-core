@@ -1,6 +1,7 @@
 export { default as AsyncSection } from "./AsyncSection.vue";
 export { isEmptyValue, valueOf, type AsyncState } from "./async";
 export { default as Badge } from "./Badge.vue";
+export { HUES, type Hue } from "./hue";
 export { default as Banner } from "./Banner.vue";
 export { default as DrawnCheck } from "./DrawnCheck.vue";
 export { default as EmptyState } from "./EmptyState.vue";
