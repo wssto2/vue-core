@@ -1,9 +1,10 @@
-import type { FormValidator } from "@wssto2/vue-core/form";
+import { missingLocales, type FormValidator } from "@wssto2/vue-core/form";
 import type { OfferBody } from "./api";
 
 /** What the offer's fields edit. Numbers are null until typed; a channel is chosen or not. */
 export interface OfferValues {
   customerId: number | null;
+  title: Record<string, string>;
   deliveryOn: string | null;
   channel: "email" | "phone" | null;
   lines: { product: string; quantity: number | null; unitPrice: number | null }[];
@@ -15,6 +16,7 @@ export interface OfferValues {
 /** What the server receives once the schema accepted the draft: nothing is null any more, which the types say. */
 export interface OfferInput {
   customerId: number;
+  title: Record<string, string>;
   deliveryOn: string | null;
   channel: "email" | "phone";
   lines: { product: string; quantity: number; unitPrice: number }[];
@@ -24,7 +26,7 @@ export interface OfferInput {
 }
 
 export const emptyLine = (): OfferValues["lines"][number] => ({ product: "", quantity: 1, unitPrice: null });
-export const emptyOffer = (): OfferValues => ({ customerId: null, deliveryOn: null, channel: null, lines: [emptyLine()], urgent: false, extras: [], note: "" });
+export const emptyOffer = (): OfferValues => ({ customerId: null, title: {}, deliveryOn: null, channel: null, lines: [emptyLine()], urgent: false, extras: [], note: "" });
 
 export const VAT_RATE = 0.25;
 
@@ -38,6 +40,7 @@ export function offerTotals(values: Pick<OfferValues, "lines">): { net: number; 
 export interface OfferWords {
   required: string;
   customer: string;
+  title: string;
   channel: string;
   quantity: string;
   price: string;
@@ -50,6 +53,7 @@ export const offerValidator = (words: OfferWords): FormValidator<OfferInput> => 
     const values = input as OfferValues;
     const issues: { path: (string | number)[]; message: string }[] = [];
     if (values.customerId === null) issues.push({ path: ["customerId"], message: words.customer });
+    if (missingLocales(values.title, ["hr"]).length > 0) issues.push({ path: ["title"], message: words.title });
     if (values.channel === null) issues.push({ path: ["channel"], message: words.channel });
     if (values.lines.length === 0) issues.push({ path: ["lines"], message: words.noLines });
     values.lines.forEach((line, index) => {
@@ -62,6 +66,7 @@ export const offerValidator = (words: OfferWords): FormValidator<OfferInput> => 
       success: true,
       data: {
         customerId: values.customerId as number,
+        title: values.title,
         deliveryOn: values.deliveryOn,
         channel: values.channel as "email" | "phone",
         lines: values.lines.map((line) => ({ product: line.product.trim(), quantity: line.quantity as number, unitPrice: line.unitPrice as number })),
@@ -76,6 +81,7 @@ export const offerValidator = (words: OfferWords): FormValidator<OfferInput> => 
 /** The create payload: the endpoint's names and shape, stated here and nowhere else. */
 export const offerBody = (input: OfferInput): OfferBody => ({
   customer_id: input.customerId,
+  title: input.title,
   delivery_on: input.deliveryOn,
   channel: input.channel,
   lines: input.lines.map((line) => ({ product: line.product, quantity: line.quantity, unit_price: line.unitPrice })),

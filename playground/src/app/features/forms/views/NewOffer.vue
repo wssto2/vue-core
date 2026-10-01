@@ -21,6 +21,7 @@ const form = useForm({
   validator: offerValidator({
     required: t("forms.required"),
     customer: t("forms.offer.chooseCustomer"),
+    title: t("forms.offer.titleRequired"),
     channel: t("forms.offer.chooseChannel"),
     quantity: t("forms.offer.quantityMin"),
     price: t("forms.offer.priceMin"),

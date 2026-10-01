@@ -187,12 +187,97 @@ Field errors land on the fields, a conflict or no permission is said in the bann
 
 ## Fields
 
-One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `MonthYearField`, `FileField`, `PhotoField`, and `OtpInput`; `Field` itself for a control of your own.
+One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `MonthYearField`, `FileField`, `PhotoField`, `I18nField`, `PhoneField` (its own subpath, below), and `OtpInput`; `Field` itself for a control of your own.
 
 - A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
 - Dates use the browser's own controls (no calendar dependency); the typed `Date` of a calendar widget is not offered.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
+
+## Phone numbers
+
+`PhoneField` is in its own subpath, `@wssto2/vue-core/phone`, because it brings the phone metadata of libphonenumber-js (about 150 kB before compression): an app without phone fields does not download it. It is a country picker with the flag and dial code (common countries first, then all, searchable by name or dial code) and a number that is formatted as it is typed. The value is a string in E.164, `+38591234567`, or `""`.
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:35-36 -->
+```vue
+    <PhoneField v-bind="form.bind('mobile')" :label="t('forms.mobile')" />
+    <PhoneField v-bind="form.bind('landline')" :label="t('forms.landline')" default-country="BA" />
+```
+
+- A number typed without a dial code belongs to the shown country (`091 234 5678` and `91 234 5678` are the same), a number pasted with a plus or `00` switches the country (`+387 61 234 567` makes it Bosnia and Herzegovina), and changing the country in the picker keeps the digits.
+- When the user leaves the field it says what is wrong ("The number is too short for Bosnia & Herzegovina.", too long, not valid for the country) and, when the metadata can tell, what the number is (mobile, landline, toll-free). A number the field cannot place (a US number may be either) says nothing.
+- The field reports; only a validator stops the save. `isValidPhone(value)` and `phoneProblem(value)` (the reason and the country) are the same check, for the form's schema; `phoneKind(value)` says mobile or landline, for a rule such as "a mobile number is required".
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:24-25 -->
+```ts
+      // The phone field says what is wrong once it is left; only a validator stops the save.
+      for (const field of ["mobile", "landline"] as const) if (!isValidPhone(values[field])) issues.push({ path: [field], message: t("forms.badPhone") });
+```
+
+The default country is the field's `default-country`, else what the app provides once, else Croatia; the same place says which countries the picker lists first:
+
+<!-- example: docs/examples/forms/environment.ts:5-9 -->
+```ts
+/** Once, in the composition root: what the app says about its phone numbers and, if not the browser's `localStorage`, where recent choices are kept. */
+export function installFieldDefaults(app: App, recents?: RecentChoices) {
+  app.provide(phoneDefaultsKey, { defaultCountry: "HR", commonCountries: ["HR", "BA", "SI", "RS", "AT", "DE"] });
+  if (recents) app.provide(recentChoicesKey, recents);
+}
+```
+
+A stored value that is not E.164 (legacy data such as `091 234 5678`) is read as a number of the default country and is not rewritten until the user edits it. Country names come from the browser (`Intl.DisplayNames`) in the app's language; the flags are SVGs, loaded one by one when they scroll into view (Windows draws emoji flags as two letters).
+
+Read mode shows the number in international form with Call (`tel:`), Message (`sms:`) and Copy. WhatsApp and the like are the app's own actions, in the `actions` slot:
+
+<!-- example: docs/examples/forms/components/PhoneRead.vue:8-15 -->
+```vue
+<template>
+  <FormGroup :editable="false">
+    <PhoneField :model-value="mobile" label="Mobile">
+      <!-- Call, Message and Copy come with the field; WhatsApp is the app's own action. -->
+      <template #actions="{ number }"><a :href="`https://wa.me/${number.slice(1)}`" class="rounded-full bg-tint-soft px-3 py-1.5 text-footnote text-content-link">WhatsApp</a></template>
+    </PhoneField>
+  </FormGroup>
+</template>
+```
+
+## Suggestions
+
+One engine suggests while typing, in two fields. `TextField :suggestions` keeps the value free text (a `string`: the user may ignore every suggestion); `ComboField` picks a record and keeps its id type. Both take a minimum length, a debounce and a limit, and neither does a request itself: the source is a function from the feature's `api.ts`.
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:37-38 -->
+```vue
+    <TextField v-bind="form.bind('city')" :label="t('forms.city')" :suggestions="(query, { signal }) => props.api.cities(query, signal)" recents="city" />
+    <ComboField v-bind="form.bind('assignee')" :label="t('forms.assignee')" :search="(query, { signal }) => props.api.users(query, signal)" recents="assignee" />
+```
+
+- A suggestion is a string, or `{ text, detail }` (the detail is the second line of the row: "Croatia · 10 000"). A list is filtered as the user types, the best matches (those that start with the text) first; a function is asked after `suggestions-debounce` ms (default 300) once the text has `suggestions-min-length` characters (default 2), the older request is aborted and an answer for older text is dropped.
+- The best match shows grey after the typed text and **Tab** accepts it; the list marks the matched part. Down and Up move, Enter picks a row the user moved to (a first suggestion nobody moved to does not steal Enter: in a pick-only `ComboField` it does), Escape closes without closing the dialog around it. A pick keeps the focus. The list says when it is loading or failed; a free-text field says nothing when nothing matches (a new street is not an error), a `ComboField` says "No matches".
+- `recents="city"` lists the last five picks under "Recent" before the user types, kept per id. The default store is `localStorage` (a refusing or full store is ignored); an app that keeps them elsewhere provides a `RecentChoices` (`read(id)`, `write(id, choices)`) under `recentChoicesKey`, once.
+
+<!-- example: docs/examples/forms/environment.ts:11-15 -->
+```ts
+/** An adapter that keeps recent choices in memory (for tests, or a store the app fills from its own settings). */
+export function memoryRecents(): RecentChoices {
+  const kept = new Map<string, readonly SelectOption<string | number>[]>();
+  return { read: (id) => kept.get(id) ?? [], write: (id, choices) => void kept.set(id, choices) };
+}
+```
+
+A free-text field with suggestions is left-aligned on phones, where other fields right-align their value: the grey completion needs the text to start at one edge. `TextField` emits `picked` with the `{ text, detail }` chosen, for filling a postcode from the city.
+
+## Text in several languages
+
+`I18nField` edits one text in each language of the app: the title of an advert, a product name. The value is `Record<locale, string>` (`{ hr: "Naslov", en: "Title" }`, `""` is not written yet); a locale the field does not list is kept as it is.
+
+<!-- example: docs/examples/forms/components/ContactFields.vue:39-39 -->
+```vue
+    <I18nField v-bind="form.bind('title')" :label="t('forms.title')" :required-locales="['hr']" />
+```
+
+- A segment per language sits next to the label, a dot on it says whether that language is written. The languages are the app's (`createApplication`'s `locale.supported`) unless `locales` says otherwise; the first (or `default-locale`) is the one **Copy HR into empty ones** copies from. It opens in the app's current language. `multiline` is the textarea variant.
+- `required-locales` says which languages must be written. Leaving the field while one is empty says so under it ("Required in Croatian."), whichever tab is open; a language that is not required but empty is a gentle line ("Not written yet: English."). `missingLocales(value, ['hr'])` is the same check for the schema, as in the form above.
+- Reading shows the current language (or the default's, or the first written) with its code in the label (`Title · HR`) and "3 more languages · 1 written" under it, which opens the others.
 
 ## Testing
 

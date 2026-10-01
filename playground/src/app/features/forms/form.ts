@@ -9,6 +9,7 @@ export interface AccountValues {
   taxId: string;
   email: string;
   phone: string;
+  mobile: string;
   channel: "email" | "phone" | null;
   street: string;
   city: string;
@@ -16,7 +17,7 @@ export interface AccountValues {
   notes: string;
 }
 
-export const emptyAccount = (): AccountValues => ({ name: "", taxId: "", email: "", phone: "", channel: null, street: "", city: "", country: null, notes: "" });
+export const emptyAccount = (): AccountValues => ({ name: "", taxId: "", email: "", phone: "", mobile: "", channel: null, street: "", city: "", country: null, notes: "" });
 
 /** DTO to draft. */
 export const accountValues = (account: Account): AccountValues => ({
@@ -24,6 +25,7 @@ export const accountValues = (account: Account): AccountValues => ({
   taxId: account.tax_id,
   email: account.email,
   phone: account.phone,
+  mobile: account.mobile,
   channel: account.channel,
   street: account.street,
   city: account.city,
@@ -37,6 +39,7 @@ export const accountBody = (values: AccountValues, account: Account): AccountBod
   tax_id: values.taxId,
   email: values.email.trim(),
   phone: values.phone,
+  mobile: values.mobile,
   channel: values.channel,
   street: values.street,
   city: values.city,
@@ -52,7 +55,7 @@ export const accountValidator = (words: { required: string; email: string }) =>
 /** Which fields each group of the record holds: the sheet edits, restores and saves exactly these. */
 export const GROUPS = {
   identity: ["name", "taxId"],
-  contact: ["email", "phone", "channel"],
+  contact: ["email", "mobile", "phone", "channel"],
   address: ["street", "city", "country"],
   notes: ["notes"],
 } as const satisfies Record<string, readonly (keyof AccountValues)[]>;

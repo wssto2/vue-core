@@ -41,7 +41,8 @@
     "status": "Status",
     "customerId": "Customer",
     "lines": "Lines",
-    "extras": "Extras"
+    "extras": "Extras",
+    "mobile": "Mobile"
   },
   "offer": {
     "create": "Create offer",
@@ -85,8 +86,11 @@
       "extras": "Extras",
       "deliveryOn": "Delivery",
       "note": "Note",
-      "urgent": "Urgent"
-    }
+      "urgent": "Urgent",
+      "title": "Title"
+    },
+    "title": "Title",
+    "titleRequired": "The title is required in Croatian."
   },
   "nav": "Forms"
 }

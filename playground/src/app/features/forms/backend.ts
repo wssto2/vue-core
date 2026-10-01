@@ -8,6 +8,8 @@ export interface Account {
   tax_id: string;
   email: string;
   phone: string;
+  /** A mobile number, E.164. */
+  mobile: string;
   /** Which way the customer wants to be reached; null when not chosen. */
   channel: "email" | "phone" | null;
   street: string;
@@ -24,6 +26,7 @@ export interface AccountBody {
   tax_id: string;
   email: string;
   phone: string;
+  mobile: string;
   channel: "email" | "phone" | null;
   street: string;
   city: string;
@@ -35,11 +38,14 @@ export interface AccountBody {
 export interface ContactBody {
   email: string;
   phone: string;
+  mobile: string;
   channel: "email" | "phone" | null;
 }
 
 export interface OfferBody {
   customer_id: number;
+  /** The offer's title in each language, by locale. */
+  title: Record<string, string>;
   delivery_on: string | null;
   channel: "email" | "phone";
   lines: { product: string; quantity: number; unit_price: number }[];
@@ -52,10 +58,25 @@ const LATENCY_MS = 250;
 let counter = 0;
 
 const store = new Map<number, Account>([
-  [1, { id: 1, name: "Adria Motors d.o.o.", tax_id: "12345678901", email: "office@adria.example", phone: "+385 21 555 100", channel: "email", street: "Ulica kralja Zvonimira 12", city: "Split", country: "HR", notes: "Prefers invoices on the first of the month.", status: "active", version: 1 }],
-  [2, { id: 2, name: "Nova Auto", tax_id: "98765432109", email: "info@nova.example", phone: "", channel: null, street: "", city: "Zagreb", country: "HR", notes: "", status: "active", version: 1 }],
-  [3, { id: 3, name: "Blocked Ltd", tax_id: "55555555555", email: "hello@blocked.example", phone: "+387 33 000 000", channel: "phone", street: "Zmaja od Bosne 1", city: "Sarajevo", country: "BA", notes: "On hold.", status: "paused", version: 1 }],
+  [1, { id: 1, name: "Adria Motors d.o.o.", tax_id: "12345678901", email: "office@adria.example", phone: "+385 21 555 100", mobile: "+385912345678", channel: "email", street: "Ulica kralja Zvonimira 12", city: "Split", country: "HR", notes: "Prefers invoices on the first of the month.", status: "active", version: 1 }],
+  [2, { id: 2, name: "Nova Auto", tax_id: "98765432109", email: "info@nova.example", phone: "", mobile: "", channel: null, street: "", city: "Zagreb", country: "HR", notes: "", status: "active", version: 1 }],
+  [3, { id: 3, name: "Blocked Ltd", tax_id: "55555555555", email: "hello@blocked.example", phone: "+387 33 000 000", mobile: "+38761234567", channel: "phone", street: "Zmaja od Bosne 1", city: "Sarajevo", country: "BA", notes: "On hold.", status: "paused", version: 1 }],
 ]);
+
+const CITIES = [
+  { text: "Zagreb", detail: "Hrvatska · 10 000" },
+  { text: "Zagrebačka ulica", detail: "Ulica u Osijeku" },
+  { text: "Zadar", detail: "Hrvatska · 23 000" },
+  { text: "Split", detail: "Hrvatska · 21 000" },
+  { text: "Sarajevo", detail: "Bosna i Hercegovina · 71 000" },
+  { text: "Banja Luka", detail: "Bosna i Hercegovina · 78 000" },
+  { text: "Ljubljana", detail: "Slovenija · 1000" },
+  { text: "Maribor", detail: "Slovenija · 2000" },
+  { text: "Beograd", detail: "Srbija · 11 000" },
+  { text: "Novi Sad", detail: "Srbija · 21 000" },
+  { text: "Osijek", detail: "Hrvatska · 31 000" },
+  { text: "Rijeka", detail: "Hrvatska · 51 000" },
+];
 
 const wait = (signal?: AbortSignal) =>
   new Promise<void>((resolve, reject) => {
@@ -137,6 +158,13 @@ export const backend = {
     await wait(signal);
     const needle = query.trim().toLowerCase();
     return [...store.values()].filter((account) => account.name.toLowerCase().includes(needle)).map((account) => ({ id: account.id, name: account.name, city: account.city }));
+  },
+
+  /** Places for the city field's suggestions: the text, and a line of detail under it. */
+  cities: async (query: string, signal?: AbortSignal): Promise<{ text: string; detail: string }[]> => {
+    await wait(signal);
+    const needle = query.trim().toLowerCase();
+    return CITIES.filter((city) => city.text.toLowerCase().includes(needle)).sort((a, b) => Number(b.text.toLowerCase().startsWith(needle)) - Number(a.text.toLowerCase().startsWith(needle)));
   },
 
   createOffer: async (body: OfferBody): Promise<{ id: number }> => {
