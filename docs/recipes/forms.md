@@ -1,12 +1,13 @@
 # Forms
 
-`@wssto2/vue-core/form` has three compositions, one per user task. Pick by the task, not by the widget.
+`@wssto2/vue-core/form` has four compositions, one per user task. Pick by the task, not by the widget.
 
 | The user… | Compose | Who saves |
 |---|---|---|
 | changes **one group of a record** | `FormGroup` + `GroupSheet` + `useGroupSheet` | the sheet, one save, the page has none |
 | **creates** a record, or edits a justified long form | `EditorPage` + `useForm` (or `useResourceForm`) | the page, one coordinated submit in the page chrome |
 | **advances, reassigns, approves, re-prices** | `useCommand` + `CommandDialog` (or `AlertDialog`) | one purpose-specific call with its own confirmation |
+| **creates something over several short screens** | `useStepForm` + `StepForm` (in a `Modal` or on a page) | the last step's button, one submit of the whole form |
 
 A screen with group sheets has no global Save. A command is never a field autosave.
 
@@ -185,9 +186,112 @@ const assign = useCommand({
 
 Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
 
+## 4. Step-by-step forms
+
+A form in steps is still **one `useForm`**: the steps only decide which fields are on screen and when each is checked. Use it when the user does one thing in a few short screens (a lead in three steps, an appraisal that asks a question at a time), not for a long form that wants sections (that is `EditorPage`) and not for work done over days in any order (that is a record whose sections are workflow steps, see the [record page recipe](record-page.md)).
+
+`useStepForm(form, { steps, submit })` holds the flow. Each step names the **fields it owns**, so Next checks only those (with the form's own validator), the step counts their errors, and an error the validator or the server sends for a field of an earlier step takes the user back to it. A step without fields (an overview) is never refused. Field names are checked against the form, and `StepForm` takes one slot per step, named after it: a typo in either does not compile.
+
+### In a dialog, with a bar
+
+<!-- example: docs/examples/forms/components/NewTicketSteps.vue:24-36 -->
+```ts
+// Each step names the fields it owns: Next checks those and nothing else, the step counts their errors, and an error
+// the server sends for one of them takes the user back to the step.
+const flow = useStepForm(form, {
+  steps: [
+    { name: "details", label: t("forms.details"), fields: ["subject", "priority"] },
+    { name: "contact", label: t("forms.contact"), fields: ["email", "phone"] },
+    { name: "review", label: t("forms.review") },
+  ],
+  submit: (payload, { idempotencyKey }) => api.create({ subject: payload.subject, priority: payload.priority, due_on: null, email: payload.email, phone: payload.phone }, idempotencyKey),
+  submitLabel: t("forms.create"),
+  onSaved: () => void modal.value?.dismiss(),
+  draft: { key: "tickets:new" }, // survives a reload; removed on submit and on discard
+});
+```
+
+<!-- example: docs/examples/forms/components/NewTicketSteps.vue:41-64 -->
+```vue
+<template>
+  <!-- The dialog takes its subtitle ("Step 2 of 3 · Contact"), its primary button ("Next: Review"), the wait and the
+       "Discard changes?" question from the flow; the bar goes in its header and Back, named after its target, in its footer. -->
+  <Modal ref="modal" :title="t('forms.newTicket')" grouped size="md" v-bind="flow.bindDialog()" @primary="flow.next()" @dismissed="flow.restart()">
+    <template #header><StepProgress :flow="flow" /></template>
+    <template #timestamp><Button v-if="flow.backLabel.value" prominence="plain" icon="arrowLeftSLine" @click="flow.back()">{{ flow.backLabel.value }}</Button></template>
+
+    <StepForm :flow="flow" progress="none" navigation="host">
+      <template #details>
+        <FormGroup>
+          <TextField v-bind="form.bind('subject')" :label="t('forms.subject')" required />
+          <NumberField v-bind="form.bind('priority')" :label="t('forms.priority')" />
+        </FormGroup>
+      </template>
+      <template #contact>
+        <FormGroup>
+          <TextField v-bind="form.bind('email')" type="email" :label="t('forms.email')" />
+          <TextField v-bind="form.bind('phone')" type="tel" :label="t('forms.phone')" />
+        </FormGroup>
+      </template>
+      <template #review><p>{{ form.values.subject }}</p></template>
+    </StepForm>
+  </Modal>
+</template>
+```
+
+What the flow does for you:
+
+- **Progress.** `StepProgress` (or `StepForm progress="bar"`, the default) draws one segment per step with its number and name; a step that is done gets a ✓, a step with errors shows how many fields are wrong, and a step already passed is a button that goes back to it. `progress="dots"` draws one dot per step with the current one wide: for steps that depend on answers, whose names cannot be told in advance.
+- **Words.** `flow.subtitle` is "Step 2 of 3 · Contact" (and "· draft saved"); the buttons name their target: Back is the previous step's label, Next is "Next: Review", a step may set its own `nextLabel` ("Confirm"), and the last step's button is the `submitLabel`.
+- **Checks.** Next checks the current step only. A step may add `beforeNext`, an async check or lookup that resolves false to keep the user there (the button waits, `flow.busy`). Back checks nothing and loses nothing: values and the other steps' errors stay. Going forward by clicking a step re-checks every step on the way.
+- **Sending.** The last step's Next sends the whole form with `submit`; the validator's or the server's refusal puts the user on the first step with an error, a failure that is not about a field (a conflict, no permission) is said in the banner and the user stays, and the draft is kept in every case. On success `onSaved` runs and the draft is gone.
+- **Leaving.** Closing the dialog (Escape, the close button, the scrim) with something entered asks "Discard changes?" through the app's leave guard: `bindDialog()` hands the dialog the question as its `before-dismiss`. On a page the leave guard asks on navigation by itself.
+- **Draft.** With `draft: { key }` what was entered, the step and the steps passed are kept in `sessionStorage` (or `storage: "local"`) a moment after each change, and put back after a reload; the step form says "Continuing your saved draft" and offers "Start over". It is removed on submit and on discard. Change `version` when the form's shape changes: a draft of another version is ignored, and only keys the form has, holding the same kind of value, are restored. Values must be JSON (a file is never kept). A browser that blocks storage simply has no draft.
+- **Motion.** A step slides in from the side the user came from; under reduced motion it fades. Focus follows the step (to the step itself, never into a field, which would raise a phone's keyboard) and goes to the first field in error after a refused Next. Enter inside a field is Next.
+
+### On a page, with dots, and steps that change
+
+<!-- example: docs/examples/forms/views/Triage.vue:11-25 -->
+```ts
+const form = useForm({ defaults: () => ({ subject: "", urgent: null as number | null, reason: "" }) });
+const asksReason = computed(() => (form.values.urgent ?? 0) > 2);
+
+// The steps depend on an answer: a high urgency adds a question. The user stays on their step by name, and the
+// dots count what is asked now (a bar of names could not say in advance).
+const flow = useStepForm(form, {
+  steps: () => [
+    { name: "subject" as const, label: t("forms.subject"), fields: ["subject" as const] },
+    { name: "urgent" as const, label: t("forms.priority"), fields: ["urgent" as const] },
+    ...(asksReason.value ? [{ name: "reason" as const, label: t("forms.reason"), fields: ["reason" as const] }] : []),
+    { name: "review" as const, label: t("forms.review") },
+  ],
+  submit: async () => undefined,
+  onSaved: () => void router.push("/"),
+});
+```
+
+<!-- example: docs/examples/forms/views/Triage.vue:28-38 -->
+```vue
+<template>
+  <!-- On a page the flow draws its own Back, Cancel and Next under the step. -->
+  <AdaptivePageShell :title="t('forms.triage')" :description="flow.subtitle.value" width="content">
+    <StepForm :flow="flow" progress="dots" @cancel="router.push('/')">
+      <template #subject><h3 class="text-center text-title font-bold">{{ t("forms.subjectQuestion") }}</h3><TextField v-bind="form.bind('subject')" :label="t('forms.subject')" /></template>
+      <template #urgent><h3 class="text-center text-title font-bold">{{ t("forms.priorityQuestion") }}</h3><NumberField v-bind="form.bind('urgent')" :label="t('forms.priority')" /></template>
+      <template #reason><h3 class="text-center text-title font-bold">{{ t("forms.reasonQuestion") }}</h3><TextField v-bind="form.bind('reason')" :label="t('forms.reason')" /></template>
+      <template #review><p class="text-center">{{ form.values.subject }}</p></template>
+    </StepForm>
+  </AdaptivePageShell>
+</template>
+```
+
+`steps` may be a getter or a ref: steps can be added or removed while the flow runs. The user stays on their step **by name**; if it goes away they land on the one that took its place, and the steps after the current one are no longer counted as done (the answers they stood on may have changed). A step's slot content is your own: a large title for one question per screen, a `FormGroup` for a few fields.
+
+`StepForm` has `navigation="inline"` (default: Back, Cancel and Next under the step, `@cancel` for the page to answer) or `"host"` when a `Modal` or a footer of your own owns the buttons: a `Modal` takes `flow.bindDialog()`, a `Sheet` or a page footer renders `<StepNavigation :flow="flow" @cancel="…" />`. A `Sheet` has no `before-dismiss`, so use a `Modal` for a flow that must ask before it is closed.
+
 ## Fields
 
-One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `MonthYearField`, `FileField`, `PhotoField`, and `OtpInput`; `Field` itself for a control of your own.
+One `Field` (label, hint, error, required, locked) around each control. `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `CheckboxField`, `DateField`, `DateTimeField`, `MonthYearField`, `FileField`, `PhotoField` (tap the picture to look at it in the photo viewer), and `OtpInput`; `Field` itself for a control of your own.
 
 - A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
