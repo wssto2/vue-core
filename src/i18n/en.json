@@ -230,6 +230,47 @@
           "12": "Dec"
         },
         "with_year": "{month} {year}"
+      },
+      "date": {
+        "calendar": "Calendar",
+        "previous_month": "Previous month",
+        "next_month": "Next month",
+        "previous_year": "Previous year",
+        "next_year": "Next year",
+        "choose_month": "Choose month and year",
+        "open": "Open calendar",
+        "invalid": "Enter a date, for example {example}.",
+        "unavailable": "This date is not available.",
+        "placeholder": "e.g. {example} or +7",
+        "keys": "Arrow keys change the day, Page Up and Page Down the month, Enter picks.",
+        "quick": "Quick picks",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "week": "In 7 days",
+        "month_end": "End of month",
+        "next_working_day": "Next working day",
+        "years": "Years",
+        "previous_years": "Previous years",
+        "next_years": "Next years",
+        "words": {
+          "today": "today",
+          "tomorrow": "tomorrow",
+          "yesterday": "yesterday"
+        }
+      },
+      "time": {
+        "label": "Time",
+        "hour": "Hour",
+        "minute": "Minute",
+        "now": "Now",
+        "invalid": "Enter a time, for example 14:35.",
+        "step": "Use minutes in steps of {step}.",
+        "open": "Choose time",
+        "placeholder": "e.g. 14:35",
+        "at": "{date} at {time}",
+        "words": {
+          "now": "now"
+        }
       }
     }
   }

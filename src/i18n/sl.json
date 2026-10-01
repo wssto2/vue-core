@@ -230,6 +230,47 @@
           "12": "dec"
         },
         "with_year": "{month} {year}"
+      },
+      "date": {
+        "calendar": "Koledar",
+        "previous_month": "Prejšnji mesec",
+        "next_month": "Naslednji mesec",
+        "previous_year": "Prejšnje leto",
+        "next_year": "Naslednje leto",
+        "choose_month": "Izberi mesec in leto",
+        "open": "Odpri koledar",
+        "invalid": "Vnesite datum, na primer {example}.",
+        "unavailable": "Ta datum ni na voljo.",
+        "placeholder": "npr. {example} ali +7",
+        "keys": "Puščice spreminjajo dan, PgUp/PgDn mesec, Enter izbere.",
+        "quick": "Hitra izbira",
+        "today": "Danes",
+        "tomorrow": "Jutri",
+        "week": "Čez 7 dni",
+        "month_end": "Konec meseca",
+        "next_working_day": "Naslednji delovni dan",
+        "years": "Leta",
+        "previous_years": "Prejšnja leta",
+        "next_years": "Naslednja leta",
+        "words": {
+          "today": "danes",
+          "tomorrow": "jutri",
+          "yesterday": "včeraj"
+        }
+      },
+      "time": {
+        "label": "Čas",
+        "hour": "Ura",
+        "minute": "Minute",
+        "now": "Zdaj",
+        "invalid": "Vnesite čas, na primer 14:35.",
+        "step": "Minute so v korakih po {step}.",
+        "open": "Izberi čas",
+        "placeholder": "npr. 14:35",
+        "at": "{date} ob {time}",
+        "words": {
+          "now": "zdaj"
+        }
       }
     }
   }

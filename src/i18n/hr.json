@@ -230,6 +230,47 @@
           "12": "pro"
         },
         "with_year": "{month} {year}."
+      },
+      "date": {
+        "calendar": "Kalendar",
+        "previous_month": "Prethodni mjesec",
+        "next_month": "Sljedeći mjesec",
+        "previous_year": "Prethodna godina",
+        "next_year": "Sljedeća godina",
+        "choose_month": "Odaberi mjesec i godinu",
+        "open": "Otvori kalendar",
+        "invalid": "Unesite datum, na primjer {example}.",
+        "unavailable": "Taj datum nije dostupan.",
+        "placeholder": "npr. {example} ili +7",
+        "keys": "Strelice mijenjaju dan, PgUp/PgDn mjesec, Enter bira.",
+        "quick": "Brzi odabir",
+        "today": "Danas",
+        "tomorrow": "Sutra",
+        "week": "Za 7 dana",
+        "month_end": "Kraj mjeseca",
+        "next_working_day": "Sljedeći radni dan",
+        "years": "Godine",
+        "previous_years": "Prethodne godine",
+        "next_years": "Sljedeće godine",
+        "words": {
+          "today": "danas",
+          "tomorrow": "sutra",
+          "yesterday": "jučer"
+        }
+      },
+      "time": {
+        "label": "Vrijeme",
+        "hour": "Sat",
+        "minute": "Minute",
+        "now": "Sada",
+        "invalid": "Unesite vrijeme, na primjer 14:35.",
+        "step": "Minute su u koracima od {step}.",
+        "open": "Odaberi vrijeme",
+        "placeholder": "npr. 14:35",
+        "at": "{date} u {time}",
+        "words": {
+          "now": "sada"
+        }
       }
     }
   }

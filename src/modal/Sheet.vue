@@ -36,6 +36,8 @@ const emit = defineEmits<{ presented: []; dismissed: [] }>();
 defineSlots<{
   default?: () => unknown;
   footer?: () => unknown;
+  /** Replaces the title and the close button (a picker's Clear, title and Done); give the title element `titleId` so the dialog is named by it. The grabber stays. */
+  header?: (scope: { titleId: string }) => unknown;
 }>();
 
 const { t } = useI18n();
@@ -110,14 +112,16 @@ defineExpose({ present, dismiss });
               <span class="h-1.25 w-9 rounded-full bg-fill-strong" />
             </div>
 
-            <div class="flex min-h-bar-height items-center justify-between gap-3 px-4" :class="isBottomSheet ? 'pb-1' : 'border-b border-border-separator'">
-              <h3 v-if="props.title" :id="titleId" class="text-headline font-semibold">{{ props.title }}</h3>
-              <button type="button" data-part="close" :aria-label="t('core.actions.close')"
-                class="hit-target -mr-1 ml-auto flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fill text-content-muted transition-colors duration-motion-fast hover:bg-fill-strong"
-                @click="dismiss">
-                <Icon name="close" :size="14" />
-              </button>
-            </div>
+            <slot name="header" :title-id="titleId">
+              <div class="flex min-h-bar-height items-center justify-between gap-3 px-4" :class="isBottomSheet ? 'pb-1' : 'border-b border-border-separator'">
+                <h3 v-if="props.title" :id="titleId" class="text-headline font-semibold">{{ props.title }}</h3>
+                <button type="button" data-part="close" :aria-label="t('core.actions.close')"
+                  class="hit-target -mr-1 ml-auto flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fill text-content-muted transition-colors duration-motion-fast hover:bg-fill-strong"
+                  @click="dismiss">
+                  <Icon name="close" :size="14" />
+                </button>
+              </div>
+            </slot>
           </div>
 
           <div ref="body" class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4" v-bind="drag.bodyEvents">

@@ -28,16 +28,19 @@ const props = withDefaults(defineProps<{
   /** The accessible name of the panel. */
   label: string;
   placement?: Placement;
-  /** Panel width on wide screens. */
-  width?: "sm" | "md" | "lg";
+  /** Panel width on wide screens; `auto` is as wide as the content (a date and time picker). */
+  width?: "sm" | "md" | "lg" | "auto";
   arrow?: boolean;
   /** The trigger fills its container (a full-width sidebar row). */
   block?: boolean;
+  /** Focus moves into the panel when it opens. `false` where the trigger is a field that keeps being typed into (a date). */
+  autofocus?: boolean;
 }>(), {
   placement: "bottom",
   width: "lg",
   arrow: true,
   block: false,
+  autofocus: true,
 });
 
 const emit = defineEmits<{ presented: []; dismissed: [] }>();
@@ -54,7 +57,7 @@ defineSlots<{
 /** Viewport edge gutter; also the width breakpoint for spanning the screen. */
 const GUTTER = 12;
 const NARROW_VIEWPORT = 640;
-const WIDTH = { sm: "w-56", md: "w-72", lg: "w-80" } as const;
+const WIDTH = { sm: "w-56", md: "w-72", lg: "w-80", auto: "w-max" } as const;
 
 const panelId = `popover-${useId()}`;
 const isOpen = ref(false);
@@ -116,7 +119,7 @@ function onFocusOut(event: FocusEvent) {
 }
 
 watch(panel, (element) => {
-  if (element) void nextTick(() => (focusableWithin(element)[0] ?? element).focus({ preventScroll: true }));
+  if (element && props.autofocus) void nextTick(() => (focusableWithin(element)[0] ?? element).focus({ preventScroll: true }));
 });
 
 function removeListeners() {
