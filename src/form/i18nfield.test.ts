@@ -54,6 +54,13 @@ describe("I18nField", () => {
     expect(input().value).toBe("Naslov");
   });
 
+  it("shows the default language first and marks the field required when a language must be written", () => {
+    mount({ defaultLocale: "en", requiredLocales: ["en"] }, { en: "x" });
+    expect(tabs().map((tab) => tab.textContent?.trim())).toEqual(["EN", "HR", "BS", "SL"]);
+    expect(screen.getByText("*")).toBeTruthy();
+    expect(document.querySelector("[data-field-required]")?.getAttribute("data-field-filled")).toBe("true");
+  });
+
   it("moves between languages with the arrow keys, only the open one in the tab order", async () => {
     mount({}, { hr: "a", en: "b" });
     await fireEvent.keyDown(tabs()[0]!, { key: "ArrowRight" });

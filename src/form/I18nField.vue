@@ -14,8 +14,8 @@ import { missingLocales, type I18nText } from "./i18nText";
  *
  *   <I18nField v-bind="form.bind('title')" :label="t('title')" :required-locales="['hr']" />
  *
- * The languages are the app's (`createApplication`'s `locale.supported`), or `locales`; the first, or `defaultLocale`, is the
- * one "Copy into empty ones" copies from. `required-locales` says which must be written: leaving the field while one is
+ * The languages are the app's (`createApplication`'s `locale.supported`), or `locales`; the first, or `defaultLocale` (which is
+ * then shown first), is the one "Copy into empty ones" copies from. `required-locales` says which must be written: leaving the field while one is
  * empty reports it under the field whichever tab is open (a form's validator uses `missingLocales` to stop the save).
  * Reading shows the current language (or the default's), with the others under "N more languages". `multiline` is the
  * textarea variant.
@@ -43,8 +43,10 @@ const root = useTemplateRef<HTMLElement>("root");
 const { editable } = useFieldMode(props);
 const surface = useControlSurface(props.multiline ? "area" : "text", () => (props.error || ownError.value ? "error" : props.disabled ? "locked" : "rest"));
 
-const list = computed(() => props.locales ?? application?.locales ?? availableLocales);
-const fallback = computed(() => props.defaultLocale ?? list.value[0] ?? "");
+const known = computed(() => props.locales ?? application?.locales ?? availableLocales);
+const fallback = computed(() => props.defaultLocale ?? known.value[0] ?? "");
+// The default language comes first: it is the one the others are copied from.
+const list = computed(() => (known.value.includes(fallback.value) ? [fallback.value, ...known.value.filter((locale) => locale !== fallback.value)] : known.value));
 const chosen = ref<string | null>(null);
 const active = computed(() => (chosen.value !== null && list.value.includes(chosen.value) ? chosen.value : list.value.includes(uiLocale.value) ? uiLocale.value : fallback.value));
 
@@ -87,6 +89,8 @@ function onFocusout(event: FocusEvent) {
 }
 const lacking = computed(() => missingLocales(model.value, props.requiredLocales));
 const ownError = computed(() => (left.value && lacking.value.length > 0 ? t("core.form.i18n.required", { languages: listed(lacking.value) }) : undefined));
+// For the page's required-field progress: whole when every required language is written (or, with none required, any is).
+const complete = computed(() => (props.requiredLocales.length > 0 ? lacking.value.length === 0 : list.value.some(written)));
 const empty = computed(() => list.value.filter((locale) => !written(locale) && !(ownError.value && lacking.value.includes(locale))));
 const canCopy = computed(() => written(fallback.value) && list.value.some((locale) => locale !== fallback.value && !written(locale)));
 function copyIntoEmpty() {
@@ -105,7 +109,7 @@ defineExpose({ focus: () => field.value?.focus() });
 </script>
 
 <template>
-  <Field v-bind="{ ...fieldProps(props), label: fieldLabel, error: props.error ?? ownError }" :value="shown ? textOf(shown) : null" row-layout="stacked">
+  <Field v-bind="{ ...fieldProps(props), label: fieldLabel, error: props.error ?? ownError, required: props.required || props.requiredLocales.length > 0 }" :value="editable ? (complete ? 'written' : null) : shown ? textOf(shown) : null" row-layout="stacked">
     <template #default="{ id, describedby, invalid }">
     <div ref="root" class="w-full" @focusout="onFocusout">
       <div :id="`${baseId}-panel`" role="tabpanel" :aria-labelledby="tabId(active)">
@@ -137,7 +141,7 @@ defineExpose({ focus: () => field.value?.focus() });
           :class="locale === active ? 'bg-segment-selected text-content-strong shadow-sm' : 'text-content-muted hover:text-content-strong'" @click="choose(locale, true)" @keydown="onTabKeydown($event, index)">
           {{ code(locale) }}
           <span aria-hidden="true" class="size-1.5 rounded-full" data-test="i18n-dot" :data-state="written(locale) ? 'written' : ownError && lacking.includes(locale) ? 'required' : 'empty'"
-            :class="written(locale) ? 'bg-status-success-solid' : ownError && lacking.includes(locale) ? 'bg-content-destructive' : 'bg-border-strong'"></span>
+            :class="written(locale) ? 'bg-status-success-solid' : ownError && lacking.includes(locale) ? 'bg-content-destructive' : 'bg-content-disabled'"></span>
         </button>
       </div>
     </template>

@@ -165,8 +165,8 @@ defineExpose({ focus: () => input.value?.focus() });
     </template>
 
     <template v-if="model !== ''" #readonly>
-      <div class="flex w-full min-w-0 items-center gap-2" data-test="phone-read">
-        <span class="min-w-0 flex-1 break-words text-body tabular-nums text-content-strong">{{ formatted }}</span>
+      <div class="flex w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5" :class="inRow ? 'justify-end' : ''" data-test="phone-read">
+        <span class="flex-auto whitespace-nowrap text-body tabular-nums text-content-strong" :class="inRow ? 'text-right' : ''">{{ formatted }}</span>
         <a :href="`tel:${model}`" :aria-label="t('core.form.phone.call')" :title="t('core.form.phone.call')" data-test="phone-call"
           class="flex size-9 shrink-0 items-center justify-center rounded-full bg-tint-soft text-content-link transition-colors duration-motion-fast hover:bg-fill focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-border-focus">
           <Icon name="phone" :size="18" />

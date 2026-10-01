@@ -196,7 +196,7 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
 
 ## Phone numbers
 
-`PhoneField` is in its own subpath, `@wssto2/vue-core/phone`, because it brings the phone metadata of libphonenumber-js (about 150 kB before compression): an app without phone fields does not download it. It is a country picker with the flag and dial code (common countries first, then all, searchable by name or dial code) and a number that is formatted as it is typed. The value is a string in E.164, `+38591234567`, or `""`.
+`PhoneField` is in its own subpath, `@wssto2/vue-core/phone`, because it brings the phone metadata of libphonenumber-js (about 225 kB minified, 55 kB compressed, with the mobile / landline data): an app without phone fields does not download it. It is a country picker with the flag and dial code (common countries first, then all, searchable by name or dial code) and a number that is formatted as it is typed. The value is a string in E.164, `+38591234567`, or `""`.
 
 <!-- example: docs/examples/forms/components/ContactFields.vue:35-36 -->
 ```vue

@@ -61,7 +61,7 @@ const { style } = useAnchoredPosition(panel, {
   offset: 4,
   padding: 8,
   fit: (floating, available) => {
-    floating.style.width = `min(22rem, ${Math.max(240, available.width)}px)`;
+    floating.style.width = "min(20rem, calc(100vw - 1rem))";
     floating.style.maxHeight = `${Math.max(200, Math.min(380, available.height))}px`;
   },
 });
@@ -116,7 +116,7 @@ defineExpose({ focus: () => trigger.value?.focus() });
 <template>
   <div ref="root" class="shrink-0" @focusout="onFocusout">
     <button :id="`${props.id}-country`" ref="trigger" type="button" :disabled="props.disabled" :aria-label="t('core.form.phone.country', { country: nameOf(country) })" aria-haspopup="listbox" :aria-expanded="open"
-      data-test="country-button" class="flex h-full min-h-8 cursor-pointer items-center gap-1.5 whitespace-nowrap text-body font-medium text-content-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-border-focus disabled:cursor-not-allowed"
+      data-test="country-button" class="flex h-full min-h-8 cursor-pointer items-center gap-1.5 whitespace-nowrap text-body font-medium text-content-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-border-focus disabled:cursor-not-allowed compact:border-r compact:border-border-separator"
       :class="props.surface" @click="open ? hide(true) : show()" @keydown="onTriggerKeydown">
       <CountryFlag :country="country" />
       <span class="tabular-nums">{{ dialCode(country) }}</span>
