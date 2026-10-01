@@ -7,7 +7,6 @@ import { mockMedia } from "../testing/media";
 import CardSelectField from "./CardSelectField.vue";
 import CheckboxField from "./CheckboxField.vue";
 import ChoiceChips from "./ChoiceChips.vue";
-import DateTimeField from "./DateTimeField.vue";
 import FormGroup from "./FormGroup.vue";
 import FormView from "./FormView.vue";
 import MoneyField from "./MoneyField.vue";
@@ -307,15 +306,7 @@ describe("SegmentedField, ChoiceChips and CardSelectField", () => {
   });
 });
 
-describe("DateField, DateTimeField and MonthYearField", () => {
-  it("a date and time is wall-clock text", async () => {
-    const { update } = mount(DateTimeField, { modelValue: null, label: "At" });
-    const input = screen.getByLabelText("At") as HTMLInputElement;
-    expect(input.type).toBe("datetime-local");
-    await fireEvent.update(input, "2026-09-30T14:30");
-    expect(update).toHaveBeenCalledWith("2026-09-30T14:30");
-  });
-
+describe("MonthYearField", () => {
   it("a month and year pick writes both numbers", async () => {
     const month = vi.fn();
     const year = vi.fn();

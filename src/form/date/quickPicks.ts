@@ -36,3 +36,10 @@ export function resolveQuickPick(pick: QuickPick, label: (name: string) => strin
   if (typeof pick === "string") return { key: pick, label: label(pick), value: NAMED[pick](today) };
   return { key: pick.label, label: pick.label, value: pick.day(today) };
 }
+
+/** A time shortcut: "Now" (rounded down to the step), a time of day (`8:00`) or the app's own. */
+export function resolveQuickTime(pick: QuickTime, nowLabel: string, now: Time): Shortcut {
+  if (pick === "now") return { key: "now", label: nowLabel, value: now };
+  if (typeof pick === "string") return { key: pick, label: `${Number(pick.slice(0, 2))}${pick.slice(2)}`, value: pick };
+  return { key: pick.label, label: pick.label, value: pick.time() };
+}

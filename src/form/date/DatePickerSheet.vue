@@ -66,6 +66,11 @@ function clear() {
   sheet.value?.dismiss();
 }
 
+function pickShortcut(value: string) {
+  if (props.mode === "time") time.value = value;
+  else day.value = value;
+}
+
 /** Turning a wheel on a date and time with no day yet takes today. */
 function turnWheel(next: Time | null) {
   time.value = next;
@@ -101,7 +106,7 @@ defineExpose({ present, dismiss: () => sheet.value?.dismiss() });
     </template>
 
     <div class="flex flex-col gap-3.5" data-test="date-picker-sheet">
-      <QuickChips v-if="props.shortcuts.length > 0" variant="sheet" :items="props.shortcuts" :selected="day" @pick="day = $event" />
+      <QuickChips v-if="props.shortcuts.length > 0" variant="sheet" :items="props.shortcuts" :selected="props.mode === 'time' ? time : day" @pick="pickShortcut" />
 
       <div v-if="hasDay" class="rounded-group bg-surface-cell p-2.5 shadow-group">
         <Calendar v-model="day" size="touch" :min="props.min" :max="props.max" :disabled-dates="props.disabledDates" :open-on="props.openOn" />
