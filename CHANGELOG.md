@@ -14,6 +14,13 @@
 - `src/modules` is generated from go-core `v1.6.0-rc.3` (impersonator, `loginAsReturn`, typed maps); it no longer contains `any`, so it is linted like the rest.
 - `identityPlatform({ parseUser })` needs the user to keep a `login` (the expiry prompt shows it).
 
+### Roles and access screens (`/access`)
+- `accessFeature({ catalogue, rootLevel?, subjectRoute?, scopes?, destination? })`: the roles list (`/iam/roles`, kinds and search), a role's page with the editor, holders, *Copy* (`/iam/roles/new?copy=`), *Compare with a predefined role*, *Replace* (its holders move; all or none) and *Delete* (its own permission), a new role. The permission tree is the application's `authzts` catalogue: modules as tabs, screens as groups, requirements kept consistent (a role that lacks what its permissions need is completed on load, with a note), *whose* held once per record type, sensitive / system / whole-organization marks. Pages and actions behind `iam.role:view|manage|delete` and `iam.user:view|manage`; typed targets `accessPages`.
+- `PersonAccess` (a person's roles with *Add role* and *Remove*, and *What {name} can do* with *Why*), `BindingRow`, `personRolesSection` (the `meta` for a record section). *Add role* reads the places from the server (`/scopes`), derives the hierarchy from them (no level names in the library), asks level and place only where the hierarchy has levels, and lists the roles the actor may give there; with one level it asks nothing.
+- `authz.*` refusals in words in en, hr, bs, sl (`core.errors.authz.*`, overridable with `errors.authz.*`): `useRefusalMessage()` for a form's `failureMessage`.
+- Texts under `core.access.*`; the application supplies a permission's label (its catalogue's keys), `access.modules.*`, `access.resources.*`, `access.ownable.*`, `access.roles.<key>`, `access.levels.*`. Icons `shieldStarFill`, `addLine`, `swapBoxLine` join the library's own.
+- Playground: `identity.html` edits roles and binds them to people against go-core's dev server. Recipe "Roles and access".
+
 ### Client (`/client`)
 - `route<In, Out>(method, path, options?)` and `route.raw(...)`: plain typed route values, the shape go-core's generator emits (`permission`, `public`). Raw routes (streams, files) keep method and path for links and are not callable through `request`.
 - `client.request(route, input, options?)`: `:params` filled from `input` (encoded), the rest the query for GET/DELETE and the JSON body for POST/PUT/PATCH; resolves to `ApiResult` as `get`/`post` (`data: null` for a `void` route). A missing path parameter throws a plain `Error` naming the route, before sending. Path parameters are checked by go-core, not by TypeScript.

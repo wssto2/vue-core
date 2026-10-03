@@ -8,6 +8,12 @@ declare module "@wssto2/vue-core/platform" {
     "tickets:view": true;
     "tickets:update": true;
     "accounts:view": true;
+    // go-core's access module defines these in the catalogue, so a generated union has them (the roles screens name them).
+    "iam.role:view": true;
+    "iam.role:manage": true;
+    "iam.role:delete": true;
+    "iam.user:view": true;
+    "iam.user:manage": true;
   }
 }
 
@@ -15,6 +21,7 @@ declare module "@wssto2/vue-core/router" {
   interface DestinationRegistry {
     tickets: true;
     accounts: true;
+    "iam.roles": true;
   }
 }
 
