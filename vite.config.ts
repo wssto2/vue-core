@@ -26,6 +26,8 @@ const entries: Record<string, string> = {
   "shell/index": "src/shell/index.ts",
   "form/index": "src/form/index.ts",
   "phone/index": "src/phone/index.ts",
+  "identity/index": "src/identity/index.ts",
+  "access/index": "src/access/index.ts",
   "testing/index": "src/testing/index.ts",
 };
 

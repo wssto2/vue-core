@@ -9,6 +9,8 @@ npm run lint             # eslint + scripts/check-src-imports.mjs (src/ imports 
 npm run typecheck        # vue-tsc --noEmit (strict, strictTemplates)
 npm run test             # vitest run (happy-dom, @testing-library/vue, co-located src/**/*.test.ts)
 npm run build            # vite lib build -> dist/*.js, dist/styles.css, then vue-tsc declarations -> dist/**/*.d.ts
+npm run modules:sync -- <go-core checkout>   # rewrite src/modules/ (go-core's identity and access types) at the version in package.json "goCore"
+npm run check:modules    # fails when src/modules differs from that version or was edited
 npm run check:consumer   # npm pack -> install the tarball into playground/ -> vue-tsc + vite build + packed-output scan
 npm run check            # all of the above in order: the gate, run once at the end of a phase
 ```
