@@ -18,7 +18,7 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | `@wssto2/vue-core/resource`, `/page` | `useRouteResource`, `ResourcePage`, `SectionNavigator`, `AdaptivePageShell` |
 | `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives |
 | `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, `useDescribeError`, formatting, `HttpClient` and `ApiError` |
-| `@wssto2/vue-core/identity`, `/access` | go-core's module contracts (types, route tables) and, in `/identity`, `identityFeature` (sign-in page, language) and `identityPlatform()`: [sign-in](docs/recipes/sign-in.md) |
+| `@wssto2/vue-core/identity`, `/access` | go-core's module contracts (types, route tables) and, in `/identity`, `identityFeature` (sign-in page, language), `identityPlatform()` and `usersFeature` (users, "my profile"): [sign-in](docs/recipes/sign-in.md), [users](docs/recipes/users.md) |
 | `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
 
 Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vue-i18n`; the library never bundles them.
@@ -233,6 +233,7 @@ declare module "@wssto2/vue-core/router" {
   interface DestinationRegistry {
     tickets: true;
     accounts: true;
+    users: true;
   }
 }
 
@@ -321,6 +322,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
 - [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Sign-in](docs/recipes/sign-in.md): go-core's identity module: the sign-in page, the session wiring, the language, the module's committed types, the dev server
+- [Users and profile](docs/recipes/users.md): the users list and a person's record, "my profile" with the e-mail change by code, opting out, extra sections, refusals
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 
