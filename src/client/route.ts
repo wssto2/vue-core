@@ -18,7 +18,7 @@ interface RouteBase {
 }
 
 /** A typed call: `In` is what `client.request` takes, `Out` what it resolves to (`void`: no body). */
-export interface Route<In, Out> extends RouteBase {
+export interface ApiRoute<In, Out> extends RouteBase {
   readonly raw: false;
   /** Type-only; never set. */
   readonly [types]?: { readonly in: In; readonly out: Out };
@@ -34,7 +34,7 @@ export interface RawRoute extends RouteBase {
  *
  *   route<ShowInput, Ticket>("GET", "/v1/tickets/:id", { permission: "tickets.ticket:view" })
  */
-export function route<In, Out>(method: HttpMethod, path: string, options: RouteOptions = {}): Route<In, Out> {
+export function route<In, Out>(method: HttpMethod, path: string, options: RouteOptions = {}): ApiRoute<In, Out> {
   return { method, path, permission: options.permission, public: options.public === true, raw: false };
 }
 

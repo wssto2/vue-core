@@ -1,7 +1,7 @@
 import { buildQuery, encodeBody, newRequestId, type QueryValue } from "./encode";
 import { readResponse, REQUEST_ID_HEADER, type ApiResult } from "./envelope";
 import { ApiError, isApiError } from "./error";
-import type { Route } from "./route";
+import type { ApiRoute } from "./route";
 import { fetchTransport, type Transport } from "./transport";
 
 export interface RequestOptions {
@@ -57,7 +57,7 @@ export interface HttpClient {
    * parameter rejects with a plain `Error` (a bug in the caller, not an answer from the server) before
    * anything is sent. Abort, request ids and 401 handling are those of `get` and `post`.
    */
-  request<In, Out>(route: Route<In, Out>, ...args: RequestArguments<In>): Promise<RouteResult<Out>>;
+  request<In, Out>(route: ApiRoute<In, Out>, ...args: RequestArguments<In>): Promise<RouteResult<Out>>;
   get<TData = unknown, TMeta = unknown>(path: string, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   post<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   put<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
@@ -135,7 +135,7 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     }
   }
 
-  async function request<In, Out>(route: Route<In, Out>, input?: unknown, callOptions: RequestOptions = {}): Promise<RouteResult<Out>> {
+  async function request<In, Out>(route: ApiRoute<In, Out>, input?: unknown, callOptions: RequestOptions = {}): Promise<RouteResult<Out>> {
     const values: Record<string, unknown> = typeof input === "object" && input !== null && !Array.isArray(input) ? { ...input } : {};
     const path = route.path.replace(/:([A-Za-z_][A-Za-z0-9_]*)/g, (_, name: string) => {
       const value = values[name];

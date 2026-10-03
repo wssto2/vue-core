@@ -8,4 +8,4 @@ export type { ApiErrorInit, ApiErrorKind, FieldErrors } from "./error";
 export { fetchTransport } from "./transport";
 export type { Transport } from "./transport";
 export { route } from "./route";
-export type { HttpMethod, ListResult, RawRoute, Route, RouteOptions } from "./route";
+export type { HttpMethod, ListResult, RawRoute, ApiRoute, RouteOptions } from "./route";
