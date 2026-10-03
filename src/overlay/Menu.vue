@@ -97,9 +97,11 @@ const point = ref<{ x: number; y: number } | null>(null);
 let returnFocus: HTMLElement | null = null;
 
 const { style, update } = useAnchoredPosition(panel, {
-  reference: () => point.value
-    ? { getBoundingClientRect: () => DOMRect.fromRect({ x: point.value!.x, y: point.value!.y, width: 0, height: 0 }) }
-    : trigger(),
+  // The point is read now, not when floating-ui measures: the menu may have closed (and cleared it) by then.
+  reference: () => {
+    const at = point.value;
+    return at ? { getBoundingClientRect: () => DOMRect.fromRect({ x: at.x, y: at.y, width: 0, height: 0 }) } : trigger();
+  },
   placement: () => (point.value ? "bottom-start" : props.placement),
   offset: 6,
   padding: GUTTER,
