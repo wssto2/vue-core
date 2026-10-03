@@ -339,7 +339,27 @@
       "check_fields": "Provjerite označena polja.",
       "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
       "cancelled": "Zahtjev je otkazan.",
-      "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo."
+      "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo.",
+      "identity": {
+        "signin": {
+          "failed": "Pogrešno korisničko ime ili lozinka.",
+          "locked": "Previše pogrešnih lozinki. Prijava je zaključana do {locked_until}.",
+          "inactive": "Ovaj korisnički račun nije aktivan."
+        },
+        "session": {
+          "invalid": "Vaša sesija je istekla. Prijavite se ponovo."
+        },
+        "locale": {
+          "invalid": "Ovaj jezik nije podržan."
+        },
+        "impersonation": {
+          "disabled": "Prijava kao druga osoba nije omogućena."
+        },
+        "account": {
+          "not_found": "Ovaj korisnički račun ne postoji.",
+          "inactive": "Ovaj korisnički račun nije aktivan."
+        }
+      }
     },
     "shortcuts": {
       "title": "Prečice na tastaturi",
@@ -352,6 +372,15 @@
         "general": "Općenito",
         "list": "Popis",
         "record": "Zapis"
+      }
+    },
+    "identity": {
+      "signin": {
+        "title": "Prijavite se u svoj račun",
+        "login": "Korisničko ime",
+        "password": "Lozinka",
+        "submit": "Prijava",
+        "required": "Obavezno polje."
       }
     }
   }

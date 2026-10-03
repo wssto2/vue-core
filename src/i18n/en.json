@@ -339,7 +339,27 @@
       "check_fields": "Check the marked fields.",
       "offline": "The server could not be reached. Check your connection and try again.",
       "cancelled": "The request was cancelled.",
-      "unexpected": "An unexpected error occurred. Please try again."
+      "unexpected": "An unexpected error occurred. Please try again.",
+      "identity": {
+        "signin": {
+          "failed": "Invalid username or password.",
+          "locked": "Too many wrong passwords. Sign-in is locked until {locked_until}.",
+          "inactive": "This account is not active."
+        },
+        "session": {
+          "invalid": "Your session has ended. Sign in again."
+        },
+        "locale": {
+          "invalid": "This language is not supported."
+        },
+        "impersonation": {
+          "disabled": "Signing in as another person is not enabled."
+        },
+        "account": {
+          "not_found": "This account does not exist.",
+          "inactive": "This account is not active."
+        }
+      }
     },
     "shortcuts": {
       "title": "Keyboard shortcuts",
@@ -352,6 +372,15 @@
         "general": "General",
         "list": "List",
         "record": "Record"
+      }
+    },
+    "identity": {
+      "signin": {
+        "title": "Sign in to your account",
+        "login": "Username",
+        "password": "Password",
+        "submit": "Sign in",
+        "required": "Required."
       }
     }
   }

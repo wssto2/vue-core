@@ -80,6 +80,17 @@ export type CoreMessages = {
       offline: string;
       cancelled: string;
       unexpected: string;
+      /** go-core's identity reasons (`identity.signin.failed` …), looked up by `describeError`. */
+      identity: {
+        signin: { failed: string; locked: string; inactive: string };
+        session: { invalid: string };
+        locale: { invalid: string };
+        impersonation: { disabled: string };
+        account: { not_found: string; inactive: string };
+      };
+    };
+    identity: {
+      signin: { title: string; login: string; password: string; submit: string; required: string };
     };
     startup: {
       title: string;

@@ -339,7 +339,27 @@
       "check_fields": "Preverite označena polja.",
       "offline": "Strežnik ni dosegljiv. Preverite povezavo in poskusite znova.",
       "cancelled": "Zahteva je bila preklicana.",
-      "unexpected": "Prišlo je do nepričakovane napake. Poskusite znova."
+      "unexpected": "Prišlo je do nepričakovane napake. Poskusite znova.",
+      "identity": {
+        "signin": {
+          "failed": "Napačno uporabniško ime ali geslo.",
+          "locked": "Preveč napačnih gesel. Prijava je zaklenjena do {locked_until}.",
+          "inactive": "Ta uporabniški račun ni aktiven."
+        },
+        "session": {
+          "invalid": "Vaša seja je potekla. Prijavite se znova."
+        },
+        "locale": {
+          "invalid": "Ta jezik ni podprt."
+        },
+        "impersonation": {
+          "disabled": "Prijava kot druga oseba ni omogočena."
+        },
+        "account": {
+          "not_found": "Ta uporabniški račun ne obstaja.",
+          "inactive": "Ta uporabniški račun ni aktiven."
+        }
+      }
     },
     "shortcuts": {
       "title": "Bližnjice na tipkovnici",
@@ -352,6 +372,15 @@
         "general": "Splošno",
         "list": "Seznam",
         "record": "Zapis"
+      }
+    },
+    "identity": {
+      "signin": {
+        "title": "Prijavite se v svoj račun",
+        "login": "Uporabniško ime",
+        "password": "Geslo",
+        "submit": "Prijava",
+        "required": "Obvezno polje."
       }
     }
   }
