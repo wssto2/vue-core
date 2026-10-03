@@ -30,6 +30,7 @@ async function compare(ref: string | null) {
   chosen.value = ref;
   comparison.value = null;
   failed.value = false;
+  loading.value = false; // an answer still on its way belongs to what was left and will be dropped
   if (!ref) return;
   loading.value = true;
   try {
