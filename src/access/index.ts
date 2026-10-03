@@ -5,7 +5,7 @@ export type * as Inputs from "../modules/access/schemas";
 export { accessRoutes } from "../modules/access/routes";
 export { accessFeature } from "./feature";
 export type { AccessFeatureOptions } from "./feature";
-export { accessPages } from "./routes";
+export { accessPages, personRolesSection } from "./routes";
 export { accessPermissions } from "./context";
 export { dependantsClosure, permissionTree, requiredClosure } from "./catalogue";
 export type { Grants, PermissionCatalogue, PermissionEntry, PermissionGroup, PermissionMeta, PermissionScreen } from "./catalogue";

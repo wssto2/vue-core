@@ -1,3 +1,4 @@
+import type { RouteMeta } from "vue-router";
 import { defineRoutes } from "../router";
 import { accessPermissions } from "./context";
 
@@ -16,3 +17,12 @@ export const accessPages = defineRoutes({
     meta: { access: accessPermissions.viewRoles, titleKey: "core.access.title", remountOnParam: "ref" },
   },
 });
+
+/**
+ * What a person's record needs to list *Roles* among its sections (`meta` of a child route whose component shows `PersonAccess`): the
+ * label, the icon and the permission go-core guards the person's access with. Spread it into the route's `meta`.
+ */
+export const personRolesSection = {
+  access: accessPermissions.viewAccess,
+  section: { labelKey: "core.access.person_roles", icon: "shieldStarFill" },
+} as const satisfies RouteMeta;
