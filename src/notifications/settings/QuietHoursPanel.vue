@@ -43,7 +43,9 @@ const summary = computed(() => {
   if (!enabled) return t("core.notifications.settings.quiet.summary_off");
   if (!from || !until || (from.hour === until.hour && from.minute === until.minute)) return ""; // no sentence for a window the form refuses
   const shown = ({ hour, minute }: { hour: number; minute: number }) => `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-  return t("core.notifications.settings.quiet.summary_on", { start: shown(from), end: shown(until), zone: props.timeZone });
+  // Go names the server's own zone "Local": no name a person could read, so the sentence leaves it out.
+  const named = props.timeZone && props.timeZone !== "Local";
+  return t(`core.notifications.settings.quiet.${named ? "summary_on" : "summary_on_no_zone"}`, { start: shown(from), end: shown(until), zone: props.timeZone });
 });
 
 async function save() {

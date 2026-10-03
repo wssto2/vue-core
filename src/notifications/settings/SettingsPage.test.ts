@@ -91,6 +91,13 @@ describe("the notification settings page", () => {
     expect(summary).toContain("e-mail waits until the quiet hours end");
   });
 
+  it("leaves out a zone the server cannot name (Go's \"Local\")", async () => {
+    await open({ "GET /v1/notifications/preferences": preferences({ time_zone: "Local" }) });
+    const summary = document.querySelector("[data-quiet-summary]")?.textContent ?? "";
+    expect(summary).toContain("Between 21:00 and 07:00 e-mail waits until the quiet hours end");
+    expect(summary).not.toContain("Local");
+  });
+
   it("saves quiet hours in minutes after midnight", async () => {
     const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: true, start: 1320, end: 360 }) });
     const panel = within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);

@@ -952,6 +952,7 @@
           "start": "From",
           "end": "To",
           "summary_on": "Between {start} and {end} ({zone}) e-mail waits until the quiet hours end.",
+          "summary_on_no_zone": "Between {start} and {end} e-mail waits until the quiet hours end.",
           "summary_off": "Quiet hours are off: e-mail is sent as soon as a notification is made.",
           "same": "From and to must be different times.",
           "required": "Choose a time.",

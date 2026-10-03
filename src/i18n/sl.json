@@ -952,6 +952,7 @@
           "start": "Od",
           "end": "Do",
           "summary_on": "Med {start} in {end} ({zone}) e-pošta počaka do konca tihih ur.",
+          "summary_on_no_zone": "Med {start} in {end} e-pošta počaka do konca tihih ur.",
           "summary_off": "Tihe ure so izklopljene: e-pošta se pošlje takoj, ko obvestilo nastane.",
           "same": "Od in do morata biti različna časa.",
           "required": "Izberite čas.",

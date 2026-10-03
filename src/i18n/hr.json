@@ -952,6 +952,7 @@
           "start": "Od",
           "end": "Do",
           "summary_on": "Između {start} i {end} ({zone}) e-pošta čeka do kraja tihih sati.",
+          "summary_on_no_zone": "Između {start} i {end} e-pošta čeka do kraja tihih sati.",
           "summary_off": "Tihi sati su isključeni: e-pošta se šalje čim obavijest nastane.",
           "same": "Od i do moraju biti različita vremena.",
           "required": "Odaberite vrijeme.",
