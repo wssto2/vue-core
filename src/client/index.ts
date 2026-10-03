@@ -7,3 +7,5 @@ export { ApiError, isAborted, isApiError } from "./error";
 export type { ApiErrorInit, ApiErrorKind, FieldErrors } from "./error";
 export { fetchTransport } from "./transport";
 export type { Transport } from "./transport";
+export { route } from "./route";
+export type { HttpMethod, RawRoute, Route, RouteOptions } from "./route";
