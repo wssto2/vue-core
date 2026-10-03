@@ -593,6 +593,61 @@
           "session_revoked": "Session ended · {name}"
         }
       }
+    },
+    "profile": {
+      "title": "My profile",
+      "description": "Your personal details, e-mail address, password and sessions",
+      "menu": "My profile",
+      "details": {
+        "title": "Personal details",
+        "login_hint": "Only an administrator can change the username.",
+        "submit": "Save details",
+        "saved": "Personal details saved"
+      },
+      "email": {
+        "title": "E-mail address",
+        "current": "Current address",
+        "change": "Change e-mail address",
+        "pending": "Waiting for confirmation of the new address {email}.",
+        "valid_until": "The code is valid until {time}.",
+        "enter_code": "Enter code",
+        "cancel_change": "Cancel the change",
+        "change_title": "Change e-mail address",
+        "new_email": "New e-mail address",
+        "current_password": "Current password",
+        "request_hint": "We will send a confirmation code to the new address. The address changes only once you enter that code.",
+        "send_code": "Send code",
+        "verify_title": "Confirm your new address",
+        "verify_description": "Enter the 6-digit code we sent to {email}.",
+        "verify": "Verify",
+        "resend": "Resend code",
+        "resend_in": "Resend code in {time}",
+        "request_new": "Request a new code",
+        "changed": "E-mail address changed",
+        "cancelled": "E-mail address change cancelled",
+        "code_sent": "A new code was sent to {email}",
+        "verify_failed": "The code could not be checked. Try again.",
+        "resend_failed": "The code could not be sent. Try again.",
+        "cancel_failed": "The change could not be cancelled. Try again."
+      },
+      "password": {
+        "title": "Change password",
+        "current": "Current password",
+        "new": "New password",
+        "repeat": "Repeat new password",
+        "show": "Show passwords",
+        "hide": "Hide passwords",
+        "submit": "Change password",
+        "changed": "Password changed. You were signed out on your other devices."
+      },
+      "sessions": {
+        "title": "Sessions",
+        "footer": "This device is marked; you leave it by signing out. Any other device can be signed out here."
+      },
+      "signins": {
+        "title": "Sign-in history",
+        "footer": "Every sign-in to your account, including refused ones. If you do not recognize one, change your password."
+      }
     }
   }
 }

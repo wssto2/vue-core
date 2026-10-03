@@ -1,8 +1,11 @@
 import { fireEvent, screen, waitFor } from "@testing-library/vue";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import en from "../../i18n/en.json";
 import { settle } from "../../testing";
 import { callsTo, dataOf, listOf, startScreen, stopApplications } from "../testing";
+
+// The first screen of a file loads its route chunks through the transformer: slow on a busy machine.
+vi.setConfig({ testTimeout: 30_000 });
 
 afterEach(stopApplications);
 

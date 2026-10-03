@@ -129,6 +129,17 @@ export type CoreMessages = {
         fields: Texts<"login" | "name" | "email" | "phone" | "locale" | "password" | "active">;
       };
     };
+    /** "My profile": the signed-in person's own account. */
+    profile: {
+      title: string;
+      description: string;
+      menu: string;
+      details: Texts<"title" | "login_hint" | "submit" | "saved">;
+      email: Texts<"title" | "current" | "change" | "pending" | "valid_until" | "enter_code" | "cancel_change" | "change_title" | "new_email" | "current_password" | "request_hint" | "send_code" | "verify_title" | "verify_description" | "verify" | "resend" | "resend_in" | "request_new" | "changed" | "cancelled" | "code_sent" | "verify_failed" | "resend_failed" | "cancel_failed">;
+      password: Texts<"title" | "current" | "new" | "repeat" | "show" | "hide" | "submit" | "changed">;
+      sessions: Texts<"title" | "footer">;
+      signins: Texts<"title" | "footer">;
+    };
     /** What the screens of a person's account share (their own profile and an administrator's view of them). */
     account: {
       validation: Texts<"required" | "mismatch">;

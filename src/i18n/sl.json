@@ -593,6 +593,61 @@
           "session_revoked": "Seja končana · {name}"
         }
       }
+    },
+    "profile": {
+      "title": "Moj profil",
+      "description": "Vaši osebni podatki, e-poštni naslov, geslo in seje",
+      "menu": "Moj profil",
+      "details": {
+        "title": "Osebni podatki",
+        "login_hint": "Uporabniško ime lahko spremeni samo skrbnik.",
+        "submit": "Shrani podatke",
+        "saved": "Osebni podatki so shranjeni"
+      },
+      "email": {
+        "title": "E-poštni naslov",
+        "current": "Trenutni naslov",
+        "change": "Spremeni e-poštni naslov",
+        "pending": "Čaka se potrditev novega naslova {email}.",
+        "valid_until": "Koda velja do {time}.",
+        "enter_code": "Vnesi kodo",
+        "cancel_change": "Prekliči spremembo",
+        "change_title": "Sprememba e-poštnega naslova",
+        "new_email": "Nov e-poštni naslov",
+        "current_password": "Trenutno geslo",
+        "request_hint": "Na novi naslov bomo poslali potrditveno kodo. Naslov se spremeni šele, ko vnesete to kodo.",
+        "send_code": "Pošlji kodo",
+        "verify_title": "Potrdite novi naslov",
+        "verify_description": "Vnesite 6-mestno kodo, ki smo jo poslali na {email}.",
+        "verify": "Potrdi",
+        "resend": "Pošlji novo kodo",
+        "resend_in": "Nova koda čez {time}",
+        "request_new": "Zahtevaj novo kodo",
+        "changed": "E-poštni naslov je spremenjen",
+        "cancelled": "Sprememba e-poštnega naslova je preklicana",
+        "code_sent": "Nova koda je poslana na {email}",
+        "verify_failed": "Kode ni bilo mogoče preveriti. Poskusite znova.",
+        "resend_failed": "Kode ni bilo mogoče poslati. Poskusite znova.",
+        "cancel_failed": "Sprememba ni bila preklicana. Poskusite znova."
+      },
+      "password": {
+        "title": "Sprememba gesla",
+        "current": "Trenutno geslo",
+        "new": "Novo geslo",
+        "repeat": "Ponovite novo geslo",
+        "show": "Pokaži gesla",
+        "hide": "Skrij gesla",
+        "submit": "Spremeni geslo",
+        "changed": "Geslo je spremenjeno. Odjavljeni ste na drugih napravah."
+      },
+      "sessions": {
+        "title": "Seje",
+        "footer": "Ta naprava je označena; z nje se izstopi z odjavo. Vsako drugo napravo lahko odjavite tukaj."
+      },
+      "signins": {
+        "title": "Zgodovina prijav",
+        "footer": "Vsaka prijava v vaš račun, tudi zavrnjena. Če katere ne prepoznate, spremenite geslo."
+      }
     }
   }
 }

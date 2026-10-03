@@ -593,6 +593,61 @@
           "session_revoked": "Sesija završena · {name}"
         }
       }
+    },
+    "profile": {
+      "title": "Moj profil",
+      "description": "Vaši osobni podaci, e-mail adresa, lozinka i sesije",
+      "menu": "Moj profil",
+      "details": {
+        "title": "Osobni podaci",
+        "login_hint": "Korisničko ime može promijeniti samo administrator.",
+        "submit": "Spremi podatke",
+        "saved": "Osobni podaci su spremljeni"
+      },
+      "email": {
+        "title": "E-mail adresa",
+        "current": "Trenutna adresa",
+        "change": "Promijeni e-mail adresu",
+        "pending": "Čeka se potvrda nove adrese {email}.",
+        "valid_until": "Kod vrijedi do {time}.",
+        "enter_code": "Unesi kod",
+        "cancel_change": "Odustani od promjene",
+        "change_title": "Promjena e-mail adrese",
+        "new_email": "Nova e-mail adresa",
+        "current_password": "Trenutna lozinka",
+        "request_hint": "Na novu adresu poslat ćemo kod za potvrdu. Adresa se mijenja tek kad unesete taj kod.",
+        "send_code": "Pošalji kod",
+        "verify_title": "Potvrdite novu adresu",
+        "verify_description": "Unesite 6-znamenkasti kod koji smo poslali na {email}.",
+        "verify": "Potvrdi",
+        "resend": "Pošalji novi kod",
+        "resend_in": "Novi kod za {time}",
+        "request_new": "Zatraži novi kod",
+        "changed": "E-mail adresa je promijenjena",
+        "cancelled": "Promjena e-mail adrese je otkazana",
+        "code_sent": "Novi kod poslan je na {email}",
+        "verify_failed": "Kod nije moguće provjeriti. Pokušajte ponovno.",
+        "resend_failed": "Kod nije moguće poslati. Pokušajte ponovno.",
+        "cancel_failed": "Promjena nije otkazana. Pokušajte ponovno."
+      },
+      "password": {
+        "title": "Promjena lozinke",
+        "current": "Trenutna lozinka",
+        "new": "Nova lozinka",
+        "repeat": "Ponovite novu lozinku",
+        "show": "Prikaži lozinke",
+        "hide": "Sakrij lozinke",
+        "submit": "Promijeni lozinku",
+        "changed": "Lozinka je promijenjena. Odjavljeni ste na ostalim uređajima."
+      },
+      "sessions": {
+        "title": "Sesije",
+        "footer": "Ovaj uređaj je označen; s njega se izlazi odjavom. Svaki drugi uređaj možete odjaviti ovdje."
+      },
+      "signins": {
+        "title": "Povijest prijava",
+        "footer": "Svaka prijava u vaš račun, i odbijena. Ako neku ne prepoznajete, promijenite lozinku."
+      }
     }
   }
 }
