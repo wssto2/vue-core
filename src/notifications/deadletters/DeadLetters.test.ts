@@ -56,8 +56,16 @@ describe("the dead-letters page", () => {
     expect(target.textContent).not.toContain("the directory was away");
   });
 
-  it("asks only for the consumer typed into the filter", async () => {
-    const { calls } = await open([VIEW]);
+  it("offers the application's consumers to choose from, and asks only for the one chosen", async () => {
+    const { calls } = await open([VIEW], { "GET /v1/events/consumers": dataOf({ consumers: ["mail.sender", "notifications.ticket-assigned"] }) });
+    await fireEvent.click(screen.getByRole("button", { name: /Consumer/ }));
+    expect(await screen.findByRole("menuitemradio", { name: "All consumers" })).toBeTruthy();
+    await fireEvent.click(await screen.findByRole("menuitemradio", { name: "mail.sender" }));
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/events/dead-letters").at(-1)!.url).toContain("consumer=mail.sender"));
+  });
+
+  it("falls back to a text field when the consumers cannot be read", async () => {
+    const { calls } = await open([VIEW], { "GET /v1/events/consumers": refusal(500, "unexpected") });
     await fireEvent.click(screen.getByRole("button", { name: /Consumer/ }));
     const field = await screen.findByRole("textbox");
     await fireEvent.update(field, "mail.sender");

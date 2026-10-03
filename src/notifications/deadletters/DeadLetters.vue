@@ -8,13 +8,14 @@ import { useFormat } from "../../format";
 import type { DeadLetterRow } from "../../modules/events/entities";
 import { eventsRoutes } from "../../modules/events/routes";
 import { AlertDialog, toast } from "../../overlay";
+import { useLoad } from "../../state";
 import { usePlatform } from "../../platform";
 import { RETRY_DEAD_LETTERS } from "./access";
 import { deadLetterList } from "./list";
 
 /**
  * The events a consumer gave up on after its retries, of every consumer of the queue: what failed and why, narrowed to one
- * consumer by the filter. "Retry" puts one back in the queue; "Retry all for this consumer" (after a question) puts back every
+ * consumer by the filter (a choice among the application's consumers). "Retry" puts one back in the queue; "Retry all for this consumer" (after a question) puts back every
  * one of that consumer. Both are behind `events.deadletter:retry`; an event whose payload was already removed cannot be retried.
  */
 const { t } = useI18n();
@@ -31,7 +32,13 @@ const columns = computed(() => [
   { key: "dead_at", label: t("core.notifications.dead_letters.columns.dead_at"), width: 170, mobile: "accessory" },
 ] satisfies CollectionColumns<DeadLetterRow>);
 
-const filters = computed(() => [{ key: "consumer", label: t("core.notifications.dead_letters.columns.consumer"), type: "text" }] satisfies FilterDescriptor<"consumer">[]);
+// The consumers the application has, for the filter; a text field until they are known (and when they cannot be read).
+const consumers = useLoad(async ({ signal }) => (await http.request(eventsRoutes.consumers, undefined, { signal })).data.consumers);
+const filters = computed<FilterDescriptor<"consumer">[]>(() => {
+  const label = t("core.notifications.dead_letters.columns.consumer");
+  const names = consumers.data.value;
+  return [names ? { key: "consumer", label, type: "select", options: names.map((name) => ({ value: name, label: name })), defaultOptionTitle: t("core.notifications.dead_letters.all_consumers") } : { key: "consumer", label, type: "text" }];
+});
 
 const letters = useCollection(deadLetterList(http), { columns, filters, state: { kind: "url", key: "query" } });
 
