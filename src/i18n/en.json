@@ -1,5 +1,146 @@
 {
   "core": {
+    "access": {
+      "title": "Roles",
+      "description": "Sets of permissions. A person is given a role on their record, together with where it applies.",
+      "new_title": "New role",
+      "new_description": "A custom role: choose the permissions and whose records they reach.",
+      "new_copy_description": "A copy of an existing role: your changes are saved as a new custom role.",
+      "create": "New role",
+      "save": "Save role",
+      "copy": "Copy",
+      "copy_name": "{name} (copy)",
+      "search": "Search roles",
+      "list_footer": "Predefined roles come with the application and are not edited. Copy gives a custom role to adjust.",
+      "empty": "No roles match.",
+      "permissions": "Permissions: {count}",
+      "holders_count": "People: {count}",
+      "kinds": {
+        "all": "All",
+        "predefined": "Predefined",
+        "custom": "Custom"
+      },
+      "role_kind": {
+        "predefined": "Predefined",
+        "custom": "Custom",
+        "computed": "Automatic"
+      },
+      "groups": {
+        "role": "Role"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "notes": {
+        "predefined": "A predefined role comes with the application and is not edited. Copy gives a custom role to adjust.",
+        "computed": "Its permissions are granted automatically: when the application gets a new permission, the role has it at once. Permissions marked System are held only by the roles that run the system."
+      },
+      "requires": "Requires: {names}.",
+      "modules": "Modules",
+      "turn_on_all": "Turn on all",
+      "turn_off_all": "Turn off all",
+      "completed": "The role lacked some permissions that its other permissions need, so they are switched on: {names}. Save the role to apply the change.",
+      "name_required": "Enter a name.",
+      "too_long": "The maximum length is exceeded.",
+      "saved": "Role saved",
+      "deleted": "Role deleted",
+      "sensitive": "Sensitive",
+      "system": "System",
+      "system_group": "System",
+      "organization_only": "Whole organization only",
+      "unowned": "Includes records nobody owns yet, so the person can pick them up.",
+      "qualifier": {
+        "own": "Own",
+        "own_location": "My location",
+        "all": "All"
+      },
+      "qualifier_hint": {
+        "own": "Only records assigned to the person or created by them",
+        "own_location": "Records of the location where the person holds the role",
+        "all": "Every record where the person holds the role"
+      },
+      "qualifier_noun": {
+        "own": "Own",
+        "own_location": "Location's",
+        "all": "All"
+      },
+      "levels": {
+        "organization": "Organization"
+      },
+      "compare": {
+        "action": "Compare with a predefined role",
+        "title": "Comparison with a predefined role",
+        "footer": "Shows how far the custom role has moved from the predefined one.",
+        "with": "Predefined role",
+        "loading": "Comparing…",
+        "failed": "The comparison failed. Try again.",
+        "identical": "The roles do not differ.",
+        "only_in_role": "Only in this role ({count})",
+        "only_in_other": "Only in the predefined role ({count})",
+        "different": "Different whose records ({count})",
+        "whose": "{role}, predefined: {other}"
+      },
+      "replace": {
+        "action": "Replace",
+        "title": "Replace the role",
+        "footer": "Everyone who has this role gets the chosen predefined role at the same place. The same rules apply as when giving a role: you cannot give more than you hold.",
+        "with": "Replace with predefined role",
+        "choose": "Choose a role.",
+        "confirm": "Replace",
+        "moves": "People who move to the predefined role: {count}.",
+        "done": "People moved to the predefined role: {count}"
+      },
+      "delete": {
+        "action": "Delete role",
+        "title": "Delete the role?",
+        "body": "The role “{name}” will be deleted. While anyone holds it, it cannot be deleted: replace it first.",
+        "failed": "The role could not be deleted."
+      },
+      "holders": {
+        "title": "People with this role",
+        "empty": "Nobody has this role now.",
+        "service": "Service account"
+      },
+      "person_roles": "Roles",
+      "roles_footer": "A role says what the person may do and whose records they see (their own or all); the place says where. Several roles add up. You can only give what you hold yourself, up to your own place.",
+      "no_roles_title": "No roles",
+      "no_roles_description": "Without a role there is nothing to see or do. Add a role and where it applies.",
+      "add_role": "Add role",
+      "remove": "Remove",
+      "remove_title": "Remove the role?",
+      "remove_body": "{name} will no longer have the role “{role}” ({scope}).",
+      "added": "Role added",
+      "removed": "Role removed",
+      "remove_failed": "The role was not removed. Try again.",
+      "add": {
+        "confirm": "Add",
+        "scope_header": "Where it applies",
+        "scope_level": "Level",
+        "scopes_failed": "The places where you can give a role did not load.",
+        "no_places": "You cannot give this person a role anywhere.",
+        "roles_loading": "Loading roles…",
+        "roles_failed": "The roles did not load. Try again.",
+        "no_roles": "You cannot give any role there.",
+        "role": "Role",
+        "role_gives": "What the role gives",
+        "role_gives_footer": "The role decides; it changes in Roles, not here.",
+        "choose_role": "Choose a role.",
+        "choose_place": "Choose where the role applies."
+      },
+      "effective": {
+        "title": "What {name} can do",
+        "footer": "The sum of all the person's roles; it changes by adding or removing roles. Own – records assigned to the person or created by them · Location's – records of their location · All – every record within the role's place.",
+        "empty": "Without roles there are no permissions.",
+        "from_roles": "from: {roles}",
+        "unavailable": "Switched off",
+        "why_row": "{role} · {whose} · {scope}",
+        "show_why": "Why",
+        "hide_why": "Hide",
+        "all_modules": "All {count} modules",
+        "fewer_modules": "Fewer modules"
+      }
+    },
     "actions": {
       "cancel": "Cancel",
       "close": "Close",
@@ -340,6 +481,14 @@
       "offline": "The server could not be reached. Check your connection and try again.",
       "cancelled": "The request was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again.",
+      "authz": {
+        "forbidden": "You are not allowed to make this change in that place.",
+        "escalation": "That role has permissions you do not hold yourself, so you cannot give it.",
+        "self_assignment": "You cannot give a role to yourself.",
+        "last_admin": "You cannot remove your own last access to roles and users.",
+        "role_in_use": "The role is still given to people. Replace it first or take it from their access.",
+        "invalid": "The role or the place is not valid."
+      },
       "identity": {
         "signin": {
           "failed": "Invalid username or password.",
@@ -347,7 +496,9 @@
           "inactive": "This account is not active."
         },
         "session": {
-          "invalid": "Your session has ended. Sign in again."
+          "invalid": "Your session has ended. Sign in again.",
+          "current": "This is the session you are using. To leave it, sign out.",
+          "not_found": "That device is no longer signed in."
         },
         "locale": {
           "invalid": "This language is not supported."
@@ -358,7 +509,54 @@
         },
         "account": {
           "not_found": "This account does not exist.",
-          "inactive": "This account is not active."
+          "inactive": "This account is not active.",
+          "already_active": "This account is already active.",
+          "already_inactive": "This account is already inactive.",
+          "self_deactivation": "You cannot deactivate your own account."
+        },
+        "code": {
+          "expired": "The code is no longer valid. Request a new one.",
+          "invalid": "Enter the 6-digit code.",
+          "mismatch": "The code is not correct. Attempts left: {attempts_left}.",
+          "no_pending": "There is no active code. Request a new one.",
+          "not_delivered": "The code could not be sent. Try again in a minute.",
+          "resend_too_soon": "You can request a new code in {retry_after} s.",
+          "too_many_attempts": "Too many wrong attempts. Request a new code.",
+          "too_many_requests": "You requested too many codes. Try again later."
+        },
+        "email": {
+          "disabled": "The e-mail address cannot be changed here.",
+          "invalid": "Enter a valid e-mail address.",
+          "taken": "This e-mail address is already used by another account.",
+          "unchanged": "This is already your e-mail address."
+        },
+        "list": {
+          "dir_invalid": "The sort direction is not valid.",
+          "order_invalid": "The list cannot be sorted by that column.",
+          "view_invalid": "That view does not exist."
+        },
+        "login": {
+          "invalid": "The username cannot be empty, contain spaces or be too long.",
+          "taken": "This username is already taken."
+        },
+        "name": {
+          "invalid": "The name cannot be empty or too long."
+        },
+        "password": {
+          "mismatch": "The passwords do not match.",
+          "unchanged": "The new password must differ from the current one.",
+          "weak": "The password does not meet the password rules.",
+          "wrong": "The password is not correct."
+        },
+        "phone": {
+          "invalid": "The phone number is too long."
+        },
+        "reauth": {
+          "locked": "Too many wrong passwords. For your security, try again after {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "That area does not exist.",
+          "range_invalid": "The end of the range is before its start."
         }
       }
     },
@@ -394,6 +592,281 @@
         "banner_short": "Signed in as {name}",
         "return": "Return to my account",
         "sign_in_as": "Sign in as {name}"
+      }
+    },
+    "users": {
+      "title": "Users",
+      "description": "People who sign in: their details, sign-ins and sessions.",
+      "views": {
+        "active": "Active",
+        "locked": "Locked",
+        "inactive": "Inactive",
+        "all": "All"
+      },
+      "columns": {
+        "person": "Person",
+        "login": "Username",
+        "last_sign_in": "Last sign-in",
+        "status": "Status"
+      },
+      "never": "Never",
+      "status": {
+        "active": "Active",
+        "locked": "Locked",
+        "inactive": "Inactive"
+      },
+      "create": {
+        "title": "New user",
+        "subtitle": "The person's page opens after saving.",
+        "action": "Create user",
+        "done": "{name} was created"
+      },
+      "fields": {
+        "login": "Username",
+        "name": "Full name",
+        "email": "E-mail",
+        "phone": "Phone number",
+        "locale": "Language",
+        "password": "Password",
+        "password_repeat": "Repeat password"
+      },
+      "record": "User",
+      "sections_label": "Parts of the person",
+      "sections": {
+        "general": "Basic details",
+        "signin": "Sign-in",
+        "sessions": "Sessions",
+        "signins": "Sign-in history",
+        "changes": "Changes",
+        "activity": "Activity"
+      },
+      "section_groups": {
+        "person": "Person",
+        "access": "Access",
+        "activity": "Activity"
+      },
+      "intro": {
+        "general": "Who the person is. Sign-in and sessions have their own pages.",
+        "signin": "How the person signs in: the lock after wrong passwords, a new password and signing in as them.",
+        "sessions": "The devices the person is signed in on now.",
+        "signins": "Every sign-in to the person's account, successful or refused.",
+        "changes": "What was changed on the person's account and who did it.",
+        "activity": "What the person did: the records they made, changed or deleted, by area and day."
+      },
+      "groups": {
+        "person": "Person",
+        "person_footer": "The username is what the person signs in with.",
+        "contact": "Contact"
+      },
+      "general": {
+        "saved": "Details saved",
+        "created": "Account created {when}",
+        "last_sign_in": "last signed in {when}",
+        "never_signed_in": "never signed in",
+        "all_changes": "All changes"
+      },
+      "actions": {
+        "deactivate": "Deactivate…",
+        "deactivate_short": "Deactivate",
+        "activate": "Activate"
+      },
+      "deactivate": {
+        "title": "Deactivate the person",
+        "busy": "Deactivating…",
+        "done_label": "Deactivated",
+        "done": "{name} was deactivated",
+        "row_sub": "Signs the person out on every device",
+        "signs_out": "Signed out on every device ({n})",
+        "signs_out_sub": "At once, without waiting for the session to end",
+        "cannot_sign_in": "Can no longer sign in",
+        "cannot_sign_in_sub": "Roles and history stay; activating again restores everything"
+      },
+      "activate": {
+        "title": "Activate the person?",
+        "body": "{name} will be able to sign in again. Roles and history stay as they were.",
+        "row_sub": "Lets the person sign in again; roles and history stay",
+        "done": "{name} was activated",
+        "failed": "The person was not activated. Try again."
+      },
+      "password": {
+        "title": "New password",
+        "action": "Set password",
+        "footer": "Nobody can read a password, not even an administrator; only a new one can be set. A new password signs the person out on every device and lifts their lock.",
+        "done": "Password set for {name}"
+      },
+      "signin": {
+        "lock": "Lock",
+        "lock_footer": "After repeated wrong passwords sign-in is locked for a while. Whoever unlocks it is recorded in Changes and in the sign-in history.",
+        "locked_title": "Sign-in is locked",
+        "not_locked": "Sign-in is not locked",
+        "not_locked_sub": "It locks after repeated wrong passwords.",
+        "unlocks_at": "unlocks by itself at {time}",
+        "unlock": "Unlock",
+        "unlocked": "Sign-in unlocked",
+        "unlock_failed": "Sign-in was not unlocked. Try again.",
+        "password": "Password",
+        "password_footer": "Nobody can read a password, not even an administrator; only a new one can be set. A new password signs the person out on every device and lifts their lock.",
+        "set_password": "Set a new password…",
+        "set_password_sub": "Tell it to the person in person; they can change it in My profile",
+        "as_header": "Signing in as {name}",
+        "as_title": "Sign in as this person",
+        "as_sub": "You see the application as they do, with their access.",
+        "as_footer": "It is recorded in the sign-in history with your name."
+      },
+      "sessions": {
+        "header": "Signed in on {n} devices",
+        "footer": "Signing out takes effect at once: the next click on that device leads to the sign-in. Deactivating and a new password sign the person out everywhere.",
+        "own_footer": "This is your account: you sign out your own devices in My profile.",
+        "end_all": "Sign out everywhere",
+        "end_all_title": "Sign out everywhere?",
+        "end_all_body": "{name} will have to sign in again on every device, including the sessions somebody opened by signing in as them.",
+        "ended_all": "Signed out on every device"
+      },
+      "changes": {
+        "empty": "No changes recorded.",
+        "diff": "{field}: {before} → {after}",
+        "actions": {
+          "created": "Account created",
+          "updated": "Details changed",
+          "deactivated": "Deactivated",
+          "activated": "Activated",
+          "password": "Password changed",
+          "email": "E-mail address changed",
+          "profile": "Profile changed",
+          "unknown": "Account changed"
+        },
+        "fields": {
+          "login": "Username",
+          "name": "Full name",
+          "email": "E-mail",
+          "phone": "Phone number",
+          "locale": "Language",
+          "password": "Password",
+          "active": "Status"
+        }
+      },
+      "activity": {
+        "areas": {
+          "all": "All",
+          "identity": "Accounts",
+          "other": "Other"
+        },
+        "areas_label": "Areas",
+        "since": "From",
+        "until": "To",
+        "empty": "No activity in this range.",
+        "footer": "Only what the application records is here. A row done while somebody was signed in as the person says so.",
+        "actions": {
+          "created": "Made a record",
+          "changed": "Changed a record",
+          "deleted": "Deleted a record",
+          "other": "Did something with a record"
+        },
+        "signed_in_as": "Signed in as · {name}",
+        "signed_in_as_other": "Signed in as, by somebody else"
+      }
+    },
+    "account": {
+      "validation": {
+        "required": "Required.",
+        "mismatch": "The passwords do not match."
+      },
+      "somebody_else": "Somebody else",
+      "sessions": {
+        "empty": "No devices are signed in.",
+        "unknown_device": "Unknown device",
+        "last_active": "last active {when}",
+        "expires": "expires {when}",
+        "this_device": "This device",
+        "opened_by": "Signed in as · {name}",
+        "opened_by_other": "Signed in as, by somebody else",
+        "end": "Sign out",
+        "end_title": "Sign out this device?",
+        "end_body": "“{device}” is signed out at once.",
+        "ended": "Device signed out",
+        "end_failed": "Signing out failed. Try again."
+      },
+      "signins": {
+        "columns": {
+          "time": "Time",
+          "event": "Event",
+          "device": "Device",
+          "ip": "IP address"
+        },
+        "empty": "No sign-ins recorded.",
+        "footer_user": "Every sign-in attempt to the account is recorded, refused ones too.",
+        "events": {
+          "signed_in": "Signed in",
+          "wrong_password": "Wrong password",
+          "locked_out": "Locked out",
+          "refused_inactive": "Inactive account",
+          "signed_in_as": "Signed in as",
+          "unlocked": "Unlocked",
+          "signed_out_everywhere": "Signed out everywhere",
+          "session_revoked": "Session ended",
+          "unknown": "Other event"
+        },
+        "events_by": {
+          "signed_in_as": "Signed in as · {name}",
+          "unlocked": "Unlocked · {name}",
+          "signed_out_everywhere": "Signed out everywhere · {name}",
+          "session_revoked": "Session ended · {name}"
+        }
+      }
+    },
+    "profile": {
+      "title": "My profile",
+      "description": "Your personal details, e-mail address, password and sessions",
+      "menu": "My profile",
+      "details": {
+        "title": "Personal details",
+        "login_hint": "Only an administrator can change the username.",
+        "submit": "Save details",
+        "saved": "Personal details saved"
+      },
+      "email": {
+        "title": "E-mail address",
+        "current": "Current address",
+        "change": "Change e-mail address",
+        "pending": "Waiting for confirmation of the new address {email}.",
+        "valid_until": "The code is valid until {time}.",
+        "enter_code": "Enter code",
+        "cancel_change": "Cancel the change",
+        "change_title": "Change e-mail address",
+        "new_email": "New e-mail address",
+        "current_password": "Current password",
+        "request_hint": "We will send a confirmation code to the new address. The address changes only once you enter that code.",
+        "send_code": "Send code",
+        "verify_title": "Confirm your new address",
+        "verify_description": "Enter the 6-digit code we sent to {email}.",
+        "verify": "Verify",
+        "resend": "Resend code",
+        "resend_in": "Resend code in {time}",
+        "request_new": "Request a new code",
+        "changed": "E-mail address changed",
+        "cancelled": "E-mail address change cancelled",
+        "code_sent": "A new code was sent to {email}",
+        "verify_failed": "The code could not be checked. Try again.",
+        "resend_failed": "The code could not be sent. Try again.",
+        "cancel_failed": "The change could not be cancelled. Try again."
+      },
+      "password": {
+        "title": "Change password",
+        "current": "Current password",
+        "new": "New password",
+        "repeat": "Repeat new password",
+        "show": "Show passwords",
+        "hide": "Hide passwords",
+        "submit": "Change password",
+        "changed": "Password changed. You were signed out on your other devices."
+      },
+      "sessions": {
+        "title": "Sessions",
+        "footer": "This device is marked; you leave it by signing out. Any other device can be signed out here."
+      },
+      "signins": {
+        "title": "Sign-in history",
+        "footer": "Every sign-in to your account, including refused ones. If you do not recognize one, change your password."
       }
     }
   }

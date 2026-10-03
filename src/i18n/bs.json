@@ -1,5 +1,146 @@
 {
   "core": {
+    "access": {
+      "title": "Uloge",
+      "description": "Skupovi dozvola. Osobi se uloga dodjeljuje na njenom zapisu, zajedno s obimom.",
+      "new_title": "Nova uloga",
+      "new_description": "Prilagođena uloga: odaberite dozvole i čije zapise obuhvataju.",
+      "new_copy_description": "Kopija postojeće uloge: dorada se sprema kao nova prilagođena uloga.",
+      "create": "Nova uloga",
+      "save": "Spremi ulogu",
+      "copy": "Kopiraj",
+      "copy_name": "{name} (kopija)",
+      "search": "Pretraži uloge",
+      "list_footer": "Standardne uloge dolaze s aplikacijom i ne uređuju se — Kopiraj daje prilagođenu ulogu za doradu.",
+      "empty": "Nema uloga koje odgovaraju.",
+      "permissions": "Dozvole: {count}",
+      "holders_count": "Osoba: {count}",
+      "kinds": {
+        "all": "Sve",
+        "predefined": "Standardne",
+        "custom": "Prilagođene"
+      },
+      "role_kind": {
+        "predefined": "Standardna",
+        "custom": "Prilagođena",
+        "computed": "Automatska"
+      },
+      "groups": {
+        "role": "Uloga"
+      },
+      "fields": {
+        "name": "Naziv",
+        "description": "Opis"
+      },
+      "notes": {
+        "predefined": "Standardna uloga dolazi s aplikacijom i ne uređuje se. Kopiraj daje prilagođenu ulogu za doradu.",
+        "computed": "Dozvole se dodjeljuju automatski: kad aplikacija dobije novu dozvolu, uloga je dobija odmah, bez ručnog dodavanja. Dozvole označene Sistem imaju samo uloge koje vode sistem."
+      },
+      "requires": "Zahtijeva: {names}.",
+      "modules": "Moduli",
+      "turn_on_all": "Uključi sve",
+      "turn_off_all": "Isključi sve",
+      "completed": "Uloga nije imala sve dozvole koje trebaju njene druge dozvole, pa su uključene: {names}. Spremite ulogu da se promjena primijeni.",
+      "name_required": "Unesite naziv.",
+      "too_long": "Prekoračena je najveća dužina.",
+      "saved": "Uloga je spremljena",
+      "deleted": "Uloga je obrisana",
+      "sensitive": "Osjetljivo",
+      "system": "Sistem",
+      "system_group": "Sistem",
+      "organization_only": "Samo cijela organizacija",
+      "unowned": "Uključuje još nedodijeljene zapise, da ih osoba može preuzeti.",
+      "qualifier": {
+        "own": "Svoje",
+        "own_location": "Moja lokacija",
+        "all": "Sve"
+      },
+      "qualifier_hint": {
+        "own": "Samo zapisi dodijeljeni osobi ili koje je izradila",
+        "own_location": "Zapisi lokacije na kojoj osoba ima ulogu",
+        "all": "Svi zapisi na mjestu na kojem osoba ima ulogu"
+      },
+      "qualifier_noun": {
+        "own": "Svoji",
+        "own_location": "Lokacije",
+        "all": "Svi"
+      },
+      "levels": {
+        "organization": "Organizacija"
+      },
+      "compare": {
+        "action": "Usporedi sa standardnom ulogom",
+        "title": "Usporedba sa standardnom ulogom",
+        "footer": "Pokazuje koliko se prilagođena uloga udaljila od standardne.",
+        "with": "Standardna uloga",
+        "loading": "Upoređujem…",
+        "failed": "Usporedba nije uspjela. Pokušajte ponovo.",
+        "identical": "Uloge se ne razlikuju.",
+        "only_in_role": "Samo u ovoj ulozi ({count})",
+        "only_in_other": "Samo u standardnoj ({count})",
+        "different": "Različito čije zapise vidi ({count})",
+        "whose": "{role}, standardna: {other}"
+      },
+      "replace": {
+        "action": "Zamijeni",
+        "title": "Zamijeni ulogu",
+        "footer": "Svi koji imaju ovu ulogu dobijaju odabranu standardnu ulogu na istom obimu. Važe ista pravila kao pri dodjeli: ne možete dati više nego što i sami imate.",
+        "with": "Zamijeni standardnom ulogom",
+        "choose": "Odaberite ulogu.",
+        "confirm": "Zamijeni",
+        "moves": "Osobe koje prelaze na standardnu ulogu: {count}.",
+        "done": "Osobe prebačene na standardnu ulogu: {count}"
+      },
+      "delete": {
+        "action": "Obriši ulogu",
+        "title": "Obrisati ulogu?",
+        "body": "Uloga „{name}” se briše. Dok je neko ima, brisanje nije moguće — najprije je zamijenite.",
+        "failed": "Uloga nije obrisana."
+      },
+      "holders": {
+        "title": "Osobe s ovom ulogom",
+        "empty": "Niko trenutno nema ovu ulogu.",
+        "service": "Servisni račun"
+      },
+      "person_roles": "Uloge",
+      "roles_footer": "Uloga kaže šta osoba smije raditi i čije zapise vidi (svoje ili sve), mjesto gdje. Više uloga se sabira. Možete dodijeliti samo ono što i sami imate, najviše do svog mjesta.",
+      "no_roles_title": "Nema nijedne uloge",
+      "no_roles_description": "Bez uloge ne može ništa vidjeti ni raditi. Dodajte ulogu i gdje vrijedi.",
+      "add_role": "Dodaj ulogu",
+      "remove": "Ukloni",
+      "remove_title": "Ukloniti ulogu?",
+      "remove_body": "{name} više neće imati ulogu „{role}” ({scope}).",
+      "added": "Uloga je dodana",
+      "removed": "Uloga je uklonjena",
+      "remove_failed": "Uloga nije uklonjena. Pokušajte ponovo.",
+      "add": {
+        "confirm": "Dodaj",
+        "scope_header": "Gdje vrijedi",
+        "scope_level": "Nivo",
+        "scopes_failed": "Mjesta na kojima možete dodijeliti ulogu nisu učitana.",
+        "no_places": "Ovoj osobi ne možete nigdje dodijeliti ulogu.",
+        "roles_loading": "Učitavam uloge…",
+        "roles_failed": "Uloge nisu učitane. Pokušajte ponovo.",
+        "no_roles": "Tamo ne možete dodijeliti nijednu ulogu.",
+        "role": "Uloga",
+        "role_gives": "Šta uloga daje",
+        "role_gives_footer": "Određuje uloga; mijenja se u Ulogama, ne ovdje.",
+        "choose_role": "Odaberite ulogu.",
+        "choose_place": "Odaberite gdje uloga vrijedi."
+      },
+      "effective": {
+        "title": "Šta {name} može",
+        "footer": "Zbir svih uloga osobe; mijenja se dodavanjem ili uklanjanjem uloga. Svoji – zapisi dodijeljeni osobi ili koje je sama izradila · Lokacije – zapisi njene lokacije · Svi – svi zapisi na mjestu uloge.",
+        "empty": "Bez uloga nema nijedne dozvole.",
+        "from_roles": "iz uloge: {roles}",
+        "unavailable": "Isključeno",
+        "why_row": "{role} · {whose} · {scope}",
+        "show_why": "Zašto",
+        "hide_why": "Sakrij",
+        "all_modules": "Svih {count} modula",
+        "fewer_modules": "Manje modula"
+      }
+    },
     "actions": {
       "cancel": "Odustani",
       "close": "Zatvori",
@@ -340,6 +481,14 @@
       "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
       "cancelled": "Zahtjev je otkazan.",
       "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo.",
+      "authz": {
+        "forbidden": "Nemate pravo na ovu promjenu na tom obimu.",
+        "escalation": "Ta uloga ima dozvole koje ni sami nemate, pa je ne možete dodijeliti.",
+        "self_assignment": "Ne možete dodijeliti ulogu sebi.",
+        "last_admin": "Ne možete ukloniti svoj zadnji pristup ulogama i korisnicima.",
+        "role_in_use": "Uloga je još dodijeljena osobama. Najprije je zamijenite ili uklonite iz njihovog pristupa.",
+        "invalid": "Uloga ili obim nisu ispravni."
+      },
       "identity": {
         "signin": {
           "failed": "Pogrešno korisničko ime ili lozinka.",
@@ -347,7 +496,9 @@
           "inactive": "Ovaj korisnički račun nije aktivan."
         },
         "session": {
-          "invalid": "Vaša sesija je istekla. Prijavite se ponovo."
+          "invalid": "Vaša sesija je istekla. Prijavite se ponovo.",
+          "current": "Ovo je sesija koju upravo koristite. Za izlaz se odjavite.",
+          "not_found": "Taj uređaj više nije prijavljen."
         },
         "locale": {
           "invalid": "Ovaj jezik nije podržan."
@@ -358,7 +509,54 @@
         },
         "account": {
           "not_found": "Ovaj korisnički račun ne postoji.",
-          "inactive": "Ovaj korisnički račun nije aktivan."
+          "inactive": "Ovaj korisnički račun nije aktivan.",
+          "already_active": "Račun je već aktivan.",
+          "already_inactive": "Račun je već neaktivan.",
+          "self_deactivation": "Ne možete deaktivirati vlastiti račun."
+        },
+        "code": {
+          "expired": "Kod više ne vrijedi. Zatražite novi kod.",
+          "invalid": "Unesite 6-cifreni kod.",
+          "mismatch": "Kod nije ispravan. Preostalo pokušaja: {attempts_left}.",
+          "no_pending": "Nema aktivnog koda. Zatražite novi kod.",
+          "not_delivered": "Kod nije moguće poslati. Pokušajte ponovo za minutu.",
+          "resend_too_soon": "Novi kod možete zatražiti za {retry_after} s.",
+          "too_many_attempts": "Previše neispravnih pokušaja. Zatražite novi kod.",
+          "too_many_requests": "Zatražili ste previše kodova. Pokušajte ponovo kasnije."
+        },
+        "email": {
+          "disabled": "E-mail adresu ovdje nije moguće promijeniti.",
+          "invalid": "Unesite ispravnu e-mail adresu.",
+          "taken": "Tu e-mail adresu već koristi drugi račun.",
+          "unchanged": "To je već vaša e-mail adresa."
+        },
+        "list": {
+          "dir_invalid": "Smjer sortiranja nije ispravan.",
+          "order_invalid": "Spisak se ne može sortirati po toj koloni.",
+          "view_invalid": "Taj prikaz ne postoji."
+        },
+        "login": {
+          "invalid": "Korisničko ime ne smije biti prazno, imati razmake niti biti predugo.",
+          "taken": "To korisničko ime je već zauzeto."
+        },
+        "name": {
+          "invalid": "Ime ne smije biti prazno niti predugo."
+        },
+        "password": {
+          "mismatch": "Lozinke se ne podudaraju.",
+          "unchanged": "Nova lozinka mora se razlikovati od trenutne.",
+          "weak": "Lozinka ne zadovoljava pravila za lozinke.",
+          "wrong": "Lozinka nije ispravna."
+        },
+        "phone": {
+          "invalid": "Broj telefona je predug."
+        },
+        "reauth": {
+          "locked": "Previše pogrešnih lozinki. Zbog sigurnosti pokušajte ponovo nakon {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "Ta oblast ne postoji.",
+          "range_invalid": "Kraj perioda je prije njegovog početka."
         }
       }
     },
@@ -394,6 +592,281 @@
         "banner_short": "Prijavljeni ste kao {name}",
         "return": "Povratak na moj račun",
         "sign_in_as": "Prijavi se kao {name}"
+      }
+    },
+    "users": {
+      "title": "Korisnici",
+      "description": "Osobe koje se prijavljuju: njihovi podaci, prijave i sesije.",
+      "views": {
+        "active": "Aktivni",
+        "locked": "Zaključani",
+        "inactive": "Neaktivni",
+        "all": "Svi"
+      },
+      "columns": {
+        "person": "Osoba",
+        "login": "Korisničko ime",
+        "last_sign_in": "Zadnja prijava",
+        "status": "Status"
+      },
+      "never": "Nikad",
+      "status": {
+        "active": "Aktivna",
+        "locked": "Zaključana",
+        "inactive": "Neaktivna"
+      },
+      "create": {
+        "title": "Novi korisnik",
+        "subtitle": "Nakon spremanja otvara se stranica osobe.",
+        "action": "Kreiraj korisnika",
+        "done": "Korisnik {name} je kreiran"
+      },
+      "fields": {
+        "login": "Korisničko ime",
+        "name": "Ime i prezime",
+        "email": "E-mail",
+        "phone": "Broj telefona",
+        "locale": "Jezik",
+        "password": "Lozinka",
+        "password_repeat": "Ponovite lozinku"
+      },
+      "record": "Korisnik",
+      "sections_label": "Dijelovi osobe",
+      "sections": {
+        "general": "Osnovni podaci",
+        "signin": "Prijava",
+        "sessions": "Sesije",
+        "signins": "Historija prijava",
+        "changes": "Promjene",
+        "activity": "Radnje"
+      },
+      "section_groups": {
+        "person": "Osoba",
+        "access": "Pristup",
+        "activity": "Aktivnost"
+      },
+      "intro": {
+        "general": "Ko je osoba. Prijava i sesije imaju svoje stranice.",
+        "signin": "Kako se osoba prijavljuje: zaključavanje nakon pogrešnih lozinki, nova lozinka i prijava u njeno ime.",
+        "sessions": "Uređaji na kojima je osoba sada prijavljena.",
+        "signins": "Svaka prijava u račun osobe, uspješna i neuspješna.",
+        "changes": "Šta je promijenjeno na računu osobe i ko je to uradio.",
+        "activity": "Šta je osoba radila: zapisi koje je kreirala, promijenila ili obrisala, po oblastima i danima."
+      },
+      "groups": {
+        "person": "Osoba",
+        "person_footer": "Korisničkim imenom se osoba prijavljuje.",
+        "contact": "Kontakt"
+      },
+      "general": {
+        "saved": "Podaci su spremljeni",
+        "created": "Račun kreiran {when}",
+        "last_sign_in": "zadnja prijava {when}",
+        "never_signed_in": "nikad se nije prijavila",
+        "all_changes": "Sve promjene"
+      },
+      "actions": {
+        "deactivate": "Deaktiviraj…",
+        "deactivate_short": "Deaktiviraj",
+        "activate": "Aktiviraj"
+      },
+      "deactivate": {
+        "title": "Deaktivacija osobe",
+        "busy": "Deaktiviranje…",
+        "done_label": "Deaktivirana",
+        "done": "Osoba je deaktivirana: {name}",
+        "row_sub": "Odjavljuje osobu sa svih uređaja",
+        "signs_out": "Odjavljuje se sa svih uređaja ({n})",
+        "signs_out_sub": "Odmah, bez čekanja da sesija istekne",
+        "cannot_sign_in": "Više se ne može prijaviti",
+        "cannot_sign_in_sub": "Uloge i historija ostaju; ponovnom aktivacijom sve vrijedi kao prije"
+      },
+      "activate": {
+        "title": "Aktivirati osobu?",
+        "body": "{name} će se ponovo moći prijaviti. Uloge i historija ostaju kakve su bile.",
+        "row_sub": "Ponovo omogućava prijavu; uloge i historija ostaju",
+        "done": "Osoba je aktivirana: {name}",
+        "failed": "Osoba nije aktivirana. Pokušajte ponovo."
+      },
+      "password": {
+        "title": "Nova lozinka",
+        "action": "Postavi lozinku",
+        "footer": "Lozinku ne vidi niko, ni administrator; može se samo postaviti nova. Nova lozinka odjavljuje osobu sa svih uređaja i otključava je.",
+        "done": "Lozinka je postavljena: {name}"
+      },
+      "signin": {
+        "lock": "Zaključavanje",
+        "lock_footer": "Nakon ponovljenih pogrešnih lozinki prijava se neko vrijeme zaključava. Ko je otključa, zapisano je u Promjenama i u historiji prijava.",
+        "locked_title": "Prijava je zaključana",
+        "not_locked": "Prijava nije zaključana",
+        "not_locked_sub": "Zaključava se nakon ponovljenih pogrešnih lozinki.",
+        "unlocks_at": "otključava se sama u {time}",
+        "unlock": "Otključaj",
+        "unlocked": "Prijava je otključana",
+        "unlock_failed": "Prijava nije otključana. Pokušajte ponovo.",
+        "password": "Lozinka",
+        "password_footer": "Lozinku ne vidi niko, ni administrator; može se samo postaviti nova. Nova lozinka odjavljuje osobu sa svih uređaja i otključava je.",
+        "set_password": "Postavi novu lozinku…",
+        "set_password_sub": "Recite je osobi lično; može je promijeniti u Mom profilu",
+        "as_header": "Prijava u račun: {name}",
+        "as_title": "Prijava kao ova osoba",
+        "as_sub": "Aplikaciju vidite kao ona, s njenim pristupom.",
+        "as_footer": "Bilježi se u historiju prijava s vašim imenom."
+      },
+      "sessions": {
+        "header": "Prijavljena na uređajima: {n}",
+        "footer": "Odjava vrijedi odmah: sljedeći klik na tom uređaju vodi na prijavu. Deaktivacija i nova lozinka odjavljuju sa svih uređaja.",
+        "own_footer": "Ovo je vaš račun: svoje uređaje odjavljujete u Mom profilu.",
+        "end_all": "Odjavi sa svih uređaja",
+        "end_all_title": "Odjaviti sa svih uređaja?",
+        "end_all_body": "Osoba {name} morat će se ponovo prijaviti na svakom uređaju, uključujući prijave koje su otvorili drugi prijavom u njen račun.",
+        "ended_all": "Osoba je odjavljena sa svih uređaja"
+      },
+      "changes": {
+        "empty": "Nema zabilježenih promjena.",
+        "diff": "{field}: {before} → {after}",
+        "actions": {
+          "created": "Račun je kreiran",
+          "updated": "Podaci su promijenjeni",
+          "deactivated": "Deaktivirana",
+          "activated": "Aktivirana",
+          "password": "Lozinka je promijenjena",
+          "email": "E-mail adresa je promijenjena",
+          "profile": "Profil je promijenjen",
+          "unknown": "Račun je promijenjen"
+        },
+        "fields": {
+          "login": "Korisničko ime",
+          "name": "Ime i prezime",
+          "email": "E-mail",
+          "phone": "Broj telefona",
+          "locale": "Jezik",
+          "password": "Lozinka",
+          "active": "Status"
+        }
+      },
+      "activity": {
+        "areas": {
+          "all": "Sve",
+          "identity": "Računi",
+          "other": "Ostalo"
+        },
+        "areas_label": "Oblasti",
+        "since": "Od",
+        "until": "Do",
+        "empty": "Nema radnji u ovom periodu.",
+        "footer": "Ovdje je samo ono što aplikacija bilježi. Radnja obavljena dok je neko bio prijavljen kao osoba to i kaže.",
+        "actions": {
+          "created": "Kreirala zapis",
+          "changed": "Promijenila zapis",
+          "deleted": "Obrisala zapis",
+          "other": "Uradila nešto sa zapisom"
+        },
+        "signed_in_as": "Prijava kao · {name}",
+        "signed_in_as_other": "Prijava kao, neko drugi"
+      }
+    },
+    "account": {
+      "validation": {
+        "required": "Obavezno polje.",
+        "mismatch": "Lozinke se ne podudaraju."
+      },
+      "somebody_else": "Neko drugi",
+      "sessions": {
+        "empty": "Nema prijavljenih uređaja.",
+        "unknown_device": "Nepoznat uređaj",
+        "last_active": "zadnja aktivnost {when}",
+        "expires": "istječe {when}",
+        "this_device": "Ovaj uređaj",
+        "opened_by": "Prijava kao · {name}",
+        "opened_by_other": "Prijava kao, neko drugi",
+        "end": "Odjavi",
+        "end_title": "Odjaviti uređaj?",
+        "end_body": "Uređaj „{device}” odjavljuje se odmah.",
+        "ended": "Uređaj je odjavljen",
+        "end_failed": "Odjava nije uspjela. Pokušajte ponovo."
+      },
+      "signins": {
+        "columns": {
+          "time": "Vrijeme",
+          "event": "Događaj",
+          "device": "Uređaj",
+          "ip": "IP adresa"
+        },
+        "empty": "Nema zapisa o prijavama.",
+        "footer_user": "Bilježi se svaki pokušaj prijave u račun, i odbijeni.",
+        "events": {
+          "signed_in": "Prijava",
+          "wrong_password": "Pogrešna lozinka",
+          "locked_out": "Zaključano",
+          "refused_inactive": "Neaktivan račun",
+          "signed_in_as": "Prijava kao",
+          "unlocked": "Otključano",
+          "signed_out_everywhere": "Odjava sa svih uređaja",
+          "session_revoked": "Sesija završena",
+          "unknown": "Ostali događaj"
+        },
+        "events_by": {
+          "signed_in_as": "Prijava kao · {name}",
+          "unlocked": "Otključano · {name}",
+          "signed_out_everywhere": "Odjava sa svih uređaja · {name}",
+          "session_revoked": "Sesija završena · {name}"
+        }
+      }
+    },
+    "profile": {
+      "title": "Moj profil",
+      "description": "Vaši lični podaci, e-mail adresa, lozinka i sesije",
+      "menu": "Moj profil",
+      "details": {
+        "title": "Lični podaci",
+        "login_hint": "Korisničko ime može promijeniti samo administrator.",
+        "submit": "Spremi podatke",
+        "saved": "Lični podaci su spremljeni"
+      },
+      "email": {
+        "title": "E-mail adresa",
+        "current": "Trenutna adresa",
+        "change": "Promijeni e-mail adresu",
+        "pending": "Čeka se potvrda nove adrese {email}.",
+        "valid_until": "Kod vrijedi do {time}.",
+        "enter_code": "Unesi kod",
+        "cancel_change": "Odustani od promjene",
+        "change_title": "Promjena e-mail adrese",
+        "new_email": "Nova e-mail adresa",
+        "current_password": "Trenutna lozinka",
+        "request_hint": "Na novu adresu poslat ćemo kod za potvrdu. Adresa se mijenja tek kad unesete taj kod.",
+        "send_code": "Pošalji kod",
+        "verify_title": "Potvrdite novu adresu",
+        "verify_description": "Unesite 6-cifreni kod koji smo poslali na {email}.",
+        "verify": "Potvrdi",
+        "resend": "Pošalji novi kod",
+        "resend_in": "Novi kod za {time}",
+        "request_new": "Zatraži novi kod",
+        "changed": "E-mail adresa je promijenjena",
+        "cancelled": "Promjena e-mail adrese je otkazana",
+        "code_sent": "Novi kod poslan je na {email}",
+        "verify_failed": "Kod nije moguće provjeriti. Pokušajte ponovo.",
+        "resend_failed": "Kod nije moguće poslati. Pokušajte ponovo.",
+        "cancel_failed": "Promjena nije otkazana. Pokušajte ponovo."
+      },
+      "password": {
+        "title": "Promjena lozinke",
+        "current": "Trenutna lozinka",
+        "new": "Nova lozinka",
+        "repeat": "Ponovite novu lozinku",
+        "show": "Prikaži lozinke",
+        "hide": "Sakrij lozinke",
+        "submit": "Promijeni lozinku",
+        "changed": "Lozinka je promijenjena. Odjavljeni ste na ostalim uređajima."
+      },
+      "sessions": {
+        "title": "Sesije",
+        "footer": "Ovaj uređaj je označen; s njega se izlazi odjavom. Svaki drugi uređaj možete odjaviti ovdje."
+      },
+      "signins": {
+        "title": "Historija prijava",
+        "footer": "Svaka prijava u vaš račun, i odbijena. Ako neku ne prepoznajete, promijenite lozinku."
       }
     }
   }

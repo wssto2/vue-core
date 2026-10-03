@@ -6,6 +6,7 @@ import { useShellContributions } from "../app/contributions";
 import { useApplication } from "../app/environment";
 import { Icon } from "../icon";
 import CountryFlag from "../internal/CountryFlag.vue";
+import { languageName } from "../internal/languageName";
 import { toast } from "../overlay";
 import { usePlatform } from "../platform/platform";
 import AccountMenuItem from "./AccountMenuItem.vue";
@@ -33,14 +34,6 @@ const offersLocales = application.locales.length > 1;
 // The language is one row until asked for: the full list is rarely needed and would dominate the menu.
 const localesOpen = ref(false);
 const localesId = useId();
-const languageName = (code: string): string => {
-  try {
-    const name = new Intl.DisplayNames([code], { type: "language" }).of(code);
-    return name ? name.charAt(0).toLocaleUpperCase(code) + name.slice(1) : code;
-  } catch {
-    return code;
-  }
-};
 const currentLanguage = computed(() => languageName(application.locale.value));
 const flagOf = (code: string): string | undefined => application.localeFlags[code];
 
