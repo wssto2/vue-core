@@ -3,6 +3,9 @@ import en from "./en.json";
 import hr from "./hr.json";
 import sl from "./sl.json";
 
+/** A group of texts: every key is a sentence. */
+type Texts<Key extends string> = { [K in Key]: string };
+
 /**
  * The shape of one locale's messages: `{ core: { … } }`. Written out (not inferred from the JSON
  * files) so the published declarations do not point at files that are not shipped; every locale
@@ -95,6 +98,21 @@ export type CoreMessages = {
       signin: { title: string; password: string; submit: string; required: string };
       expired: { title: string; body: string; kept: string; sign_out: string };
       impersonation: { banner: string; banner_short: string; return: string; sign_in_as: string };
+    };
+    /** The screens of `usersFeature`: the list of people and a person's record. */
+    users: {
+      title: string;
+      description: string;
+      views: Texts<"active" | "locked" | "inactive" | "all">;
+      columns: Texts<"person" | "login" | "last_sign_in" | "status">;
+      never: string;
+      status: Texts<"active" | "locked" | "inactive">;
+      create: Texts<"title" | "subtitle" | "action" | "done">;
+      fields: Texts<"login" | "name" | "email" | "phone" | "locale" | "password" | "password_repeat">;
+    };
+    /** What the screens of a person's account share (their own profile and an administrator's view of them). */
+    account: {
+      validation: Texts<"required" | "mismatch">;
     };
     startup: {
       title: string;

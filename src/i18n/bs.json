@@ -395,6 +395,49 @@
         "return": "Povratak na moj račun",
         "sign_in_as": "Prijavi se kao {name}"
       }
+    },
+    "users": {
+      "title": "Korisnici",
+      "description": "Osobe koje se prijavljuju: njihovi podaci, prijave i sesije.",
+      "views": {
+        "active": "Aktivni",
+        "locked": "Zaključani",
+        "inactive": "Neaktivni",
+        "all": "Svi"
+      },
+      "columns": {
+        "person": "Osoba",
+        "login": "Korisničko ime",
+        "last_sign_in": "Zadnja prijava",
+        "status": "Status"
+      },
+      "never": "Nikad",
+      "status": {
+        "active": "Aktivna",
+        "locked": "Zaključana",
+        "inactive": "Neaktivna"
+      },
+      "create": {
+        "title": "Novi korisnik",
+        "subtitle": "Nakon spremanja otvara se stranica osobe.",
+        "action": "Kreiraj korisnika",
+        "done": "Korisnik {name} je kreiran"
+      },
+      "fields": {
+        "login": "Korisničko ime",
+        "name": "Ime i prezime",
+        "email": "E-mail",
+        "phone": "Broj telefona",
+        "locale": "Jezik",
+        "password": "Lozinka",
+        "password_repeat": "Ponovite lozinku"
+      }
+    },
+    "account": {
+      "validation": {
+        "required": "Obavezno polje.",
+        "mismatch": "Lozinke se ne podudaraju."
+      }
     }
   }
 }

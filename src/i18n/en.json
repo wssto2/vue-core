@@ -395,6 +395,49 @@
         "return": "Return to my account",
         "sign_in_as": "Sign in as {name}"
       }
+    },
+    "users": {
+      "title": "Users",
+      "description": "People who sign in: their details, sign-ins and sessions.",
+      "views": {
+        "active": "Active",
+        "locked": "Locked",
+        "inactive": "Inactive",
+        "all": "All"
+      },
+      "columns": {
+        "person": "Person",
+        "login": "Username",
+        "last_sign_in": "Last sign-in",
+        "status": "Status"
+      },
+      "never": "Never",
+      "status": {
+        "active": "Active",
+        "locked": "Locked",
+        "inactive": "Inactive"
+      },
+      "create": {
+        "title": "New user",
+        "subtitle": "The person's page opens after saving.",
+        "action": "Create user",
+        "done": "{name} was created"
+      },
+      "fields": {
+        "login": "Username",
+        "name": "Full name",
+        "email": "E-mail",
+        "phone": "Phone number",
+        "locale": "Language",
+        "password": "Password",
+        "password_repeat": "Repeat password"
+      }
+    },
+    "account": {
+      "validation": {
+        "required": "Required.",
+        "mismatch": "The passwords do not match."
+      }
     }
   }
 }

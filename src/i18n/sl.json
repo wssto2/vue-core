@@ -395,6 +395,49 @@
         "return": "Nazaj na moj račun",
         "sign_in_as": "Prijavi se kot {name}"
       }
+    },
+    "users": {
+      "title": "Uporabniki",
+      "description": "Osebe, ki se prijavljajo: njihovi podatki, prijave in seje.",
+      "views": {
+        "active": "Aktivni",
+        "locked": "Zaklenjeni",
+        "inactive": "Neaktivni",
+        "all": "Vsi"
+      },
+      "columns": {
+        "person": "Oseba",
+        "login": "Uporabniško ime",
+        "last_sign_in": "Zadnja prijava",
+        "status": "Status"
+      },
+      "never": "Nikoli",
+      "status": {
+        "active": "Aktivna",
+        "locked": "Zaklenjena",
+        "inactive": "Neaktivna"
+      },
+      "create": {
+        "title": "Nov uporabnik",
+        "subtitle": "Po shranjevanju se odpre stran osebe.",
+        "action": "Ustvari uporabnika",
+        "done": "Uporabnik {name} je ustvarjen"
+      },
+      "fields": {
+        "login": "Uporabniško ime",
+        "name": "Ime in priimek",
+        "email": "E-pošta",
+        "phone": "Telefonska številka",
+        "locale": "Jezik",
+        "password": "Geslo",
+        "password_repeat": "Ponovite geslo"
+      }
+    },
+    "account": {
+      "validation": {
+        "required": "Obvezno polje.",
+        "mismatch": "Gesli se ne ujemata."
+      }
     }
   }
 }
