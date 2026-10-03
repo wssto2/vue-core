@@ -2,10 +2,10 @@
 
 ## 0.3.0 — 2026-10-03
 
-The screens for go-core's identity and access modules: sign-in, the session-expiry prompt, impersonation, users and "my profile", a person's activity, roles and access; and typed routes on the HTTP client. Built and checked against go-core `v1.6.0-rc.5`.
+The screens for go-core's identity and access modules: sign-in, the session-expiry prompt, impersonation, users and "my profile", a person's activity, roles and access; and typed routes on the HTTP client. Built and checked against go-core `v1.6.0`.
 
 ### Requires
-- go-core **`v1.6.0-rc.5`** or later on the server (`package.json` `"goCore"` names the version the committed module types come from).
+- go-core **`v1.6.0`** or later on the server (`package.json` `"goCore"` names the version the committed module types come from).
 - `zod` is an optional peer dependency: only needed when you use the generated input schemas.
 
 ### Changes to existing behaviour
