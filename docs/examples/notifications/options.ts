@@ -1,12 +1,13 @@
 // What an application can leave out, link to, or read.
-import { deadLettersRoutes, notificationRoutes, notificationsFeature } from "@wssto2/vue-core/notifications";
+import { deadLettersRoutes, notificationRoutes, notificationSettingsRoutes, notificationsFeature } from "@wssto2/vue-core/notifications";
 import type { Notification } from "@wssto2/vue-core/notifications";
 
-// The bell and the inbox only: no dead-letters page.
-export const bellOnly = notificationsFeature({ deadLetters: false });
+// The bell and the inbox only: no dead-letters page and no notification settings.
+export const bellOnly = notificationsFeature({ deadLetters: false, settings: false });
 
 // Links are typed targets: `to` of a RouterLink or `router.push`.
 export const toTheFailedEvents = deadLettersRoutes.index;
+export const toTheSettings = notificationSettingsRoutes.index;
 
 // The route tables go-core's generator wrote, for calls of your own (a button that sends the signed-in person a test notification).
 export const sendTest = notificationRoutes.test;

@@ -14,7 +14,8 @@
 //
 // Notifications (notificationsFeature): the bell is in the sidebar header (the top bar on phones). `user` has one unread and
 // one read notification; "Send a test notification" on the home page sends another through the dev server's event queue and it
-// arrives live. Admin (the webmaster) also opens "Failed events" (/events/dead-letters), empty until a consumer gives up on an event.
+// arrives live. "Notification settings" (account menu, or the gear in the inbox): e-mail per category and quiet hours; the dev server
+// prints the e-mails it would send. Admin (the webmaster) also opens "Failed events" (/events/dead-letters), empty until a consumer gives up on an event.
 import { createApplication } from "@wssto2/vue-core/app";
 import { identityFeature, identityPlatform, usersFeature } from "@wssto2/vue-core/identity";
 import { notificationsFeature } from "@wssto2/vue-core/notifications";
@@ -47,6 +48,7 @@ void createApplication({
   ],
   router: { history: createWebHashHistory() },
   icons: [appIcons, shellIcons],
-  i18n: { messages: { en: { ...permissionMessages.en, areas: { crm: "Customers" } } } },
+  // The names of the categories on the notification settings page: `notifications.categories.<code>.label`, the code split at its dots.
+  i18n: { messages: { en: { ...permissionMessages.en, areas: { crm: "Customers" }, notifications: { categories: { devserver: { sample: { label: "Playground sample", description: "A sample notification from the dev server" } } } } } } },
   locale: { flags: { en: "GB", hr: "HR", sl: "SI" } },
 }).mount("#app");

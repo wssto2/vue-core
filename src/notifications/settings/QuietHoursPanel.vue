@@ -2,8 +2,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { Panel } from "../../content";
-import { useFormat } from "../../format";
-import { FormView, SwitchField, TimeField, useForm, type FormValidator } from "../../form";
+import { FormGroup, FormView, SwitchField, TimeField, useForm, type FormValidator } from "../../form";
 import { parseTime } from "../../form/date/time";
 import { useServerMessages } from "../../identity/fieldMessages";
 import PanelActions from "../../identity/profile/PanelActions.vue";
@@ -20,7 +19,6 @@ import { draftOf, minutesOfTime, type QuietDraft } from "./state";
 const props = defineProps<{ quietHours: QuietHours; timeZone: string; submit: (input: QuietHoursInput) => Promise<QuietHours> }>();
 
 const { t } = useI18n();
-const format = useFormat();
 
 const validator: FormValidator<QuietHoursInput> = {
   safeParse(input) {
@@ -43,8 +41,8 @@ const summary = computed(() => {
   const from = parseTime(start);
   const until = parseTime(end);
   if (!enabled) return t("core.notifications.settings.quiet.summary_off");
-  if (!from || !until) return "";
-  const shown = ({ hour, minute }: { hour: number; minute: number }) => format.time(new Date(2000, 0, 1, hour, minute));
+  if (!from || !until || (from.hour === until.hour && from.minute === until.minute)) return ""; // no sentence for a window the form refuses
+  const shown = ({ hour, minute }: { hour: number; minute: number }) => `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
   return t("core.notifications.settings.quiet.summary_on", { start: shown(from), end: shown(until), zone: props.timeZone });
 });
 
@@ -60,12 +58,13 @@ async function save() {
 <template>
   <Panel :title="t('core.notifications.settings.quiet.title')" icon="moonLine" data-notification-quiet-hours>
     <FormView :form="form" @submit="save">
-      <SwitchField v-bind="form.bind('enabled')" :label="t('core.notifications.settings.quiet.enabled')" />
-      <div v-if="form.values.enabled" class="grid grid-cols-2 gap-3">
-        <TimeField v-bind="form.bind('start')" :label="t('core.notifications.settings.quiet.start')" />
-        <TimeField v-bind="form.bind('end')" :label="t('core.notifications.settings.quiet.end')" />
-      </div>
-      <p class="text-footnote text-content-muted" data-quiet-summary>{{ summary }}</p>
+      <FormGroup :footer="summary" data-quiet-summary>
+        <SwitchField v-bind="form.bind('enabled')" :label="t('core.notifications.settings.quiet.enabled')" />
+        <template v-if="form.values.enabled">
+          <TimeField v-bind="form.bind('start')" :label="t('core.notifications.settings.quiet.start')" />
+          <TimeField v-bind="form.bind('end')" :label="t('core.notifications.settings.quiet.end')" />
+        </template>
+      </FormGroup>
     </FormView>
     <template #footer><PanelActions :label="t('core.notifications.settings.quiet.submit')" :processing="form.submitting.value" :dirty="form.dirty.value" @submit="save" @cancel="form.reset()" /></template>
   </Panel>

@@ -17,6 +17,8 @@ void createApplication({
       categories: { "tickets.assigned": { icon: "user3Line", hue: "blue" }, "system.test": { icon: "checkCircle", hue: "teal" } },
       // `destination` is the node of the server's menu that opens the page; `false` leaves the page out.
       deadLetters: { destination: "events.deadletters" },
+      // The person's own settings page (default true): see "Notification settings"; their names come from the application's texts, see "Texts".
+      settings: true,
     }),
   ],
 }).mount("#app");

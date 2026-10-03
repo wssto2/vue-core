@@ -1,0 +1,1 @@
+{ "notifications": { "categories": { "tickets": { "assigned": { "label": "Ticket assigned to me", "description": "When someone gives you a ticket" } } } } }

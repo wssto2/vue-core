@@ -60,8 +60,10 @@ describe("the notification settings page", () => {
 
   it("shows an enforced setting locked, with who decides", async () => {
     await open();
-    expect(switchOf("billing.overdue").hasAttribute("disabled")).toBe(true);
+    expect(within(row("billing.overdue")).queryByRole("switch")).toBeNull();
+    expect(row("billing.overdue").textContent).toContain("billing.overdue");
     expect(row("billing.overdue").textContent).toContain("Set by your organisation");
+    expect(row("billing.overdue").textContent).toContain("Yes");
   });
 
   it("takes a refused switch back and says why", async () => {
@@ -85,7 +87,7 @@ describe("the notification settings page", () => {
     await open();
     const summary = document.querySelector("[data-quiet-summary]")?.textContent ?? "";
     expect(summary).toContain("Europe/Zagreb");
-    expect(summary).toMatch(/Between .*9:00.* and .*7:00/);
+    expect(summary).toContain("Between 21:00 and 07:00 (Europe/Zagreb)");
     expect(summary).toContain("e-mail waits until the quiet hours end");
   });
 

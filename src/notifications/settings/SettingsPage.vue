@@ -36,7 +36,7 @@ async function change(category: string, enabled: boolean) {
     <AsyncSection :state="settings.loaded.state.value" :skeleton-rows="6" :is-empty="() => false" @retry="settings.loaded.reload()">
       <template #default="{ value }">
         <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-          <EmailPanel :preferences="value" :saving="settings.saving.value" @change="change" />
+          <EmailPanel :preferences="value" @change="change" />
           <QuietHoursPanel v-if="value.email_available" :quiet-hours="value.quiet_hours" :time-zone="value.time_zone" :submit="settings.saveQuietHours" />
         </div>
       </template>
