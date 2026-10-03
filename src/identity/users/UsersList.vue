@@ -48,9 +48,9 @@ const actions = computed<PageAction[]>(() =>
   <CollectionPage :collection="users" :title="t('core.users.title')" :description="t('core.users.description')" :actions="actions" :row-height="64"
     :row-label="(user) => user.name" views-presentation="scope">
     <template #leading="{ item }"><Avatar :name="item.name" size="md" tone="anchor" /></template>
-    <template #cell-last_sign_in="{ item }">
-      <time v-if="item.last_sign_in" :datetime="item.last_sign_in" class="text-body text-content">{{ format.dateTime(item.last_sign_in) }}</time>
-      <span v-else class="text-body text-content-disabled">{{ t("core.users.never") }}</span>
+    <template #cell-last_sign_in="{ item, compact }">
+      <time v-if="item.last_sign_in" :datetime="item.last_sign_in" class="text-content" :class="compact ? 'text-footnote text-content-muted' : 'text-body'">{{ format.dateTime(item.last_sign_in) }}</time>
+      <span v-else :class="compact ? 'text-footnote text-content-disabled' : 'text-body text-content-disabled'">{{ t("core.users.never") }}</span>
     </template>
     <!-- A phone row says only what is not the ordinary: the badge of a locked or inactive person. -->
     <template #cell-status="{ item, compact }">

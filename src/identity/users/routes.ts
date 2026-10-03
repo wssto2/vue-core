@@ -1,3 +1,4 @@
+import type { RouteRecordRaw } from "vue-router";
 import { defineRoutes } from "../../router";
 import { VIEW_USERS } from "./access";
 
@@ -6,7 +7,15 @@ import { VIEW_USERS } from "./access";
  * records the feature installs. The names and paths are fixed, so a link or a menu binding of the application can name
  * them. The sections of a person's record are its children, reached by name (`users.record.sessions`).
  */
-export const usersRoutes = defineRoutes({
+export interface UsersRoutes {
+  /** The records `usersFeature` installs. */
+  readonly records: readonly RouteRecordRaw[];
+  readonly index: { readonly name: "users.index" };
+  readonly record: (params: { id: string | number }) => { readonly name: "users.record"; readonly params: { id: string | number } };
+}
+
+// Typed by hand: the inferred type would name the screens' modules in the published declarations.
+export const usersRoutes: UsersRoutes = defineRoutes({
   index: { name: "users.index", path: "/users", component: () => import("./UsersList.vue"), meta: { access: VIEW_USERS, titleKey: "core.users.title" } },
   record: {
     name: "users.record",

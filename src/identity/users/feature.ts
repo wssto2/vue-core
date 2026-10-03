@@ -43,7 +43,7 @@ export interface UsersFeatureOptions {
 export function usersFeature(options: UsersFeatureOptions = {}): Feature {
   const people = options.people ?? true;
   const profile = options.profile ?? true;
-  const signInAs = options.signInAs ?? "iam.user:impersonate";
+  const signInAs = options.signInAs ?? ("iam.user:impersonate" as Permission);
   return defineFeature({
     id: "users",
     routes: [...(people ? withSections(options.sections ?? []) : []), ...(profile ? profileRoutes.records : [])],

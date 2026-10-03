@@ -15,6 +15,7 @@ declare module "@wssto2/vue-core/router" {
   interface DestinationRegistry {
     tickets: true;
     accounts: true;
+    users: true;
   }
 }
 
