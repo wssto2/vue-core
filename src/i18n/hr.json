@@ -888,7 +888,37 @@
       "load_error": "Obavijesti se nisu mogle učitati.",
       "load_more": "Prikaži starije",
       "load_more_error": "Starije obavijesti se nisu mogle učitati.",
-      "mark_all_read": "Označi sve kao pročitano"
+      "mark_all_read": "Označi sve kao pročitano",
+      "dead_letters": {
+        "title": "Neuspjeli događaji",
+        "description": "Događaji koje potrošač nije uspio obraditi ni nakon ponovnih pokušaja. Ponovni pokušaj vraća događaj u red.",
+        "columns": {
+          "event": "Događaj",
+          "consumer": "Potrošač",
+          "attempts": "Pokušaji",
+          "last_error": "Zadnja greška",
+          "dead_at": "Odustano"
+        },
+        "event_id": "Događaj #{id}",
+        "event_gone": "Događaj više ne postoji",
+        "actions": {
+          "retry": "Pošalji ponovno",
+          "retry_all": "Pošalji ponovno sve za ovog potrošača"
+        },
+        "retry_all": {
+          "title": "Poslati ponovno sve za ovog potrošača?",
+          "message": "Svi neuspjeli događaji potrošača „{consumer}” vraćaju se u red i ponovno se obrađuju.",
+          "confirm": "Pošalji sve ponovno"
+        },
+        "toasts": {
+          "retried": "Događaj je vraćen u red i uskoro će se ponovno obraditi.",
+          "retried_all": "Događaja vraćeno u red: {count}"
+        },
+        "errors": {
+          "not_found": "Ovaj događaj je već vraćen u red ili više ne postoji.",
+          "event_gone": "Događaj je obrisan pa se ne može ponovno poslati."
+        }
+      }
     }
   }
 }

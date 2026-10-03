@@ -25,6 +25,11 @@ describe("defineCollection", () => {
     expect(Object.isFrozen(definition)).toBe(true);
   });
 
+  it("is searchable unless the contract says the backend does not search", () => {
+    expect(make().contract.search).toBe(true);
+    expect(make({ query: { search: false } }).contract.search).toBe(false);
+  });
+
   it.each([
     ["an empty id", { id: " " }],
     ["a zero version", { stateVersion: 0 }],

@@ -23,6 +23,8 @@ export interface QueryContract<Sort extends string, Filter extends string, View 
   readonly sensitive?: readonly Filter[];
   /** Default: `DEFAULT_PAGE_SIZES`. */
   readonly pageSizes?: readonly number[];
+  /** Whether the backend searches by text. `false` leaves the search field out of the toolbar (a list the server only filters). Default true. */
+  readonly search?: boolean;
 }
 
 export type CollectionDefaults<Sort extends string, Filter extends string, View extends string> = Partial<CollectionQuery<Sort, Filter, View>>;
@@ -62,6 +64,7 @@ export interface CollectionDefinition<Row, Sort extends string = string, Filter 
     readonly views: readonly View[] | null;
     readonly sensitive: readonly Filter[];
     readonly pageSizes: readonly number[];
+    readonly search: boolean;
   };
   readonly migrate?: (stored: StoredState, version: number) => StoredState | null;
 }
@@ -100,6 +103,7 @@ export function defineCollection<Row, Sort extends string = string, Filter exten
     views: input.query?.views ? [...input.query.views] : null,
     sensitive: [...(input.query?.sensitive ?? [])],
     pageSizes: [...(input.query?.pageSizes ?? DEFAULT_PAGE_SIZES)],
+    search: input.query?.search ?? true,
   };
   if (contract.pageSizes.length === 0 || contract.pageSizes.some((size) => !Number.isInteger(size) || size < 1)) {
     throw new Error(`${where}: \`query.pageSizes\` must list positive integers.`);

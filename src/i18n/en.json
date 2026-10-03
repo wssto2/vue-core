@@ -888,7 +888,37 @@
       "load_error": "Notifications could not be loaded.",
       "load_more": "Show older",
       "load_more_error": "Older notifications could not be loaded.",
-      "mark_all_read": "Mark all as read"
+      "mark_all_read": "Mark all as read",
+      "dead_letters": {
+        "title": "Failed events",
+        "description": "Events a consumer could not handle even after its retries. A retry puts the event back in the queue.",
+        "columns": {
+          "event": "Event",
+          "consumer": "Consumer",
+          "attempts": "Attempts",
+          "last_error": "Last error",
+          "dead_at": "Given up"
+        },
+        "event_id": "Event #{id}",
+        "event_gone": "The event no longer exists",
+        "actions": {
+          "retry": "Retry",
+          "retry_all": "Retry all for this consumer"
+        },
+        "retry_all": {
+          "title": "Retry all for this consumer?",
+          "message": "Every failed event of “{consumer}” goes back in the queue and is handled again.",
+          "confirm": "Retry all"
+        },
+        "toasts": {
+          "retried": "The event is back in the queue and will be handled again shortly.",
+          "retried_all": "Events put back in the queue: {count}"
+        },
+        "errors": {
+          "not_found": "This event was already put back in the queue or no longer exists.",
+          "event_gone": "The event was removed, so it cannot be retried."
+        }
+      }
     }
   }
 }

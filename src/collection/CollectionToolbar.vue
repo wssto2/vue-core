@@ -126,7 +126,7 @@ const savedItems = computed<MenuItem[]>(() =>
 <template>
   <div :class="props.flat ? 'pb-3' : 'border-b border-border-separator px-3 py-2.5'" class="select-none" data-test="collection-toolbar">
     <div class="flex flex-col items-start gap-2 lg:flex-row">
-      <div class="flex h-9 w-full items-center rounded-control bg-fill px-2.5 text-content-muted transition-colors duration-motion-fast focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-border-focus lg:w-72 compact:h-10">
+      <div v-if="props.collection.searchable" class="flex h-9 w-full items-center rounded-control bg-fill px-2.5 text-content-muted transition-colors duration-motion-fast focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-border-focus lg:w-72 compact:h-10">
         <Icon name="search" :size="16" />
         <input ref="field" v-model="text" type="text" name="collection-search" autocomplete="off" :placeholder="t('core.collection.search.placeholder')"
           :aria-label="t('core.collection.search.label')"

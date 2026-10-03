@@ -10,3 +10,5 @@ export { eventsRoutes } from "../modules/events/routes";
 export { notificationsFeature } from "./feature";
 export type { NotificationsFeatureOptions } from "./feature";
 export type { NotificationCategoryLook } from "./context";
+export { deadLettersRoutes } from "./deadletters/routes";
+export type { DeadLettersRoutes } from "./deadletters/routes";

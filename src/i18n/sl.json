@@ -888,7 +888,37 @@
       "load_error": "Obvestil ni bilo mogoče naložiti.",
       "load_more": "Prikaži starejša",
       "load_more_error": "Starejših obvestil ni bilo mogoče naložiti.",
-      "mark_all_read": "Označi vse kot prebrano"
+      "mark_all_read": "Označi vse kot prebrano",
+      "dead_letters": {
+        "title": "Neuspeli dogodki",
+        "description": "Dogodki, ki jih porabnik ni uspel obdelati niti po ponovnih poskusih. Ponovni poskus vrne dogodek v vrsto.",
+        "columns": {
+          "event": "Dogodek",
+          "consumer": "Porabnik",
+          "attempts": "Poskusi",
+          "last_error": "Zadnja napaka",
+          "dead_at": "Opuščeno"
+        },
+        "event_id": "Dogodek #{id}",
+        "event_gone": "Dogodek ne obstaja več",
+        "actions": {
+          "retry": "Pošlji ponovno",
+          "retry_all": "Pošlji ponovno vse za tega porabnika"
+        },
+        "retry_all": {
+          "title": "Poslati ponovno vse za tega porabnika?",
+          "message": "Vsi neuspeli dogodki porabnika „{consumer}” se vrnejo v vrsto in se ponovno obdelajo.",
+          "confirm": "Pošlji vse ponovno"
+        },
+        "toasts": {
+          "retried": "Dogodek je vrnjen v vrsto in bo kmalu ponovno obdelan.",
+          "retried_all": "Dogodkov vrnjenih v vrsto: {count}"
+        },
+        "errors": {
+          "not_found": "Ta dogodek je že vrnjen v vrsto ali ne obstaja več.",
+          "event_gone": "Dogodek je bil odstranjen, zato ga ni mogoče ponovno poslati."
+        }
+      }
     }
   }
 }

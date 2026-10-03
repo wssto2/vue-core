@@ -92,6 +92,8 @@ export interface Collection<Row, Sort extends string = string, Filter extends st
   rowKey(row: Row): string | number;
   /** The page sizes the list offers. */
   readonly pageSizes: readonly number[];
+  /** Whether the list can be searched by text (the definition's `query.search`); the toolbar shows the search field only then. */
+  readonly searchable: boolean;
   /** The request state: loading (nothing to show), loaded, refreshing (previous rows stay), stale (a refresh failed, previous rows stay) or failed. */
   readonly state: Readonly<Ref<AsyncState<ListPage<Row>>>>;
   /** The query the list shows or is loading. */
@@ -492,6 +494,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
   return {
     id: definition.id,
     pageSizes: definition.contract.pageSizes,
+    searchable: definition.contract.search,
     rowKey: (row) => definition.key(row),
     state,
     query,
