@@ -877,6 +877,18 @@
         "title": "Zgodovina prijav",
         "footer": "Vsaka prijava v vaš račun, tudi zavrnjena. Če katere ne prepoznate, spremenite geslo."
       }
+    },
+    "notifications": {
+      "title": "Obvestila",
+      "open": "Obvestila",
+      "open_unread": "Obvestila, neprebrano: {count}",
+      "unread": "neprebrano",
+      "empty_title": "Nimate obvestil",
+      "empty_description": "Tu boste videli vse, kar potrebuje vašo pozornost.",
+      "load_error": "Obvestil ni bilo mogoče naložiti.",
+      "load_more": "Prikaži starejša",
+      "load_more_error": "Starejših obvestil ni bilo mogoče naložiti.",
+      "mark_all_read": "Označi vse kot prebrano"
     }
   }
 }

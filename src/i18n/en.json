@@ -877,6 +877,18 @@
         "title": "Sign-in history",
         "footer": "Every sign-in to your account, including refused ones. If you do not recognize one, change your password."
       }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "open": "Notifications",
+      "open_unread": "Notifications, {count} unread",
+      "unread": "unread",
+      "empty_title": "No notifications",
+      "empty_description": "What needs your attention will show up here.",
+      "load_error": "Notifications could not be loaded.",
+      "load_more": "Show older",
+      "load_more_error": "Older notifications could not be loaded.",
+      "mark_all_read": "Mark all as read"
     }
   }
 }

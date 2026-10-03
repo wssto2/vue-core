@@ -877,6 +877,18 @@
         "title": "Historija prijava",
         "footer": "Svaka prijava u vaš račun, i odbijena. Ako neku ne prepoznajete, promijenite lozinku."
       }
+    },
+    "notifications": {
+      "title": "Obavijesti",
+      "open": "Obavijesti",
+      "open_unread": "Obavijesti, nepročitano: {count}",
+      "unread": "nepročitano",
+      "empty_title": "Nemate obavijesti",
+      "empty_description": "Ovdje ćete vidjeti sve što traži vašu pažnju.",
+      "load_error": "Obavijesti se nisu mogle učitati.",
+      "load_more": "Prikaži starije",
+      "load_more_error": "Starije obavijesti se nisu mogle učitati.",
+      "mark_all_read": "Označi sve kao pročitano"
     }
   }
 }

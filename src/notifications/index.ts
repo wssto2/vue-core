@@ -7,3 +7,6 @@ export { notificationRoutes } from "../modules/notification/routes";
 export type { DeadLetterRow, Retried } from "../modules/events/entities";
 export type * as DeadLetterInputs from "../modules/events/schemas";
 export { eventsRoutes } from "../modules/events/routes";
+export { notificationsFeature } from "./feature";
+export type { NotificationsFeatureOptions } from "./feature";
+export type { NotificationCategoryLook } from "./context";
