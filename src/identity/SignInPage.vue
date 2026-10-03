@@ -29,7 +29,7 @@ async function submit() {
     <h1 class="text-xl font-semibold text-content-strong">{{ t("core.identity.signin.title") }}</h1>
     <Panel class="w-full max-w-md">
       <FormView class="p-1" @submit="submit">
-        <TextField v-bind="form.bind('login')" :label="t('core.identity.signin.login')" autocomplete="username" required />
+        <TextField v-bind="form.bind('login')" :label="t('core.identity.username')" autocomplete="username" required />
         <TextField v-bind="form.bind('password')" :label="t('core.identity.signin.password')" type="password" autocomplete="current-password" required
           :error="passwordError" />
         <Button type="submit" prominence="primary" class="w-full" :processing="form.submitting.value">{{ t("core.identity.signin.submit") }}</Button>

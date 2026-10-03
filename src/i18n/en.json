@@ -376,9 +376,9 @@
       }
     },
     "identity": {
+      "username": "Username",
       "signin": {
         "title": "Sign in to your account",
-        "login": "Username",
         "password": "Password",
         "submit": "Sign in",
         "required": "Required."

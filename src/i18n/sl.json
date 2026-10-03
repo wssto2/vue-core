@@ -376,9 +376,9 @@
       }
     },
     "identity": {
+      "username": "Uporabniško ime",
       "signin": {
         "title": "Prijavite se v svoj račun",
-        "login": "Uporabniško ime",
         "password": "Geslo",
         "submit": "Prijava",
         "required": "Obvezno polje."

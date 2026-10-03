@@ -79,7 +79,7 @@ async function signOut() {
           </p>
           <FormView @submit="submit">
             <div class="flex flex-col gap-1.5">
-              <span class="text-footnote text-content-muted">{{ t("core.identity.signin.login") }}</span>
+              <span class="text-footnote text-content-muted">{{ t("core.identity.username") }}</span>
               <span class="rounded-control bg-fill px-2.5 py-2 text-body text-content-muted" data-expiry-login>{{ login }}</span>
             </div>
             <TextField v-bind="form.bind('password')" :label="t('core.identity.signin.password')" type="password" autocomplete="current-password" required

@@ -376,9 +376,9 @@
       }
     },
     "identity": {
+      "username": "Korisničko ime",
       "signin": {
         "title": "Prijavite se u svoj račun",
-        "login": "Korisničko ime",
         "password": "Lozinka",
         "submit": "Prijava",
         "required": "Obavezno polje."

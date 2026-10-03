@@ -90,7 +90,9 @@ export type CoreMessages = {
       };
     };
     identity: {
-      signin: { title: string; login: string; password: string; submit: string; required: string };
+      /** The label of a login field, on the sign-in page and in the prompt of an expired session. */
+      username: string;
+      signin: { title: string; password: string; submit: string; required: string };
       expired: { title: string; body: string; kept: string; sign_out: string };
       impersonation: { banner: string; banner_short: string; return: string; sign_in_as: string };
     };
