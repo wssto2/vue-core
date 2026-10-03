@@ -45,3 +45,18 @@ route.raw = (method: HttpMethod, path: string, options: RouteOptions = {}): RawR
   public: options.public === true,
   raw: true,
 });
+
+/**
+ * The wire shape of go-core's `datatable.DatatableResult[T]`: a page of rows with its numbers.
+ * `readListPage` (`/collection`) reads it into a `ListPage` with no glue.
+ */
+export interface ListResult<Row> {
+  readonly data: readonly Row[];
+  readonly meta?: Readonly<Record<string, unknown>>;
+  readonly total: number;
+  readonly per_page: number;
+  readonly current_page: number;
+  readonly last_page: number;
+  readonly from: number;
+  readonly to: number;
+}

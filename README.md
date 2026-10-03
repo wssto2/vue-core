@@ -299,6 +299,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Shell](docs/recipes/shell.md): the default shell, contributions from features, keyboard shortcuts and their help, running inside a frame, a custom shell
 - [App setup](docs/recipes/app-setup.md): config, session, effects, locales and flags, permissions in the UI, error sentences, startup errors
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
+- [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 
