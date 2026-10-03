@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHttpClient } from "../client";
+import { route, type ListResult } from "../client";
 import { jsonResponse, scriptedTransport } from "../testing";
 import { httpList, listParams, readListPage } from "./http";
 import { defineCollection } from "./definition";
@@ -32,6 +33,18 @@ describe("go-core list answers", () => {
   it("reads an empty result", () => {
     expect(readListPage({ data: [], meta: { total: 0 }, message: null, status: 200, requestId: null }, query)).toMatchObject({ rows: [], total: 0, lastPage: 0, from: 0, to: 0 });
     expect(readListPage({ data: null, meta: null, message: null, status: 200, requestId: null }, query).rows).toEqual([]);
+  });
+});
+
+describe("a typed route feeding a collection", () => {
+  it("reads a ListResult<Row> with Row inferred", async () => {
+    const list = route<{ page: number }, ListResult<{ id: number }>>("GET", "/v1/users");
+    const body = { data: [{ id: 1 }], meta: { authors: [2] }, total: 31, per_page: 10, current_page: 2, last_page: 4, from: 11, to: 11 };
+    const { transport } = scriptedTransport(jsonResponse(200, { success: true, data: body }));
+    const result = await createHttpClient({ transport }).request(list, { page: 2 });
+    const page = readListPage(result, { page: 2, pageSize: 10 });
+    expect(page.rows[0]?.id).toBe(1);
+    expect(page).toMatchObject({ total: 31, page: 2, pageSize: 10, lastPage: 4, from: 11, to: 11, meta: { authors: [2] } });
   });
 });
 

@@ -8,7 +8,7 @@ import vueParser from "vue-eslint-parser";
 // baselines, typed-lint ratchet and architecture scripts. Boundaries of src/ (no `@/`,
 // no stores, nothing outside src/ and the peers) are checked by scripts/check-src-imports.mjs.
 export default [
-  { ignores: ["dist/**", "node_modules/**", "coverage/**", "playground/dist/**", "playground/node_modules/**", "playground/.pack/**", "**/*.d.ts"] },
+  { ignores: ["dist/**", "node_modules/**", "coverage/**", "playground/dist/**", "playground/node_modules/**", "playground/.pack/**", "**/*.d.ts", "test-data/go-core/*/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...vue.configs["flat/recommended"],

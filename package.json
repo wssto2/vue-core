@@ -123,18 +123,19 @@
     "lint": "eslint . && node scripts/check-src-imports.mjs",
     "typecheck": "vue-tsc --noEmit",
     "typecheck:docs": "vue-tsc --noEmit -p docs/examples/tsconfig.json",
+    "typecheck:fixtures": "vue-tsc --noEmit -p test-data/tsconfig.json",
     "test": "vitest run",
     "build": "vite build && vite build -c vite.styles.config.ts && vue-tsc -p tsconfig.build.json",
     "check:consumer": "node scripts/check-consumer.mjs",
-    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run check:docs && npm run test && npm run build && npm run check:consumer",
+    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run typecheck:fixtures && npm run check:docs && npm run test && npm run build && npm run check:consumer",
     "check:docs": "node scripts/check-docs.mjs",
     "prepublishOnly": "npm run check"
   },
   "peerDependencies": {
+    "tailwindcss": "^4.0.0",
     "vue": "^3.5.0",
     "vue-i18n": "^10.0.0-beta.5",
-    "vue-router": "^4.4.3",
-    "tailwindcss": "^4.0.0"
+    "vue-router": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -156,7 +157,8 @@
     "vue-eslint-parser": "^10.4.0",
     "vue-i18n": "^10.0.8",
     "vue-router": "^4.5.0",
-    "vue-tsc": "^2.2.8"
+    "vue-tsc": "^2.2.8",
+    "zod": "^4.6.5"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",

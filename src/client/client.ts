@@ -1,6 +1,7 @@
 import { buildQuery, encodeBody, newRequestId, type QueryValue } from "./encode";
 import { readResponse, REQUEST_ID_HEADER, type ApiResult } from "./envelope";
 import { ApiError, isApiError } from "./error";
+import type { ApiRoute } from "./route";
 import { fetchTransport, type Transport } from "./transport";
 
 export interface RequestOptions {
@@ -39,7 +40,24 @@ export interface HttpClientOptions {
   onUnauthorized?: (context: UnauthorizedContext) => UnauthorizedDecision | Promise<UnauthorizedDecision>;
 }
 
+/** A route that takes no input (`void`, or an empty object) needs no second argument. */
+type RequestArguments<In> = [In] extends [void]
+  ? [input?: undefined, options?: RequestOptions]
+  : [In] extends [Record<string, never>]
+    ? [input?: In, options?: RequestOptions]
+    : [input: In, options?: RequestOptions];
+
+/** A route declared `void` has no body: its data is `null`. */
+export type RouteResult<Out> = ApiResult<[Out] extends [void] ? null : Out>;
+
 export interface HttpClient {
+  /**
+   * Calls a declared route: `:name` segments of the path are filled from `input` (encoded), the rest of
+   * `input` is the query for GET and DELETE and the JSON body for POST, PUT and PATCH. A missing path
+   * parameter rejects with a plain `Error` (a bug in the caller, not an answer from the server) before
+   * anything is sent. Abort, request ids and 401 handling are those of `get` and `post`.
+   */
+  request<In, Out>(route: ApiRoute<In, Out>, ...args: RequestArguments<In>): Promise<RouteResult<Out>>;
   get<TData = unknown, TMeta = unknown>(path: string, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   post<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   put<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
@@ -117,7 +135,26 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     }
   }
 
+  async function request<In, Out>(route: ApiRoute<In, Out>, input?: unknown, callOptions: RequestOptions = {}): Promise<RouteResult<Out>> {
+    const values: Record<string, unknown> = typeof input === "object" && input !== null && !Array.isArray(input) ? { ...input } : {};
+    const path = route.path.replace(/:([A-Za-z_][A-Za-z0-9_]*)/g, (_, name: string) => {
+      const value = values[name];
+      if (value === undefined || value === null || value === "") {
+        throw new Error(`${route.method} ${route.path}: the input has no value for the path parameter "${name}"`);
+      }
+      delete values[name];
+      return encodeURIComponent(String(value));
+    });
+    const hasRest = Object.keys(values).length > 0;
+    if (route.method === "GET" || route.method === "DELETE") {
+      return send<RouteResult<Out>["data"], unknown>(route.method, path, undefined, { ...callOptions, query: { ...(values as Record<string, QueryValue>), ...callOptions.query } });
+    }
+    return send<RouteResult<Out>["data"], unknown>(route.method, path, hasRest ? values : undefined, callOptions);
+  }
+
   return {
+    // the rest-tuple overload is the public contract; the implementation takes its arguments positionally
+    request: request as HttpClient["request"],
     get: (path, callOptions) => send("GET", path, undefined, callOptions),
     post: (path, body, callOptions) => send("POST", path, body, callOptions),
     put: (path, body, callOptions) => send("PUT", path, body, callOptions),

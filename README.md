@@ -190,6 +190,25 @@ Its texts are JSON files under the feature, loaded the first time one of its rou
 
 The views are [a list page](docs/recipes/list-page.md) and [a record page](docs/recipes/record-page.md).
 
+## Typed routes
+
+go-core's generator writes one `route<In, Out>(method, path, options?)` per endpoint; `client.request(route, input)` calls it with the input and the answer typed. Details, a list from a route and the errors: [typed routes](docs/recipes/typed-routes.md).
+
+<!-- example: docs/examples/routes/api.ts:1-11 -->
+```ts
+import { createHttpClient, isApiError } from "@wssto2/vue-core/client";
+import { ticketsRoutes } from "./routes";
+import { route } from "@wssto2/vue-core/client";
+
+const http = createHttpClient({ baseUrl: "/api" });
+
+// A path parameter and the rest as the query: GET /api/v1/tickets/7
+export async function loadTicket(id: number, signal: AbortSignal) {
+  const result = await http.request(ticketsRoutes.show, { id }, { signal });
+  return result.data; // typed as Ticket
+}
+```
+
 ## Permissions, destinations and icons
 
 The library knows none of your permissions, none of your backend's menu destinations and none of your icons. You declare them by merging into three interfaces, like vue-router's `RouteMeta`; after that a typo in `meta.access`, in a navigation binding or in `<Icon name>` is a compile error:
@@ -299,6 +318,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Shell](docs/recipes/shell.md): the default shell, contributions from features, keyboard shortcuts and their help, running inside a frame, a custom shell
 - [App setup](docs/recipes/app-setup.md): config, session, effects, locales and flags, permissions in the UI, error sentences, startup errors
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
+- [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 
