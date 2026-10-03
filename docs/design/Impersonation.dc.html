@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signed in as someone else</title>
+<style>
+  body { margin: 0; background: #E7ECE9; font-family: Inter, system-ui, sans-serif; color: #0D1714 }
+  .board { display: grid; grid-template-columns: 820px 390px; gap: 40px; padding: 40px 48px; align-items: start }
+  h2 { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5B6763 }
+  p.note { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #465350; max-width: 780px }
+  .screen { position: relative; overflow: hidden; background: #F1F4F2; border-radius: 12px; box-shadow: 0 0 0 1px rgba(18,38,32,.11); display: flex; flex-direction: column }
+  .banner { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: #FAEDDF; color: #9A4A07; font-size: 14px; box-shadow: inset 0 -1px 0 rgba(154,74,7,.25) }
+  .banner b { font-weight: 600 }
+  .banner button { margin-left: auto; border: 0; border-radius: 7px; background: #9A4A07; color: #fff; font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; white-space: nowrap }
+  .body { display: flex; flex: 1; min-height: 0 }
+  .rail { width: 200px; background: #0F211D; flex: none }
+  .page { padding: 24px 28px; flex: 1 }
+  .card { background: #fff; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,.08); padding: 4px 16px }
+  .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(18,38,32,.11); font-size: 15px }
+  .row:last-child { border: 0 }
+  .row span:first-child { color: #5B6763 }
+  .menu { position: absolute; right: 16px; top: 84px; width: 260px; background: #fff; border-radius: 10px; box-shadow: 0 8px 28px rgba(8,18,15,.2), 0 0 0 1px rgba(18,38,32,.08); padding: 6px; font-size: 14px }
+  .menu div { padding: 8px 10px; border-radius: 7px }
+  .menu .who { color: #5B6763; font-size: 13px }
+</style>
+</head>
+<body>
+<div class="board">
+<section>
+  <h2>Desktop: a strip above everything, on every page</h2>
+  <div class="screen" style="height: 420px">
+    <div class="banner" role="status">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A4A07" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"></path></svg>
+      <span>You are signed in as <b>Ivan Horvat</b>. Everything you do here is done as them.</span>
+      <button type="button">Return to my account</button>
+    </div>
+    <div class="body">
+      <div class="rail"></div>
+      <div class="page">
+        <div style="font-size: 20px; font-weight: 600; margin: 0 0 16px">Tickets</div>
+        <div class="card">
+          <div class="row"><span>1042</span><span>Printer is on fire</span></div>
+          <div class="row"><span>1041</span><span>Password reset</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">The strip uses the warning status colours, is not dismissible and scrolls away with nothing (it is part of the shell frame, above the top bar). The account menu in the sidebar names the person the app is acting as, with the same <em>Return to my account</em> row.</p>
+</section>
+
+<section>
+  <h2>Phone: the strip above the top bar, two lines</h2>
+  <div class="screen" style="height: 560px">
+    <div class="banner" style="flex-wrap: wrap; gap: 6px 10px" role="status">
+      <span style="flex: 1; min-width: 0">Signed in as <b>Ivan Horvat</b></span>
+      <button type="button" style="margin: 0">Return to my account</button>
+    </div>
+    <div style="display: flex; align-items: center; height: 48px; padding: 0 16px; font-weight: 600; background: #fff; box-shadow: 0 1px 0 rgba(18,38,32,.11)">Tickets</div>
+    <div style="padding: 16px">
+      <div class="card">
+        <div class="row"><span>1042</span><span>Printer is on fire</span></div>
+        <div class="row"><span>1041</span><span>Password reset</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div style="padding: 0 48px 40px"><p class="note"><strong>Questions for the owner.</strong> (1) ARV has no banner today: after "sign in as" the person simply is the other user, with no sign and no way back except signing out and in. Is this strip (warning colours, full width above the shell, one button) the look you want? (2) <strong>It needs go-core first.</strong> The session payload says who is signed in but not that it is an impersonation or who the real person is, and there is no route that returns to the original account (the login-as sign-in records the actor in the history only). The banner needs <code>impersonator: { id, name }</code> in <code>/auth/me</code>, and "Return to my account" needs a route that ends the impersonation and restores the actor's session (or, simpler, ends it and signs out so the actor signs in again). Which?</p></div>
+</body>
+</html>
