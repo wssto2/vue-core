@@ -39,12 +39,15 @@ describe("go-core list answers", () => {
 describe("a typed route feeding a collection", () => {
   it("reads a ListResult<Row> with Row inferred", async () => {
     const list = route<{ page: number }, ListResult<{ id: number }>>("GET", "/v1/users");
-    const body = { data: [{ id: 1 }], meta: { authors: [2] }, total: 31, per_page: 10, current_page: 2, last_page: 4, from: 11, to: 11 };
+    const body = { data: [{ id: 1 }], meta: { authors: [2], views: [{ key: "all", count: 31 }] }, total: 31, per_page: 10, current_page: 2, last_page: 4, from: 11, to: 11 };
     const { transport } = scriptedTransport(jsonResponse(200, { success: true, data: body }));
     const result = await createHttpClient({ transport }).request(list, { page: 2 });
     const page = readListPage(result, { page: 2, pageSize: 10 });
     expect(page.rows[0]?.id).toBe(1);
-    expect(page).toMatchObject({ total: 31, page: 2, pageSize: 10, lastPage: 4, from: 11, to: 11, meta: { authors: [2] } });
+    expect(page).toMatchObject({ total: 31, page: 2, pageSize: 10, lastPage: 4, from: 11, to: 11, meta: { authors: [2] }, views: [{ key: "all", count: 31 }] });
+    // `meta.views` is typed: no cast to read a count
+    const count: number | undefined = result.data.meta?.views?.[0]?.count;
+    expect(count).toBe(31);
   });
 });
 

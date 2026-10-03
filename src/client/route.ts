@@ -46,13 +46,19 @@ route.raw = (method: HttpMethod, path: string, options: RouteOptions = {}): RawR
   raw: true,
 });
 
+/** One tab's count in `meta.views` (go-core `datatable.ViewCount`). */
+export interface ViewCount {
+  readonly key: string;
+  readonly count: number;
+}
+
 /**
  * The wire shape of go-core's `datatable.DatatableResult[T]`: a page of rows with its numbers.
  * `readListPage` (`/collection`) reads it into a `ListPage` with no glue.
  */
 export interface ListResult<Row> {
   readonly data: readonly Row[];
-  readonly meta?: Readonly<Record<string, unknown>>;
+  readonly meta?: Readonly<Record<string, unknown>> & { readonly views?: readonly ViewCount[] };
   readonly total: number;
   readonly per_page: number;
   readonly current_page: number;
