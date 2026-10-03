@@ -29,22 +29,23 @@ void application.mount("#app");
 - **Reads the session** from `GET /v1/auth/me`. When that answers 401 (the access token ran out while the app was closed) it swaps the refresh cookie for new tokens once before it decides nobody is signed in, so a returning person is not sent to the sign-in page for nothing. Anything but 401 (a server fault, an unreadable payload) is a failed start, not a signed-out user.
 - **Renews on a 401** while signed in: one refresh, then the session is read again and the failed requests are sent once more. If the refresh is refused the session ends with reason `expired` and the router sends the person to the sign-in page, remembering where they were.
 - **Ends the session** with `POST /v1/auth/logout` after the before-sign-out hooks; a session that is already over is not an error.
-- The user is go-core's default projection, `IdentityUser` (`id`, `login`, `name`, `email`, `locale`). A server with its own `UserProjector` passes `parseUser`, which must keep the `id`:
+- The user is go-core's default projection, `IdentityUser` (`id`, `login`, `name`, `email`, `locale`). A server with its own `UserProjector` passes `parseUser`, which must keep the `id` and the `login` (the prompt for an expired session shows it):
 
 <!-- example: docs/examples/identity/user.ts -->
 ```ts
-// An application whose server projects more than go-core's default user (`UserProjector`) reads it itself.
+// An application whose server projects more than go-core's default user (`UserProjector`) reads it itself; the `login` stays, the prompt for an expired session shows it.
 import { identityPlatform } from "@wssto2/vue-core/identity";
 import { createPlatform, readBootstrap, type SessionUser } from "@wssto2/vue-core/platform";
 
 interface Employee extends SessionUser {
+  readonly login: string;
   readonly name: string;
   readonly dealer: string;
 }
 
 const parseEmployee = (raw: unknown): Employee => {
-  const { id, name, dealer } = raw as { id: number; name: string; dealer: string };
-  return { id, name, dealer };
+  const { id, login, name, dealer } = raw as { id: number; login: string; name: string; dealer: string };
+  return { id, login, name, dealer };
 };
 
 export const platform = createPlatform({ config: readBootstrap(), ...identityPlatform({ parseUser: parseEmployee }) });
@@ -86,11 +87,11 @@ export async function loadProfile(platform: Platform) {
 }
 ```
 
-`package.json` names the go-core version (`"goCore": "v1.6.0-rc.2"`); `npm run modules:sync -- <go-core checkout at that tag>` rewrites the files and `npm run check:modules` (part of `npm run check`) fails when a file was written by another version or edited by hand. The input schemas are exported as types only; an application that validates with the Zod schemas generates its own with go-core's `contract.Generate`.
+`package.json` names the go-core version (`"goCore": "v1.6.0-rc.3"`); `npm run modules:sync -- <go-core checkout at that tag>` rewrites the files and `npm run check:modules` (part of `npm run check`) fails when a file was written by another version or edited by hand. The input schemas are exported as types only; an application that validates with the Zod schemas generates its own with go-core's `contract.Generate`.
 
 ## Developing against go-core
 
-go-core's dev server serves identity and access over an in-memory database with two accounts (`admin` / `admin-password`, `user` / `user-password`):
+go-core's dev server serves identity and access over an in-memory database with two accounts (`admin` / `admin-password`, `user` / `user-password`); `admin` may sign in as `user`, which shows the banner:
 
 ```sh
 go run github.com/wssto2/go-core/cmd/devserver     # 127.0.0.1:8090, /api
@@ -99,6 +100,30 @@ cd playground && npm run dev                       # then open /identity.html
 
 Vite forwards `/api` to it, so the cookies are same-origin; the dev server also allows the browser origin `http://localhost:5173` (`-origin` for another). The playground's other pages keep their fake transport, which is also what your tests use (`routedTransport`, see [testing](testing.md)): answer `GET /v1/auth/me` with the payload of your server.
 
-## Not yet
+## A session that ends in the middle of work
 
-A prompt that asks for the password again when a session ends in the middle of work, and a banner for "signed in as someone else", are not in this release: neither has a counterpart in arv-next, so their looks are artboards for the owner (`docs/design/SessionExpiry.dc.html`, `docs/design/Impersonation.dc.html`), and the banner needs the server to say who the real person is.
+When the refresh is refused while someone works, `identityFeature` does not send them to the sign-in page: the page stays, behind a scrim, and a dialog (wide screens) or a bottom sheet (phones) asks for the password again. The login is shown and fixed: it is the same person's page. Signing in closes it and the page carries on exactly as it was, so a form keeps its draft; Escape does nothing; **Sign out instead** asks the unsaved-changes question first, then goes to the sign-in page. A session that ended while the app was closed still lands on the sign-in page (nothing is on screen to keep), and so does one that ended while signed in as somebody else (the password is not the real person's to give).
+
+This is the router and the session working together, and any feature can use it: `defineFeature({ holdsExpiredSession: true })` says it shows its own prompt, and `heldSession(state)` (from `/platform`) gives the session that just expired, so the shell, the menu and permissions keep showing what they showed. The identity feature needs a shell with a `host` slot (`backofficeShell()` has one).
+
+## Signed in as somebody else
+
+go-core's `login-as` signs in as another person when the application allowed it, and the session payload then names the real person (`impersonator`, also on the session: `session.state.value.impersonator`). While it does, a warning strip stretches across the top of the shell, above everything, with one button, **Return to my account**: it calls `login-as/return` (no password; the person's own session comes back) and goes to the home page, since what was on screen belonged to the other person. The strip cannot be dismissed. It is a `banner` slot contribution, so a custom shell renders `<ShellOutlet name="banner" />` at its top.
+
+The entry point is `SignInAsButton`, for a person's page or a row, shown only to whoever holds the permission you name (your catalogue says which; the server decides again), never for oneself and never while already signed in as somebody else:
+
+<!-- example: docs/examples/identity/SignInAs.vue -->
+```vue
+<script setup lang="ts">
+import { SignInAsButton } from "@wssto2/vue-core/identity";
+
+defineProps<{ person: { id: number; name: string } }>();
+</script>
+
+<template>
+  <!-- Shown to whoever holds the permission; the server decides again. -->
+  <SignInAsButton :user-id="person.id" :name="person.name" permission="tickets:update" />
+</template>
+```
+
+`signInAs(platform, userId)` and `returnToOwnAccount(platform)` are the calls behind them. Their refusals are `core.errors.identity.impersonation.*` (`disabled`: the application did not say who may; `not_active`: the session is not an impersonation).
