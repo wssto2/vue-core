@@ -4,6 +4,7 @@ import { defineComponent, nextTick, ref } from "vue";
 import Modal from "../modal/Modal.vue";
 import { createTestI18n } from "../testing/i18n";
 import Menu, { type MenuItem } from "./Menu.vue";
+import { closeOverlays } from "./closeOverlays";
 
 const global = { plugins: [createTestI18n()], stubs: { transition: false } };
 
@@ -92,6 +93,13 @@ describe("Menu", () => {
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Delete" }));
     await fireEvent.keyDown(menu, { key: "Home" });
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Rename" }));
+  });
+
+  it("closes when something takes the screen over (closeOverlays)", async () => {
+    mountMenu();
+    await openMenu();
+    closeOverlays();
+    await vi.waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
   });
 
   it("Escape closes it and returns focus to the trigger", async () => {

@@ -9,6 +9,7 @@ import { jsonResponse, routedTransport, settle, type RecordedCall } from "../tes
 import fixture from "../../test-data/go-core/session_payload.json";
 import { identityFeature } from "./feature";
 import { identityPlatform } from "./session";
+import { CLOSE_OVERLAYS_EVENT } from "../overlay/closeOverlays";
 import SignInAsButton from "./SignInAsButton.vue";
 
 // The screens that show when the session ends mid-work, and while somebody is signed in as another person.
@@ -157,5 +158,19 @@ describe("signed in as somebody else", () => {
   it("does not offer it without the permission", async () => {
     await start(payloadOf(1, "Ana"), "/person");
     expect(document.querySelector("[data-sign-in-as]")).toBeNull();
+  });
+});
+
+describe("the prompt of an expired session", () => {
+  it("closes the menus and popovers that are open when it appears", async () => {
+    const { platform } = await start(payloadOf(1, "Ana"));
+    let closed = 0;
+    const onClose = () => closed++;
+    document.addEventListener(CLOSE_OVERLAYS_EVENT, onClose);
+    platform.session.expire();
+    await settle();
+    document.removeEventListener(CLOSE_OVERLAYS_EVENT, onClose);
+    expect(closed).toBe(1);
+    expect(dialog()).not.toBeNull();
   });
 });

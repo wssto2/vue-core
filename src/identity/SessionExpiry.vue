@@ -8,6 +8,7 @@ import { Icon } from "../icon";
 import { useCompactPresentation } from "../internal/mediaQuery";
 import { useDescribeError } from "../i18n";
 import { toast } from "../overlay";
+import { closeOverlays } from "../overlay/closeOverlays";
 import { useDialog } from "../overlay/useDialog";
 import { usePlatform } from "../platform";
 import { useSignInForm } from "./useSignInForm";
@@ -43,6 +44,7 @@ const { form, passwordError, submit } = useSignInForm({ login: login.value ?? ""
 watch(wanted, (open) => {
   if (open) {
     form.hydrate({ login: login.value ?? "", password: "" });
+    closeOverlays(); // an open menu would hang beside the prompt
     dialog.present();
   } else dialog.dismissWithoutAsking();
 }, { immediate: true, flush: "post" });

@@ -3,6 +3,7 @@ import { computed, nextTick, onUnmounted, ref, useId, watch } from "vue";
 import type { Placement } from "@floating-ui/dom";
 import { focusableWithin } from "../internal/focusable";
 import { arrowSide, useAnchoredPosition } from "./anchored";
+import { CLOSE_OVERLAYS_EVENT } from "./closeOverlays";
 
 /**
  * A small, interactive panel anchored to the element that opened it.
@@ -126,15 +127,21 @@ watch(panel, (element) => {
   if (element && props.autofocus) void nextTick(() => (focusableWithin(element)[0] ?? element).focus({ preventScroll: true }));
 });
 
+function onCloseOverlays() {
+  dismiss();
+}
+
 function removeListeners() {
   window.removeEventListener("keydown", onKeydown, true);
   document.removeEventListener("pointerdown", onPointerDown, true);
+  document.removeEventListener(CLOSE_OVERLAYS_EVENT, onCloseOverlays);
 }
 
 watch(isOpen, (open) => {
   if (open) {
     window.addEventListener("keydown", onKeydown, true);
     document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener(CLOSE_OVERLAYS_EVENT, onCloseOverlays);
   } else removeListeners();
 });
 
