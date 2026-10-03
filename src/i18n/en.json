@@ -23,7 +23,7 @@
       "role_kind": {
         "predefined": "Predefined",
         "custom": "Custom",
-        "computed": "automatic"
+        "computed": "Automatic"
       },
       "groups": {
         "role": "Role"

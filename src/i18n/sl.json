@@ -23,7 +23,7 @@
       "role_kind": {
         "predefined": "Standardna",
         "custom": "Prilagojena",
-        "computed": "samodejna"
+        "computed": "Samodejna"
       },
       "groups": {
         "role": "Vloga"

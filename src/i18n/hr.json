@@ -23,7 +23,7 @@
       "role_kind": {
         "predefined": "Standardna",
         "custom": "Prilagođena",
-        "computed": "automatska"
+        "computed": "Automatska"
       },
       "groups": {
         "role": "Uloga"
