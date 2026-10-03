@@ -17,5 +17,7 @@ const user = computed(() => {
     <p class="text-content-muted">{{ user.login }} · {{ user.email }} · {{ user.locale }}</p>
     <!-- The dev server lets admin sign in as user (id 2): the banner appears, with the way back. -->
     <div><SignInAsButton :user-id="2" name="user" permission="iam.user:impersonate" /></div>
+    <!-- Enough page to scroll: the banner stays at the top and the bars sit below it. -->
+    <p v-for="n in 60" :key="n" class="text-content-muted">Line {{ n }}</p>
   </div>
 </template>

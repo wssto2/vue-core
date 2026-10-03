@@ -72,7 +72,7 @@ function goBack() {
   <header v-if="shown" data-shell-top-bar
     class="pt-[max(0.25rem,env(safe-area-inset-top))] pr-[max(0.5rem,env(safe-area-inset-right))] pb-1 pl-[max(0.5rem,env(safe-area-inset-left))] text-content-strong"
     :class="authenticated
-      ? ['sticky top-0 z-30 border-b bg-surface-page/85 backdrop-blur-xl transition-colors duration-motion-normal', showTitle ? 'border-border-separator' : 'border-transparent']
+      ? ['sticky top-[var(--shell-banner-h,0px)] z-30 border-b bg-surface-page/85 backdrop-blur-xl transition-colors duration-motion-normal', showTitle ? 'border-border-separator' : 'border-transparent']
       : 'border-b border-border-separator bg-surface-cell'">
     <!-- Three columns so a long back label, the title and the actions truncate instead of running into each other. -->
     <div class="grid min-h-bar-height grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1">

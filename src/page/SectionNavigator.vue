@@ -151,7 +151,7 @@ const segmentLabel = (section: SectionLink) => (variant.value === "segments" && 
   <!-- A source list beside the content -->
   <div v-else-if="hasNav && variant === 'sidebar'" data-test="section-navigator" data-variant="sidebar"
     class="grid min-w-0 grid-cols-[minmax(0,15rem)_minmax(0,1fr)] items-start gap-8">
-    <aside class="sticky top-[calc(var(--app-bar-height)+1rem)] flex min-w-0 flex-col gap-4 self-start">
+    <aside class="sticky top-[calc(var(--app-bar-height)+1rem+var(--shell-banner-h,0px))] flex min-w-0 flex-col gap-4 self-start">
       <slot name="summary" />
       <nav :aria-label="props.label">
         <ul class="flex flex-col gap-0.5">
@@ -209,7 +209,7 @@ const segmentLabel = (section: SectionLink) => (variant.value === "segments" && 
 
     <!-- A segmented control: full labels on wide screens, short ones on compact screens. -->
     <div v-if="hasNav && (variant === 'segments' || variant === 'segmented')"
-      :class="variant === 'segmented' ? 'z-20 -mx-screen-padding bg-surface-page/90 px-screen-padding py-2 backdrop-blur-xl max-md:sticky max-md:top-[calc(max(0.25rem,env(safe-area-inset-top))+var(--app-bar-height)+0.25rem+1px)]' : ''">
+      :class="variant === 'segmented' ? 'z-20 -mx-screen-padding bg-surface-page/90 px-screen-padding py-2 backdrop-blur-xl max-md:sticky max-md:top-[calc(max(0.25rem,env(safe-area-inset-top))+var(--app-bar-height)+0.25rem+1px+var(--shell-banner-h,0px))]' : ''">
       <nav ref="segments" :aria-label="props.label" class="max-w-full overflow-x-auto rounded-control bg-fill p-0.5 scrollbar-hide">
         <ul class="flex gap-0.5">
           <li v-for="section in sections" :key="section.name" class="flex min-w-0 flex-1">
@@ -252,7 +252,7 @@ const segmentLabel = (section: SectionLink) => (variant.value === "segments" && 
     <!-- The wrappers stay mounted either way (`contents`), so the routed page never remounts when its sections register and the aside appears. -->
     <div :class="stepsAside ? 'grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,14rem)] items-start gap-7' : 'contents'" :data-test="stepsAside ? 'section-steps-form' : undefined">
       <div :class="stepsAside ? 'min-w-0' : 'contents'"><slot /></div>
-      <aside v-if="stepsAside" class="sticky top-[calc(var(--app-bar-height)+1rem)] min-w-0 self-start"><SectionList standalone /></aside>
+      <aside v-if="stepsAside" class="sticky top-[calc(var(--app-bar-height)+1rem+var(--shell-banner-h,0px))] min-w-0 self-start"><SectionList standalone /></aside>
     </div>
 
     <!-- A long page's own sections on compact screens: the floating jumper. -->

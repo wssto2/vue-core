@@ -61,7 +61,7 @@ async function leave() {
 
 <template>
   <div v-if="impersonator" ref="strip" role="status" data-impersonation-banner
-    class="flex flex-wrap items-center gap-x-3 gap-y-1.5 bg-status-warning-surface px-4 py-2 text-subheadline text-status-warning-content shadow-[inset_0_-1px_0_rgb(154_74_7/0.25)]">
+    class="sticky top-0 z-40 flex flex-wrap items-center gap-x-3 gap-y-1.5 bg-status-warning-surface px-4 py-2 text-subheadline text-status-warning-content shadow-[inset_0_-1px_0_rgb(154_74_7/0.25)]">
     <Icon name="informationLine" :size="18" class="shrink-0 compact:hidden" />
     <span class="min-w-0 flex-1">
       <span class="hidden md:inline">{{ t("core.identity.impersonation.banner", { name }) }}</span>

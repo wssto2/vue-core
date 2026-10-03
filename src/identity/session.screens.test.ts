@@ -137,6 +137,7 @@ describe("signed in as somebody else", () => {
     const { application, platform, calls } = await start(payloadOf(2, "Ivan", { impersonator: { id: 1, name: "Ana" } }), "/draft", payloadOf(1, "Ana"));
     const banner = document.querySelector("[data-impersonation-banner]");
     expect(banner?.textContent).toContain("You are signed in as Ivan");
+    expect(banner?.className).toContain("sticky"); // it stays in view while the page scrolls
     expect(banner?.querySelector("button")).not.toBeNull();
     expect(banner?.querySelector("[aria-label],[data-dismiss]")).toBeNull(); // not dismissible: the only control is the way back
 
