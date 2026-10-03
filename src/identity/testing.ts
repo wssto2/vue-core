@@ -57,13 +57,15 @@ export interface ScreenOptions {
   users?: UsersFeatureOptions;
   /** Features of the test's own (pages to navigate to). */
   features?: readonly Feature[];
+  /** The menu the server sends with the session (go-core's navigation nodes). */
+  navigation?: readonly object[];
   /** The application's own texts per locale (`{ en: { errors: { "crm.owns_leads": "…" } } }`), over the library's. */
   messages?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
 }
 
 /** Starts the application with the users feature on a fake server and waits until it settles. */
 export async function startScreen(options: ScreenOptions) {
-  const me = sessionOf(options.user ?? { id: 1, name: "Ana" }, options.permissions);
+  const me = sessionOf(options.user ?? { id: 1, name: "Ana" }, options.permissions, options.navigation ? { navigation: options.navigation } : {});
   const { transport, calls } = routedTransport({
     "GET /api/v1/auth/me": jsonResponse(200, me),
     "POST /api/v1/auth/refresh": jsonResponse(401, { success: false, error: "no", code: "identity.session.invalid" }),

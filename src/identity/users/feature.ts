@@ -4,7 +4,13 @@ import type { Destination } from "../../router";
 import ProfileMenuItem from "../profile/ProfileMenuItem.vue";
 import { profileRoutes } from "../profile/routes";
 import { usersContextKey } from "./context";
+import { personSectionRoute, type PersonSection } from "./personSections";
 import { usersRoutes } from "./routes";
+
+/** The users routes, the record carrying the application's own sections after its own. */
+function withSections(sections: readonly PersonSection[]) {
+  return usersRoutes.records.map((record) => (record.name === "users.record" ? { ...record, children: [...(record.children ?? []), ...sections.map(personSectionRoute)] } : record));
+}
 
 export interface UsersFeatureOptions {
   /** The users list and a person's record (`/users`), for whoever holds `iam.user:view`. Default true. */
@@ -13,6 +19,8 @@ export interface UsersFeatureOptions {
   profile?: boolean;
   /** The permission that shows "Sign in as" on a person's record (what the server's `AllowImpersonation` was given). Default `iam.user:impersonate`; `false` leaves the button out. */
   signInAs?: Permission | false;
+  /** Sections the application adds to a person's record after the feature's own (their roles); each is a child route `users.record.<path>`. */
+  sections?: readonly PersonSection[];
   /** The destination of the backend's menu that opens the users list. Without it the application binds the list itself. */
   destination?: Destination;
 }
@@ -38,7 +46,7 @@ export function usersFeature(options: UsersFeatureOptions = {}): Feature {
   const signInAs = options.signInAs ?? "iam.user:impersonate";
   return defineFeature({
     id: "users",
-    routes: [...(people ? usersRoutes.records : []), ...(profile ? profileRoutes.records : [])],
+    routes: [...(people ? withSections(options.sections ?? []) : []), ...(profile ? profileRoutes.records : [])],
     context: provideContext(usersContextKey, { signInAs }),
     navigation: people && options.destination ? [{ destination: options.destination, to: usersRoutes.index, within: ["users.record"] }] : [],
     // The entry of the account menu; a shell without that menu leaves it out.
