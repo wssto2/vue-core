@@ -18,8 +18,6 @@ const props = defineProps<{
   canEnd: boolean;
   header?: string;
   footer?: string;
-  /** The name of whoever opened a session by signing in as the person, when known. */
-  openedBy: (id: number) => string | null;
 }>();
 
 const emit = defineEmits<{ end: [session: SessionItem] }>();
@@ -42,10 +40,10 @@ const format = useFormat();
           <span aria-hidden="true">·</span>
           <span>{{ t("core.account.sessions.expires", { when: format.dateTime(session.expires_at) }) }}</span>
         </span>
-        <span v-if="session.current || session.opened_by !== null" class="mt-1 flex flex-wrap gap-1">
+        <span v-if="session.current || session.opened_by" class="mt-1 flex flex-wrap gap-1">
           <Badge v-if="session.current" tone="positive" dot data-session-current>{{ t("core.account.sessions.this_device") }}</Badge>
-          <Badge v-if="session.opened_by !== null" tone="warning" data-session-opened-by>
-            {{ props.openedBy(session.opened_by) ? t("core.account.sessions.opened_by", { name: props.openedBy(session.opened_by) }) : t("core.account.sessions.opened_by_other") }}
+          <Badge v-if="session.opened_by" tone="warning" data-session-opened-by>
+            {{ session.opened_by.name ? t("core.account.sessions.opened_by", { name: session.opened_by.name }) : t("core.account.sessions.opened_by_other") }}
           </Badge>
         </span>
       </template>

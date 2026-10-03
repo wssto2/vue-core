@@ -9,7 +9,7 @@ afterEach(stopApplications);
 
 const person = { id: 2, login: "ivan", name: "Ivan Horvat", email: "ivan@example.test", phone: "", locale: "en", active: true, status: "active", last_sign_in: null, locked_until: null, created_at: "2026-09-01T08:00:00Z" };
 const rows = [
-  { id: 3, area: "crm", record_type: "customers", record_id: 7, action: "changed", signed_in_as: 1, created_at: "2026-10-02T09:15:00Z" },
+  { id: 3, area: "crm", record_type: "customers", record_id: 7, action: "changed", signed_in_as: { id: 1, name: "Ana Anić" }, created_at: "2026-10-02T09:15:00Z" },
   { id: 2, area: "crm", record_type: "customers", record_id: 6, action: "created", signed_in_as: null, created_at: "2026-10-02T08:00:00Z" },
   { id: 1, area: "identity", record_type: "users", record_id: 2, action: "deleted", signed_in_as: null, created_at: "2026-10-01T08:00:00Z" },
 ];

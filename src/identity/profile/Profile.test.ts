@@ -18,7 +18,7 @@ async function open(answers: Parameters<typeof startScreen>[0]["answers"] = {}, 
     answers: {
       "GET /v1/iam/profile": () => dataOf(who),
       "GET /v1/iam/profile/sessions": dataOf({ sessions: [session(7, { current: true }), session(8)] }),
-      "GET /v1/iam/profile/signins": listOf([{ id: 1, event: "signed_in", ip: "10.0.0.1", device: "Chrome on Mac", actor_id: null, created_at: "2026-10-01T08:30:00Z" }]),
+      "GET /v1/iam/profile/signins": listOf([{ id: 1, event: "signed_in", ip: "10.0.0.1", device: "Chrome on Mac", actor: null, created_at: "2026-10-01T08:30:00Z" }]),
       ...answers,
     },
   });

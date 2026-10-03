@@ -4,12 +4,11 @@ import { useI18n } from "vue-i18n";
 import { IconTile, Tabs, type TabItem } from "../../../controls";
 import { useFormat } from "../../../format";
 import { DateField, FormGroup, FormRow } from "../../../form";
-import type { ActivityRow, AreaCount } from "../../../modules/identity/entities";
+import type { ActivityRow } from "../../../modules/identity/entities";
 import { identityRoutes } from "../../../modules/identity/routes";
 import { usePlatform } from "../../../platform";
 import { useRouteResourceContext } from "../../../resource";
 import { AsyncSection, Badge, useLoad } from "../../../state";
-import { useActorNames } from "../../shared/actors";
 import PageBar from "../../shared/PageBar.vue";
 import SectionIntro from "../../shared/SectionIntro.vue";
 import { useUsersContext } from "../context";
@@ -25,7 +24,6 @@ const { http } = usePlatform();
 const format = useFormat();
 const person = useRouteResourceContext(PERSON);
 const { activityAreas } = useUsersContext();
-const actors = useActorNames();
 
 const area = ref("all");
 const since = ref<string | null>(null);
@@ -47,7 +45,6 @@ watch([area, since, until], () => {
   void history.reload();
 });
 watch(page, () => void history.reload());
-watch(() => history.data.value, (data) => actors.load(data?.data.map((row) => row.signed_in_as) ?? []), { immediate: true });
 
 const label = (key: string): string => {
   if (key === "all" || key === "identity" || key === "other") return t(`core.users.activity.areas.${key}`);
@@ -56,7 +53,7 @@ const label = (key: string): string => {
 };
 
 // The server counts the areas under the same range; the one being looked at stays even when it is empty there.
-const counts = computed(() => (history.data.value?.meta?.views as readonly AreaCount[] | undefined) ?? []);
+const counts = computed(() => history.data.value?.meta?.views ?? []);
 const tabs = computed<TabItem<string>[]>(() => {
   const listed = counts.value.filter((view) => view.key === "all" || view.key === area.value || view.count > 0).map((view) => ({ value: view.key, label: label(view.key), badge: view.count }));
   return listed.length > 0 ? listed : [{ value: "all", label: label("all") }];
@@ -105,8 +102,8 @@ const days = computed(() => {
                   <span>{{ row.record_type }} #{{ row.record_id }}</span>
                 </span>
               </template>
-              <Badge v-if="row.signed_in_as !== null" tone="warning" data-activity-signed-in-as>
-                {{ actors.nameOf(row.signed_in_as) ? t("core.users.activity.signed_in_as", { name: actors.nameOf(row.signed_in_as) }) : t("core.users.activity.signed_in_as_other") }}
+              <Badge v-if="row.signed_in_as" tone="warning" data-activity-signed-in-as>
+                {{ row.signed_in_as.name ? t("core.users.activity.signed_in_as", { name: row.signed_in_as.name }) : t("core.users.activity.signed_in_as_other") }}
               </Badge>
               <span class="text-body tabular-nums text-content-muted">{{ format.time(row.created_at) }}</span>
             </FormRow>

@@ -25,8 +25,7 @@ watch(page, () => void history.reload());
   <Panel :title="t('core.profile.signins.title')" icon="timeFill" flush data-profile-signins>
     <AsyncSection :state="history.state.value" :skeleton-rows="4" :is-empty="() => false" @retry="history.reload()">
       <template #default="{ value }">
-        <!-- Who signed in as the person (or unlocked them) is somebody else, whom this person may not be able to look up: no name. -->
-        <SignInTable :rows="value.data" :actor-name="() => null" />
+        <SignInTable :rows="value.data" />
         <div class="py-3"><PageBar v-model:page="page" :last-page="value.last_page" :total="value.total" /></div>
         <p class="px-4 pb-3 text-footnote text-content-muted">{{ t("core.profile.signins.footer") }}</p>
       </template>
