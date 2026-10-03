@@ -1,5 +1,4 @@
 import { useI18n } from "vue-i18n";
-import type { AccessQualifier } from "../platform";
 import { SYSTEM_GROUP } from "./catalogue";
 import { useAccessContext } from "./context";
 
@@ -38,9 +37,9 @@ export function useAccessLabels() {
     groupLabel: (group: string) => first([`access.modules.${group}`, ...(group === SYSTEM_GROUP ? ["core.access.system_group"] : [])], group),
     screenLabel: (key: string) => first([`access.resources.${key}`], key),
     ownableLabel: (ownable: string) => first([`access.ownable.${ownable.replace(/\./g, "_")}`], ownable),
-    qualifierLabel: (qualifier: AccessQualifier) => t(`core.access.qualifier.${qualifier}`),
-    qualifierHint: (qualifier: AccessQualifier) => t(`core.access.qualifier_hint.${qualifier}`),
-    qualifierNoun: (qualifier: AccessQualifier) => t(`core.access.qualifier_noun.${qualifier}`),
+    qualifierLabel: (qualifier: string) => t(`core.access.qualifier.${qualifier}`),
+    qualifierHint: (qualifier: string) => t(`core.access.qualifier_hint.${qualifier}`),
+    qualifierNoun: (qualifier: string) => t(`core.access.qualifier_noun.${qualifier}`),
     levelLabel,
     /** A place: the level and its name (`Dealer · Auto Zagreb`); the root, which has no name, by its level. */
     scopeLabel: (scope: ScopeName) => (scope.name ? `${levelLabel(scope.level)} · ${scope.name}` : levelLabel(scope.level)),

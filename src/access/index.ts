@@ -11,3 +11,5 @@ export { dependantsClosure, permissionTree, requiredClosure } from "./catalogue"
 export type { Grants, PermissionCatalogue, PermissionEntry, PermissionGroup, PermissionMeta, PermissionScreen } from "./catalogue";
 export { useAccessLabels } from "./labels";
 export { useRefusalMessage } from "./refusals";
+export { default as PersonAccess } from "./PersonAccess.vue";
+export { default as BindingRow } from "./BindingRow.vue";

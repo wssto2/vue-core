@@ -74,7 +74,7 @@ defineExpose({ present });
 
         <FormGroup v-if="comparison.different.length" :header="t('core.access.compare.different', { count: comparison.different.length })">
           <FormRow v-for="row in comparison.different" :key="row.permission" layout="setting" :label="labels.permissionLabel(row.permission)"
-            :value="t('core.access.compare.whose', { role: labels.qualifierLabel(row.role as never), other: labels.qualifierLabel(row.other as never) })" />
+            :value="t('core.access.compare.whose', { role: labels.qualifierLabel(row.role), other: labels.qualifierLabel(row.other) })" />
         </FormGroup>
       </template>
     </div>

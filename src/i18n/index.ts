@@ -54,6 +54,19 @@ export type CoreMessages = {
       replace: { action: string; title: string; footer: string; with: string; choose: string; confirm: string; moves: string; done: string };
       delete: { action: string; title: string; body: string; failed: string };
       holders: { title: string; empty: string; service: string };
+      person_roles: string;
+      roles_footer: string;
+      no_roles_title: string;
+      no_roles_description: string;
+      add_role: string;
+      remove: string;
+      remove_title: string;
+      remove_body: string;
+      added: string;
+      removed: string;
+      remove_failed: string;
+      add: { confirm: string; scope_header: string; scope_level: string; scopes_failed: string; no_places: string; roles_loading: string; roles_failed: string; no_roles: string; role: string; role_gives: string; role_gives_footer: string; choose_role: string; choose_place: string };
+      effective: { title: string; footer: string; empty: string; from_roles: string; unavailable: string; why_row: string; show_why: string; hide_why: string; all_modules: string; fewer_modules: string };
     };
     actions: {
       cancel: string;

@@ -1,6 +1,6 @@
 // Fixtures for this folder's tests; the declaration build excludes it.
 import { createMemoryHistory } from "vue-router";
-import { createApplication, defineFeature, type Application } from "../app";
+import { createApplication, defineFeature, type Application, type Feature } from "../app";
 import { page } from "../app/testing";
 import type { Role, RoleSummary } from "../modules/access/entities";
 import { backofficeShell } from "../shell";
@@ -42,7 +42,7 @@ export interface Started {
 }
 
 /** The access feature in an application whose server answers `answers`, signed in with `permissions`, at `location`. */
-export async function startAccess(answers: Record<string, Answer>, permissions: readonly string[], location: string, options: Partial<AccessFeatureOptions> = {}): Promise<Started> {
+export async function startAccess(answers: Record<string, Answer>, permissions: readonly string[], location: string, options: Partial<AccessFeatureOptions> = {}, more: readonly Feature[] = []): Promise<Started> {
   const { transport, calls } = routedTransport(answers);
   const platform = createTestPlatform({ permissions, transport });
   const history = createMemoryHistory();
@@ -50,10 +50,10 @@ export async function startAccess(answers: Record<string, Answer>, permissions: 
   const application = createApplication({
     platform,
     shell: backofficeShell(),
-    features: [defineFeature({ id: "sign-in", routes: [{ name: "login", path: "/login", component: page("sign in"), meta: { public: true } }, { name: "home", path: "/", component: page("home") }] }), accessFeature({ catalogue, ...options })],
+    features: [defineFeature({ id: "sign-in", routes: [{ name: "login", path: "/login", component: page("sign in"), meta: { public: true } }, { name: "home", path: "/", component: page("home") }] }), accessFeature({ catalogue, ...options }), ...more],
     router: { history },
     // The application's own texts: what a catalogue's keys, a custom role's kind and a level mean.
-    i18n: { missingWarn: false, messages: { en: { perm: { customer: { view: "View customers", update: "Edit customers" }, lead: { view: "View leads" }, role: { manage: "Manage roles" } }, access: { modules: { crm: "CRM", iam: "Administration" }, resources: { crm_customer: "Customers", crm_lead: "Leads" } } } } },
+    i18n: { missingWarn: false, messages: { en: { perm: { customer: { view: "View customers", update: "Edit customers" }, lead: { view: "View leads" }, role: { manage: "Manage roles" } }, access: { modules: { crm: "CRM", iam: "Administration" }, resources: { crm_customer: "Customers", crm_lead: "Leads" }, levels: { dealer: "Dealer", location: "Location" } } } } },
   });
   const target = document.createElement("div");
   document.body.append(target);
