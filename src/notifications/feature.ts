@@ -4,6 +4,8 @@ import { shallowRef, type ShallowRef } from "vue";
 import type { Destination } from "../router";
 import { notificationsContextKey, type NotificationCategoryLook } from "./context";
 import { deadLettersRoutes } from "./deadletters/routes";
+import SettingsMenuItem from "./settings/SettingsMenuItem.vue";
+import { notificationSettingsRoutes } from "./settings/routes";
 import { createInbox, type Inbox } from "./inbox";
 import NotificationBell from "./NotificationBell.vue";
 
@@ -17,6 +19,13 @@ export interface NotificationsFeatureOptions {
    * Default: the page, with no menu binding.
    */
   deadLetters?: { destination?: Destination } | false;
+  /**
+   * The person's own notification settings (`/profile/notifications`, route `notifications.settings`): the categories they get by e-mail
+   * and their quiet hours, reached from the account menu ("Notification settings") and from a gear in the inbox. Needs no permission, only a
+   * session. The names of the categories are the application's texts `notifications.categories.<code>.label` (and `.description`), the code
+   * split at its dots; a category without a text is shown by its code. `false` leaves the page, the menu entry and the gear out. Default true.
+   */
+  settings?: boolean;
 }
 
 /** The inbox of one session: made when the person signs in, and ended, with its stream, when the session ends or changes (signing in as somebody else included). */
@@ -44,12 +53,16 @@ function inboxOfSession(holder: ShallowRef<Inbox | null>): SessionEffect {
 export function notificationsFeature(options: NotificationsFeatureOptions = {}): Feature {
   const inbox = shallowRef<Inbox | null>(null);
   const deadLetters = options.deadLetters ?? {};
+  const settings = options.settings ?? true;
   return defineFeature({
     id: "notifications",
-    routes: deadLetters === false ? [] : deadLettersRoutes.records,
+    routes: [...(deadLetters === false ? [] : deadLettersRoutes.records), ...(settings ? notificationSettingsRoutes.records : [])],
     navigation: deadLetters !== false && deadLetters.destination ? [{ destination: deadLetters.destination, to: deadLettersRoutes.index }] : [],
-    context: provideContext(notificationsContextKey, { inbox, categories: options.categories ?? {} }),
-    contributions: [{ id: "notifications.bell", slot: "headerActions", component: NotificationBell, scope: "authenticated" }],
+    context: provideContext(notificationsContextKey, { inbox, categories: options.categories ?? {}, settings }),
+    contributions: [
+      { id: "notifications.bell", slot: "headerActions", component: NotificationBell, scope: "authenticated" },
+      ...(settings ? [{ id: "notifications.settings", slot: "accountMenu", component: SettingsMenuItem, scope: "authenticated", optional: true, order: -9 } as const] : []),
+    ],
     effects: [inboxOfSession(inbox)],
   });
 }

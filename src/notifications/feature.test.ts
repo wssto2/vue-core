@@ -163,6 +163,23 @@ describe("notificationsFeature", () => {
     expect(connections).toHaveLength(2);
     expect(bell().getAttribute("aria-label")).toBe("Notifications");
   });
+
+  it("has a gear in the inbox that opens the person's notification settings, and the account menu entry", async () => {
+    answersFor({ "GET /api/v1/notifications/preferences": jsonResponse(200, { success: true, data: { email_available: true, categories: [], quiet_hours: { enabled: true, start: 1260, end: 420 }, time_zone: "Europe/Zagreb" } }) });
+    const { application } = await start();
+    await fireEvent.click(bell());
+    await fireEvent.click(await screen.findByRole("link", { name: "Notification settings" }));
+    await waitFor(() => expect(application.router.currentRoute.value.name).toBe("notifications.settings"));
+    expect(application.router.currentRoute.value.path).toBe("/profile/notifications");
+  });
+
+  it("leaves the gear, the entry and the page out with settings: false", async () => {
+    const { application } = await start({ feature: { settings: false } });
+    await fireEvent.click(bell());
+    await waitFor(() => expect(document.querySelectorAll("[data-notification-item]")).toHaveLength(2));
+    expect(screen.queryByRole("link", { name: "Notification settings" })).toBeNull();
+    expect(application.router.hasRoute("notifications.settings")).toBe(false);
+  });
 });
 
 function answersFor(next: Record<string, Response>) {

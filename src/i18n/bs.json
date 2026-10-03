@@ -558,6 +558,20 @@
           "area_unknown": "Ta oblast ne postoji.",
           "range_invalid": "Kraj perioda je prije njegovog početka."
         }
+      },
+      "notification": {
+        "setting": {
+          "enforced": "Ovu postavku određuje vaša organizacija pa je ne možete promijeniti."
+        },
+        "email": {
+          "unavailable": "E-pošta nije dostupna pa se ne može uključiti."
+        },
+        "quiet_hours": {
+          "invalid": "Tihi sati trebaju početak i kraj koji se razlikuju."
+        },
+        "category": {
+          "unknown": "Ta vrsta obavještenja ne postoji."
+        }
       }
     },
     "shortcuts": {
@@ -917,6 +931,32 @@
         "errors": {
           "not_found": "Ovaj događaj je već vraćen u red ili više ne postoji.",
           "event_gone": "Događaj je obrisan pa se ne može ponovo poslati."
+        },
+        "all_consumers": "Svi potrošači"
+      },
+      "settings": {
+        "title": "Postavke obavještenja",
+        "description": "Odaberite šta vam stiže e-poštom i kada e-pošta čeka.",
+        "open": "Postavke obavještenja",
+        "email": {
+          "title": "Obavijesti me e-poštom o",
+          "note": "U aplikaciji stiže svako obavještenje, uvijek.",
+          "in_app": "U aplikaciji: uvijek uključeno",
+          "locked": "Određuje vaša organizacija",
+          "unavailable": "E-pošta ovdje nije dostupna pa obavještenja stižu samo u aplikaciji.",
+          "save_failed": "Postavka nije spremljena."
+        },
+        "quiet": {
+          "title": "Tihi sati",
+          "enabled": "Zadrži e-poštu tokom tihih sati",
+          "start": "Od",
+          "end": "Do",
+          "summary_on": "Između {start} i {end} ({zone}) e-pošta čeka do kraja tihih sati.",
+          "summary_off": "Tihi sati su isključeni: e-pošta se šalje čim obavještenje nastane.",
+          "same": "Od i do moraju biti različita vremena.",
+          "required": "Odaberite vrijeme.",
+          "submit": "Spremi tihe sate",
+          "saved": "Tihi sati su spremljeni."
         }
       }
     }

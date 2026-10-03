@@ -558,6 +558,20 @@
           "area_unknown": "That area does not exist.",
           "range_invalid": "The end of the range is before its start."
         }
+      },
+      "notification": {
+        "setting": {
+          "enforced": "Your organisation decides this setting, so you cannot change it."
+        },
+        "email": {
+          "unavailable": "E-mail is not available, so it cannot be turned on."
+        },
+        "quiet_hours": {
+          "invalid": "Quiet hours need a start and an end that differ."
+        },
+        "category": {
+          "unknown": "That kind of notification does not exist."
+        }
       }
     },
     "shortcuts": {
@@ -917,6 +931,32 @@
         "errors": {
           "not_found": "This event was already put back in the queue or no longer exists.",
           "event_gone": "The event was removed, so it cannot be retried."
+        },
+        "all_consumers": "All consumers"
+      },
+      "settings": {
+        "title": "Notification settings",
+        "description": "Choose what reaches you by e-mail and when e-mail waits.",
+        "open": "Notification settings",
+        "email": {
+          "title": "E-mail me about",
+          "note": "In the app every notification arrives, always.",
+          "in_app": "In the app: always on",
+          "locked": "Set by your organisation",
+          "unavailable": "E-mail is not available here, so notifications reach you in the app only.",
+          "save_failed": "The setting could not be saved."
+        },
+        "quiet": {
+          "title": "Quiet hours",
+          "enabled": "Hold e-mail during quiet hours",
+          "start": "From",
+          "end": "To",
+          "summary_on": "Between {start} and {end} ({zone}) e-mail waits until the quiet hours end.",
+          "summary_off": "Quiet hours are off: e-mail is sent as soon as a notification is made.",
+          "same": "From and to must be different times.",
+          "required": "Choose a time.",
+          "submit": "Save quiet hours",
+          "saved": "Quiet hours saved."
         }
       }
     }

@@ -558,6 +558,20 @@
           "area_unknown": "To područje ne postoji.",
           "range_invalid": "Kraj razdoblja je prije njegova početka."
         }
+      },
+      "notification": {
+        "setting": {
+          "enforced": "Ovu postavku određuje vaša organizacija pa je ne možete promijeniti."
+        },
+        "email": {
+          "unavailable": "E-pošta nije dostupna pa se ne može uključiti."
+        },
+        "quiet_hours": {
+          "invalid": "Tihi sati trebaju početak i kraj koji se razlikuju."
+        },
+        "category": {
+          "unknown": "Ta vrsta obavijesti ne postoji."
+        }
       }
     },
     "shortcuts": {
@@ -917,6 +931,32 @@
         "errors": {
           "not_found": "Ovaj događaj je već vraćen u red ili više ne postoji.",
           "event_gone": "Događaj je obrisan pa se ne može ponovno poslati."
+        },
+        "all_consumers": "Svi potrošači"
+      },
+      "settings": {
+        "title": "Postavke obavijesti",
+        "description": "Odaberite što vam stiže e-poštom i kada e-pošta čeka.",
+        "open": "Postavke obavijesti",
+        "email": {
+          "title": "Obavijesti me e-poštom o",
+          "note": "U aplikaciji stiže svaka obavijest, uvijek.",
+          "in_app": "U aplikaciji: uvijek uključeno",
+          "locked": "Određuje vaša organizacija",
+          "unavailable": "E-pošta ovdje nije dostupna pa obavijesti stižu samo u aplikaciji.",
+          "save_failed": "Postavka nije spremljena."
+        },
+        "quiet": {
+          "title": "Tihi sati",
+          "enabled": "Zadrži e-poštu tijekom tihih sati",
+          "start": "Od",
+          "end": "Do",
+          "summary_on": "Između {start} i {end} ({zone}) e-pošta čeka do kraja tihih sati.",
+          "summary_off": "Tihi sati su isključeni: e-pošta se šalje čim obavijest nastane.",
+          "same": "Od i do moraju biti različita vremena.",
+          "required": "Odaberite vrijeme.",
+          "submit": "Spremi tihe sate",
+          "saved": "Tihi sati su spremljeni."
         }
       }
     }

@@ -17,6 +17,8 @@ export interface NotificationsContext {
   /** The signed-in session's inbox; null while nobody is signed in (it is made and ended with the session). */
   readonly inbox: ShallowRef<Inbox | null>;
   readonly categories: Readonly<Record<string, NotificationCategoryLook>>;
+  /** Whether the settings page is installed: the inbox shows its gear. */
+  readonly settings: boolean;
 }
 
 export const [notificationsContextKey, useNotificationsContext] = defineFeatureContext<NotificationsContext>("vue-core.notifications");

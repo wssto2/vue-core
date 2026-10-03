@@ -558,6 +558,20 @@
           "area_unknown": "To področje ne obstaja.",
           "range_invalid": "Konec obdobja je pred njegovim začetkom."
         }
+      },
+      "notification": {
+        "setting": {
+          "enforced": "To nastavitev določa vaša organizacija, zato je ne morete spremeniti."
+        },
+        "email": {
+          "unavailable": "E-pošta ni na voljo, zato je ni mogoče vklopiti."
+        },
+        "quiet_hours": {
+          "invalid": "Tihe ure potrebujejo začetek in konec, ki se razlikujeta."
+        },
+        "category": {
+          "unknown": "Take vrste obvestila ni."
+        }
       }
     },
     "shortcuts": {
@@ -917,6 +931,32 @@
         "errors": {
           "not_found": "Ta dogodek je že vrnjen v vrsto ali ne obstaja več.",
           "event_gone": "Dogodek je bil odstranjen, zato ga ni mogoče ponovno poslati."
+        },
+        "all_consumers": "Vsi porabniki"
+      },
+      "settings": {
+        "title": "Nastavitve obvestil",
+        "description": "Izberite, kaj vam pride po e-pošti in kdaj e-pošta počaka.",
+        "open": "Nastavitve obvestil",
+        "email": {
+          "title": "Obvesti me po e-pošti o",
+          "note": "V aplikaciji prispe vsako obvestilo, vedno.",
+          "in_app": "V aplikaciji: vedno vklopljeno",
+          "locked": "Določa vaša organizacija",
+          "unavailable": "E-pošta tu ni na voljo, zato obvestila prispejo samo v aplikaciji.",
+          "save_failed": "Nastavitve ni bilo mogoče shraniti."
+        },
+        "quiet": {
+          "title": "Tihe ure",
+          "enabled": "Zadrži e-pošto med tihimi urami",
+          "start": "Od",
+          "end": "Do",
+          "summary_on": "Med {start} in {end} ({zone}) e-pošta počaka do konca tihih ur.",
+          "summary_off": "Tihe ure so izklopljene: e-pošta se pošlje takoj, ko obvestilo nastane.",
+          "same": "Od in do morata biti različna časa.",
+          "required": "Izberite čas.",
+          "submit": "Shrani tihe ure",
+          "saved": "Tihe ure so shranjene."
         }
       }
     }

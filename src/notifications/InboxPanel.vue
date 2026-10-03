@@ -10,6 +10,7 @@ import { AsyncSection, type AsyncState, type Hue } from "../state";
 import { useNotificationsContext } from "./context";
 import type { Inbox } from "./inbox";
 import MarkAllRead from "./MarkAllRead.vue";
+import SettingsLink from "./SettingsLink.vue";
 
 /**
  * The inbox: what the popover (wide screens) and the sheet (phones) show. Newest first; a tap marks the
@@ -22,7 +23,7 @@ const emit = defineEmits<{ close: [] }>();
 const { t } = useI18n();
 const router = useRouter();
 const format = useFormat();
-const { categories } = useNotificationsContext();
+const { categories, settings } = useNotificationsContext();
 
 // Written out in full so Tailwind generates every class.
 const TILES: Record<Hue, string> = {
@@ -69,7 +70,10 @@ function open(item: Item) {
     <!-- The popover carries its title and "Mark all as read" here; the sheet has the title in its header and the button in its footer. -->
     <div v-if="appearance === 'popover'" class="mb-1 flex items-center justify-between gap-2">
       <h2 class="px-1 text-headline font-semibold">{{ t("core.notifications.title") }}</h2>
-      <MarkAllRead :inbox="inbox" />
+      <div class="flex items-center gap-1">
+        <SettingsLink v-if="settings" @click="emit('close')" />
+        <MarkAllRead :inbox="inbox" />
+      </div>
     </div>
 
     <AsyncSection :state="state" :empty-title="t('core.notifications.empty_title')" :empty-description="t('core.notifications.empty_description')" empty-icon="notification3Line" @retry="inbox.load()">

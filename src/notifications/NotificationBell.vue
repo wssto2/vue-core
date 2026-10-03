@@ -8,6 +8,7 @@ import HeaderAction from "../shell/HeaderAction.vue";
 import { useNotificationsContext } from "./context";
 import InboxPanel from "./InboxPanel.vue";
 import MarkAllRead from "./MarkAllRead.vue";
+import SettingsLink from "./SettingsLink.vue";
 import { unreadBadge } from "./state";
 
 /**
@@ -15,7 +16,7 @@ import { unreadBadge } from "./state";
  * the inbox as a popover on wide screens and as a bottom sheet on phones. Contributed by `notificationsFeature`.
  */
 const { t } = useI18n();
-const { inbox } = useNotificationsContext();
+const { inbox, settings } = useNotificationsContext();
 const compact = useCompactPresentation();
 const sheet = useTemplateRef<InstanceType<typeof Sheet>>("sheet");
 
@@ -39,7 +40,10 @@ const badge = computed(() => (unread.value > 0 ? unreadBadge(unread.value) : und
       <Sheet ref="sheet" :title="t('core.notifications.title')">
         <InboxPanel :inbox="inbox" appearance="sheet" @close="sheet?.dismiss()" />
         <template #footer>
-          <div class="flex justify-center"><MarkAllRead :inbox="inbox" /></div>
+          <div class="flex items-center justify-center gap-1">
+            <SettingsLink v-if="settings" @click="sheet?.dismiss()" />
+            <MarkAllRead :inbox="inbox" />
+          </div>
         </template>
       </Sheet>
     </template>
