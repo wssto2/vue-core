@@ -1,6 +1,7 @@
 {
   "name": "@wssto2/vue-core",
   "version": "0.2.0",
+  "goCore": "v1.6.0-rc.3",
   "description": "Shared Vue 3 library for go-core applications: app shell, list / record / form pages and their controls.",
   "keywords": [
     "vue",
@@ -107,6 +108,14 @@
       "types": "./dist/phone/index.d.ts",
       "import": "./dist/phone/index.js"
     },
+    "./identity": {
+      "types": "./dist/identity/index.d.ts",
+      "import": "./dist/identity/index.js"
+    },
+    "./access": {
+      "types": "./dist/access/index.d.ts",
+      "import": "./dist/access/index.js"
+    },
     "./testing": {
       "types": "./dist/testing/index.d.ts",
       "import": "./dist/testing/index.js"
@@ -127,15 +136,18 @@
     "test": "vitest run",
     "build": "vite build && vite build -c vite.styles.config.ts && vue-tsc -p tsconfig.build.json",
     "check:consumer": "node scripts/check-consumer.mjs",
-    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run typecheck:fixtures && npm run check:docs && npm run test && npm run build && npm run check:consumer",
+    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run typecheck:fixtures && npm run check:modules && npm run check:docs && npm run test && npm run build && npm run check:consumer",
     "check:docs": "node scripts/check-docs.mjs",
-    "prepublishOnly": "npm run check"
+    "prepublishOnly": "npm run check",
+    "modules:sync": "node scripts/modules.mjs sync",
+    "check:modules": "node scripts/modules.mjs check"
   },
   "peerDependencies": {
     "tailwindcss": "^4.0.0",
     "vue": "^3.5.0",
     "vue-i18n": "^10.0.0-beta.5",
-    "vue-router": "^4.4.3"
+    "vue-router": "^4.4.3",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -168,6 +180,9 @@
   },
   "peerDependenciesMeta": {
     "tailwindcss": {
+      "optional": true
+    },
+    "zod": {
       "optional": true
     }
   }

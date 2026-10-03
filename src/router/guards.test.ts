@@ -224,3 +224,29 @@ describe("removing the guards", () => {
     expect(progress.start).not.toHaveBeenCalled();
   });
 });
+
+describe("an expired session on a protected page", () => {
+  const open = async (hold: boolean) => {
+    const made = setup(snapshotOf(1), { holdExpired: hold });
+    made.session.holdExpired(hold);
+    await made.router.push("/tickets?page=2");
+    return made;
+  };
+
+  it("goes to the login page, remembering the page, unless something asks for the password on the page", async () => {
+    const { router, session } = await open(false);
+    session.expire();
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe("login"));
+    expect(router.currentRoute.value.query.redirect).toBe("/tickets?page=2");
+  });
+
+  it("stays on the page when it is held, and leaves for the login page when the person signs out instead", async () => {
+    const { router, session } = await open(true);
+    session.expire();
+    await nextTick();
+    expect(router.currentRoute.value.fullPath).toBe("/tickets?page=2");
+    await session.signOut();
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe("login"));
+    expect(router.currentRoute.value.query.redirect).toBeUndefined(); // signed out on purpose: nothing to come back to
+  });
+});

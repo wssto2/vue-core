@@ -22,6 +22,14 @@ describe("parseSessionPayload", () => {
     expect(Object.keys(snapshot.access.permissions)).toEqual(["a:b"]);
   });
 
+  it("reads who the real person is while somebody is signed in as another, and nothing otherwise", () => {
+    const own = parseSessionPayload(mePayload(4));
+    expect(own.impersonator).toBeUndefined();
+    expect(parseSessionPayload({ ...mePayload(4), impersonator: null }).impersonator).toBeUndefined();
+    expect(parseSessionPayload({ ...mePayload(4), impersonator: { id: 1, name: "Ana" } }).impersonator).toEqual({ id: 1, name: "Ana" });
+    expect(() => parseSessionPayload({ ...mePayload(4), impersonator: { id: 1 } })).toThrow(/impersonator/);
+  });
+
   it("lets an application project its own user", () => {
     const snapshot = parseSessionPayload(mePayload(4), (raw) => {
       const { id, name } = raw as { id: number; name: string };

@@ -3,8 +3,8 @@
 import { createHttpClient } from "@wssto2/vue-core/client";
 import type { Ticket } from "./tickets/entities";
 import { ticketsRoutes } from "./tickets/routes";
-import { identityRoutes } from "./identity/routes";
-import { accessRoutes } from "./access/routes";
+import { identityRoutes } from "../../src/modules/identity/routes";
+import { accessRoutes } from "../../src/modules/access/routes";
 
 const http = createHttpClient();
 

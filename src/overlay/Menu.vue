@@ -29,6 +29,7 @@ import type { Placement } from "@floating-ui/dom";
 import { Icon } from "../icon";
 import { useAnchoredPosition } from "./anchored";
 import { INERT_SKIP_ATTR } from "./dialogStack";
+import { CLOSE_OVERLAYS_EVENT } from "./closeOverlays";
 
 /**
  * A list of commands anchored to the control that opened it: the toolbar overflow on desktop, the
@@ -188,15 +189,21 @@ watch(panel, (element) => {
   if (element) void nextTick(() => focusAt(0));
 });
 
+function onCloseOverlays() {
+  dismiss();
+}
+
 function removeListeners() {
   window.removeEventListener("keydown", onKeydown, true);
   document.removeEventListener("pointerdown", onPointerDown, true);
+  document.removeEventListener(CLOSE_OVERLAYS_EVENT, onCloseOverlays);
 }
 
 watch(isOpen, (open) => {
   if (open) {
     window.addEventListener("keydown", onKeydown, true);
     document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener(CLOSE_OVERLAYS_EVENT, onCloseOverlays);
   } else removeListeners();
 });
 

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick, ref } from "vue";
 import Modal from "../modal/Modal.vue";
 import { createTestI18n } from "../testing/i18n";
+import { closeOverlays } from "./closeOverlays";
 import Popover from "./Popover.vue";
 
 const global = { plugins: [createTestI18n()], stubs: { transition: false } };
@@ -43,6 +44,14 @@ afterEach(() => {
 });
 
 describe("Popover", () => {
+  it("closes when something takes the screen over (closeOverlays)", async () => {
+    mountPopover();
+    await toggle();
+    expect(screen.getByRole("dialog", { name: "Save filter" })).toBeTruthy();
+    closeOverlays();
+    await vi.waitFor(() => expect(screen.queryByRole("dialog", { name: "Save filter" })).toBeNull());
+  });
+
   it("is a named dialog opened by its trigger, which reports it", async () => {
     mountPopover();
     const trigger = screen.getByRole("button", { name: "Save" });

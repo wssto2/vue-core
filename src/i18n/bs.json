@@ -339,7 +339,28 @@
       "check_fields": "Provjerite označena polja.",
       "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
       "cancelled": "Zahtjev je otkazan.",
-      "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo."
+      "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo.",
+      "identity": {
+        "signin": {
+          "failed": "Pogrešno korisničko ime ili lozinka.",
+          "locked": "Previše pogrešnih lozinki. Prijava je zaključana do {locked_until}.",
+          "inactive": "Ovaj korisnički račun nije aktivan."
+        },
+        "session": {
+          "invalid": "Vaša sesija je istekla. Prijavite se ponovo."
+        },
+        "locale": {
+          "invalid": "Ovaj jezik nije podržan."
+        },
+        "impersonation": {
+          "disabled": "Prijava kao druga osoba nije omogućena.",
+          "not_active": "Niste prijavljeni kao druga osoba."
+        },
+        "account": {
+          "not_found": "Ovaj korisnički račun ne postoji.",
+          "inactive": "Ovaj korisnički račun nije aktivan."
+        }
+      }
     },
     "shortcuts": {
       "title": "Prečice na tastaturi",
@@ -352,6 +373,27 @@
         "general": "Općenito",
         "list": "Popis",
         "record": "Zapis"
+      }
+    },
+    "identity": {
+      "username": "Korisničko ime",
+      "signin": {
+        "title": "Prijavite se u svoj račun",
+        "password": "Lozinka",
+        "submit": "Prijava",
+        "required": "Obavezno polje."
+      },
+      "expired": {
+        "title": "Vaša sesija je istekla",
+        "body": "Prijavite se ponovo da nastavite gdje ste stali.",
+        "kept": "Vaše nesačuvane izmjene na ovoj stranici su zadržane.",
+        "sign_out": "Odjavi me umjesto toga"
+      },
+      "impersonation": {
+        "banner": "Prijavljeni ste kao {name}. Sve što ovdje radite, radi se u njihovo ime.",
+        "banner_short": "Prijavljeni ste kao {name}",
+        "return": "Povratak na moj račun",
+        "sign_in_as": "Prijavi se kao {name}"
       }
     }
   }

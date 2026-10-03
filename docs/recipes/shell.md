@@ -47,12 +47,13 @@ The other options are `footer` (above the account block) and `topBarEnd`. Use on
 
 ## Contributing to the shell
 
-A feature puts a component into a slot. The shell documents three:
+A feature puts a component into a slot. The shell documents four:
 
 | Slot | For |
 |---|---|
 | `headerActions` | icon buttons of the top bar (a notification bell, a search button) |
 | `accountMenu` | rows of the signed-in user's menu (a popover on desktop, a grouped sheet on phones) |
+| `banner` | a strip across the top of the whole shell, above everything (a notice that must stay in view: signed in as somebody else); a custom shell renders `<ShellOutlet name="banner" />` first |
 | `host` | components with no place of their own that must be mounted once (a command palette, a dialog host) |
 
 <!-- example: docs/examples/shell/feature.ts -->

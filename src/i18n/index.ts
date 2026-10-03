@@ -80,6 +80,21 @@ export type CoreMessages = {
       offline: string;
       cancelled: string;
       unexpected: string;
+      /** go-core's identity reasons (`identity.signin.failed` …), looked up by `describeError`. */
+      identity: {
+        signin: { failed: string; locked: string; inactive: string };
+        session: { invalid: string };
+        locale: { invalid: string };
+        impersonation: { disabled: string; not_active: string };
+        account: { not_found: string; inactive: string };
+      };
+    };
+    identity: {
+      /** The label of a login field, on the sign-in page and in the prompt of an expired session. */
+      username: string;
+      signin: { title: string; password: string; submit: string; required: string };
+      expired: { title: string; body: string; kept: string; sign_out: string };
+      impersonation: { banner: string; banner_short: string; return: string; sign_in_as: string };
     };
     startup: {
       title: string;

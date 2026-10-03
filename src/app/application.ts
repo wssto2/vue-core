@@ -371,12 +371,18 @@ export function createApplication(options: ApplicationOptions): Application {
       window.removeEventListener("error", onWindowError);
     });
 
+    // A feature with a prompt for an expired session keeps the person on their page (and the session's snapshot on screen).
+    const holdExpired = features.some((feature) => feature.holdsExpiredSession);
+    platform.session.holdExpired(holdExpired);
+    undo.push(() => platform.session.holdExpired(false));
+
     undo.push(
       installRouterGuards({
         router,
         session: platform.session,
         login,
         home,
+        holdExpired,
         prepare,
         afterNavigation: applyTitle,
         progress: options.router?.progress ?? shell?.progress,

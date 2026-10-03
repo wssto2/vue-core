@@ -2,7 +2,7 @@ import { computed, type ComputedRef } from "vue";
 import type { RouteLocationRaw, Router } from "vue-router";
 import { defineFeatureContext } from "../platform/context";
 import type { NavigationNode } from "../platform/navigation";
-import type { Session } from "../platform/session";
+import { heldSession, type Session } from "../platform/session";
 import type { Destination } from "./index";
 
 /**
@@ -123,8 +123,8 @@ export function createNavigation(options: NavigationOptions): ComputedRef<readon
   });
 
   return computed(() => {
-    const state = session.state.value;
-    return state.status === "authenticated" ? resolve(state.navigation ?? [], "") : [];
+    const held = heldSession(session.state.value);
+    return held ? resolve(held.navigation ?? [], "") : [];
   });
 }
 

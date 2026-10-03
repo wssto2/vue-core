@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session expiry sheet</title>
+<style>
+  body { margin: 0; background: #E7ECE9; font-family: Inter, system-ui, sans-serif; color: #0D1714 }
+  .board { display: grid; grid-template-columns: 820px 390px; gap: 40px; padding: 40px 48px; align-items: start }
+  h2 { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5B6763 }
+  p.note { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #465350; max-width: 780px }
+  .screen { position: relative; overflow: hidden; background: #F1F4F2; border-radius: 12px; box-shadow: 0 0 0 1px rgba(18,38,32,.11) }
+  .rail { position: absolute; inset: 0 auto 0 0; width: 200px; background: #0F211D }
+  .page { margin-left: 200px; padding: 24px 28px; height: 100% }
+  .card { background: #fff; border-radius: 10px; box-shadow: 0 0 0 1px rgba(18,38,32,.08); padding: 4px 16px }
+  .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(18,38,32,.11); font-size: 15px }
+  .row:last-child { border: 0 }
+  .row span:first-child { color: #5B6763 }
+  .scrim { position: absolute; inset: 0; background: rgba(8,18,15,.32) }
+  .sheet { position: absolute; background: #fff; box-shadow: 0 12px 40px rgba(8,18,15,.28), 0 0 0 1px rgba(18,38,32,.08); padding: 24px }
+  .sheet h3 { margin: 0 0 6px; font-size: 18px; font-weight: 600 }
+  .sheet p { margin: 0 0 16px; font-size: 14px; line-height: 1.45; color: #465350 }
+  label { display: block; font-size: 13px; color: #5B6763; margin: 0 0 6px }
+  .input { box-sizing: border-box; width: 100%; background: #EDEFEE; border: 0; border-radius: 7px; padding: 9px 10px; font: inherit; font-size: 15px; color: #0D1714 }
+  .input.focus { box-shadow: 0 0 0 2px #047857 }
+  .input.error { box-shadow: 0 0 0 2px #C62A1F }
+  .input.readonly { color: #465350 }
+  .field { margin-bottom: 12px }
+  .err { margin: 6px 0 0; font-size: 13px; color: #B42318 }
+  .primary { width: 100%; border: 0; border-radius: 8px; background: #047857; color: #fff; font: inherit; font-size: 15px; font-weight: 600; padding: 10px 12px }
+  .quiet { display: block; margin: 12px auto 0; border: 0; background: none; font: inherit; font-size: 14px; color: #465350; text-decoration: underline }
+  .kept { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; padding: 8px 10px; border-radius: 8px; background: #E1F2ED; color: #047857; font-size: 13px }
+  .phone { height: 720px }
+  .desktop { height: 470px }
+</style>
+</head>
+<body>
+<div class="board">
+<section>
+  <h2>Desktop: the page stays, a dialog asks</h2>
+  <div class="screen desktop">
+    <div class="rail"></div>
+    <div class="page">
+      <div style="font-size: 20px; font-weight: 600; margin: 0 0 16px">Ticket 1042</div>
+      <div class="card">
+        <div class="row"><span>Subject</span><span>Printer is on fire (edited)</span></div>
+        <div class="row"><span>Priority</span><span>High</span></div>
+        <div class="row"><span>Assignee</span><span>Ana Anić</span></div>
+      </div>
+    </div>
+    <div class="scrim"></div>
+    <div class="sheet" style="left: 50%; top: 50%; width: 380px; transform: translate(-50%, -50%); border-radius: 14px">
+      <h3>Your session has ended</h3>
+      <p>Sign in again to continue where you were.</p>
+      <div class="kept">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5l9-11"></path></svg>
+        Your unsaved changes on this page are kept.
+      </div>
+      <div class="field"><label>Username</label><div class="input readonly">ana</div></div>
+      <div class="field"><label for="pw1">Password</label><input id="pw1" class="input focus" type="password" value="••••••••"></div>
+      <button class="primary" type="button">Sign in</button>
+      <button class="quiet" type="button">Sign out instead</button>
+    </div>
+  </div>
+  <p class="note"><strong>Wrong password</strong>: the message sits under the password field, as on the sign-in page (<span style="color:#B42318">Invalid username or password.</span> / <em>Sign-in is locked until 14:35.</em>). <strong>Another person</strong> signing in here is not offered: the username is fixed to the person whose page this is. <strong>Escape</strong> does not dismiss it: the page behind is read-only until they sign in or choose Sign out (which discards nothing: the unsaved-changes question is asked first, as for any leave).</p>
+</section>
+
+<section>
+  <h2>Phone: a bottom sheet</h2>
+  <div class="screen phone">
+    <div style="padding: 16px">
+      <div style="font-size: 20px; font-weight: 600; margin: 0 0 16px">Ticket 1042</div>
+      <div class="card">
+        <div class="row"><span>Subject</span><span>Printer is on fire</span></div>
+        <div class="row"><span>Priority</span><span>High</span></div>
+      </div>
+    </div>
+    <div class="scrim"></div>
+    <div class="sheet" style="left: 0; right: 0; bottom: 0; border-radius: 16px 16px 0 0; padding-bottom: 32px">
+      <div style="width: 36px; height: 4px; border-radius: 2px; background: #D8DDDB; margin: -12px auto 16px"></div>
+      <h3>Your session has ended</h3>
+      <p>Sign in again to continue where you were.</p>
+      <div class="kept">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5l9-11"></path></svg>
+        Your unsaved changes are kept.
+      </div>
+      <div class="field"><label>Username</label><div class="input readonly">ana</div></div>
+      <div class="field"><label for="pw2">Password</label><input id="pw2" class="input error" type="password" value="••••"><p class="err">Invalid username or password.</p></div>
+      <button class="primary" type="button">Sign in</button>
+      <button class="quiet" type="button">Sign out instead</button>
+    </div>
+  </div>
+</section>
+</div>
+<div style="padding: 0 48px 40px"><p class="note"><strong>Questions for the owner.</strong> (1) ARV today ends the session silently and sends the person to the sign-in page, losing unsaved work; this sheet is new. Is a dialog over the page (desktop) and a bottom sheet (phone) the right look, in the style of the other sheets? (2) The username is shown fixed, not editable; the password is the only input. (3) The sheet appears only after the renewal with the refresh token failed; a person who was away and comes back to a page whose session ended while it was closed still lands on the sign-in page (nothing is on screen to keep).</p></div>
+</body>
+</html>

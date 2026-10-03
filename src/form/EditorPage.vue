@@ -105,7 +105,7 @@ function focusSection(id: string) {
     <EditorChrome v-if="chrome" :options="chrome" />
 
     <div class="grid min-w-0 grid-cols-1 items-start gap-8 lg:grid-cols-[12.5rem_minmax(0,1fr)]" data-test="editor-page">
-      <aside v-if="!compact" class="sticky top-[calc(var(--app-bar-height)+1.5rem)] hidden min-w-0 flex-col gap-4 self-start lg:flex">
+      <aside v-if="!compact" class="sticky top-[calc(var(--app-bar-height)+1.5rem+var(--shell-banner-h,0px))] hidden min-w-0 flex-col gap-4 self-start lg:flex">
         <SectionList standalone :states="states" :progress="totals" @select="focusSection" />
         <slot name="aside" />
       </aside>

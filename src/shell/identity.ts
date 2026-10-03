@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from "vue";
 import { usePlatform } from "../platform/platform";
-import type { SessionUser } from "../platform/session";
+import { heldSession, type SessionUser } from "../platform/session";
 
 /** Who is signed in, as the account menu shows them. */
 export interface ShellIdentity {
@@ -31,7 +31,7 @@ export function useShellIdentity<U extends SessionUser = SessionUser>(resolve?: 
   // The session of this application produces U; the platform only knows it as a SessionUser.
   const read = (resolve ?? defaultIdentity) as (user: SessionUser) => ShellIdentity;
   return computed(() => {
-    const state = session.state.value;
-    return state.status === "authenticated" ? read(state.user) : null;
+    const held = heldSession(session.state.value);
+    return held ? read(held.user) : null;
   });
 }

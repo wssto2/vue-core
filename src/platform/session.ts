@@ -7,9 +7,17 @@ export interface SessionUser {
   readonly id: number | string;
 }
 
+/** The real person behind a session in which somebody signed in as another (go-core `login-as`). */
+export interface SessionImpersonator {
+  readonly id: number | string;
+  readonly name: string;
+}
+
 /** What the server says about a session. */
 export interface SessionSnapshot<U extends SessionUser = SessionUser> {
   readonly user: U;
+  /** Set while the user was signed in as by somebody else: who that really is. Absent for a person's own session. */
+  readonly impersonator?: SessionImpersonator;
   /** When the session's access token expires, if the server says; renewing it is the application's effect. */
   readonly expiresAt: Date | null;
   readonly access: AccessSnapshot;
@@ -27,10 +35,20 @@ export type SessionState<U extends SessionUser = SessionUser> =
   /** Nobody has asked the server yet. */
   | { readonly status: "unknown" }
   | { readonly status: "loading" }
-  | { readonly status: "anonymous"; readonly reason: SessionEnd }
+  /** `previous` is what the session was, kept when it `expired` while someone was working: the page may stay on screen while they sign in again. */
+  | { readonly status: "anonymous"; readonly reason: SessionEnd; readonly previous?: SessionSnapshot<U> }
   | ({ readonly status: "authenticated" } & SessionSnapshot<U>)
   /** The server could not say (network, 5xx, unreadable answer): not the same as signed out. */
   | { readonly status: "failed"; readonly error: unknown };
+
+/**
+ * The session as the page around it should still show it: the signed-in one, or the one that just
+ * expired (its user, access and menu stay on screen while the person signs in again); null otherwise.
+ */
+export function heldSession<U extends SessionUser>(state: SessionState<U>): SessionSnapshot<U> | null {
+  if (state.status === "authenticated") return state;
+  return state.status === "anonymous" && state.reason === "expired" ? state.previous ?? null : null;
+}
 
 /** The seam to a backend: how to ask who is signed in and how to end the session. */
 export interface SessionAdapter<U extends SessionUser = SessionUser> {
@@ -70,6 +88,12 @@ export interface Session<U extends SessionUser = SessionUser> {
    */
   signOut(): Promise<void>;
   /**
+   * Whether an expired session keeps what it was (`previous` on the anonymous state), so the page and its shell can
+   * stay on screen while the person signs in again. Off by default; `createApplication` turns it on when a feature
+   * has a prompt for it (`holdsExpiredSession`).
+   */
+  holdExpired(enabled: boolean): void;
+  /**
    * Adds a hook `signOut()` runs while the user is still signed in. Returns the function that removes it: a
    * session effect returns it as its stop, so the hook lives exactly as long as the effect.
    */
@@ -92,6 +116,7 @@ export function createSession<U extends SessionUser = SessionUser>(
   const state = shallowRef<SessionState<U>>({ status: "unknown" });
   let epoch = 0; // bumped by every change of who is signed in
   const hooks = new Set<BeforeSignOutHook<U>>(options.beforeSignOut ? [options.beforeSignOut] : []);
+  let holdExpired = false;
   let signingOut: Promise<void> | null = null;
   let current: { controller: AbortController; promise: Promise<SessionState<U>> } | null = null;
 
@@ -130,7 +155,9 @@ export function createSession<U extends SessionUser = SessionUser>(
     const mine = epoch;
     const controller = new AbortController();
     const previous = state.value;
-    if (previous.status !== "authenticated") state.value = { status: "loading" };
+    // A session that is held on screen (signed in, or just expired) is not replaced by "loading".
+    const held = heldSession(previous) !== null;
+    if (!held) state.value = { status: "loading" };
 
     const run = async (): Promise<SessionState<U>> => {
       try {
@@ -141,7 +168,7 @@ export function createSession<U extends SessionUser = SessionUser>(
         if (epoch !== mine) return state.value;
         options.onError?.(error);
         // A transient failure must not sign a user out or throw away unsaved work.
-        state.value = previous.status === "authenticated" ? previous : { status: "failed", error };
+        state.value = held ? previous : { status: "failed", error };
       } finally {
         if (epoch === mine) current = null;
       }
@@ -162,8 +189,9 @@ export function createSession<U extends SessionUser = SessionUser>(
     },
     expire() {
       if (state.value.status !== "authenticated") return;
+      const { status: _status, ...snapshot } = state.value;
       supersede();
-      state.value = { status: "anonymous", reason: "expired" };
+      state.value = holdExpired && !state.value.impersonator ? { status: "anonymous", reason: "expired", previous: snapshot as SessionSnapshot<U> } : { status: "anonymous", reason: "expired" };
       options.onExpired?.();
     },
     signOut() {
@@ -179,6 +207,9 @@ export function createSession<U extends SessionUser = SessionUser>(
         }
       })();
       return signingOut;
+    },
+    holdExpired(enabled) {
+      holdExpired = enabled;
     },
     onBeforeSignOut(hook) {
       hooks.add(hook);
