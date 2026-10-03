@@ -1,5 +1,146 @@
 {
   "core": {
+    "access": {
+      "title": "Vloge",
+      "description": "Sklopi dovoljenj. Oseba dobi vlogo na svojem zapisu, skupaj z obsegom.",
+      "new_title": "Nova vloga",
+      "new_description": "Prilagojena vloga: izberite dovoljenja in čigave zapise zajemajo.",
+      "new_copy_description": "Kopija obstoječe vloge: dopolnitve se shranijo kot nova prilagojena vloga.",
+      "create": "Nova vloga",
+      "save": "Shrani vlogo",
+      "copy": "Kopiraj",
+      "copy_name": "{name} (kopija)",
+      "search": "Išči vloge",
+      "list_footer": "Standardne vloge so del aplikacije in se ne urejajo — Kopiraj da prilagojeno vlogo za dopolnitev.",
+      "empty": "Ni ustreznih vlog.",
+      "permissions": "Dovoljenja: {count}",
+      "holders_count": "Oseb: {count}",
+      "kinds": {
+        "all": "Vse",
+        "predefined": "Standardne",
+        "custom": "Prilagojene"
+      },
+      "role_kind": {
+        "predefined": "Standardna",
+        "custom": "Prilagojena",
+        "computed": "samodejna"
+      },
+      "groups": {
+        "role": "Vloga"
+      },
+      "fields": {
+        "name": "Naziv",
+        "description": "Opis"
+      },
+      "notes": {
+        "predefined": "Standardna vloga je del aplikacije in se ne ureja. Kopiraj da prilagojeno vlogo za dopolnitev.",
+        "computed": "Dovoljenja se dodelijo samodejno: ko aplikacija dobi novo dovoljenje, ga vloga dobi takoj, brez ročnega dodajanja. Dovoljenja z oznako Sistem imajo samo vloge, ki vodijo sistem."
+      },
+      "requires": "Zahteva: {names}.",
+      "modules": "Moduli",
+      "turn_on_all": "Vklopi vse",
+      "turn_off_all": "Izklopi vse",
+      "completed": "Vloga ni imela vseh dovoljenj, ki jih potrebujejo njena druga dovoljenja, zato so vklopljena: {names}. Shranite vlogo, da se sprememba uveljavi.",
+      "name_required": "Vnesite naziv.",
+      "too_long": "Presežena je največja dolžina.",
+      "saved": "Vloga je shranjena",
+      "deleted": "Vloga je izbrisana",
+      "sensitive": "Občutljivo",
+      "system": "Sistem",
+      "system_group": "Sistem",
+      "organization_only": "Samo cela organizacija",
+      "unowned": "Vključuje še nedodeljene zapise, da jih oseba lahko prevzame.",
+      "qualifier": {
+        "own": "Svoje",
+        "own_location": "Moja lokacija",
+        "all": "Vse"
+      },
+      "qualifier_hint": {
+        "own": "Samo zapisi, dodeljeni osebi ali jih je ustvarila",
+        "own_location": "Zapisi lokacije, kjer ima oseba vlogo",
+        "all": "Vsi zapisi na mestu, kjer ima oseba vlogo"
+      },
+      "qualifier_noun": {
+        "own": "Svoji",
+        "own_location": "Lokacije",
+        "all": "Vsi"
+      },
+      "levels": {
+        "organization": "Organizacija"
+      },
+      "compare": {
+        "action": "Primerjaj s standardno vlogo",
+        "title": "Primerjava s standardno vlogo",
+        "footer": "Pokaže, koliko se je prilagojena vloga oddaljila od standardne.",
+        "with": "Standardna vloga",
+        "loading": "Primerjam …",
+        "failed": "Primerjava ni uspela. Poskusite znova.",
+        "identical": "Vlogi se ne razlikujeta.",
+        "only_in_role": "Samo v tej vlogi ({count})",
+        "only_in_other": "Samo v standardni ({count})",
+        "different": "Drugače čigave zapise vidi ({count})",
+        "whose": "{role}, standardna: {other}"
+      },
+      "replace": {
+        "action": "Zamenjaj",
+        "title": "Zamenjaj vlogo",
+        "footer": "Vsi, ki imajo to vlogo, dobijo izbrano standardno vlogo na istem obsegu. Veljajo ista pravila kot pri dodelitvi: ne morete dati več, kot imate sami.",
+        "with": "Zamenjaj s standardno vlogo",
+        "choose": "Izberite vlogo.",
+        "confirm": "Zamenjaj",
+        "moves": "Osebe, ki preidejo na standardno vlogo: {count}.",
+        "done": "Osebe, prestavljene na standardno vlogo: {count}"
+      },
+      "delete": {
+        "action": "Izbriši vlogo",
+        "title": "Izbrisati vlogo?",
+        "body": "Vloga »{name}« se izbriše. Dokler jo kdo ima, brisanje ni mogoče — najprej jo zamenjajte.",
+        "failed": "Vloge ni bilo mogoče izbrisati."
+      },
+      "holders": {
+        "title": "Osebe s to vlogo",
+        "empty": "Trenutno te vloge nima nihče.",
+        "service": "Storitveni račun"
+      },
+      "person_roles": "Vloge",
+      "roles_footer": "Vloga pove, kaj sme oseba početi in čigave zapise vidi (svoje ali vse); mesto pove, kje. Več vlog se sešteje. Dodelite lahko samo to, kar imate sami, največ do svojega mesta.",
+      "no_roles_title": "Nobene vloge",
+      "no_roles_description": "Brez vloge ni mogoče ničesar videti ali početi. Dodajte vlogo in kje velja.",
+      "add_role": "Dodaj vlogo",
+      "remove": "Odstrani",
+      "remove_title": "Odstraniti vlogo?",
+      "remove_body": "{name} ne bo več imel(a) vloge »{role}« ({scope}).",
+      "added": "Vloga je dodana",
+      "removed": "Vloga je odstranjena",
+      "remove_failed": "Vloga ni odstranjena. Poskusite znova.",
+      "add": {
+        "confirm": "Dodaj",
+        "scope_header": "Kje velja",
+        "scope_level": "Raven",
+        "scopes_failed": "Mesta, kjer lahko dodelite vlogo, se niso naložila.",
+        "no_places": "Tej osebi ne morete nikjer dodeliti vloge.",
+        "roles_loading": "Nalagam vloge …",
+        "roles_failed": "Vloge se niso naložile. Poskusite znova.",
+        "no_roles": "Tam ne morete dodeliti nobene vloge.",
+        "role": "Vloga",
+        "role_gives": "Kaj vloga daje",
+        "role_gives_footer": "Določa vloga; spreminja se v Vlogah, ne tukaj.",
+        "choose_role": "Izberite vlogo.",
+        "choose_place": "Izberite, kje vloga velja."
+      },
+      "effective": {
+        "title": "Kaj {name} lahko",
+        "footer": "Seštevek vseh vlog osebe; spremeni se z dodajanjem ali odstranjevanjem vlog. Svoji – zapisi, dodeljeni osebi ali jih je ustvarila sama · Lokacije – zapisi njene lokacije · Vsi – vsi zapisi na mestu vloge.",
+        "empty": "Brez vlog ni nobenega dovoljenja.",
+        "from_roles": "iz vloge: {roles}",
+        "unavailable": "Izklopljeno",
+        "why_row": "{role} · {whose} · {scope}",
+        "show_why": "Zakaj",
+        "hide_why": "Skrij",
+        "all_modules": "Vseh {count} modulov",
+        "fewer_modules": "Manj modulov"
+      }
+    },
     "actions": {
       "cancel": "Prekliči",
       "close": "Zapri",
@@ -340,6 +481,14 @@
       "offline": "Strežnik ni dosegljiv. Preverite povezavo in poskusite znova.",
       "cancelled": "Zahteva je bila preklicana.",
       "unexpected": "Prišlo je do nepričakovane napake. Poskusite znova.",
+      "authz": {
+        "forbidden": "Te spremembe na tem mestu nimate pravice narediti.",
+        "escalation": "Ta vloga ima dovoljenja, ki jih sami nimate, zato je ne morete dodeliti.",
+        "self_assignment": "Vloge ne morete dodeliti sebi.",
+        "last_admin": "Ne morete odstraniti svojega zadnjega dostopa do vlog in uporabnikov.",
+        "role_in_use": "Vloga je še dodeljena osebam. Najprej jo zamenjajte ali odstranite iz njihovega dostopa.",
+        "invalid": "Vloga ali mesto nista veljavna."
+      },
       "identity": {
         "signin": {
           "failed": "Napačno uporabniško ime ali geslo.",

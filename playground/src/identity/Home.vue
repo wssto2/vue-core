@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SignInAsButton, type IdentityUser } from "@wssto2/vue-core/identity";
 import { computed } from "vue";
+import AccessLinks from "./AccessLinks.vue";
 import { usePlatform } from "@wssto2/vue-core/platform";
 
 // What the dev server's session says about the person, as the library read it.
@@ -15,6 +16,7 @@ const user = computed(() => {
   <div v-if="user" class="flex flex-col gap-2">
     <h1 class="text-large-title font-semibold text-content-strong">{{ user.name }}</h1>
     <p class="text-content-muted">{{ user.login }} · {{ user.email }} · {{ user.locale }}</p>
+    <AccessLinks />
     <!-- The dev server lets admin sign in as user (id 2): the banner appears, with the way back. -->
     <nav class="flex gap-4 text-content-link">
       <RouterLink to="/profile">My profile</RouterLink>

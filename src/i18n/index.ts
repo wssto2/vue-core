@@ -13,6 +13,64 @@ type Texts<Key extends string> = { [K in Key]: string };
  */
 export type CoreMessages = {
   core: {
+    /** The roles, bindings and effective-access screens (`@wssto2/vue-core/access`). */
+    access: {
+      title: string;
+      description: string;
+      new_title: string;
+      new_description: string;
+      new_copy_description: string;
+      create: string;
+      save: string;
+      copy: string;
+      copy_name: string;
+      search: string;
+      list_footer: string;
+      empty: string;
+      permissions: string;
+      holders_count: string;
+      kinds: { all: string; predefined: string; custom: string };
+      role_kind: { predefined: string; custom: string; computed: string };
+      groups: { role: string };
+      fields: { name: string; description: string };
+      notes: { predefined: string; computed: string };
+      requires: string;
+      modules: string;
+      turn_on_all: string;
+      turn_off_all: string;
+      completed: string;
+      name_required: string;
+      too_long: string;
+      saved: string;
+      deleted: string;
+      sensitive: string;
+      system: string;
+      system_group: string;
+      organization_only: string;
+      unowned: string;
+      qualifier: { own: string; own_location: string; all: string };
+      qualifier_hint: { own: string; own_location: string; all: string };
+      qualifier_noun: { own: string; own_location: string; all: string };
+      /** The names of hierarchy levels (`organization` is the root of an application with one level); an app adds its own under `access.levels`. */
+      levels: { organization: string };
+      compare: { action: string; title: string; footer: string; with: string; loading: string; failed: string; identical: string; only_in_role: string; only_in_other: string; different: string; whose: string };
+      replace: { action: string; title: string; footer: string; with: string; choose: string; confirm: string; moves: string; done: string };
+      delete: { action: string; title: string; body: string; failed: string };
+      holders: { title: string; empty: string; service: string };
+      person_roles: string;
+      roles_footer: string;
+      no_roles_title: string;
+      no_roles_description: string;
+      add_role: string;
+      remove: string;
+      remove_title: string;
+      remove_body: string;
+      added: string;
+      removed: string;
+      remove_failed: string;
+      add: { confirm: string; scope_header: string; scope_level: string; scopes_failed: string; no_places: string; roles_loading: string; roles_failed: string; no_roles: string; role: string; role_gives: string; role_gives_footer: string; choose_role: string; choose_place: string };
+      effective: { title: string; footer: string; empty: string; from_roles: string; unavailable: string; why_row: string; show_why: string; hide_why: string; all_modules: string; fewer_modules: string };
+    };
     actions: {
       cancel: string;
       close: string;
@@ -83,6 +141,8 @@ export type CoreMessages = {
       offline: string;
       cancelled: string;
       unexpected: string;
+      /** go-core's delegation refusals (`authz.escalation` …), looked up by `describeError`. */
+      authz: { forbidden: string; escalation: string; self_assignment: string; last_admin: string; role_in_use: string; invalid: string };
       /** go-core's identity reasons (`identity.signin.failed` …), looked up by `describeError`. */
       identity: {
         signin: { failed: string; locked: string; inactive: string };

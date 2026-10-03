@@ -1,5 +1,146 @@
 {
   "core": {
+    "access": {
+      "title": "Roles",
+      "description": "Sets of permissions. A person is given a role on their record, together with where it applies.",
+      "new_title": "New role",
+      "new_description": "A custom role: choose the permissions and whose records they reach.",
+      "new_copy_description": "A copy of an existing role: your changes are saved as a new custom role.",
+      "create": "New role",
+      "save": "Save role",
+      "copy": "Copy",
+      "copy_name": "{name} (copy)",
+      "search": "Search roles",
+      "list_footer": "Predefined roles come with the application and are not edited. Copy gives a custom role to adjust.",
+      "empty": "No roles match.",
+      "permissions": "Permissions: {count}",
+      "holders_count": "People: {count}",
+      "kinds": {
+        "all": "All",
+        "predefined": "Predefined",
+        "custom": "Custom"
+      },
+      "role_kind": {
+        "predefined": "Predefined",
+        "custom": "Custom",
+        "computed": "automatic"
+      },
+      "groups": {
+        "role": "Role"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "notes": {
+        "predefined": "A predefined role comes with the application and is not edited. Copy gives a custom role to adjust.",
+        "computed": "Its permissions are granted automatically: when the application gets a new permission, the role has it at once. Permissions marked System are held only by the roles that run the system."
+      },
+      "requires": "Requires: {names}.",
+      "modules": "Modules",
+      "turn_on_all": "Turn on all",
+      "turn_off_all": "Turn off all",
+      "completed": "The role lacked some permissions that its other permissions need, so they are switched on: {names}. Save the role to apply the change.",
+      "name_required": "Enter a name.",
+      "too_long": "The maximum length is exceeded.",
+      "saved": "Role saved",
+      "deleted": "Role deleted",
+      "sensitive": "Sensitive",
+      "system": "System",
+      "system_group": "System",
+      "organization_only": "Whole organization only",
+      "unowned": "Includes records nobody owns yet, so the person can pick them up.",
+      "qualifier": {
+        "own": "Own",
+        "own_location": "My location",
+        "all": "All"
+      },
+      "qualifier_hint": {
+        "own": "Only records assigned to the person or created by them",
+        "own_location": "Records of the location where the person holds the role",
+        "all": "Every record where the person holds the role"
+      },
+      "qualifier_noun": {
+        "own": "Own",
+        "own_location": "Location's",
+        "all": "All"
+      },
+      "levels": {
+        "organization": "Organization"
+      },
+      "compare": {
+        "action": "Compare with a predefined role",
+        "title": "Comparison with a predefined role",
+        "footer": "Shows how far the custom role has moved from the predefined one.",
+        "with": "Predefined role",
+        "loading": "Comparing…",
+        "failed": "The comparison failed. Try again.",
+        "identical": "The roles do not differ.",
+        "only_in_role": "Only in this role ({count})",
+        "only_in_other": "Only in the predefined role ({count})",
+        "different": "Different whose records ({count})",
+        "whose": "{role}, predefined: {other}"
+      },
+      "replace": {
+        "action": "Replace",
+        "title": "Replace the role",
+        "footer": "Everyone who has this role gets the chosen predefined role at the same place. The same rules apply as when giving a role: you cannot give more than you hold.",
+        "with": "Replace with predefined role",
+        "choose": "Choose a role.",
+        "confirm": "Replace",
+        "moves": "People who move to the predefined role: {count}.",
+        "done": "People moved to the predefined role: {count}"
+      },
+      "delete": {
+        "action": "Delete role",
+        "title": "Delete the role?",
+        "body": "The role “{name}” will be deleted. While anyone holds it, it cannot be deleted: replace it first.",
+        "failed": "The role could not be deleted."
+      },
+      "holders": {
+        "title": "People with this role",
+        "empty": "Nobody has this role now.",
+        "service": "Service account"
+      },
+      "person_roles": "Roles",
+      "roles_footer": "A role says what the person may do and whose records they see (their own or all); the place says where. Several roles add up. You can only give what you hold yourself, up to your own place.",
+      "no_roles_title": "No roles",
+      "no_roles_description": "Without a role there is nothing to see or do. Add a role and where it applies.",
+      "add_role": "Add role",
+      "remove": "Remove",
+      "remove_title": "Remove the role?",
+      "remove_body": "{name} will no longer have the role “{role}” ({scope}).",
+      "added": "Role added",
+      "removed": "Role removed",
+      "remove_failed": "The role was not removed. Try again.",
+      "add": {
+        "confirm": "Add",
+        "scope_header": "Where it applies",
+        "scope_level": "Level",
+        "scopes_failed": "The places where you can give a role did not load.",
+        "no_places": "You cannot give this person a role anywhere.",
+        "roles_loading": "Loading roles…",
+        "roles_failed": "The roles did not load. Try again.",
+        "no_roles": "You cannot give any role there.",
+        "role": "Role",
+        "role_gives": "What the role gives",
+        "role_gives_footer": "The role decides; it changes in Roles, not here.",
+        "choose_role": "Choose a role.",
+        "choose_place": "Choose where the role applies."
+      },
+      "effective": {
+        "title": "What {name} can do",
+        "footer": "The sum of all the person's roles; it changes by adding or removing roles. Own – records assigned to the person or created by them · Location's – records of their location · All – every record within the role's place.",
+        "empty": "Without roles there are no permissions.",
+        "from_roles": "from: {roles}",
+        "unavailable": "Switched off",
+        "why_row": "{role} · {whose} · {scope}",
+        "show_why": "Why",
+        "hide_why": "Hide",
+        "all_modules": "All {count} modules",
+        "fewer_modules": "Fewer modules"
+      }
+    },
     "actions": {
       "cancel": "Cancel",
       "close": "Close",
@@ -340,6 +481,14 @@
       "offline": "The server could not be reached. Check your connection and try again.",
       "cancelled": "The request was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again.",
+      "authz": {
+        "forbidden": "You are not allowed to make this change in that place.",
+        "escalation": "That role has permissions you do not hold yourself, so you cannot give it.",
+        "self_assignment": "You cannot give a role to yourself.",
+        "last_admin": "You cannot remove your own last access to roles and users.",
+        "role_in_use": "The role is still given to people. Replace it first or take it from their access.",
+        "invalid": "The role or the place is not valid."
+      },
       "identity": {
         "signin": {
           "failed": "Invalid username or password.",

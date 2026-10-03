@@ -19,6 +19,7 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives |
 | `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, `useDescribeError`, formatting, `HttpClient` and `ApiError` |
 | `@wssto2/vue-core/identity`, `/access` | go-core's module contracts (types, route tables) and, in `/identity`, `identityFeature` (sign-in page, language), `identityPlatform()` and `usersFeature` (users, "my profile"): [sign-in](docs/recipes/sign-in.md), [users](docs/recipes/users.md) |
+| `@wssto2/vue-core/access` (screens) | `accessFeature({ catalogue })`: roles list and editor, compare, replace, a person's roles (`PersonAccess`) and what they can do: [roles and access](docs/recipes/access.md) |
 | `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
 
 Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vue-i18n`; the library never bundles them.
@@ -226,6 +227,12 @@ declare module "@wssto2/vue-core/platform" {
     "tickets:view": true;
     "tickets:update": true;
     "accounts:view": true;
+    // go-core's access module defines these in the catalogue, so a generated union has them (the roles screens name them).
+    "iam.role:view": true;
+    "iam.role:manage": true;
+    "iam.role:delete": true;
+    "iam.user:view": true;
+    "iam.user:manage": true;
   }
 }
 
@@ -234,6 +241,7 @@ declare module "@wssto2/vue-core/router" {
     tickets: true;
     accounts: true;
     users: true;
+    "iam.roles": true;
   }
 }
 
@@ -323,6 +331,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Sign-in](docs/recipes/sign-in.md): go-core's identity module: the sign-in page, the session wiring, the language, the module's committed types, the dev server
 - [Users and profile](docs/recipes/users.md): the users list and a person's record, "my profile" with the e-mail change by code, opting out, extra sections, refusals
+- [Roles and access](docs/recipes/access.md): go-core's access module: the roles list and editor from your catalogue, a person's roles and effective access, where a role applies, the refusals
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 

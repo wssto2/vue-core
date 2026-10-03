@@ -12,6 +12,12 @@ declare module "@wssto2/vue-core/platform" {
     "records:view": true;
     "records:settings": true;
     "iam.user:impersonate": true; // the sign-in playground (identity.html): go-core's dev server lets admin sign in as user
+    // the access playground (identity.html): the permissions go-core's access module defines in the catalogue
+    "iam.role:view": true;
+    "iam.role:manage": true;
+    "iam.role:delete": true;
+    "iam.user:view": true;
+    "iam.user:manage": true;
     "records:audit": true; // the demo user does not hold this one: the dealer's audit section stays out of its navigation
   }
 }
