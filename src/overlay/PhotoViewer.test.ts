@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/vue";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick, ref, type Component } from "vue";
 import { createTestI18n } from "../testing/i18n";
 import PhotoViewer, { type PhotoViewerItem } from "./PhotoViewer.vue";
@@ -29,8 +29,8 @@ const settle = async () => {
   await nextTick();
   await nextTick();
 };
-// A leave transition ends on a frame.
-const closed = () => new Promise((resolve) => setTimeout(resolve, 50));
+// A leave transition ends on a frame; on a busy machine that frame comes late, so wait for it rather than a fixed time.
+const closed = () => vi.waitFor(() => expect(q("photo-viewer")).toBeNull(), { timeout: 2000 });
 
 function mount(list: PhotoViewerItem[] = items) {
   const viewer = ref<InstanceType<typeof PhotoViewer> | null>(null);
