@@ -603,8 +603,8 @@
           "other": "Drugo"
         },
         "areas_label": "Področja",
-        "from": "Od",
-        "to": "Do",
+        "since": "Od",
+        "until": "Do",
         "empty": "V tem obdobju ni dejanj.",
         "footer": "Tu je le tisto, kar aplikacija beleži. Dejanje, opravljeno med prijavo nekoga drugega kot oseba, to pove.",
         "actions": {

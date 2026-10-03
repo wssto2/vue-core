@@ -28,21 +28,21 @@ const { activityAreas } = useUsersContext();
 const actors = useActorNames();
 
 const area = ref("all");
-const from = ref<string | null>(null);
-const to = ref<string | null>(null);
+const since = ref<string | null>(null);
+const until = ref<string | null>(null);
 const page = ref(1);
 
 const history = useLoad(
   async ({ signal }) => {
     const id = person.id.value;
     if (id === null) return null;
-    const input = { id, page: page.value, per_page: 20, ...(area.value === "all" ? {} : { area: area.value }), ...(from.value ? { from: from.value } : {}), ...(to.value ? { to: to.value } : {}) };
+    const input = { id, page: page.value, per_page: 20, ...(area.value === "all" ? {} : { area: area.value }), ...(since.value ? { from: since.value } : {}), ...(until.value ? { to: until.value } : {}) };
     return (await http.request(identityRoutes.usersActivity, input, { signal })).data;
   },
   { watch: () => person.id.value },
 );
 // A new filter starts at its first page; rows and tabs stay on screen until the answer arrives.
-watch([area, from, to], () => {
+watch([area, since, until], () => {
   page.value = 1;
   void history.reload();
 });
@@ -84,8 +84,8 @@ const days = computed(() => {
     <div class="flex flex-wrap items-end justify-between gap-3">
       <Tabs v-model="area" :tabs="tabs" presentation="scope" :label="t('core.users.activity.areas_label')" />
       <div class="flex items-end gap-2" data-activity-range>
-        <DateField v-model="from" :label="t('core.users.activity.from')" :max="to ?? undefined" />
-        <DateField v-model="to" :label="t('core.users.activity.to')" :min="from ?? undefined" />
+        <DateField v-model="since" :label="t('core.users.activity.since')" :max="until ?? undefined" />
+        <DateField v-model="until" :label="t('core.users.activity.until')" :min="since ?? undefined" />
       </div>
     </div>
 

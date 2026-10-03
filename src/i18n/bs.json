@@ -603,8 +603,8 @@
           "other": "Ostalo"
         },
         "areas_label": "Oblasti",
-        "from": "Od",
-        "to": "Do",
+        "since": "Od",
+        "until": "Do",
         "empty": "Nema radnji u ovom periodu.",
         "footer": "Ovdje je samo ono što aplikacija bilježi. Radnja obavljena dok je neko bio prijavljen kao osoba to i kaže.",
         "actions": {

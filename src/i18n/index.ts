@@ -134,8 +134,8 @@ export type CoreMessages = {
       activity: {
         areas: Texts<"all" | "identity" | "other">;
         areas_label: string;
-        from: string;
-        to: string;
+        since: string;
+        until: string;
         empty: string;
         footer: string;
         actions: Texts<"created" | "changed" | "deleted" | "other">;

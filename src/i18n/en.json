@@ -603,8 +603,8 @@
           "other": "Other"
         },
         "areas_label": "Areas",
-        "from": "From",
-        "to": "To",
+        "since": "From",
+        "until": "To",
         "empty": "No activity in this range.",
         "footer": "Only what the application records is here. A row done while somebody was signed in as the person says so.",
         "actions": {
