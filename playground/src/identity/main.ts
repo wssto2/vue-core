@@ -4,7 +4,8 @@
 //   npm run dev                                         (in playground/, then open /identity.html)
 //
 // Sign in as admin / admin-password or user / user-password; admin may then sign in as user (the home page
-// has the button) and sees the impersonation banner with the way back. Vite forwards /api to 127.0.0.1:8090, so the
+// has the button) and sees the impersonation banner with the way back. Admin also edits roles (/iam/roles) and binds
+// seller or webmaster to a person (People); user, who holds only crm.customer:view, sees none of it. Vite forwards /api to 127.0.0.1:8090, so the
 // cookies are same-origin; the dev server also allows http://localhost:5173 directly.
 import { createApplication } from "@wssto2/vue-core/app";
 import { identityFeature, identityPlatform } from "@wssto2/vue-core/identity";
@@ -14,6 +15,8 @@ import { createWebHashHistory } from "vue-router";
 import "../app.css";
 import { shellIcons } from "../app/icons";
 import { appIcons } from "../icons";
+import { accessFeatures } from "./access";
+import { permissionMessages } from "./permissions";
 import { homeFeature } from "./home";
 
 const platform = createPlatform({
@@ -24,8 +27,9 @@ const platform = createPlatform({
 void createApplication({
   platform,
   shell: backofficeShell(),
-  features: [identityFeature(), homeFeature],
+  features: [identityFeature(), homeFeature, ...accessFeatures],
   router: { history: createWebHashHistory() },
   icons: [appIcons, shellIcons],
+  i18n: { messages: permissionMessages },
   locale: { flags: { en: "GB", hr: "HR", sl: "SI" } },
 }).mount("#app");
