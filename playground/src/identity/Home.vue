@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import type { IdentityUser } from "@wssto2/vue-core/identity";
+import { computed } from "vue";
+import { usePlatform } from "@wssto2/vue-core/platform";
+
+// What the dev server's session says about the person, as the library read it.
+const { session } = usePlatform();
+const user = computed(() => {
+  const state = session.state.value;
+  return state.status === "authenticated" ? (state.user as IdentityUser) : null;
+});
+</script>
+
+<template>
+  <div v-if="user" class="flex flex-col gap-2">
+    <h1 class="text-large-title font-semibold text-content-strong">{{ user.name }}</h1>
+    <p class="text-content-muted">{{ user.login }} · {{ user.email }} · {{ user.locale }}</p>
+  </div>
+</template>
