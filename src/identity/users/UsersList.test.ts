@@ -77,8 +77,8 @@ describe("a new user", () => {
     expect(screen.getByText("The passwords do not match.")).toBeTruthy();
   });
 
-  it("creates the person, without the repetition, and refreshes the list", async () => {
-    const { calls } = await dialog({ "POST /v1/iam/users": dataOf(person(3, "Eva")) });
+  it("creates the person, without the repetition, and opens their record", async () => {
+    const { calls, application } = await dialog({ "POST /v1/iam/users": dataOf(person(3, "Eva")), "GET /v1/iam/users/3": dataOf(person(3, "Eva")), "GET /v1/iam/users/3/sessions": dataOf({ sessions: [] }) });
     await fill(/Full name/, "Eva");
     await fill(/^Username/, "eva");
     await fill(/^E-mail/, "eva@example.test");
@@ -87,6 +87,7 @@ describe("a new user", () => {
     await fireEvent.click(screen.getByRole("button", { name: "Create user" }));
     await waitFor(() => expect(callsTo(calls, "POST", "/v1/iam/users")).toHaveLength(1));
     expect(JSON.parse(String(callsTo(calls, "POST", "/v1/iam/users")[0]!.init.body))).toEqual({ login: "eva", name: "Eva", email: "eva@example.test", locale: "en", password: "long enough password" });
-    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/users").length).toBeGreaterThan(1));
+    await waitFor(() => expect(application.router.currentRoute.value.name).toBe("users.record.general"));
+    expect(application.router.currentRoute.value.params.id).toBe("3");
   });
 });

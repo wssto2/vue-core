@@ -431,12 +431,167 @@
         "locale": "Language",
         "password": "Password",
         "password_repeat": "Repeat password"
+      },
+      "record": "User",
+      "sections_label": "Parts of the person",
+      "sections": {
+        "general": "Basic details",
+        "signin": "Sign-in",
+        "sessions": "Sessions",
+        "signins": "Sign-in history",
+        "changes": "Changes"
+      },
+      "section_groups": {
+        "person": "Person",
+        "access": "Access",
+        "activity": "Activity"
+      },
+      "intro": {
+        "general": "Who the person is. Sign-in and sessions have their own pages.",
+        "signin": "How the person signs in: the lock after wrong passwords, a new password and signing in as them.",
+        "sessions": "The devices the person is signed in on now.",
+        "signins": "Every sign-in to the person's account, successful or refused.",
+        "changes": "What was changed on the person's account and who did it."
+      },
+      "groups": {
+        "person": "Person",
+        "person_footer": "The username is what the person signs in with.",
+        "contact": "Contact"
+      },
+      "general": {
+        "saved": "Details saved",
+        "created": "Account created {when}",
+        "last_sign_in": "last signed in {when}",
+        "never_signed_in": "never signed in",
+        "all_changes": "All changes"
+      },
+      "actions": {
+        "deactivate": "Deactivate…",
+        "deactivate_short": "Deactivate",
+        "activate": "Activate"
+      },
+      "deactivate": {
+        "title": "Deactivate the person",
+        "busy": "Deactivating…",
+        "done_label": "Deactivated",
+        "done": "{name} was deactivated",
+        "row_sub": "Signs the person out on every device",
+        "signs_out": "Signed out on every device ({n})",
+        "signs_out_sub": "At once, without waiting for the session to end",
+        "cannot_sign_in": "Can no longer sign in",
+        "cannot_sign_in_sub": "Roles and history stay; activating again restores everything"
+      },
+      "activate": {
+        "title": "Activate the person?",
+        "body": "{name} will be able to sign in again. Roles and history stay as they were.",
+        "row_sub": "Lets the person sign in again; roles and history stay",
+        "done": "{name} was activated",
+        "failed": "The person was not activated. Try again."
+      },
+      "password": {
+        "title": "New password",
+        "action": "Set password",
+        "footer": "Nobody can read a password, not even an administrator; only a new one can be set. A new password signs the person out on every device and lifts their lock.",
+        "done": "Password set for {name}"
+      },
+      "signin": {
+        "lock": "Lock",
+        "lock_footer": "After repeated wrong passwords sign-in is locked for a while. Whoever unlocks it is recorded in Changes and in the sign-in history.",
+        "locked_title": "Sign-in is locked",
+        "not_locked": "Sign-in is not locked",
+        "not_locked_sub": "It locks after repeated wrong passwords.",
+        "unlocks_at": "unlocks by itself at {time}",
+        "unlock": "Unlock",
+        "unlocked": "Sign-in unlocked",
+        "unlock_failed": "Sign-in was not unlocked. Try again.",
+        "password": "Password",
+        "password_footer": "Nobody can read a password, not even an administrator; only a new one can be set. A new password signs the person out on every device and lifts their lock.",
+        "set_password": "Set a new password…",
+        "set_password_sub": "Tell it to the person in person; they can change it in My profile",
+        "as_header": "Signing in as {name}",
+        "as_title": "Sign in as this person",
+        "as_sub": "You see the application as they do, with their access.",
+        "as_footer": "It is recorded in the sign-in history with your name."
+      },
+      "sessions": {
+        "header": "Signed in on {n} devices",
+        "footer": "Signing out takes effect at once: the next click on that device leads to the sign-in. Deactivating and a new password sign the person out everywhere.",
+        "own_footer": "This is your account: you sign out your own devices in My profile.",
+        "end_all": "Sign out everywhere",
+        "end_all_title": "Sign out everywhere?",
+        "end_all_body": "{name} will have to sign in again on every device, including the sessions somebody opened by signing in as them.",
+        "ended_all": "Signed out on every device"
+      },
+      "changes": {
+        "empty": "No changes recorded.",
+        "diff": "{field}: {before} → {after}",
+        "actions": {
+          "created": "Account created",
+          "updated": "Details changed",
+          "deactivated": "Deactivated",
+          "activated": "Activated",
+          "password": "Password changed",
+          "email": "E-mail address changed",
+          "profile": "Profile changed",
+          "unknown": "Account changed"
+        },
+        "fields": {
+          "login": "Username",
+          "name": "Full name",
+          "email": "E-mail",
+          "phone": "Phone number",
+          "locale": "Language",
+          "password": "Password",
+          "active": "Status"
+        }
       }
     },
     "account": {
       "validation": {
         "required": "Required.",
         "mismatch": "The passwords do not match."
+      },
+      "somebody_else": "Somebody else",
+      "sessions": {
+        "empty": "No devices are signed in.",
+        "unknown_device": "Unknown device",
+        "last_active": "last active {when}",
+        "expires": "expires {when}",
+        "this_device": "This device",
+        "opened_by": "Signed in as · {name}",
+        "opened_by_other": "Signed in as, by somebody else",
+        "end": "Sign out",
+        "end_title": "Sign out this device?",
+        "end_body": "“{device}” is signed out at once.",
+        "ended": "Device signed out",
+        "end_failed": "Signing out failed. Try again."
+      },
+      "signins": {
+        "columns": {
+          "time": "Time",
+          "event": "Event",
+          "device": "Device",
+          "ip": "IP address"
+        },
+        "empty": "No sign-ins recorded.",
+        "footer_user": "Every sign-in attempt to the account is recorded, refused ones too.",
+        "events": {
+          "signed_in": "Signed in",
+          "wrong_password": "Wrong password",
+          "locked_out": "Locked out",
+          "refused_inactive": "Inactive account",
+          "signed_in_as": "Signed in as",
+          "unlocked": "Unlocked",
+          "signed_out_everywhere": "Signed out everywhere",
+          "session_revoked": "Session ended",
+          "unknown": "Other event"
+        },
+        "events_by": {
+          "signed_in_as": "Signed in as · {name}",
+          "unlocked": "Unlocked · {name}",
+          "signed_out_everywhere": "Signed out everywhere · {name}",
+          "session_revoked": "Session ended · {name}"
+        }
       }
     }
   }

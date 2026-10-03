@@ -431,12 +431,167 @@
         "locale": "Jezik",
         "password": "Geslo",
         "password_repeat": "Ponovite geslo"
+      },
+      "record": "Uporabnik",
+      "sections_label": "Deli osebe",
+      "sections": {
+        "general": "Osnovni podatki",
+        "signin": "Prijava",
+        "sessions": "Seje",
+        "signins": "Zgodovina prijav",
+        "changes": "Spremembe"
+      },
+      "section_groups": {
+        "person": "Oseba",
+        "access": "Dostop",
+        "activity": "Dejavnost"
+      },
+      "intro": {
+        "general": "Kdo je oseba. Prijava in seje imajo svoje strani.",
+        "signin": "Kako se oseba prijavlja: zaklep po napačnih geslih, novo geslo in prijava v njen račun.",
+        "sessions": "Naprave, na katerih je oseba trenutno prijavljena.",
+        "signins": "Vsaka prijava v račun osebe, uspešna ali zavrnjena.",
+        "changes": "Kaj je bilo spremenjeno na računu osebe in kdo je to storil."
+      },
+      "groups": {
+        "person": "Oseba",
+        "person_footer": "Z uporabniškim imenom se oseba prijavlja.",
+        "contact": "Stik"
+      },
+      "general": {
+        "saved": "Podatki so shranjeni",
+        "created": "Račun ustvarjen {when}",
+        "last_sign_in": "zadnja prijava {when}",
+        "never_signed_in": "še nikoli prijavljena",
+        "all_changes": "Vse spremembe"
+      },
+      "actions": {
+        "deactivate": "Deaktiviraj …",
+        "deactivate_short": "Deaktiviraj",
+        "activate": "Aktiviraj"
+      },
+      "deactivate": {
+        "title": "Deaktivacija osebe",
+        "busy": "Deaktiviranje …",
+        "done_label": "Deaktivirana",
+        "done": "Oseba je deaktivirana: {name}",
+        "row_sub": "Osebo odjavi z vseh naprav",
+        "signs_out": "Odjava z vseh naprav ({n})",
+        "signs_out_sub": "Takoj, brez čakanja na potek seje",
+        "cannot_sign_in": "Ne more se več prijaviti",
+        "cannot_sign_in_sub": "Vloge in zgodovina ostanejo; ob ponovni aktivaciji vse velja kot prej"
+      },
+      "activate": {
+        "title": "Aktivirati osebo?",
+        "body": "{name} se bo lahko spet prijavil(a). Vloge in zgodovina ostanejo, kot so bile.",
+        "row_sub": "Osebi spet omogoči prijavo; vloge in zgodovina ostanejo",
+        "done": "Oseba je aktivirana: {name}",
+        "failed": "Oseba ni bila aktivirana. Poskusite znova."
+      },
+      "password": {
+        "title": "Novo geslo",
+        "action": "Nastavi geslo",
+        "footer": "Gesla ne vidi nihče, niti skrbnik; nastavi se lahko le novo. Novo geslo osebo odjavi z vseh naprav in jo odklene.",
+        "done": "Geslo je nastavljeno: {name}"
+      },
+      "signin": {
+        "lock": "Zaklep",
+        "lock_footer": "Po ponavljajočih se napačnih geslih se prijava za nekaj časa zaklene. Kdor jo odklene, je zapisan pri Spremembah in v zgodovini prijav.",
+        "locked_title": "Prijava je zaklenjena",
+        "not_locked": "Prijava ni zaklenjena",
+        "not_locked_sub": "Zaklene se po ponavljajočih se napačnih geslih.",
+        "unlocks_at": "se odklene sama ob {time}",
+        "unlock": "Odkleni",
+        "unlocked": "Prijava je odklenjena",
+        "unlock_failed": "Prijava ni bila odklenjena. Poskusite znova.",
+        "password": "Geslo",
+        "password_footer": "Gesla ne vidi nihče, niti skrbnik; nastavi se lahko le novo. Novo geslo osebo odjavi z vseh naprav in jo odklene.",
+        "set_password": "Nastavi novo geslo …",
+        "set_password_sub": "Povejte ga osebi osebno; lahko ga spremeni v Mojem profilu",
+        "as_header": "Prijava v račun: {name}",
+        "as_title": "Prijava kot ta oseba",
+        "as_sub": "Aplikacijo vidite kot oseba, z njenim dostopom.",
+        "as_footer": "Zapiše se v zgodovino prijav z vašim imenom."
+      },
+      "sessions": {
+        "header": "Prijavljena na napravah: {n}",
+        "footer": "Odjava velja takoj: naslednji klik na tej napravi vodi na prijavo. Deaktivacija in novo geslo odjavita z vseh naprav.",
+        "own_footer": "To je vaš račun: svoje naprave odjavite v Mojem profilu.",
+        "end_all": "Odjavi z vseh naprav",
+        "end_all_title": "Odjaviti z vseh naprav?",
+        "end_all_body": "Oseba {name} se bo morala ponovno prijaviti na vsaki napravi, vključno s sejami, ki so jih odprli drugi s prijavo v njen račun.",
+        "ended_all": "Oseba je odjavljena z vseh naprav"
+      },
+      "changes": {
+        "empty": "Ni zabeleženih sprememb.",
+        "diff": "{field}: {before} → {after}",
+        "actions": {
+          "created": "Račun je ustvarjen",
+          "updated": "Podatki so spremenjeni",
+          "deactivated": "Deaktivirana",
+          "activated": "Aktivirana",
+          "password": "Geslo je spremenjeno",
+          "email": "E-poštni naslov je spremenjen",
+          "profile": "Profil je spremenjen",
+          "unknown": "Račun je spremenjen"
+        },
+        "fields": {
+          "login": "Uporabniško ime",
+          "name": "Ime in priimek",
+          "email": "E-pošta",
+          "phone": "Telefonska številka",
+          "locale": "Jezik",
+          "password": "Geslo",
+          "active": "Status"
+        }
       }
     },
     "account": {
       "validation": {
         "required": "Obvezno polje.",
         "mismatch": "Gesli se ne ujemata."
+      },
+      "somebody_else": "Nekdo drug",
+      "sessions": {
+        "empty": "Ni prijavljenih naprav.",
+        "unknown_device": "Neznana naprava",
+        "last_active": "zadnja dejavnost {when}",
+        "expires": "poteče {when}",
+        "this_device": "Ta naprava",
+        "opened_by": "Prijava kot · {name}",
+        "opened_by_other": "Prijava kot, nekdo drug",
+        "end": "Odjavi",
+        "end_title": "Odjaviti napravo?",
+        "end_body": "Naprava »{device}« se odjavi takoj.",
+        "ended": "Naprava je odjavljena",
+        "end_failed": "Odjava ni uspela. Poskusite znova."
+      },
+      "signins": {
+        "columns": {
+          "time": "Čas",
+          "event": "Dogodek",
+          "device": "Naprava",
+          "ip": "IP naslov"
+        },
+        "empty": "Ni zapisov o prijavah.",
+        "footer_user": "Zabeleži se vsak poskus prijave v račun, tudi zavrnjeni.",
+        "events": {
+          "signed_in": "Prijava",
+          "wrong_password": "Napačno geslo",
+          "locked_out": "Zaklenjeno",
+          "refused_inactive": "Neaktiven račun",
+          "signed_in_as": "Prijava kot",
+          "unlocked": "Odklenjeno",
+          "signed_out_everywhere": "Odjava z vseh naprav",
+          "session_revoked": "Seja končana",
+          "unknown": "Drug dogodek"
+        },
+        "events_by": {
+          "signed_in_as": "Prijava kot · {name}",
+          "unlocked": "Odklenjeno · {name}",
+          "signed_out_everywhere": "Odjava z vseh naprav · {name}",
+          "session_revoked": "Seja končana · {name}"
+        }
       }
     }
   }

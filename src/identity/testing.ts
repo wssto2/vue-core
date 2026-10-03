@@ -35,9 +35,9 @@ export function sessionOf(user: { id: number; name: string; login?: string; loca
   };
 }
 
-/** A list answer as go-core's datatable page sends it. */
+/** A list answer as go-core's datatable sends it (inside the envelope). */
 export const listOf = (rows: readonly object[], extra: object = {}) =>
-  jsonResponse(200, { success: true, data: rows, meta: { total: rows.length, page: 1, per_page: 25, last_page: 1, from: rows.length === 0 ? 0 : 1, to: rows.length, ...extra } });
+  jsonResponse(200, { success: true, data: { data: rows, total: rows.length, per_page: 25, current_page: 1, last_page: 1, from: rows.length === 0 ? 0 : 1, to: rows.length, ...extra } });
 
 /** A plain answer: `{ success: true, data }`. */
 export const dataOf = (data: unknown) => jsonResponse(200, { success: true, data });

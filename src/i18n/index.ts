@@ -109,10 +109,38 @@ export type CoreMessages = {
       status: Texts<"active" | "locked" | "inactive">;
       create: Texts<"title" | "subtitle" | "action" | "done">;
       fields: Texts<"login" | "name" | "email" | "phone" | "locale" | "password" | "password_repeat">;
+      record: string;
+      sections_label: string;
+      sections: Texts<"general" | "signin" | "sessions" | "signins" | "changes">;
+      section_groups: Texts<"person" | "access" | "activity">;
+      intro: Texts<"general" | "signin" | "sessions" | "signins" | "changes">;
+      groups: Texts<"person" | "person_footer" | "contact">;
+      general: Texts<"saved" | "created" | "last_sign_in" | "never_signed_in" | "all_changes">;
+      actions: Texts<"deactivate" | "deactivate_short" | "activate">;
+      deactivate: Texts<"title" | "busy" | "done_label" | "done" | "row_sub" | "signs_out" | "signs_out_sub" | "cannot_sign_in" | "cannot_sign_in_sub">;
+      activate: Texts<"title" | "body" | "row_sub" | "done" | "failed">;
+      password: Texts<"title" | "action" | "footer" | "done">;
+      signin: Texts<"lock" | "lock_footer" | "locked_title" | "not_locked" | "not_locked_sub" | "unlocks_at" | "unlock" | "unlocked" | "unlock_failed" | "password" | "password_footer" | "set_password" | "set_password_sub" | "as_header" | "as_title" | "as_sub" | "as_footer">;
+      sessions: Texts<"header" | "footer" | "own_footer" | "end_all" | "end_all_title" | "end_all_body" | "ended_all">;
+      changes: {
+        empty: string;
+        diff: string;
+        actions: Texts<"created" | "updated" | "deactivated" | "activated" | "password" | "email" | "profile" | "unknown">;
+        fields: Texts<"login" | "name" | "email" | "phone" | "locale" | "password" | "active">;
+      };
     };
     /** What the screens of a person's account share (their own profile and an administrator's view of them). */
     account: {
       validation: Texts<"required" | "mismatch">;
+      somebody_else: string;
+      sessions: Texts<"empty" | "unknown_device" | "last_active" | "expires" | "this_device" | "opened_by" | "opened_by_other" | "end" | "end_title" | "end_body" | "ended" | "end_failed">;
+      signins: {
+        columns: Texts<"time" | "event" | "device" | "ip">;
+        empty: string;
+        footer_user: string;
+        events: Texts<"signed_in" | "wrong_password" | "locked_out" | "refused_inactive" | "signed_in_as" | "unlocked" | "signed_out_everywhere" | "session_revoked" | "unknown">;
+        events_by: Texts<"signed_in_as" | "unlocked" | "signed_out_everywhere" | "session_revoked">;
+      };
     };
     startup: {
       title: string;

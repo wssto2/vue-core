@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplication } from "../../app";
+import { useLanguages } from "./languages";
 import { identityRoutes } from "../../modules/identity/routes";
 import type { UserDetail } from "../../modules/identity/entities";
 import type { CreateUserInput } from "../../modules/identity/schemas";
 import { CommandDialog, FormGroup, SelectField, TextField, useCommand, type FormValidator, type ValidationIssue } from "../../form";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { languageName } from "../../internal/languageName";
 import { useServerMessages } from "../fieldMessages";
 
 /**
@@ -21,7 +20,7 @@ const { http } = usePlatform();
 const application = useApplication();
 const messages = useServerMessages();
 
-const languages = computed(() => application.locales.map((code) => ({ value: code, label: languageName(code) })));
+const languages = useLanguages();
 const defaults = () => ({ login: "", name: "", email: "", phone: "", locale: application.locale.value as string | null, password: "", repeat: "" });
 
 const blank = (value: string) => value.trim() === "";

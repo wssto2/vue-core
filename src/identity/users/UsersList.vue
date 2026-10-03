@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 import { CollectionPage, useCollection, type CollectionColumns } from "../../collection";
 import { Avatar } from "../../content";
 import { useFormat } from "../../format";
@@ -11,6 +12,7 @@ import { Badge } from "../../state";
 import { MANAGE_USERS } from "./access";
 import { USER_VIEWS, userList } from "./list";
 import NewUserDialog from "./NewUserDialog.vue";
+import { usersRoutes } from "./routes";
 import { statusTone } from "./status";
 
 /**
@@ -21,6 +23,7 @@ import { statusTone } from "./status";
 const { t } = useI18n();
 const { http, access } = usePlatform();
 const format = useFormat();
+const router = useRouter();
 const dialog = useTemplateRef<InstanceType<typeof NewUserDialog>>("dialog");
 
 const columns = computed(() => [
@@ -32,7 +35,7 @@ const columns = computed(() => [
 
 const views = computed(() => USER_VIEWS.map((key) => ({ key, label: t(`core.users.views.${key}`) })));
 
-const users = useCollection(userList(http), { columns, views, state: { kind: "url", key: "query" } });
+const users = useCollection(userList(http), { columns, views, state: { kind: "url", key: "query" }, recordRoute: (user) => usersRoutes.record({ id: user.id }) });
 
 const actions = computed<PageAction[]>(() =>
   access.can(MANAGE_USERS)
@@ -53,6 +56,6 @@ const actions = computed<PageAction[]>(() =>
     <template #cell-status="{ item, compact }">
       <Badge v-if="!compact || item.status !== 'active'" :tone="statusTone(item.status)" dot>{{ t(`core.users.status.${item.status}`) }}</Badge>
     </template>
-    <NewUserDialog ref="dialog" @created="users.refresh()" />
+    <NewUserDialog ref="dialog" @created="(user) => router.push(usersRoutes.record({ id: user.id }))" />
   </CollectionPage>
 </template>
