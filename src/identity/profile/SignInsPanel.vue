@@ -31,10 +31,10 @@ watch(page, () => void history.reload());
 
 <template>
   <Panel :title="t('core.profile.signins.title')" icon="timeFill" flush data-profile-signins>
-    <div class="px-4 pt-3"><ViewTabs v-model="view" :views="SIGNIN_VIEWS" :counts="history.data.value?.meta?.views" :label-of="(key) => t(`core.account.signins.views.${key}`)" :label="t('core.profile.signins.title')" /></div>
+    <div class="px-3 pt-3"><ViewTabs v-model="view" :views="SIGNIN_VIEWS" :counts="history.data.value?.meta?.views" :label-of="(key) => t(`core.account.signins.views.${key}`)" :label="t('core.profile.signins.title')" /></div>
     <AsyncSection :state="history.state.value" :skeleton-rows="4" :is-empty="() => false" @retry="history.reload()">
       <template #default="{ value }">
-        <SignInTable :rows="value.data" />
+        <div class="px-3 pt-3"><SignInTable :rows="value.data" /></div>
         <div class="py-3"><PageBar v-model:page="page" :last-page="value.last_page" :total="value.total" /></div>
         <p class="px-4 pb-3 text-footnote text-content-muted">{{ t("core.profile.signins.footer") }}</p>
       </template>
