@@ -98,6 +98,7 @@ export type CoreMessages = {
         password: Texts<"mismatch" | "unchanged" | "weak" | "wrong">;
         phone: Texts<"invalid">;
         reauth: Texts<"locked">;
+        activity: Texts<"area_unknown" | "range_invalid">;
       };
     };
     identity: {
@@ -119,9 +120,9 @@ export type CoreMessages = {
       fields: Texts<"login" | "name" | "email" | "phone" | "locale" | "password" | "password_repeat">;
       record: string;
       sections_label: string;
-      sections: Texts<"general" | "signin" | "sessions" | "signins" | "changes">;
+      sections: Texts<"general" | "signin" | "sessions" | "signins" | "changes" | "activity">;
       section_groups: Texts<"person" | "access" | "activity">;
-      intro: Texts<"general" | "signin" | "sessions" | "signins" | "changes">;
+      intro: Texts<"general" | "signin" | "sessions" | "signins" | "changes" | "activity">;
       groups: Texts<"person" | "person_footer" | "contact">;
       general: Texts<"saved" | "created" | "last_sign_in" | "never_signed_in" | "all_changes">;
       actions: Texts<"deactivate" | "deactivate_short" | "activate">;
@@ -130,6 +131,17 @@ export type CoreMessages = {
       password: Texts<"title" | "action" | "footer" | "done">;
       signin: Texts<"lock" | "lock_footer" | "locked_title" | "not_locked" | "not_locked_sub" | "unlocks_at" | "unlock" | "unlocked" | "unlock_failed" | "password" | "password_footer" | "set_password" | "set_password_sub" | "as_header" | "as_title" | "as_sub" | "as_footer">;
       sessions: Texts<"header" | "footer" | "own_footer" | "end_all" | "end_all_title" | "end_all_body" | "ended_all">;
+      activity: {
+        areas: Texts<"all" | "identity" | "other">;
+        areas_label: string;
+        from: string;
+        to: string;
+        empty: string;
+        footer: string;
+        actions: Texts<"created" | "changed" | "deleted" | "other">;
+        signed_in_as: string;
+        signed_in_as_other: string;
+      };
       changes: {
         empty: string;
         diff: string;

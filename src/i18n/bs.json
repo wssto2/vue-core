@@ -404,6 +404,10 @@
         },
         "reauth": {
           "locked": "Previše pogrešnih lozinki. Zbog sigurnosti pokušajte ponovo nakon {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "Ta oblast ne postoji.",
+          "range_invalid": "Kraj perioda je prije njegovog početka."
         }
       }
     },
@@ -484,7 +488,8 @@
         "signin": "Prijava",
         "sessions": "Sesije",
         "signins": "Historija prijava",
-        "changes": "Promjene"
+        "changes": "Promjene",
+        "activity": "Radnje"
       },
       "section_groups": {
         "person": "Osoba",
@@ -496,7 +501,8 @@
         "signin": "Kako se osoba prijavljuje: zaključavanje nakon pogrešnih lozinki, nova lozinka i prijava u njeno ime.",
         "sessions": "Uređaji na kojima je osoba sada prijavljena.",
         "signins": "Svaka prijava u račun osobe, uspješna i neuspješna.",
-        "changes": "Šta je promijenjeno na računu osobe i ko je to uradio."
+        "changes": "Šta je promijenjeno na računu osobe i ko je to uradio.",
+        "activity": "Šta je osoba radila: zapisi koje je kreirala, promijenila ili obrisala, po oblastima i danima."
       },
       "groups": {
         "person": "Osoba",
@@ -589,6 +595,26 @@
           "password": "Lozinka",
           "active": "Status"
         }
+      },
+      "activity": {
+        "areas": {
+          "all": "Sve",
+          "identity": "Računi",
+          "other": "Ostalo"
+        },
+        "areas_label": "Oblasti",
+        "from": "Od",
+        "to": "Do",
+        "empty": "Nema radnji u ovom periodu.",
+        "footer": "Ovdje je samo ono što aplikacija bilježi. Radnja obavljena dok je neko bio prijavljen kao osoba to i kaže.",
+        "actions": {
+          "created": "Kreirala zapis",
+          "changed": "Promijenila zapis",
+          "deleted": "Obrisala zapis",
+          "other": "Uradila nešto sa zapisom"
+        },
+        "signed_in_as": "Prijava kao · {name}",
+        "signed_in_as_other": "Prijava kao, neko drugi"
       }
     },
     "account": {

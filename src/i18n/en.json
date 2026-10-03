@@ -404,6 +404,10 @@
         },
         "reauth": {
           "locked": "Too many wrong passwords. For your security, try again after {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "That area does not exist.",
+          "range_invalid": "The end of the range is before its start."
         }
       }
     },
@@ -484,7 +488,8 @@
         "signin": "Sign-in",
         "sessions": "Sessions",
         "signins": "Sign-in history",
-        "changes": "Changes"
+        "changes": "Changes",
+        "activity": "Activity"
       },
       "section_groups": {
         "person": "Person",
@@ -496,7 +501,8 @@
         "signin": "How the person signs in: the lock after wrong passwords, a new password and signing in as them.",
         "sessions": "The devices the person is signed in on now.",
         "signins": "Every sign-in to the person's account, successful or refused.",
-        "changes": "What was changed on the person's account and who did it."
+        "changes": "What was changed on the person's account and who did it.",
+        "activity": "What the person did: the records they made, changed or deleted, by area and day."
       },
       "groups": {
         "person": "Person",
@@ -589,6 +595,26 @@
           "password": "Password",
           "active": "Status"
         }
+      },
+      "activity": {
+        "areas": {
+          "all": "All",
+          "identity": "Accounts",
+          "other": "Other"
+        },
+        "areas_label": "Areas",
+        "from": "From",
+        "to": "To",
+        "empty": "No activity in this range.",
+        "footer": "Only what the application records is here. A row done while somebody was signed in as the person says so.",
+        "actions": {
+          "created": "Made a record",
+          "changed": "Changed a record",
+          "deleted": "Deleted a record",
+          "other": "Did something with a record"
+        },
+        "signed_in_as": "Signed in as · {name}",
+        "signed_in_as_other": "Signed in as, by somebody else"
       }
     },
     "account": {

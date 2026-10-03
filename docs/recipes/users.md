@@ -38,6 +38,7 @@ Install it for everyone: the server's permission catalogue decides who sees what
 | Sessions | the devices, each with **Sign out**, and **Sign out everywhere**; a session somebody opened by signing in as the person is marked. On one's own record they are only listed: one's own devices are signed out in "my profile" |
 | Sign-in history | every sign-in, successful or refused, with the device, the address and who did it when somebody else did |
 | Changes | what was changed on the account and who did it, with what changed from what to what (never a password) |
+| Activity | what the person did: the records they made, changed or deleted, by day, with the area tabs (counts from the server), a date range and the "signed in as" mark; only for `iam.user.activity:view` |
 
 **Deactivate** says what it does (signed out on every device, cannot sign in, roles and history stay) and asks once. When the application's deactivation hook refuses (`WithDeactivationHook` returns an error with a reason), the dialog stays open and says that reason: your text for it (`errors.<reason>` in the application's messages, with the error's params) or, without one, the sentence the server sent. Nobody can deactivate themselves (go-core refuses it, and the action is not offered).
 
@@ -74,11 +75,15 @@ const roles: PersonSection = {
   meta: { section: { labelKey: "people.roles", icon: "user3Line", groupKey: "core.users.section_groups.access" } },
 };
 export const withRoles = usersFeature({ sections: [roles] });
+
+// The Activity section names the application's areas (the keys the audit records) by its own texts.
+export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm", billing: "areas.billing" } });
 ```
 
 - The paths are fixed (`/users`, `/profile`) and so are the route names; link by `usersRoutes` and `profileRoutes`.
 - `destination` binds the list to the node of the backend's menu that opens it; the record keeps it highlighted.
 - `sections` adds a child route `users.record.<path>` after the feature's own. The component gets what `props` makes of the loaded person, so a feature of another module (the roles screens) is passed in by the application and identity never imports it. The section's label and icon texts are the application's keys.
+- `activityAreas` names the application's areas of the Activity section: the area key the server's audit records (`crm`) and the i18n key of its name; `all`, `identity` and `other` are the library's, and an area without a name reads as "Other".
 - `signInAs: false` leaves out "Sign in as"; otherwise `identityFeature()` must be installed too (it is checked at start-up).
 
 ## Refusals

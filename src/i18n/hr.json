@@ -404,6 +404,10 @@
         },
         "reauth": {
           "locked": "Previše pogrešnih lozinki. Zbog sigurnosti pokušajte ponovno nakon {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "To područje ne postoji.",
+          "range_invalid": "Kraj razdoblja je prije njegova početka."
         }
       }
     },
@@ -484,7 +488,8 @@
         "signin": "Prijava",
         "sessions": "Sesije",
         "signins": "Povijest prijava",
-        "changes": "Promjene"
+        "changes": "Promjene",
+        "activity": "Radnje"
       },
       "section_groups": {
         "person": "Osoba",
@@ -496,7 +501,8 @@
         "signin": "Kako se osoba prijavljuje: zaključavanje nakon pogrešnih lozinki, nova lozinka i prijava u njezino ime.",
         "sessions": "Uređaji na kojima je osoba sada prijavljena.",
         "signins": "Svaka prijava u račun osobe, uspješna i neuspješna.",
-        "changes": "Što je promijenjeno na računu osobe i tko je to učinio."
+        "changes": "Što je promijenjeno na računu osobe i tko je to učinio.",
+        "activity": "Što je osoba radila: zapisi koje je izradila, promijenila ili obrisala, po područjima i danima."
       },
       "groups": {
         "person": "Osoba",
@@ -589,6 +595,26 @@
           "password": "Lozinka",
           "active": "Status"
         }
+      },
+      "activity": {
+        "areas": {
+          "all": "Sve",
+          "identity": "Računi",
+          "other": "Ostalo"
+        },
+        "areas_label": "Područja",
+        "from": "Od",
+        "to": "Do",
+        "empty": "Nema radnji u ovom razdoblju.",
+        "footer": "Ovdje je samo ono što aplikacija bilježi. Radnja obavljena dok je netko bio prijavljen kao osoba to i kaže.",
+        "actions": {
+          "created": "Izradila zapis",
+          "changed": "Promijenila zapis",
+          "deleted": "Obrisala zapis",
+          "other": "Napravila nešto sa zapisom"
+        },
+        "signed_in_as": "Prijava kao · {name}",
+        "signed_in_as_other": "Prijava kao, netko drugi"
       }
     },
     "account": {

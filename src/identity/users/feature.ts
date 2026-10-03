@@ -19,6 +19,8 @@ export interface UsersFeatureOptions {
   profile?: boolean;
   /** The permission that shows "Sign in as" on a person's record (what the server's `AllowImpersonation` was given). Default `iam.user:impersonate`; `false` leaves the button out. */
   signInAs?: Permission | false;
+  /** Names of the application's areas in a person's Activity: the area key the audit records (`crm`) and the i18n key of its name. `all`, `identity` and `other` are the library's. An area without a key reads as "Other". */
+  activityAreas?: Readonly<Record<string, string>>;
   /** Sections the application adds to a person's record after the feature's own (their roles); each is a child route `users.record.<path>`. */
   sections?: readonly PersonSection[];
   /** The destination of the backend's menu that opens the users list. Without it the application binds the list itself. */
@@ -47,7 +49,7 @@ export function usersFeature(options: UsersFeatureOptions = {}): Feature {
   return defineFeature({
     id: "users",
     routes: [...(people ? withSections(options.sections ?? []) : []), ...(profile ? profileRoutes.records : [])],
-    context: provideContext(usersContextKey, { signInAs }),
+    context: provideContext(usersContextKey, { signInAs, activityAreas: options.activityAreas ?? {} }),
     navigation: people && options.destination ? [{ destination: options.destination, to: usersRoutes.index, within: ["users.record"] }] : [],
     // The entry of the account menu; a shell without that menu leaves it out.
     contributions: profile ? [{ id: "users.profile", slot: "accountMenu", component: ProfileMenuItem, scope: "authenticated", optional: true, order: -10 }] : [],

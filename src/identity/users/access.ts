@@ -4,3 +4,4 @@ import type { Permission } from "../../platform";
 // application's catalogue (`PermissionRegistry`) so they fit its routes, whatever it declares.
 export const VIEW_USERS = "iam.user:view" as Permission;
 export const MANAGE_USERS = "iam.user:manage" as Permission;
+export const VIEW_ACTIVITY = "iam.user.activity:view" as Permission;

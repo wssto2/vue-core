@@ -404,6 +404,10 @@
         },
         "reauth": {
           "locked": "Preveč napačnih gesel. Zaradi varnosti poskusite znova po {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "To področje ne obstaja.",
+          "range_invalid": "Konec obdobja je pred njegovim začetkom."
         }
       }
     },
@@ -484,7 +488,8 @@
         "signin": "Prijava",
         "sessions": "Seje",
         "signins": "Zgodovina prijav",
-        "changes": "Spremembe"
+        "changes": "Spremembe",
+        "activity": "Dejanja"
       },
       "section_groups": {
         "person": "Oseba",
@@ -496,7 +501,8 @@
         "signin": "Kako se oseba prijavlja: zaklep po napačnih geslih, novo geslo in prijava v njen račun.",
         "sessions": "Naprave, na katerih je oseba trenutno prijavljena.",
         "signins": "Vsaka prijava v račun osebe, uspešna ali zavrnjena.",
-        "changes": "Kaj je bilo spremenjeno na računu osebe in kdo je to storil."
+        "changes": "Kaj je bilo spremenjeno na računu osebe in kdo je to storil.",
+        "activity": "Kaj je oseba počela: zapisi, ki jih je ustvarila, spremenila ali izbrisala, po področjih in dneh."
       },
       "groups": {
         "person": "Oseba",
@@ -589,6 +595,26 @@
           "password": "Geslo",
           "active": "Status"
         }
+      },
+      "activity": {
+        "areas": {
+          "all": "Vse",
+          "identity": "Računi",
+          "other": "Drugo"
+        },
+        "areas_label": "Področja",
+        "from": "Od",
+        "to": "Do",
+        "empty": "V tem obdobju ni dejanj.",
+        "footer": "Tu je le tisto, kar aplikacija beleži. Dejanje, opravljeno med prijavo nekoga drugega kot oseba, to pove.",
+        "actions": {
+          "created": "Ustvarila zapis",
+          "changed": "Spremenila zapis",
+          "deleted": "Izbrisala zapis",
+          "other": "Naredila nekaj z zapisom"
+        },
+        "signed_in_as": "Prijava kot · {name}",
+        "signed_in_as_other": "Prijava kot, nekdo drug"
       }
     },
     "account": {

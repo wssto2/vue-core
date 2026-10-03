@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from "vue-router";
 import { defineRoutes } from "../../router";
-import { VIEW_USERS } from "./access";
+import { VIEW_ACTIVITY, VIEW_USERS } from "./access";
 
 /**
  * The routes of `usersFeature`: typed targets for links (`usersRoutes.index`, `usersRoutes.record({ id })`), and the
@@ -28,6 +28,7 @@ export const usersRoutes: UsersRoutes = defineRoutes({
       { name: "users.record.sessions", path: "sessions", component: () => import("./sections/Sessions.vue"), meta: { section: { labelKey: "core.users.sections.sessions", icon: "deviceLine", groupKey: "core.users.section_groups.access" } } },
       { name: "users.record.signins", path: "signins", component: () => import("./sections/SignIns.vue"), meta: { section: { labelKey: "core.users.sections.signins", icon: "timeFill", groupKey: "core.users.section_groups.activity" } } },
       { name: "users.record.changes", path: "changes", component: () => import("./sections/Changes.vue"), meta: { section: { labelKey: "core.users.sections.changes", icon: "edit", groupKey: "core.users.section_groups.activity" } } },
+      { name: "users.record.activity", path: "activity", component: () => import("./sections/Activity.vue"), meta: { access: VIEW_ACTIVITY, section: { labelKey: "core.users.sections.activity", icon: "listCheck", groupKey: "core.users.section_groups.activity" } } },
     ],
   },
 });

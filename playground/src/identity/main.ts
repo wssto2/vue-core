@@ -30,8 +30,9 @@ const platform = createPlatform({
 void createApplication({
   platform,
   shell: backofficeShell(),
-  features: [identityFeature(), usersFeature({ sections: [rolesStub] }), homeFeature],
+  features: [identityFeature(), usersFeature({ sections: [rolesStub], activityAreas: { crm: "areas.crm" } }), homeFeature],
   router: { history: createWebHashHistory() },
   icons: [appIcons, shellIcons],
+  i18n: { messages: { en: { areas: { crm: "Customers" } } } },
   locale: { flags: { en: "GB", hr: "HR", sl: "SI" } },
 }).mount("#app");
