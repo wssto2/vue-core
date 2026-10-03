@@ -50,7 +50,7 @@ const verbRank = (verb: string) => (VERBS.includes(verb) ? VERBS.indexOf(verb) :
  * actions held, the roles that give them, and how wide (whose records, which places). A permission the catalogue does not know (a role
  * saved before it was removed) is grouped by its module and shown by its identifier.
  */
-export function groupEffective(catalogue: PermissionCatalogue, effective: readonly EffectivePermission[], rootLevel: string): readonly EffectiveGroup[] {
+export function groupEffective(catalogue: PermissionCatalogue, effective: readonly EffectivePermission[]): readonly EffectiveGroup[] {
   const groups = new Map<string, Map<string, EffectiveScreen & { actions: EffectiveAction[]; sources: EffectiveSource[]; scopes: Scope[] }>>();
 
   for (const entry of effective) {
@@ -86,8 +86,8 @@ export function groupEffective(catalogue: PermissionCatalogue, effective: readon
       .map((screen) => ({
         ...screen,
         actions: [...screen.actions].sort((a, b) => verbRank(a.verb) - verbRank(b.verb) || a.verb.localeCompare(b.verb)),
-        // the root first: what applies everywhere is what a reader looks for
-        scopes: [...screen.scopes].sort((a, b) => Number(b.level === rootLevel) - Number(a.level === rootLevel)),
+        // the root (the place without an id) first: what applies everywhere is what a reader looks for
+        scopes: [...screen.scopes].sort((a, b) => Number(b.id === null) - Number(a.id === null)),
       }))
       .sort((a, b) => a.key.localeCompare(b.key)),
   }));

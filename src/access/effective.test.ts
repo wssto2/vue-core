@@ -14,7 +14,7 @@ describe("groupEffective", () => {
       entry("crm.customer:update", [grant("support", "own"), grant("manager", "all", dealer, 2)]),
       entry("crm.customer:view", [grant("support", "own")]),
       entry("crm.lead:view", [grant("support", "all")]),
-    ], "organization");
+    ]);
     expect(groups.map((group) => group.key)).toEqual(["crm"]);
     const [customers, leads] = groups[0]?.screens ?? [];
     expect(customers?.key).toBe("crm_customer");
@@ -26,12 +26,12 @@ describe("groupEffective", () => {
   });
 
   it("marks a screen whose every action is switched off for the tenant", () => {
-    const [group] = groupEffective(catalogue, [entry("crm.lead:view", [grant("support", "all")], true)], "organization");
+    const [group] = groupEffective(catalogue, [entry("crm.lead:view", [grant("support", "all")], true)]);
     expect(group?.screens[0]?.allUnavailable).toBe(true);
   });
 
   it("leaves out a permission with no grant, puts system ones last and shows an unknown one by its module", () => {
-    const groups = groupEffective(catalogue, [entry("iam.role:manage", [grant("admin", "all")]), entry("crm.lead:view", []), entry("gone.old:view", [grant("old", "all")])], "organization");
+    const groups = groupEffective(catalogue, [entry("iam.role:manage", [grant("admin", "all")]), entry("crm.lead:view", []), entry("gone.old:view", [grant("old", "all")])]);
     expect(groups.map((group) => group.key)).toEqual(["gone", "system"]);
     expect(groups[0]?.screens[0]?.key).toBe("gone_old");
   });

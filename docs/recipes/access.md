@@ -78,7 +78,7 @@ A role's `attrs` (go-core's constraints on a role, your own business) are shown 
 
 ## Where a role applies
 
-A person's roles carry a place: a level of your hierarchy and, below the root, one of its places. The library knows no level names: *Add role* asks the server (`GET /v1/iam/users/:id/scopes`) which places this person may be given roles at and the actor may give, reads the hierarchy off them (each place says its parent level), and offers the level (narrowest first, the usual whole-parent level chosen) and the chain of places down to it, with only the places that can complete a choice. Then it asks which roles the actor may give *there* (`GET /v1/iam/bindable-roles`, delegation already applied). **An application with one level asks nothing:** no level, no place, the role is bound at the root (`rootLevel`, `organization` by default, go-core's own).
+A person's roles carry a place: a level of your hierarchy and, below the root, one of its places. The library knows no level names: *Add role* asks the server (`GET /v1/iam/users/:id/scopes`) which places this person may be given roles at and the actor may give, reads the hierarchy off them (each place says its parent level), and offers the level (narrowest first, the usual whole-parent level chosen) and the chain of places down to it, with only the places that can complete a choice. Then it asks which roles the actor may give *there* (`GET /v1/iam/bindable-roles`, delegation already applied). **An application with one level asks nothing:** no level, no place, the role is bound at the root (the `root_level` the server names).
 
 Two things come from your application, as options of `accessFeature`:
 

@@ -6,13 +6,14 @@ const place = (level: string, id: number, name: string, parent: [string, number 
 
 // organization > dealer > location; dealer 3 has two locations, dealer 4 none
 const options: ScopeOptions = {
+  root_level: "organization",
   root: true,
   places: [place("dealer", 3, "Auto Zagreb", ["organization", null]), place("dealer", 4, "Auto Split", ["organization", null]), place("location", 7, "Zagreb Sjever", ["dealer", 3]), place("location", 8, "Zagreb Jug", ["dealer", 3])],
 };
 
 describe("scopeLevels", () => {
   it("lists the levels narrowest first with their chains, the root last", () => {
-    expect(scopeLevels(options, "organization")).toEqual([
+    expect(scopeLevels(options)).toEqual([
       { level: "location", chain: ["dealer", "location"] },
       { level: "dealer", chain: ["dealer"] },
       { level: "organization", chain: [] },
@@ -20,13 +21,13 @@ describe("scopeLevels", () => {
   });
 
   it("leaves the root out when roles may not be given there, and has only the root for an application with one level", () => {
-    expect(scopeLevels({ ...options, root: false }, "organization").map((entry) => entry.level)).toEqual(["location", "dealer"]);
-    expect(scopeLevels({ root: true, places: [] }, "organization")).toEqual([{ level: "organization", chain: [] }]);
+    expect(scopeLevels({ ...options, root: false }).map((entry) => entry.level)).toEqual(["location", "dealer"]);
+    expect(scopeLevels({ root_level: "organization", root: true, places: [] })).toEqual([{ level: "organization", chain: [] }]);
   });
 
   it("starts at the broadest level below the root", () => {
-    expect(defaultLevel(scopeLevels(options, "organization"))?.level).toBe("dealer");
-    expect(defaultLevel(scopeLevels({ root: true, places: [] }, "organization"))?.level).toBe("organization");
+    expect(defaultLevel(scopeLevels(options))?.level).toBe("dealer");
+    expect(defaultLevel(scopeLevels({ root_level: "organization", root: true, places: [] }))?.level).toBe("organization");
     expect(defaultLevel([])).toBeNull();
   });
 });

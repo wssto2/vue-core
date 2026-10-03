@@ -12,20 +12,20 @@ export interface ScopeLevel {
  * narrowest first, then the root when roles may be given there. The hierarchy is read off the places (each says its parent level), so
  * the library knows no level names.
  */
-export function scopeLevels(options: ScopeOptions, rootLevel: string): readonly ScopeLevel[] {
+export function scopeLevels(options: ScopeOptions): readonly ScopeLevel[] {
   const parentOf = new Map<string, string>();
   for (const place of options.places) parentOf.set(place.level, place.parent_level);
   const chainOf = (level: string): string[] => {
     const chain = [level];
     const seen = new Set(chain);
-    for (let parent = parentOf.get(level); parent !== undefined && parent !== rootLevel && parentOf.has(parent) && !seen.has(parent); parent = parentOf.get(parent)) {
+    for (let parent = parentOf.get(level); parent !== undefined && parent !== options.root_level && parentOf.has(parent) && !seen.has(parent); parent = parentOf.get(parent)) {
       chain.unshift(parent);
       seen.add(parent);
     }
     return chain;
   };
   const levels = [...parentOf.keys()].map((level): ScopeLevel => ({ level, chain: chainOf(level) })).sort((a, b) => b.chain.length - a.chain.length || a.level.localeCompare(b.level));
-  return options.root ? [...levels, { level: rootLevel, chain: [] }] : levels;
+  return options.root ? [...levels, { level: options.root_level, chain: [] }] : levels;
 }
 
 /** Where to start: the broadest level below the root (the usual choice), else the root. */

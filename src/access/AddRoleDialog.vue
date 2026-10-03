@@ -21,7 +21,7 @@ const emit = defineEmits<{ added: [binding: Binding] }>();
 const { t } = useI18n();
 const labels = useAccessLabels();
 const api = useAccessApi();
-const { catalogue, rootLevel, scopes: loadScopes } = useAccessContext();
+const { catalogue, scopes: loadScopes } = useAccessContext();
 
 interface Draft {
   level: string | null;
@@ -33,7 +33,7 @@ const validator: FormValidator<{ level: string; place: number | null; role: stri
   safeParse(input) {
     const draft = input as Draft;
     const issues = [
-      ...(draft.level === null || (draft.level !== rootLevel && draft.place === null) ? [{ path: ["level"], message: t("core.access.add.choose_place") }] : []),
+      ...(draft.level === null || (draft.level !== options.value?.root_level && draft.place === null) ? [{ path: ["level"], message: t("core.access.add.choose_place") }] : []),
       ...(draft.role === null ? [{ path: ["role"], message: t("core.access.add.choose_role") }] : []),
     ];
     return issues.length === 0 ? { success: true, data: { level: draft.level as string, place: draft.place, role: draft.role as string } } : { success: false, error: { issues } };
@@ -59,7 +59,7 @@ const roles = ref<readonly Role[]>([]);
 const rolesLoading = ref(false);
 const rolesFailed = ref(false);
 
-const levels = computed(() => (options.value ? scopeLevels(options.value, rootLevel) : []));
+const levels = computed(() => (options.value ? scopeLevels(options.value) : []));
 const level = computed<ScopeLevel | null>(() => levels.value.find((entry) => entry.level === values.level) ?? null);
 /** One level only (the root): there is nothing to ask. */
 const askLevel = computed(() => levels.value.length > 1);
@@ -130,7 +130,7 @@ const whoseRows = computed(() => {
   }
   return [...held].map(([ownable, qualifier]) => ({ ownable, qualifier }));
 });
-const scopeText = computed(() => labels.scopeLabel({ level: values.level ?? rootLevel, name: placeName.value }));
+const scopeText = computed(() => labels.scopeLabel({ level: values.level ?? options.value?.root_level ?? "", name: placeName.value }));
 
 async function present() {
   options.value = null;

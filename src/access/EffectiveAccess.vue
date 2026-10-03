@@ -18,11 +18,11 @@ import { useAccessLabels } from "./labels";
 const props = defineProps<{ effective: readonly EffectivePermission[]; name: string }>();
 
 const { t } = useI18n();
-const { catalogue, rootLevel } = useAccessContext();
+const { catalogue } = useAccessContext();
 const labels = useAccessLabels();
 const compact = useCompactPresentation();
 
-const groups = computed(() => groupEffective(catalogue, props.effective, rootLevel));
+const groups = computed(() => groupEffective(catalogue, props.effective));
 const showAll = ref(false);
 const shown = computed(() => (compact.value && !showAll.value ? groups.value.slice(0, 3) : groups.value));
 const open = ref<Record<string, boolean>>({});

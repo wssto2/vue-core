@@ -12,8 +12,6 @@ export interface AccessFeatureOptions {
    * The role editor's tree is this catalogue; the texts are the application's (`labelKey`, `access.modules.<module>`, ...).
    */
   catalogue: PermissionCatalogue;
-  /** The hierarchy's top level, where a role is bound for the whole application. Default `organization`, go-core's own. */
-  rootLevel?: string;
   /** Where a holder's name leads (their record). Default: nowhere, the name is not a link. */
   subjectRoute?: (subject: SubjectRef) => RouteLocationRaw | null;
   /** The places a person may be given roles at. Default: what the server says (`GET /v1/iam/users/:id/scopes`). */
@@ -36,7 +34,6 @@ export function accessFeature(options: AccessFeatureOptions): Feature {
     routes: accessPages.records,
     context: provideContext(accessContextKey, {
       catalogue: options.catalogue,
-      rootLevel: options.rootLevel ?? "organization",
       subjectRoute: options.subjectRoute ?? (() => null),
       scopes: options.scopes ?? null,
     }),

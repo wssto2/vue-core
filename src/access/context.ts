@@ -6,8 +6,6 @@ import type { PermissionCatalogue } from "./catalogue";
 /** What the access screens need from the feature that installed them. */
 export interface AccessContext {
   readonly catalogue: PermissionCatalogue;
-  /** The hierarchy's top level, where a role is bound for the whole application. */
-  readonly rootLevel: string;
   /** Where a holder's name leads (their record), or null for a name that is not a link. */
   readonly subjectRoute: (subject: SubjectRef) => RouteLocationRaw | null;
   /** The places `subject` may be given roles at; by default what the server says (`GET /v1/iam/users/:id/scopes`). */

@@ -98,7 +98,7 @@ describe("adding a role", () => {
 
   it("asks nothing about where in an application with one level, and binds at the root", async () => {
     let body: unknown = null;
-    const scopes: ScopeOptions = { root: true, places: [] };
+    const scopes: ScopeOptions = { root_level: "organization", root: true, places: [] };
     const { calls } = await mount({
       "GET /v1/iam/users/4/access": data(access({ bindings: [], effective: [] })),
       "GET /v1/iam/users/4/scopes": data(scopes),
@@ -119,6 +119,7 @@ describe("adding a role", () => {
   it("asks where first when the hierarchy has levels: the level, then the places down to it, and offers the roles of that place", async () => {
     let body: unknown = null;
     const scopes: ScopeOptions = {
+      root_level: "organization",
       root: true,
       places: [
         { level: "dealer", id: 3, name: "Auto Zagreb", parent_level: "organization", parent_id: null },
@@ -148,7 +149,7 @@ describe("adding a role", () => {
   });
 
   it("says why a role was refused, in the dialog", async () => {
-    const scopes: ScopeOptions = { root: true, places: [] };
+    const scopes: ScopeOptions = { root_level: "organization", root: true, places: [] };
     await mount({
       "GET /v1/iam/users/4/access": data(access({ bindings: [], effective: [] })),
       "GET /v1/iam/users/4/scopes": data(scopes),
@@ -164,7 +165,7 @@ describe("adding a role", () => {
   });
 
   it("tells when there is nowhere to give a role", async () => {
-    await mount({ "GET /v1/iam/users/4/access": data(access({ bindings: [], effective: [] })), "GET /v1/iam/users/4/scopes": data({ root: false, places: [] }) });
+    await mount({ "GET /v1/iam/users/4/access": data(access({ bindings: [], effective: [] })), "GET /v1/iam/users/4/scopes": data({ root_level: "organization", root: false, places: [] }) });
     await screen.findByText("No roles");
     await fireEvent.click(within(queryTest("add-role") as HTMLElement).getByRole("button", { name: "Add role" }));
     await findTest("no-places");
@@ -173,7 +174,7 @@ describe("adding a role", () => {
 });
 
 describe("the application's adapters", () => {
-  it("takes the places from the adapter instead of the server, and the root level from the application", async () => {
+  it("takes the places, and the root level they name, from the adapter instead of the server", async () => {
     let body: unknown = null;
     const asked: number[] = [];
     running = await startAccess(
@@ -184,7 +185,7 @@ describe("the application's adapters", () => {
       },
       [accessPermissions.viewAccess, accessPermissions.manageBindings],
       "/people/4",
-      { rootLevel: "company", scopes: async (subject) => (asked.push(subject.id), { root: true, places: [] }) }, // /scopes has no answer: asking the server would fail the test
+      { scopes: async (subject) => (asked.push(subject.id), { root_level: "company", root: true, places: [] }) }, // /scopes has no answer: asking the server would fail the test
       [personFeature],
     );
     await screen.findByText("No roles");
