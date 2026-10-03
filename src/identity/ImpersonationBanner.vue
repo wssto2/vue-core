@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref, useTemplateRef, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { Icon } from "../icon";
@@ -26,6 +26,25 @@ const name = computed(() => {
 });
 const returning = ref(false);
 
+// The shell's sidebar gives the banner's height back to the window (`--shell-banner-h`).
+const strip = useTemplateRef<HTMLElement>("strip");
+let observer: ResizeObserver | null = null;
+watchEffect(() => {
+  observer?.disconnect();
+  observer = null;
+  const element = strip.value;
+  if (!element) return void document.documentElement.style.removeProperty("--shell-banner-h");
+  if (typeof ResizeObserver === "undefined") return;
+  const publish = () => document.documentElement.style.setProperty("--shell-banner-h", `${element.offsetHeight}px`);
+  observer = new ResizeObserver(publish);
+  observer.observe(element);
+  publish();
+}, { flush: "post" });
+onBeforeUnmount(() => {
+  observer?.disconnect();
+  document.documentElement.style.removeProperty("--shell-banner-h");
+});
+
 async function leave() {
   returning.value = true;
   try {
@@ -41,7 +60,7 @@ async function leave() {
 </script>
 
 <template>
-  <div v-if="impersonator" role="status" data-impersonation-banner
+  <div v-if="impersonator" ref="strip" role="status" data-impersonation-banner
     class="flex flex-wrap items-center gap-x-3 gap-y-1.5 bg-status-warning-surface px-4 py-2 text-subheadline text-status-warning-content shadow-[inset_0_-1px_0_rgb(154_74_7/0.25)]">
     <Icon name="informationLine" :size="18" class="shrink-0 compact:hidden" />
     <span class="min-w-0 flex-1">

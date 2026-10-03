@@ -3,7 +3,8 @@
 //   go run github.com/wssto2/go-core/cmd/devserver      (in a go-core checkout, or by module path)
 //   npm run dev                                         (in playground/, then open /identity.html)
 //
-// Sign in as admin / admin-password or user / user-password. Vite forwards /api to 127.0.0.1:8090, so the
+// Sign in as admin / admin-password or user / user-password; admin may then sign in as user (the home page
+// has the button) and sees the impersonation banner with the way back. Vite forwards /api to 127.0.0.1:8090, so the
 // cookies are same-origin; the dev server also allows http://localhost:5173 directly.
 import { createApplication } from "@wssto2/vue-core/app";
 import { identityFeature, identityPlatform } from "@wssto2/vue-core/identity";
