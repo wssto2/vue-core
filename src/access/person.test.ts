@@ -171,3 +171,45 @@ describe("adding a role", () => {
     await settle();
   });
 });
+
+describe("the application's adapters", () => {
+  it("takes the places from the adapter instead of the server, and the root level from the application", async () => {
+    let body: unknown = null;
+    const asked: number[] = [];
+    running = await startAccess(
+      {
+        "GET /v1/iam/users/4/access": data(access({ bindings: [], effective: [] })),
+        "GET /v1/iam/bindable-roles": data({ roles: [seller] }),
+        "POST /v1/iam/users/4/bindings": (call: { init: RequestInit }) => ((body = JSON.parse(String(call.init.body))), data(binding(12, sellerRow))),
+      },
+      [accessPermissions.viewAccess, accessPermissions.manageBindings],
+      "/people/4",
+      { rootLevel: "company", scopes: async (subject) => (asked.push(subject.id), { root: true, places: [] }) }, // /scopes has no answer: asking the server would fail the test
+      [personFeature],
+    );
+    await screen.findByText("No roles");
+    await fireEvent.click(within(queryTest("add-role") as HTMLElement).getByRole("button", { name: "Add role" }));
+    await findTest("bindable-roles");
+    expect(asked).toEqual([4]);
+    await fireEvent.click(screen.getByRole("option", { name: /Seller/ }).querySelector("button") as HTMLElement);
+    await fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    await waitFor(() => expect(body).toEqual({ role_ref: "seller", level: "company", scope_id: null }));
+  });
+
+  it("makes a holder's name a link where the application says their record is", async () => {
+    running = await startAccess(
+      {
+        "GET /v1/iam/roles/7": data(support),
+        "GET /v1/iam/roles/7/holders": data({ holders: [{ subject: { kind: "user", id: 4 }, name: "Ana Anić", scope: root }, { subject: { kind: "service", id: 9 }, name: "Importer", scope: root }] }),
+      },
+      [accessPermissions.viewRoles],
+      "/iam/roles/7",
+      { subjectRoute: (subject) => (subject.kind === "user" ? { name: "person" } : null) },
+      [personFeature],
+    );
+    const ana = await screen.findByText("Ana Anić");
+    expect(ana.closest("a")?.getAttribute("href")).toBe("/people/4");
+    expect(screen.getByText("Importer").closest("a")).toBeNull();
+    expect(screen.getByText("Service account")).toBeTruthy();
+  });
+});
