@@ -7,6 +7,7 @@ import { Popover } from "../overlay";
 import HeaderAction from "../shell/HeaderAction.vue";
 import { useNotificationsContext } from "./context";
 import InboxPanel from "./InboxPanel.vue";
+import MarkAllRead from "./MarkAllRead.vue";
 import { unreadBadge } from "./state";
 
 /**
@@ -37,6 +38,9 @@ const badge = computed(() => (unread.value > 0 ? unreadBadge(unread.value) : und
       <HeaderAction icon="notification3Line" :label="label" :badge="badge" data-notification-bell @click="sheet?.present(); inbox.load()" />
       <Sheet ref="sheet" :title="t('core.notifications.title')">
         <InboxPanel :inbox="inbox" appearance="sheet" @close="sheet?.dismiss()" />
+        <template #footer>
+          <div class="flex justify-center"><MarkAllRead :inbox="inbox" /></div>
+        </template>
       </Sheet>
     </template>
   </template>

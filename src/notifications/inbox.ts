@@ -96,7 +96,7 @@ export function createInbox(options: InboxOptions): Inbox {
   }
 
   async function loadMore(): Promise<void> {
-    const oldest = items.value.at(-1)?.id;
+    const oldest = items.value[items.value.length - 1]?.id;
     if (!hasMore.value || more.value === "loading" || oldest === undefined) return;
     const mine = generation;
     more.value = "loading";

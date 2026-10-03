@@ -9,6 +9,7 @@ import type { Item } from "../modules/notification/entities";
 import { AsyncSection, type AsyncState, type Hue } from "../state";
 import { useNotificationsContext } from "./context";
 import type { Inbox } from "./inbox";
+import MarkAllRead from "./MarkAllRead.vue";
 
 /**
  * The inbox: what the popover (wide screens) and the sheet (phones) show. Newest first; a tap marks the
@@ -65,11 +66,10 @@ function open(item: Item) {
 
 <template>
   <div data-notification-inbox class="w-full min-w-0 sm:w-96">
-    <div class="mb-1 flex items-center gap-2" :class="appearance === 'popover' ? 'justify-between' : 'justify-end'">
-      <h2 v-if="appearance === 'popover'" class="px-1 text-headline font-semibold">{{ t("core.notifications.title") }}</h2>
-      <Button prominence="plain" size="sm" icon="checkDoubleLine" data-notification-mark-all :disabled="inbox.unreadCount.value === 0" @click="inbox.markAllRead()">
-        {{ t("core.notifications.mark_all_read") }}
-      </Button>
+    <!-- The popover carries its title and "Mark all as read" here; the sheet has the title in its header and the button in its footer. -->
+    <div v-if="appearance === 'popover'" class="mb-1 flex items-center justify-between gap-2">
+      <h2 class="px-1 text-headline font-semibold">{{ t("core.notifications.title") }}</h2>
+      <MarkAllRead :inbox="inbox" />
     </div>
 
     <AsyncSection :state="state" :empty-title="t('core.notifications.empty_title')" :empty-description="t('core.notifications.empty_description')" empty-icon="notification3Line" @retry="inbox.load()">

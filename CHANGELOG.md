@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+The screens for go-core's notification module (in-app notifications) and the failed events of its event queue. Built and checked against go-core `v1.7.0-rc.1`.
+
+### Requires
+- go-core **`v1.7.0-rc.1`** or later on the server (`package.json` `"goCore"`); the committed module types are now written by it (`src/modules/notification`, `src/modules/events`; identity and access are unchanged).
+
+### Notifications (`/notifications`, new)
+- `notificationsFeature({ categories?, deadLetters? })`: the bell in the shell's `headerActions` (unread count, `99+`), the inbox it opens (a popover on wide screens, a bottom sheet on phones: newest first, "Show older" by `before_id`, unread marked, relative time, a category icon and hue; a tap marks the notification read and opens its link through the router; "Mark all as read" sends the newest id the inbox shows, so one that arrives meanwhile stays unread) and the live stream behind it. The stream is read with `fetch` through the session's cookies, reconnects with a 1 s to 30 s backoff after refetching the count, drops a connection silent for two heartbeats, catches up when the page returns to the foreground or the network returns, and is ended and cleared with the session (sign-out, expiry, signing in as somebody else).
+- The failed events page (`/events/dead-letters`, route `events.deadletters`, `events.deadletter:view`): the dead letters of every consumer with a consumer filter and paging; "Retry" and "Retry all for this consumer" (after a question) behind `events.deadletter:retry`. `deadLettersRoutes`, `notificationRoutes`, `eventsRoutes` and the wire types are exported; `deadLetters: { destination }` binds the menu, `deadLetters: false` leaves the page out.
+- Texts `core.notifications.*` and `core.notifications.dead_letters.*` in en, hr, bs, sl. Playground: `identity.html` has the bell and "Send a test notification". Recipe "Notifications".
+- Core icons `notification3Line` and `checkDoubleLine`.
+
+### Changes to existing behaviour
+- `defineCollection({ query: { search: false } })` leaves the search field out of the toolbar (`collection.searchable`); the default is unchanged.
+- The desktop sidebar is stacked above the page toolbar (`z-30`), so a popover opened from the rail is not painted under the page.
+
 ## 0.3.0 — 2026-10-03
 
 The screens for go-core's identity and access modules: sign-in, the session-expiry prompt, impersonation, users and "my profile", a person's activity, roles and access; and typed routes on the HTTP client. Built and checked against go-core `v1.6.0`.

@@ -11,8 +11,13 @@
 // activity, roles) and "My profile"; user sees only "My profile" (account menu). E-mail codes of an address change are
 // printed in the dev server's log. Admin also edits roles (/iam/roles) and gives roles from a person's "Roles" section;
 // user, who holds only crm.customer:view, sees none of it.
+//
+// Notifications (notificationsFeature): the bell is in the sidebar header (the top bar on phones). `user` has one unread and
+// one read notification; "Send a test notification" on the home page sends another through the dev server's event queue and it
+// arrives live. Admin (the webmaster) also opens "Failed events" (/events/dead-letters), empty until a consumer gives up on an event.
 import { createApplication } from "@wssto2/vue-core/app";
 import { identityFeature, identityPlatform, usersFeature } from "@wssto2/vue-core/identity";
+import { notificationsFeature } from "@wssto2/vue-core/notifications";
 import { createPlatform, parseBootstrap } from "@wssto2/vue-core/platform";
 import { backofficeShell } from "@wssto2/vue-core/shell";
 import { createWebHashHistory } from "vue-router";
@@ -32,7 +37,14 @@ const platform = createPlatform({
 void createApplication({
   platform,
   shell: backofficeShell(),
-  features: [identityFeature(), usersFeature({ sections: [rolesSection], activityAreas: { crm: "areas.crm" } }), homeFeature, ...accessFeatures],
+  features: [
+    identityFeature(),
+    usersFeature({ sections: [rolesSection], activityAreas: { crm: "areas.crm" } }),
+    // The dev server's categories: its seeded notifications, and the module's own test one.
+    notificationsFeature({ categories: { "devserver.sample": { icon: "user3Line", hue: "blue" }, "system.test": { icon: "checkCircle", hue: "teal" } } }),
+    homeFeature,
+    ...accessFeatures,
+  ],
   router: { history: createWebHashHistory() },
   icons: [appIcons, shellIcons],
   i18n: { messages: { en: { ...permissionMessages.en, areas: { crm: "Customers" } } } },

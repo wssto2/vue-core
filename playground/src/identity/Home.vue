@@ -1,15 +1,29 @@
 <script setup lang="ts">
+import { Button } from "@wssto2/vue-core/button";
 import { SignInAsButton, type IdentityUser } from "@wssto2/vue-core/identity";
-import { computed } from "vue";
+import { notificationRoutes } from "@wssto2/vue-core/notifications";
+import { computed, ref } from "vue";
 import AccessLinks from "./AccessLinks.vue";
 import { usePlatform } from "@wssto2/vue-core/platform";
 
 // What the dev server's session says about the person, as the library read it.
-const { session, access } = usePlatform();
+const { session, access, http } = usePlatform();
 const user = computed(() => {
   const state = session.state.value;
   return state.status === "authenticated" ? (state.user as IdentityUser) : null;
 });
+
+// The module's own test notification: published as an event, handled by the dev server's queue within a second,
+// and then it arrives on the bell through the live stream.
+const sending = ref(false);
+async function sendTest() {
+  sending.value = true;
+  try {
+    await http.request(notificationRoutes.test);
+  } finally {
+    sending.value = false;
+  }
+}
 </script>
 
 <template>
@@ -21,7 +35,9 @@ const user = computed(() => {
     <nav class="flex gap-4 text-content-link">
       <RouterLink to="/profile">My profile</RouterLink>
       <RouterLink v-if="access.can('iam.user:view')" to="/users">Users</RouterLink>
+      <RouterLink v-if="access.can('events.deadletter:view')" to="/events/dead-letters">Failed events</RouterLink>
     </nav>
+    <div><Button :processing="sending" @click="sendTest">Send a test notification</Button></div>
     <div><SignInAsButton :user-id="2" name="user" permission="iam.user:impersonate" /></div>
     <!-- Enough page to scroll: the banner stays at the top and the bars sit below it. -->
     <p v-for="n in 60" :key="n" class="text-content-muted">Line {{ n }}</p>

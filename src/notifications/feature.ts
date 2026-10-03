@@ -39,7 +39,7 @@ function inboxOfSession(holder: ShallowRef<Inbox | null>): SessionEffect {
  * unread count in the shell's `headerActions`, the inbox it opens (a popover on wide screens, a bottom sheet on
  * phones), and the live stream behind both, which follows the session. Needs a shell with a `headerActions` place.
  *
- *   createApplication({ platform, shell: backofficeShell(), features: [identityFeature(), notificationsFeature({ categories: { "tickets.assigned": { icon: "user3Line", hue: "blue" } }, deadLetters: { destination: "admin" } })] })
+ *   createApplication({ platform, shell: backofficeShell(), features: [identityFeature(), notificationsFeature({ categories: { "tickets.assigned": { icon: "user3Line", hue: "blue" } }, deadLetters: { destination: "events.deadletters" } })] })
  */
 export function notificationsFeature(options: NotificationsFeatureOptions = {}): Feature {
   const inbox = shallowRef<Inbox | null>(null);
