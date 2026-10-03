@@ -201,6 +201,26 @@ describe("the histories", () => {
     expect(target.textContent).not.toContain("99");
   });
 
+  it("filters the sign-ins by All / Failed, with the server's counts", async () => {
+    const meta = { views: [{ key: "all", count: 3 }, { key: "failed", count: 1 }] };
+    const { calls, target } = await open(MANAGE, { section: "signins", answers: { "GET /v1/iam/users/2/signins": () => listOf(signins, { meta }) } });
+    const tab = await screen.findByRole("tab", { name: /Failed/ });
+    expect(tab.textContent).toContain("1");
+    expect(screen.getByRole("tab", { name: /All/ }).textContent).toContain("3");
+    await fireEvent.click(tab);
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/users/2/signins").at(-1)!.url).toContain("view=failed"));
+    expect(target.querySelector("[data-person-signins]")).not.toBeNull();
+  });
+
+  it("filters the changes by All / Access / Details, with the server's counts", async () => {
+    const meta = { views: [{ key: "all", count: 5 }, { key: "access", count: 2 }, { key: "details", count: 3 }] };
+    const { calls } = await open(MANAGE, { section: "changes", answers: { "GET /v1/iam/users/2/changes": () => listOf([], { meta }) } });
+    const tab = await screen.findByRole("tab", { name: /Access/ });
+    expect(tab.textContent).toContain("2");
+    await fireEvent.click(tab);
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/users/2/changes").at(-1)!.url).toContain("view=access"));
+  });
+
   it("pages the sign-ins", async () => {
     const { calls } = await open(MANAGE, { section: "signins", answers: { "GET /v1/iam/users/2/signins": () => listOf(signins, { total: 45, last_page: 3 }) } });
     await fireEvent.click(screen.getByRole("button", { name: "Next page" }));

@@ -36,6 +36,15 @@ describe("my profile", () => {
     expect(target.querySelector("[data-event='signed_in']")?.textContent).toBe("Signed in");
   });
 
+  it("filters its own sign-ins by All / Failed, with the server's counts", async () => {
+    const meta = { views: [{ key: "all", count: 4 }, { key: "failed", count: 2 }] };
+    const { calls } = await open({ "GET /v1/iam/profile/signins": () => listOf([], { meta }) });
+    const tab = await screen.findByRole("tab", { name: /Failed/ });
+    expect(tab.textContent).toContain("2");
+    await fireEvent.click(tab);
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/profile/signins").at(-1)!.url).toContain("view=failed"));
+  });
+
   it("has an entry in the account menu that opens it", async () => {
     await startScreen({ permissions: [], location: "/", answers: {} });
     await fireEvent.click(screen.getByRole("button", { name: /Ana/ }));

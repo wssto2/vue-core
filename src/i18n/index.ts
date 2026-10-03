@@ -207,6 +207,7 @@ export type CoreMessages = {
         diff: string;
         actions: Texts<"created" | "updated" | "deactivated" | "activated" | "password" | "email" | "profile" | "unknown">;
         fields: Texts<"login" | "name" | "email" | "phone" | "locale" | "password" | "active">;
+        views: Texts<"all" | "access" | "details">;
       };
     };
     /** "My profile": the signed-in person's own account. */
@@ -231,6 +232,7 @@ export type CoreMessages = {
         footer_user: string;
         events: Texts<"signed_in" | "wrong_password" | "locked_out" | "refused_inactive" | "signed_in_as" | "unlocked" | "signed_out_everywhere" | "session_revoked" | "unknown">;
         events_by: Texts<"signed_in_as" | "unlocked" | "signed_out_everywhere" | "session_revoked">;
+        views: Texts<"all" | "failed">;
       };
     };
     startup: {

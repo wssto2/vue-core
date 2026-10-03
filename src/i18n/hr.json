@@ -743,6 +743,11 @@
           "locale": "Jezik",
           "password": "Lozinka",
           "active": "Status"
+        },
+        "views": {
+          "all": "Sve",
+          "access": "Pristup",
+          "details": "Podaci"
         }
       },
       "activity": {
@@ -811,6 +816,10 @@
           "unlocked": "Otključano · {name}",
           "signed_out_everywhere": "Odjava sa svih uređaja · {name}",
           "session_revoked": "Sesija završena · {name}"
+        },
+        "views": {
+          "all": "Sve",
+          "failed": "Neuspjele"
         }
       }
     },

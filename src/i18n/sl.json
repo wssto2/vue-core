@@ -743,6 +743,11 @@
           "locale": "Jezik",
           "password": "Geslo",
           "active": "Status"
+        },
+        "views": {
+          "all": "Vse",
+          "access": "Dostop",
+          "details": "Podatki"
         }
       },
       "activity": {
@@ -811,6 +816,10 @@
           "unlocked": "Odklenjeno · {name}",
           "signed_out_everywhere": "Odjava z vseh naprav · {name}",
           "session_revoked": "Seja končana · {name}"
+        },
+        "views": {
+          "all": "Vse",
+          "failed": "Neuspele"
         }
       }
     },

@@ -32,6 +32,14 @@ describe("the users list", () => {
     expect(target.textContent).toContain("Locked");
   });
 
+  it("shows the server's counts on the tabs", async () => {
+    const meta = { views: [{ key: "active", count: 12 }, { key: "locked", count: 2 }, { key: "inactive", count: 0 }, { key: "all", count: 14 }] };
+    await open(["iam.user:view"], { "GET /v1/iam/users": () => listOf([person(1, "Ana")], { meta }) });
+    await waitFor(() => expect(screen.getByRole("tab", { name: /Locked/ }).textContent).toContain("2"));
+    expect(screen.getByRole("tab", { name: /Active/ }).textContent).toContain("12");
+    expect(screen.getByRole("tab", { name: /All/ }).textContent).toContain("14");
+  });
+
   it("asks again for the view that was chosen", async () => {
     const { calls } = await open(["iam.user:view"]);
     await fireEvent.click(screen.getByRole("tab", { name: "Locked" }));
