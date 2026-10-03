@@ -9,13 +9,11 @@ import type { ChangeRow } from "../../modules/identity/entities";
 
 /**
  * What was changed on a person's account, newest first, one sentence per change ("Details changed", "Password changed"),
- * with who did it (nothing when it was the person themselves), what changed from what to what, and when. An action or a
+ * with who did it (by the name the row carries, "somebody else" when the person is gone; nothing when it was the person themselves), what changed from what to what, and when. An action or a
  * field this version does not know reads as a generic one, never as its key; a password is never shown.
  */
 const props = defineProps<{
   rows: readonly ChangeRow[];
-  /** The name of whoever made the change, when known. */
-  actorName: (id: number | null) => string | null;
 }>();
 
 const { t, te } = useI18n();
@@ -45,14 +43,14 @@ const lines = computed(() =>
     <FormRow v-for="line in lines" :key="line.row.id" layout="setting" :label="line.sentence" data-change-row>
       <template #leading>
         <span class="flex items-center pl-0.5">
-          <Avatar v-if="props.actorName(line.row.actor_id)" :name="props.actorName(line.row.actor_id)" size="sm" />
+          <Avatar v-if="line.row.actor?.name" :name="line.row.actor.name" size="sm" />
           <IconTile v-else tone="anchor" icon="edit" />
         </span>
       </template>
       <template #sub>
         <span class="flex flex-wrap items-center gap-x-1.5">
-          <template v-if="line.row.actor_id !== null">
-            <span class="font-medium text-content" data-change-actor>{{ props.actorName(line.row.actor_id) ?? t("core.account.somebody_else") }}</span>
+          <template v-if="line.row.actor">
+            <span class="font-medium text-content" data-change-actor>{{ line.row.actor.name || t("core.account.somebody_else") }}</span>
             <span aria-hidden="true">·</span>
           </template>
           <template v-for="detail in line.details" :key="detail">

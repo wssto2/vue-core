@@ -743,6 +743,11 @@
           "locale": "Language",
           "password": "Password",
           "active": "Status"
+        },
+        "views": {
+          "all": "All",
+          "access": "Access",
+          "details": "Details"
         }
       },
       "activity": {
@@ -811,6 +816,10 @@
           "unlocked": "Unlocked · {name}",
           "signed_out_everywhere": "Signed out everywhere · {name}",
           "session_revoked": "Session ended · {name}"
+        },
+        "views": {
+          "all": "All",
+          "failed": "Failed"
         }
       }
     },

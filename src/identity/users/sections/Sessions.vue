@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { Button } from "../../../button";
 import { useDescribeError } from "../../../i18n";
@@ -9,7 +9,6 @@ import { AlertDialog, toast } from "../../../overlay";
 import { usePlatform } from "../../../platform";
 import { useRouteResourceContext } from "../../../resource";
 import { AsyncSection } from "../../../state";
-import { useActorNames } from "../../shared/actors";
 import SectionIntro from "../../shared/SectionIntro.vue";
 import SessionList from "../../shared/SessionList.vue";
 import { isSessionEnded } from "../../signIn";
@@ -27,13 +26,11 @@ const describeError = useDescribeError();
 const person = useRouteResourceContext(PERSON);
 const actions = usePersonActions();
 const sessions = usePersonSessions();
-const actors = useActorNames();
 
 const one = useTemplateRef<{ present: (session: SessionItem) => void }>("one");
 const all = useTemplateRef<{ present: () => void }>("all");
 
 const list = computed(() => sessions.data.value?.sessions ?? []);
-watch(list, (items) => actors.load(items.map((item) => item.opened_by)), { immediate: true });
 
 async function revoke(call: () => Promise<unknown>, done: string) {
   try {
@@ -60,7 +57,7 @@ const pending = ref<SessionItem | null>(null);
 
     <AsyncSection :state="sessions.state.value" :skeleton-rows="3" :is-empty="() => false" @retry="sessions.reload()">
       <SessionList :sessions="list" :can-end="actions.can.endSessions" :header="t('core.users.sessions.header', { n: list.length })"
-        :footer="actions.can.endSessions ? t('core.users.sessions.footer') : t('core.users.sessions.own_footer')" :opened-by="(id) => actors.nameOf(id)"
+        :footer="actions.can.endSessions ? t('core.users.sessions.footer') : t('core.users.sessions.own_footer')"
         @end="(session) => { pending = session; one?.present(session); }" />
     </AsyncSection>
 

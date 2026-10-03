@@ -13,8 +13,6 @@ import { signInEventKey, signInEventStyle } from "./signInEvents";
 const props = defineProps<{
   rows: readonly SignInRow[];
   loading?: boolean;
-  /** The name of the person who did it, when known. */
-  actorName: (id: number | null) => string | null;
 }>();
 
 const { t } = useI18n();
@@ -26,7 +24,7 @@ const columns = computed(() => [
   { key: "ip", label: t("core.account.signins.columns.ip"), hideBelow: "md", width: 140, mobile: "hidden" },
 ] satisfies TableColumns<SignInRow>);
 
-const words = (row: SignInRow) => t(signInEventKey(row.event, props.actorName(row.actor_id)), { name: props.actorName(row.actor_id) ?? "" });
+const words = (row: SignInRow) => t(signInEventKey(row.event, row.actor?.name || null), { name: row.actor?.name ?? "" });
 </script>
 
 <template>

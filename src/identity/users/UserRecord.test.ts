@@ -16,7 +16,7 @@ const session = (id: number, extra: object = {}) => ({ id, device: `Chrome on Ma
 
 const MANAGE = ["iam.user:view", "iam.user:manage"];
 
-async function open(permissions: string[], { who = person(), section = "general", sessions = [session(11), session(12, { opened_by: 1 })], answers = {} as Parameters<typeof startScreen>[0]["answers"], user = { id: 1, name: "Ana" } } = {}) {
+async function open(permissions: string[], { who = person(), section = "general", sessions = [session(11), session(12, { opened_by: { id: 1, name: "Ana Anić" } })], answers = {} as Parameters<typeof startScreen>[0]["answers"], user = { id: 1, name: "Ana" } } = {}) {
   return startScreen({
     permissions,
     user,
@@ -182,9 +182,9 @@ describe("the sessions section", () => {
 
 describe("the histories", () => {
   const signins = [
-    { id: 1, event: "signed_in", ip: "10.0.0.1", device: "Chrome on Mac", actor_id: null, created_at: "2026-10-01T08:30:00Z" },
-    { id: 2, event: "signed_in_as", ip: "10.0.0.9", device: "Firefox", actor_id: 1, created_at: "2026-10-02T09:00:00Z" },
-    { id: 3, event: "wrong_password", ip: "10.0.0.2", device: "", actor_id: null, created_at: "2026-10-02T10:00:00Z" },
+    { id: 1, event: "signed_in", ip: "10.0.0.1", device: "Chrome on Mac", actor: null, created_at: "2026-10-01T08:30:00Z" },
+    { id: 2, event: "signed_in_as", ip: "10.0.0.9", device: "Firefox", actor: { id: 1, name: "Ana Anić" }, created_at: "2026-10-02T09:00:00Z" },
+    { id: 3, event: "wrong_password", ip: "10.0.0.2", device: "", actor: null, created_at: "2026-10-02T10:00:00Z" },
   ];
 
   it("lists the sign-ins as badges, naming who signed in as the person", async () => {
@@ -192,6 +192,33 @@ describe("the histories", () => {
     expect(target.querySelector("[data-event='signed_in']")?.textContent).toBe("Signed in");
     expect(target.querySelector("[data-event='wrong_password']")?.textContent).toBe("Wrong password");
     await waitFor(() => expect(target.querySelector("[data-event='signed_in_as']")?.textContent).toBe("Signed in as · Ana Anić"));
+  });
+
+  it("says somebody else when the row's person is gone (an empty name), never a number", async () => {
+    const gone = [{ ...signins[1]!, actor: { id: 99, name: "" } }];
+    const { target } = await open(MANAGE, { section: "signins", answers: { "GET /v1/iam/users/2/signins": listOf(gone) } });
+    await waitFor(() => expect(target.querySelector("[data-event='signed_in_as']")?.textContent).toBe("Signed in as"));
+    expect(target.textContent).not.toContain("99");
+  });
+
+  it("filters the sign-ins by All / Failed, with the server's counts", async () => {
+    const meta = { views: [{ key: "all", count: 3 }, { key: "failed", count: 1 }] };
+    const { calls, target } = await open(MANAGE, { section: "signins", answers: { "GET /v1/iam/users/2/signins": () => listOf(signins, { meta }) } });
+    const tab = await screen.findByRole("tab", { name: /Failed/ });
+    expect(tab.textContent).toContain("1");
+    expect(screen.getByRole("tab", { name: /All/ }).textContent).toContain("3");
+    await fireEvent.click(tab);
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/users/2/signins").at(-1)!.url).toContain("view=failed"));
+    expect(target.querySelector("[data-person-signins]")).not.toBeNull();
+  });
+
+  it("filters the changes by All / Access / Details, with the server's counts", async () => {
+    const meta = { views: [{ key: "all", count: 5 }, { key: "access", count: 2 }, { key: "details", count: 3 }] };
+    const { calls } = await open(MANAGE, { section: "changes", answers: { "GET /v1/iam/users/2/changes": () => listOf([], { meta }) } });
+    const tab = await screen.findByRole("tab", { name: /Access/ });
+    expect(tab.textContent).toContain("2");
+    await fireEvent.click(tab);
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/users/2/changes").at(-1)!.url).toContain("view=access"));
   });
 
   it("pages the sign-ins", async () => {
@@ -205,9 +232,9 @@ describe("the histories", () => {
       section: "changes",
       answers: {
         "GET /v1/iam/users/2/changes": listOf([
-          { id: 1, action: "updated", fields: ["name", "phone"], before: { name: "Ivan", phone: "" }, after: { name: "Ivan Horvat", phone: "099" }, actor_id: 1, created_at: "2026-10-02T09:00:00Z" },
-          { id: 2, action: "password", fields: ["password"], before: {}, after: {}, actor_id: null, created_at: "2026-10-01T09:00:00Z" },
-          { id: 3, action: "deactivated", fields: ["active"], before: { active: "true" }, after: { active: "false" }, actor_id: 1, created_at: "2026-09-30T09:00:00Z" },
+          { id: 1, action: "updated", fields: ["name", "phone"], before: { name: "Ivan", phone: "" }, after: { name: "Ivan Horvat", phone: "099" }, actor: { id: 1, name: "Ana Anić" }, created_at: "2026-10-02T09:00:00Z" },
+          { id: 2, action: "password", fields: ["password"], before: {}, after: {}, actor: null, created_at: "2026-10-01T09:00:00Z" },
+          { id: 3, action: "deactivated", fields: ["active"], before: { active: "true" }, after: { active: "false" }, actor: { id: 1, name: "Ana Anić" }, created_at: "2026-09-30T09:00:00Z" },
         ]),
       },
     });
