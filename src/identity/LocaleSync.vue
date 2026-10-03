@@ -5,6 +5,7 @@ import { useDescribeError } from "../i18n";
 import { identityRoutes } from "../modules/identity/routes";
 import { toast } from "../overlay";
 import { usePlatform } from "../platform";
+import { isSessionEnded } from "./signIn";
 
 /**
  * Keeps the person's language in step with the server while they are signed in, and renders nothing: the
@@ -35,7 +36,7 @@ watch(application.locale, async (locale) => {
     await http.request(identityRoutes.changeLocale, { locale });
     known = locale;
   } catch (error) {
-    toast.error(describeError(error));
+    if (!isSessionEnded(error)) toast.error(describeError(error));
   }
 });
 </script>

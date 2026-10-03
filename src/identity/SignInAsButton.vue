@@ -7,7 +7,7 @@ import { useDescribeError } from "../i18n";
 import { toast } from "../overlay";
 import { AccessGate, heldSession, usePlatform, type Permission } from "../platform";
 import { useIdentityContext } from "./context";
-import { signInAs } from "./signIn";
+import { isSessionEnded, signInAs } from "./signIn";
 
 /**
  * The "sign in as" entry point of a person's page or row: shown only to whoever holds `permission` (the
@@ -36,7 +36,7 @@ async function signInAsThem() {
     await signInAs(platform, props.userId);
     await router.push(home);
   } catch (error) {
-    toast.error(describeError(error));
+    if (!isSessionEnded(error)) toast.error(describeError(error));
   } finally {
     busy.value = false;
   }

@@ -3,6 +3,12 @@ import type { Platform } from "../platform";
 import { identityRoutes } from "../modules/identity/routes";
 import type { LoginInput } from "../modules/identity/schemas";
 
+/**
+ * Whether a failure is the session having ended (a 401). The prompt for an expired session (or the sign-in page) says
+ * so; a toast for the failed request on top of it would only cover the prompt's buttons, so callers leave it out.
+ */
+export const isSessionEnded = (error: unknown): boolean => isApiError(error) && error.kind === "unauthorized";
+
 /** The refusal of a sign-in that tells when the lock ends, as the moment it ends; null for any other failure. */
 export function lockedUntil(error: unknown): Date | null {
   if (!isApiError(error) || error.code !== "identity.signin.locked") return null;

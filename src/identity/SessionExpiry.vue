@@ -11,6 +11,7 @@ import { toast } from "../overlay";
 import { closeOverlays } from "../overlay/closeOverlays";
 import { useDialog } from "../overlay/useDialog";
 import { usePlatform } from "../platform";
+import { isSessionEnded } from "./signIn";
 import { useSignInForm } from "./useSignInForm";
 
 /**
@@ -45,6 +46,7 @@ watch(wanted, (open) => {
   if (open) {
     form.hydrate({ login: login.value ?? "", password: "" });
     closeOverlays(); // an open menu would hang beside the prompt
+    toast.dismiss(); // a message about the expiry itself would sit over its buttons
     dialog.present();
   } else dialog.dismissWithoutAsking();
 }, { immediate: true, flush: "post" });
@@ -54,7 +56,7 @@ async function signOut() {
   try {
     await session.signOut();
   } catch (error) {
-    toast.error(describeError(error)); // the session ended here; the server did not confirm it
+    if (!isSessionEnded(error)) toast.error(describeError(error)); // the session ended here; the server did not confirm it
   }
 }
 </script>

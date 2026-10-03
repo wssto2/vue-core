@@ -7,7 +7,7 @@ import { useDescribeError } from "../i18n";
 import { toast } from "../overlay";
 import { heldSession, usePlatform } from "../platform";
 import { useIdentityContext } from "./context";
-import { returnToOwnAccount } from "./signIn";
+import { isSessionEnded, returnToOwnAccount } from "./signIn";
 
 /**
  * The strip across the top while somebody is signed in as another person, with the one way out: "Return to my
@@ -51,7 +51,7 @@ async function leave() {
     await returnToOwnAccount(platform);
     await router.push(home); // what was on screen belonged to the other person
   } catch (error) {
-    toast.error(describeError(error));
+    if (!isSessionEnded(error)) toast.error(describeError(error));
     void platform.session.refresh(); // the banner may be stale (the impersonation ended elsewhere)
   } finally {
     returning.value = false;

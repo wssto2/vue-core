@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor } from "@testing-library/vue";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, ref } from "vue";
 import { createMemoryHistory } from "vue-router";
 import { createApplication, defineFeature, type Application } from "../app";
@@ -9,6 +9,7 @@ import { jsonResponse, routedTransport, settle, type RecordedCall } from "../tes
 import fixture from "../../test-data/go-core/session_payload.json";
 import { identityFeature } from "./feature";
 import { identityPlatform } from "./session";
+import { toast } from "../overlay";
 import { CLOSE_OVERLAYS_EVENT } from "../overlay/closeOverlays";
 import SignInAsButton from "./SignInAsButton.vue";
 
@@ -49,7 +50,7 @@ async function start(initial: ReturnType<typeof payloadOf>, location = "/draft",
       return jsonResponse(200, initial);
     },
     "POST /api/v1/auth/logout": () => jsonResponse(204),
-    "POST /api/v1/auth/login-as": () => ((server.me = payloadOf(2, "Ivan", { impersonator: { id: 1, name: "Ana" } })), jsonResponse(200, server.me)),
+    "POST /api/v1/auth/login-as": () => (server.me === null ? jsonResponse(401, { success: false, error: "no", code: "identity.session.invalid" }) : ((server.me = payloadOf(2, "Ivan", { impersonator: { id: 1, name: "Ana" } })), jsonResponse(200, server.me))),
     "POST /api/v1/auth/login-as/return": () => ((server.me = own), jsonResponse(200, own)),
     "POST /api/v1/auth/change-locale": jsonResponse(204),
   });
@@ -172,5 +173,23 @@ describe("the prompt of an expired session", () => {
     document.removeEventListener(CLOSE_OVERLAYS_EVENT, onClose);
     expect(closed).toBe(1);
     expect(dialog()).not.toBeNull();
+  });
+});
+
+describe("a request that fails because the session ended", () => {
+  it("shows no toast over the prompt that already says so", async () => {
+    const { platform, server } = await start(payloadOf(1, "Ana", {}, ["iam.user:impersonate"]), "/person");
+    const error = vi.spyOn(toast, "error");
+    const dismiss = vi.spyOn(toast, "dismiss");
+    server.me = null; // the server revoked it: the click's own request answers 401, and renewing fails
+    platform.session.expire();
+    await settle();
+    expect(dismiss).toHaveBeenCalled(); // what was on screen when the prompt opened is gone
+    await fireEvent.click(screen.getByRole("button", { name: "Sign in as Ivan" }), {});
+    await settle();
+    expect(error).not.toHaveBeenCalled();
+    expect(dialog()).not.toBeNull();
+    error.mockRestore();
+    dismiss.mockRestore();
   });
 });
