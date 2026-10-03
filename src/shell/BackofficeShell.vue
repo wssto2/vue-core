@@ -7,7 +7,7 @@ import LeaveGuardRoot from "../form/LeaveGuardRoot.vue";
 import { Toaster } from "../overlay";
 import { BottomDock, usePageChromeContext } from "../page";
 import { usePlatform } from "../platform/platform";
-import type { SessionUser } from "../platform/session";
+import { heldSession, type SessionUser } from "../platform/session";
 import { AppRouterView } from "../router";
 import AccountSheet from "./AccountSheet.vue";
 import NavigationDrawer from "./NavigationDrawer.vue";
@@ -20,7 +20,7 @@ import type { NavigationProgress } from "./progress";
 /**
  * The layout of a backoffice application: a sidebar with the server's menu on desktop, a top bar
  * and a push navigation drawer on phones, the page in between, the bottom dock and the toasts, and
- * the places features contribute to (`headerActions`, `accountMenu`, `host`). Give it to
+ * the places features contribute to (`headerActions`, `accountMenu`, `banner`, `host`). Give it to
  * `createApplication` through `backofficeShell()`, or render it inside a shell of your own.
  *
  * Signed out (the login page) there is only the top bar with the brand and the page.
@@ -52,7 +52,7 @@ const { session } = usePlatform();
 const chrome = usePageChromeContext();
 const identity = useShellIdentity(props.identity);
 
-const authenticated = computed(() => session.state.value.status === "authenticated");
+const authenticated = computed(() => heldSession(session.state.value) !== null);
 const accountSheet = useTemplateRef("accountSheet");
 </script>
 
@@ -63,6 +63,8 @@ const accountSheet = useTemplateRef("accountSheet");
       class="fixed inset-x-0 top-0 z-10000 flex h-1 justify-center bg-primary-800">
       <div class="animate-grow-and-shrink-width bg-primary-600 motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-60"></div>
     </div>
+
+    <ShellOutlet name="banner" />
 
     <ShellStage :enabled="authenticated">
       <template v-if="identity" #drawer="{ select, dismiss }">

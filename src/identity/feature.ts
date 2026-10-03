@@ -3,6 +3,8 @@ import { defineFeature, keepSessionAlive, provideContext, type Feature } from ".
 import { defineRoutes } from "../router";
 import { identityContextKey } from "./context";
 import LocaleSync from "./LocaleSync.vue";
+import ImpersonationBanner from "./ImpersonationBanner.vue";
+import SessionExpiry from "./SessionExpiry.vue";
 import { renewIdentityTokens } from "./session";
 
 const routes = defineRoutes({
@@ -16,7 +18,8 @@ export interface IdentityFeatureOptions {
 
 /**
  * The sign-in screens of go-core's identity module, one feature to install: the sign-in page at `/login`
- * (route name `login`, public), the session kept alive while the app is open, and the person's language kept
+ * (route name `login`, public), the prompt that asks for the password again when the session ends in the middle of
+ * work (the page stays, drafts survive; needs a shell with a `host` slot), a banner while signed in as somebody else, the session kept alive while the app is open, and the person's language kept
  * in step with the server (the account menu's language row saves it with `change-locale`). Pair it with
  * `createPlatform({ config, ...identityPlatform() })`, which wires the session, the refresh on 401 and sign-out.
  *
@@ -27,7 +30,14 @@ export function identityFeature(options: IdentityFeatureOptions = {}): Feature {
     id: "identity",
     routes: routes.records,
     context: provideContext(identityContextKey, { home: options.home ?? "/" }),
-    contributions: [{ id: "identity.locale", slot: "host", component: LocaleSync, scope: "authenticated", optional: true }],
+    holdsExpiredSession: true,
+    contributions: [
+      // Not optional: a shell without a `host` could not ask for the password, and the person would be stuck on a dead page.
+      { id: "identity.expiry", slot: "host", component: SessionExpiry, scope: "always" },
+      // Not optional either: acting as somebody else must always be visible.
+      { id: "identity.impersonation", slot: "banner", component: ImpersonationBanner, scope: "authenticated" },
+      { id: "identity.locale", slot: "host", component: LocaleSync, scope: "authenticated", optional: true },
+    ],
     effects: [keepSessionAlive({ renew: renewIdentityTokens })],
   });
 }

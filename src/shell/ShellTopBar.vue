@@ -8,6 +8,7 @@ import { useMediaQuery } from "../internal/mediaQuery";
 import { Menu, type MenuItem } from "../overlay";
 import { usePageChromeContext } from "../page";
 import { usePlatform } from "../platform/platform";
+import { heldSession } from "../platform/session";
 import NavigationMenuButton from "./NavigationMenuButton.vue";
 import ShellBrand from "./ShellBrand.vue";
 import { headerSurfaceKey } from "./accountMenu";
@@ -46,7 +47,7 @@ const phone = useMediaQuery("(max-width: 47.999rem)");
 
 provide(headerSurfaceKey, "bar");
 
-const authenticated = computed(() => session.state.value.status === "authenticated");
+const authenticated = computed(() => heldSession(session.state.value) !== null);
 const shown = computed(() => !authenticated.value || phone.value);
 
 const back = computed(() => (authenticated.value ? chrome.back.value : null));

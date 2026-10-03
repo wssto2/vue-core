@@ -1,6 +1,6 @@
 import { defineComponent, h, type PropType } from "vue";
 import { defineFeatureContext } from "../platform/context";
-import type { Session } from "../platform/session";
+import { heldSession, type Session } from "../platform/session";
 import type { ShellContribution, ShellSlot } from "./feature";
 
 /** A contribution with the feature that declared it, for error messages. */
@@ -20,7 +20,7 @@ export function createShellContributions(owned: readonly OwnedContribution[], se
   const sorted = owned.map(({ contribution }) => contribution).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   return {
     get(slot) {
-      const authenticated = session.state.value.status === "authenticated";
+      const authenticated = heldSession(session.state.value) !== null;
       return sorted.filter((entry) => entry.slot === slot && (entry.scope === "always" || authenticated));
     },
   };

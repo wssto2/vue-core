@@ -19,8 +19,32 @@ export function lockedUntil(error: unknown): Date | null {
  */
 export async function signIn({ http, session }: Pick<Platform, "http" | "session">, input: LoginInput): Promise<void> {
   await http.request(identityRoutes.login, input, { handleUnauthorized: false });
-  const state = await session.refresh();
-  if (state.status === "failed") throw state.error;
-  if (state.status !== "authenticated") throw new Error("The server accepted the sign-in but reports nobody signed in.");
+  await readSession({ session });
 }
 
+
+/** The session answered by a call that switches who is signed in: read it again, and fail loudly if nobody is. */
+async function readSession({ session }: Pick<Platform, "session">): Promise<void> {
+  const state = await session.refresh();
+  if (state.status === "failed") throw state.error;
+  if (state.status !== "authenticated") throw new Error("The server accepted the request but reports nobody signed in.");
+}
+
+/**
+ * Signs in as somebody else (go-core `login-as`; the server decides who may). Afterwards the session is that
+ * person's, with `impersonator` naming the real one. Rejects with the server's refusal
+ * (`identity.impersonation.disabled`, a missing or inactive account).
+ */
+export async function signInAs(platform: Pick<Platform, "http" | "session">, userId: number): Promise<void> {
+  await platform.http.request(identityRoutes.loginAs, { user_id: userId });
+  await readSession(platform);
+}
+
+/**
+ * Ends the impersonation: the session is the real person's own again, with no password asked. Rejects with
+ * `identity.impersonation.not_active` when the session is not an impersonation.
+ */
+export async function returnToOwnAccount(platform: Pick<Platform, "http" | "session">): Promise<void> {
+  await platform.http.request(identityRoutes.loginAsReturn);
+  await readSession(platform);
+}

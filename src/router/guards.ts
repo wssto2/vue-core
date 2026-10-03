@@ -1,6 +1,6 @@
 import { effectScope, watch } from "vue";
 import type { RouteLocationNormalized, RouteLocationRaw, Router } from "vue-router";
-import type { Session } from "../platform/session";
+import { heldSession, type Session } from "../platform/session";
 
 export interface RouterGuardOptions {
   router: Router;
@@ -18,6 +18,12 @@ export interface RouterGuardOptions {
   afterNavigation?: (to: RouteLocationNormalized) => void;
   /** Begins and ends the page-load indicator. `done` is called exactly once per `start`, whatever way the navigation ends. */
   progress?: { start(): void; done(): void };
+  /**
+   * True when something on the page asks the person to sign in again when their session expires (the identity
+   * feature's sheet): an expired session then stays on its protected page instead of going to the login page.
+   * A session that ends any other way still goes to the login page.
+   */
+  holdExpired?: boolean;
   /** A failure of the session check or of the router (a lazy view that did not load). */
   onError?: (error: unknown) => void;
 }
@@ -111,9 +117,10 @@ export function installRouterGuards(options: RouterGuardOptions): () => void {
     watch(
       () => session.state.value,
       (state, before) => {
-        if (state.status !== "anonymous" || before.status !== "authenticated") return;
+        if (state.status !== "anonymous" || heldSession(before) === null) return;
         const current = router.currentRoute.value;
         if (current.meta.public === true) return;
+        if (state.reason === "expired" && options.holdExpired && state.previous) return; // held: the session kept what it was, a prompt asks for the password
         void router.replace(withReturn(login, state.reason === "expired" ? current.fullPath : null)).catch(options.onError);
       },
     ),

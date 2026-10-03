@@ -353,7 +353,8 @@
           "invalid": "This language is not supported."
         },
         "impersonation": {
-          "disabled": "Signing in as another person is not enabled."
+          "disabled": "Signing in as another person is not enabled.",
+          "not_active": "You are not signed in as somebody else."
         },
         "account": {
           "not_found": "This account does not exist.",
@@ -381,6 +382,18 @@
         "password": "Password",
         "submit": "Sign in",
         "required": "Required."
+      },
+      "expired": {
+        "title": "Your session has ended",
+        "body": "Sign in again to continue where you were.",
+        "kept": "Your unsaved changes on this page are kept.",
+        "sign_out": "Sign out instead"
+      },
+      "impersonation": {
+        "banner": "You are signed in as {name}. Everything you do here is done as them.",
+        "banner_short": "Signed in as {name}",
+        "return": "Return to my account",
+        "sign_in_as": "Sign in as {name}"
       }
     }
   }

@@ -51,10 +51,10 @@ export type IdentityPlatformOptions<U extends SessionUser> = Required<Pick<Platf
  *   const platform = createPlatform({ config, ...identityPlatform() });
  *
  * The user is go-core's default projection (`IdentityUser`); an application that projects its own passes
- * `parseUser`, which must keep an `id`.
+ * `parseUser`, which must keep the `id` and the `login` (the prompt for an expired session shows it).
  */
 export function identityPlatform(): IdentityPlatformOptions<IdentityUser>;
-export function identityPlatform<U extends SessionUser>(options: { parseUser: UserParser<U> }): IdentityPlatformOptions<U>;
+export function identityPlatform<U extends SessionUser & { readonly login: string }>(options: { parseUser: UserParser<U> }): IdentityPlatformOptions<U>;
 export function identityPlatform(options?: { parseUser: UserParser<SessionUser> }): IdentityPlatformOptions<IdentityUser> | IdentityPlatformOptions<SessionUser> {
   const parseUser = options?.parseUser ?? parseIdentityUser;
   const wiring: IdentityPlatformOptions<SessionUser> = {

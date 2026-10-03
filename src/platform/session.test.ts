@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { beforeSignOutTimeout, createSession, type SessionAdapter, type SessionSnapshot } from "./session";
+import { beforeSignOutTimeout, createSession, heldSession, type SessionAdapter, type SessionSnapshot } from "./session";
 import { deferred, snapshotOf } from "./testing";
 
 function adapterOf(load: SessionAdapter["load"], signOut: SessionAdapter["signOut"] = async () => {}): SessionAdapter {
@@ -271,5 +271,45 @@ describe("late answers of a previous session are dropped", () => {
     first.resolve(snapshotOf(1));
     await old;
     expect(session.state.value).toMatchObject({ user: { id: 2 } });
+  });
+});
+
+describe("an expired session that is held", () => {
+  it("keeps what it was while a prompt asks for the password, and still shows it as the held session", () => {
+    const session = createSession(adapterOf(async () => null));
+    session.holdExpired(true);
+    session.establish(snapshotOf(7));
+    session.expire();
+    expect(session.state.value).toMatchObject({ status: "anonymous", reason: "expired", previous: { user: { id: 7 } } });
+    expect(heldSession(session.state.value)?.user.id).toBe(7);
+    expect(heldSession({ status: "anonymous", reason: "signedOut" })).toBeNull();
+  });
+
+  it("is read again without showing loading, and a failed read keeps it", async () => {
+    const load = vi.fn<SessionAdapter["load"]>().mockRejectedValueOnce(new Error("offline")).mockResolvedValue(snapshotOf(7));
+    const session = createSession(adapterOf(load), { onError: () => undefined });
+    session.holdExpired(true);
+    session.establish(snapshotOf(7));
+    session.expire();
+    const asking = session.refresh();
+    expect(session.state.value.status).toBe("anonymous");
+    await asking;
+    expect(session.state.value).toMatchObject({ status: "anonymous", reason: "expired" });
+    expect((await session.refresh()).status).toBe("authenticated");
+  });
+
+  it("is not kept while somebody was signed in as another person: their password is not the real person's to give", () => {
+    const session = createSession(adapterOf(async () => null));
+    session.holdExpired(true);
+    session.establish({ ...snapshotOf(7), impersonator: { id: 1, name: "Ana" } });
+    session.expire();
+    expect(session.state.value).toEqual({ status: "anonymous", reason: "expired" });
+  });
+
+  it("is not kept unless the application asked for it", () => {
+    const session = createSession(adapterOf(async () => null));
+    session.establish(snapshotOf(7));
+    session.expire();
+    expect(session.state.value).toEqual({ status: "anonymous", reason: "expired" });
   });
 });

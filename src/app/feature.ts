@@ -25,6 +25,7 @@ export function provideContext<T>(key: InjectionKey<T>, value: T): ContextProvis
  *
  * - `headerActions`: the actions of the top bar (a notification bell, a search button)
  * - `accountMenu`: entries of the signed-in user's menu
+ * - `banner`: a strip across the top of the whole shell, above everything (a notice that must stay in view: signed in as somebody else)
  * - `host`: components with no place of their own that must be mounted once (a command palette, a dialog host)
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- extended by augmentation, see the doc comment
@@ -32,6 +33,7 @@ export interface ShellSlots {}
 interface DocumentedShellSlots {
   headerActions: true;
   accountMenu: true;
+  banner: true;
   host: true;
 }
 export type ShellSlot = keyof DocumentedShellSlots | keyof ShellSlots;
@@ -105,6 +107,11 @@ export interface FeatureDefinition {
   effects?: readonly FeatureEffect[];
   /** Capabilities the backend must report (`platform.config.capabilities`); startup fails naming this feature when one is missing. */
   backend?: readonly string[];
+  /**
+   * The feature shows its own prompt when a session expires in the middle of work (a sheet to sign in again), so the
+   * router keeps the person on their page instead of sending them to the login page.
+   */
+  holdsExpiredSession?: boolean;
   /** Features that must be installed too (for a shared integration); checked, never installed for you. */
   requires?: readonly FeatureReference[];
 }
@@ -119,6 +126,7 @@ export interface Feature {
   readonly contributions: readonly ShellContribution[];
   readonly effects: readonly FeatureEffect[];
   readonly backend: readonly string[];
+  readonly holdsExpiredSession: boolean;
   readonly requires: readonly string[];
 }
 
@@ -154,6 +162,7 @@ export function defineFeature(definition: FeatureDefinition): Feature {
     contributions: listOf(definition.contributions),
     effects: listOf(definition.effects),
     backend: listOf(definition.backend),
+    holdsExpiredSession: definition.holdsExpiredSession === true,
     requires: listOf(definition.requires).map((reference) => (typeof reference === "string" ? reference : reference.id)),
   });
   defined.add(feature);

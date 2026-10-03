@@ -1,7 +1,7 @@
 import { ApiError, isApiError, type HttpClient } from "../client";
 import { parseAccessSnapshot } from "./access";
 import { parseNavigation } from "./navigation";
-import type { SessionAdapter, SessionSnapshot, SessionUser } from "./session";
+import type { SessionAdapter, SessionImpersonator, SessionSnapshot, SessionUser } from "./session";
 
 export interface HttpSessionOptions {
   /** Where the session is read (GET). Default `/auth/me`. */
@@ -47,11 +47,18 @@ export function parseSessionPayload<U extends SessionUser = SessionUser>(
     else expiresAt = date;
   }
 
+  let impersonator: SessionImpersonator | undefined;
+  if (raw.impersonator !== undefined && raw.impersonator !== null) {
+    const who = raw.impersonator;
+    if (isObject(who) && (typeof who.id === "number" || typeof who.id === "string") && typeof who.name === "string") impersonator = { id: who.id, name: who.name };
+    else issues.push("impersonator: expected { id, name }");
+  }
+
   const access = parseAccessSnapshot(raw.access);
   issues.push(...access.issues);
   const navigation = raw.navigation === undefined || raw.navigation === null ? undefined : parseNavigation(raw.navigation, issues);
   if (user === null || issues.length > 0) throw malformed(issues);
-  return { user, expiresAt, access: access.snapshot, ...(navigation && { navigation }) };
+  return { user, expiresAt, access: access.snapshot, ...(impersonator && { impersonator }), ...(navigation && { navigation }) };
 }
 
 const malformed = (issues: readonly string[]) =>

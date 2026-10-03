@@ -85,12 +85,14 @@ export type CoreMessages = {
         signin: { failed: string; locked: string; inactive: string };
         session: { invalid: string };
         locale: { invalid: string };
-        impersonation: { disabled: string };
+        impersonation: { disabled: string; not_active: string };
         account: { not_found: string; inactive: string };
       };
     };
     identity: {
       signin: { title: string; login: string; password: string; submit: string; required: string };
+      expired: { title: string; body: string; kept: string; sign_out: string };
+      impersonation: { banner: string; banner_short: string; return: string; sign_in_as: string };
     };
     startup: {
       title: string;

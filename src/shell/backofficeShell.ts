@@ -21,7 +21,7 @@ export interface BackofficeShellOptions<U extends SessionUser = SessionUser> {
 
 /**
  * The backoffice shell as `createApplication` takes it: the layout, the slots it renders
- * (`headerActions`, `accountMenu`, `host`) and the page-load indicator wired to the router.
+ * (`headerActions`, `accountMenu`, `banner`, `host`) and the page-load indicator wired to the router.
  *
  *   createApplication({ platform, features, shell: backofficeShell({ brand: MyLogo }) });
  *
@@ -50,5 +50,5 @@ export function backofficeShell<U extends SessionUser = SessionUser>(options: Ba
         );
     },
   });
-  return { component, slots: ["headerActions", "accountMenu", "host"], progress };
+  return { component, slots: ["headerActions", "accountMenu", "banner", "host"], progress };
 }

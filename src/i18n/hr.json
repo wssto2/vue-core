@@ -353,7 +353,8 @@
           "invalid": "Ovaj jezik nije podržan."
         },
         "impersonation": {
-          "disabled": "Prijava kao druga osoba nije omogućena."
+          "disabled": "Prijava kao druga osoba nije omogućena.",
+          "not_active": "Niste prijavljeni kao druga osoba."
         },
         "account": {
           "not_found": "Ovaj korisnički račun ne postoji.",
@@ -381,6 +382,18 @@
         "password": "Lozinka",
         "submit": "Prijava",
         "required": "Obavezno polje."
+      },
+      "expired": {
+        "title": "Vaša sesija je istekla",
+        "body": "Prijavite se ponovno da nastavite gdje ste stali.",
+        "kept": "Vaše nespremljene izmjene na ovoj stranici su sačuvane.",
+        "sign_out": "Odjavi me umjesto toga"
+      },
+      "impersonation": {
+        "banner": "Prijavljeni ste kao {name}. Sve što ovdje radite, radi se u njihovo ime.",
+        "banner_short": "Prijavljeni ste kao {name}",
+        "return": "Povratak na moj račun",
+        "sign_in_as": "Prijavi se kao {name}"
       }
     }
   }

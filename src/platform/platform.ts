@@ -4,7 +4,7 @@ import { createAccessClient, type AccessClient, type AccessClientOptions } from 
 import type { BootstrapConfig } from "./bootstrap";
 import { defineFeatureContext } from "./context";
 import { httpSessionAdapter } from "./httpSession";
-import { createSession, type BeforeSignOutHook, type Session, type SessionAdapter, type SessionUser } from "./session";
+import { createSession, heldSession, type BeforeSignOutHook, type Session, type SessionAdapter, type SessionUser } from "./session";
 
 /** One application's shared services. Everything in it belongs to this instance alone. */
 export interface Platform<U extends SessionUser = SessionUser, C extends BootstrapConfig = BootstrapConfig> {
@@ -88,8 +88,7 @@ export function createPlatform<U extends SessionUser, C extends BootstrapConfig>
   const session = createSession<U>(adapter, { onError: options.onSessionError, onExpired: options.onSessionExpired, beforeSignOut: options.beforeSignOut });
   const access = createAccessClient(
     () => {
-      const state = session.state.value;
-      return state.status === "authenticated" ? state.access : null;
+      return heldSession(session.state.value)?.access ?? null; // a session that just expired still shows what it showed
     },
     { covers: options.covers },
   );
