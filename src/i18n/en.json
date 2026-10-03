@@ -347,7 +347,9 @@
           "inactive": "This account is not active."
         },
         "session": {
-          "invalid": "Your session has ended. Sign in again."
+          "invalid": "Your session has ended. Sign in again.",
+          "current": "This is the session you are using. To leave it, sign out.",
+          "not_found": "That device is no longer signed in."
         },
         "locale": {
           "invalid": "This language is not supported."
@@ -358,7 +360,50 @@
         },
         "account": {
           "not_found": "This account does not exist.",
-          "inactive": "This account is not active."
+          "inactive": "This account is not active.",
+          "already_active": "This account is already active.",
+          "already_inactive": "This account is already inactive.",
+          "self_deactivation": "You cannot deactivate your own account."
+        },
+        "code": {
+          "expired": "The code is no longer valid. Request a new one.",
+          "invalid": "Enter the 6-digit code.",
+          "mismatch": "The code is not correct. Attempts left: {attempts_left}.",
+          "no_pending": "There is no active code. Request a new one.",
+          "not_delivered": "The code could not be sent. Try again in a minute.",
+          "resend_too_soon": "You can request a new code in {retry_after} s.",
+          "too_many_attempts": "Too many wrong attempts. Request a new code.",
+          "too_many_requests": "You requested too many codes. Try again later."
+        },
+        "email": {
+          "disabled": "The e-mail address cannot be changed here.",
+          "invalid": "Enter a valid e-mail address.",
+          "taken": "This e-mail address is already used by another account.",
+          "unchanged": "This is already your e-mail address."
+        },
+        "list": {
+          "dir_invalid": "The sort direction is not valid.",
+          "order_invalid": "The list cannot be sorted by that column.",
+          "view_invalid": "That view does not exist."
+        },
+        "login": {
+          "invalid": "The username cannot be empty, contain spaces or be too long.",
+          "taken": "This username is already taken."
+        },
+        "name": {
+          "invalid": "The name cannot be empty or too long."
+        },
+        "password": {
+          "mismatch": "The passwords do not match.",
+          "unchanged": "The new password must differ from the current one.",
+          "weak": "The password does not meet the password rules.",
+          "wrong": "The password is not correct."
+        },
+        "phone": {
+          "invalid": "The phone number is too long."
+        },
+        "reauth": {
+          "locked": "Too many wrong passwords. For your security, try again after {locked_until}."
         }
       }
     },

@@ -57,6 +57,8 @@ export interface ScreenOptions {
   users?: UsersFeatureOptions;
   /** Features of the test's own (pages to navigate to). */
   features?: readonly Feature[];
+  /** The application's own texts per locale (`{ en: { errors: { "crm.owns_leads": "…" } } }`), over the library's. */
+  messages?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
 }
 
 /** Starts the application with the users feature on a fake server and waits until it settles. */
@@ -76,7 +78,7 @@ export async function startScreen(options: ScreenOptions) {
     features: [identityFeature(), usersFeature(options.users), defineFeature({ id: "pages", routes: [{ name: "home", path: "/", component: { render: () => null } }] }), ...(options.features ?? [])],
     router: { history },
     locale: { supported: ["en", "hr"], fallback: "en" },
-    i18n: { missingWarn: false },
+    i18n: { missingWarn: false, ...(options.messages ? { messages: options.messages } : {}) },
   });
   const target = document.createElement("div");
   document.body.append(target);

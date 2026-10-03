@@ -347,7 +347,9 @@
           "inactive": "Ovaj korisnički račun nije aktivan."
         },
         "session": {
-          "invalid": "Vaša sesija je istekla. Prijavite se ponovo."
+          "invalid": "Vaša sesija je istekla. Prijavite se ponovo.",
+          "current": "Ovo je sesija koju upravo koristite. Za izlaz se odjavite.",
+          "not_found": "Taj uređaj više nije prijavljen."
         },
         "locale": {
           "invalid": "Ovaj jezik nije podržan."
@@ -358,7 +360,50 @@
         },
         "account": {
           "not_found": "Ovaj korisnički račun ne postoji.",
-          "inactive": "Ovaj korisnički račun nije aktivan."
+          "inactive": "Ovaj korisnički račun nije aktivan.",
+          "already_active": "Račun je već aktivan.",
+          "already_inactive": "Račun je već neaktivan.",
+          "self_deactivation": "Ne možete deaktivirati vlastiti račun."
+        },
+        "code": {
+          "expired": "Kod više ne vrijedi. Zatražite novi kod.",
+          "invalid": "Unesite 6-cifreni kod.",
+          "mismatch": "Kod nije ispravan. Preostalo pokušaja: {attempts_left}.",
+          "no_pending": "Nema aktivnog koda. Zatražite novi kod.",
+          "not_delivered": "Kod nije moguće poslati. Pokušajte ponovo za minutu.",
+          "resend_too_soon": "Novi kod možete zatražiti za {retry_after} s.",
+          "too_many_attempts": "Previše neispravnih pokušaja. Zatražite novi kod.",
+          "too_many_requests": "Zatražili ste previše kodova. Pokušajte ponovo kasnije."
+        },
+        "email": {
+          "disabled": "E-mail adresu ovdje nije moguće promijeniti.",
+          "invalid": "Unesite ispravnu e-mail adresu.",
+          "taken": "Tu e-mail adresu već koristi drugi račun.",
+          "unchanged": "To je već vaša e-mail adresa."
+        },
+        "list": {
+          "dir_invalid": "Smjer sortiranja nije ispravan.",
+          "order_invalid": "Spisak se ne može sortirati po toj koloni.",
+          "view_invalid": "Taj prikaz ne postoji."
+        },
+        "login": {
+          "invalid": "Korisničko ime ne smije biti prazno, imati razmake niti biti predugo.",
+          "taken": "To korisničko ime je već zauzeto."
+        },
+        "name": {
+          "invalid": "Ime ne smije biti prazno niti predugo."
+        },
+        "password": {
+          "mismatch": "Lozinke se ne podudaraju.",
+          "unchanged": "Nova lozinka mora se razlikovati od trenutne.",
+          "weak": "Lozinka ne zadovoljava pravila za lozinke.",
+          "wrong": "Lozinka nije ispravna."
+        },
+        "phone": {
+          "invalid": "Broj telefona je predug."
+        },
+        "reauth": {
+          "locked": "Previše pogrešnih lozinki. Zbog sigurnosti pokušajte ponovo nakon {locked_until}."
         }
       }
     },

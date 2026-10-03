@@ -347,7 +347,9 @@
           "inactive": "Ta uporabniški račun ni aktiven."
         },
         "session": {
-          "invalid": "Vaša seja je potekla. Prijavite se znova."
+          "invalid": "Vaša seja je potekla. Prijavite se znova.",
+          "current": "To je seja, ki jo trenutno uporabljate. Za izhod se odjavite.",
+          "not_found": "Ta naprava ni več prijavljena."
         },
         "locale": {
           "invalid": "Ta jezik ni podprt."
@@ -358,7 +360,50 @@
         },
         "account": {
           "not_found": "Ta uporabniški račun ne obstaja.",
-          "inactive": "Ta uporabniški račun ni aktiven."
+          "inactive": "Ta uporabniški račun ni aktiven.",
+          "already_active": "Račun je že aktiven.",
+          "already_inactive": "Račun je že neaktiven.",
+          "self_deactivation": "Lastnega računa ne morete deaktivirati."
+        },
+        "code": {
+          "expired": "Koda ne velja več. Zahtevajte novo kodo.",
+          "invalid": "Vnesite 6-mestno kodo.",
+          "mismatch": "Koda ni pravilna. Preostali poskusi: {attempts_left}.",
+          "no_pending": "Ni aktivne kode. Zahtevajte novo kodo.",
+          "not_delivered": "Kode ni bilo mogoče poslati. Poskusite znova čez minuto.",
+          "resend_too_soon": "Novo kodo lahko zahtevate čez {retry_after} s.",
+          "too_many_attempts": "Preveč napačnih poskusov. Zahtevajte novo kodo.",
+          "too_many_requests": "Zahtevali ste preveč kod. Poskusite znova pozneje."
+        },
+        "email": {
+          "disabled": "E-poštnega naslova tukaj ni mogoče spremeniti.",
+          "invalid": "Vnesite veljaven e-poštni naslov.",
+          "taken": "Ta e-poštni naslov že uporablja drug račun.",
+          "unchanged": "To je že vaš e-poštni naslov."
+        },
+        "list": {
+          "dir_invalid": "Smer razvrščanja ni veljavna.",
+          "order_invalid": "Seznama ni mogoče razvrstiti po tem stolpcu.",
+          "view_invalid": "Tak pogled ne obstaja."
+        },
+        "login": {
+          "invalid": "Uporabniško ime ne sme biti prazno, imeti presledkov ali biti predolgo.",
+          "taken": "To uporabniško ime je že zasedeno."
+        },
+        "name": {
+          "invalid": "Ime ne sme biti prazno ali predolgo."
+        },
+        "password": {
+          "mismatch": "Gesli se ne ujemata.",
+          "unchanged": "Novo geslo mora biti drugačno od trenutnega.",
+          "weak": "Geslo ne ustreza pravilom za gesla.",
+          "wrong": "Geslo ni pravilno."
+        },
+        "phone": {
+          "invalid": "Telefonska številka je predolga."
+        },
+        "reauth": {
+          "locked": "Preveč napačnih gesel. Zaradi varnosti poskusite znova po {locked_until}."
         }
       }
     },

@@ -86,10 +86,18 @@ export type CoreMessages = {
       /** go-core's identity reasons (`identity.signin.failed` …), looked up by `describeError`. */
       identity: {
         signin: { failed: string; locked: string; inactive: string };
-        session: { invalid: string };
+        session: { invalid: string; current: string; not_found: string };
         locale: { invalid: string };
         impersonation: { disabled: string; not_active: string };
-        account: { not_found: string; inactive: string };
+        account: { not_found: string; inactive: string; already_active: string; already_inactive: string; self_deactivation: string };
+        code: Texts<"expired" | "invalid" | "mismatch" | "no_pending" | "not_delivered" | "resend_too_soon" | "too_many_attempts" | "too_many_requests">;
+        email: Texts<"disabled" | "invalid" | "taken" | "unchanged">;
+        list: Texts<"dir_invalid" | "order_invalid" | "view_invalid">;
+        login: Texts<"invalid" | "taken">;
+        name: Texts<"invalid">;
+        password: Texts<"mismatch" | "unchanged" | "weak" | "wrong">;
+        phone: Texts<"invalid">;
+        reauth: Texts<"locked">;
       };
     };
     identity: {
