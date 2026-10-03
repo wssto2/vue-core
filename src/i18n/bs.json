@@ -1,5 +1,108 @@
 {
   "core": {
+    "access": {
+      "title": "Uloge",
+      "description": "Skupovi dozvola. Osobi se uloga dodjeljuje na njenom zapisu, zajedno s obimom.",
+      "new_title": "Nova uloga",
+      "new_description": "Prilagođena uloga: odaberite dozvole i čije zapise obuhvataju.",
+      "new_copy_description": "Kopija postojeće uloge: dorada se sprema kao nova prilagođena uloga.",
+      "create": "Nova uloga",
+      "save": "Spremi ulogu",
+      "copy": "Kopiraj",
+      "copy_name": "{name} (kopija)",
+      "search": "Pretraži uloge",
+      "list_footer": "Standardne uloge dolaze s aplikacijom i ne uređuju se — Kopiraj daje prilagođenu ulogu za doradu.",
+      "empty": "Nema uloga koje odgovaraju.",
+      "permissions": "Dozvole: {count}",
+      "holders_count": "Osoba: {count}",
+      "kinds": {
+        "all": "Sve",
+        "predefined": "Standardne",
+        "custom": "Prilagođene"
+      },
+      "role_kind": {
+        "predefined": "Standardna",
+        "custom": "Prilagođena",
+        "computed": "automatska"
+      },
+      "groups": {
+        "role": "Uloga"
+      },
+      "fields": {
+        "name": "Naziv",
+        "description": "Opis"
+      },
+      "notes": {
+        "predefined": "Standardna uloga dolazi s aplikacijom i ne uređuje se. Kopiraj daje prilagođenu ulogu za doradu.",
+        "computed": "Dozvole se dodjeljuju automatski: kad aplikacija dobije novu dozvolu, uloga je dobija odmah, bez ručnog dodavanja. Dozvole označene Sistem imaju samo uloge koje vode sistem."
+      },
+      "requires": "Zahtijeva: {names}.",
+      "modules": "Moduli",
+      "turn_on_all": "Uključi sve",
+      "turn_off_all": "Isključi sve",
+      "completed": "Uloga nije imala sve dozvole koje trebaju njene druge dozvole, pa su uključene: {names}. Spremite ulogu da se promjena primijeni.",
+      "name_required": "Unesite naziv.",
+      "too_long": "Prekoračena je najveća dužina.",
+      "saved": "Uloga je spremljena",
+      "deleted": "Uloga je obrisana",
+      "sensitive": "Osjetljivo",
+      "system": "Sistem",
+      "system_group": "Sistem",
+      "organization_only": "Samo cijela organizacija",
+      "unowned": "Uključuje još nedodijeljene zapise, da ih osoba može preuzeti.",
+      "qualifier": {
+        "own": "Svoje",
+        "own_location": "Moja lokacija",
+        "all": "Sve"
+      },
+      "qualifier_hint": {
+        "own": "Samo zapisi dodijeljeni osobi ili koje je izradila",
+        "own_location": "Zapisi lokacije na kojoj osoba ima ulogu",
+        "all": "Svi zapisi na mjestu na kojem osoba ima ulogu"
+      },
+      "qualifier_noun": {
+        "own": "Svoji",
+        "own_location": "Lokacije",
+        "all": "Svi"
+      },
+      "levels": {
+        "organization": "Organizacija"
+      },
+      "compare": {
+        "action": "Usporedi sa standardnom ulogom",
+        "title": "Usporedba sa standardnom ulogom",
+        "footer": "Pokazuje koliko se prilagođena uloga udaljila od standardne.",
+        "with": "Standardna uloga",
+        "loading": "Upoređujem…",
+        "failed": "Usporedba nije uspjela. Pokušajte ponovo.",
+        "identical": "Uloge se ne razlikuju.",
+        "only_in_role": "Samo u ovoj ulozi ({count})",
+        "only_in_other": "Samo u standardnoj ({count})",
+        "different": "Različito čije zapise vidi ({count})",
+        "whose": "{role}, standardna: {other}"
+      },
+      "replace": {
+        "action": "Zamijeni",
+        "title": "Zamijeni ulogu",
+        "footer": "Svi koji imaju ovu ulogu dobijaju odabranu standardnu ulogu na istom obimu. Važe ista pravila kao pri dodjeli: ne možete dati više nego što i sami imate.",
+        "with": "Zamijeni standardnom ulogom",
+        "choose": "Odaberite ulogu.",
+        "confirm": "Zamijeni",
+        "moves": "Osobe koje prelaze na standardnu ulogu: {count}.",
+        "done": "Osobe prebačene na standardnu ulogu: {count}"
+      },
+      "delete": {
+        "action": "Obriši ulogu",
+        "title": "Obrisati ulogu?",
+        "body": "Uloga „{name}” se briše. Dok je neko ima, brisanje nije moguće — najprije je zamijenite.",
+        "failed": "Uloga nije obrisana."
+      },
+      "holders": {
+        "title": "Osobe s ovom ulogom",
+        "empty": "Niko trenutno nema ovu ulogu.",
+        "service": "Servisni račun"
+      }
+    },
     "actions": {
       "cancel": "Odustani",
       "close": "Zatvori",
@@ -340,6 +443,14 @@
       "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
       "cancelled": "Zahtjev je otkazan.",
       "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo.",
+      "authz": {
+        "forbidden": "Nemate pravo na ovu promjenu na tom obimu.",
+        "escalation": "Ta uloga ima dozvole koje ni sami nemate, pa je ne možete dodijeliti.",
+        "self_assignment": "Ne možete dodijeliti ulogu sebi.",
+        "last_admin": "Ne možete ukloniti svoj zadnji pristup ulogama i korisnicima.",
+        "role_in_use": "Uloga je još dodijeljena osobama. Najprije je zamijenite ili uklonite iz njihovog pristupa.",
+        "invalid": "Uloga ili obim nisu ispravni."
+      },
       "identity": {
         "signin": {
           "failed": "Pogrešno korisničko ime ili lozinka.",
