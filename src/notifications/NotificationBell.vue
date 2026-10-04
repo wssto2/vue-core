@@ -38,10 +38,12 @@ const badge = computed(() => (unread.value > 0 ? unreadBadge(unread.value) : und
     <template v-else>
       <HeaderAction icon="notification3Line" :label="label" :badge="badge" data-notification-bell @click="sheet?.present(); inbox.load()" />
       <Sheet ref="sheet" :title="t('core.notifications.title')">
+        <template v-if="settings" #actions>
+          <SettingsLink @click="sheet?.dismiss()" />
+        </template>
         <InboxPanel :inbox="inbox" appearance="sheet" @close="sheet?.dismiss()" />
         <template #footer>
-          <div class="flex items-center justify-center gap-1">
-            <SettingsLink v-if="settings" @click="sheet?.dismiss()" />
+          <div class="flex items-center justify-center">
             <MarkAllRead :inbox="inbox" />
           </div>
         </template>

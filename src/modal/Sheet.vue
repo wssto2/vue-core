@@ -38,6 +38,8 @@ defineSlots<{
   footer?: () => unknown;
   /** Replaces the title and the close button (a picker's Clear, title and Done); give the title element `titleId` so the dialog is named by it. The grabber stays. */
   header?: (scope: { titleId: string }) => unknown;
+  /** Buttons in the default header, just before the close button (an inbox's settings gear). */
+  actions?: () => unknown;
 }>();
 
 const { t } = useI18n();
@@ -115,11 +117,14 @@ defineExpose({ present, dismiss });
             <slot name="header" :title-id="titleId">
               <div class="flex min-h-bar-height items-center justify-between gap-3 px-4" :class="isBottomSheet ? 'pb-1' : 'border-b border-border-separator'">
                 <h3 v-if="props.title" :id="titleId" class="text-headline font-semibold">{{ props.title }}</h3>
-                <button type="button" data-part="close" :aria-label="t('core.actions.close')"
-                  class="hit-target -mr-1 ml-auto flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fill text-content-muted transition-colors duration-motion-fast hover:bg-fill-strong"
-                  @click="dismiss">
-                  <Icon name="close" :size="14" />
-                </button>
+                <div class="ml-auto flex items-center gap-1">
+                  <slot name="actions" />
+                  <button type="button" data-part="close" :aria-label="t('core.actions.close')"
+                    class="hit-target -mr-1 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fill text-content-muted transition-colors duration-motion-fast hover:bg-fill-strong"
+                    @click="dismiss">
+                    <Icon name="close" :size="14" />
+                  </button>
+                </div>
               </div>
             </slot>
           </div>

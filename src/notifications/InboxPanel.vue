@@ -67,7 +67,7 @@ function open(item: Item) {
 
 <template>
   <div data-notification-inbox class="w-full min-w-0 sm:w-96">
-    <!-- The popover carries its title and "Mark all as read" here; the sheet has the title in its header and the button in its footer. -->
+    <!-- The popover carries its title and "Mark all as read" here; the sheet has the title and gear in its header and the button in its footer. -->
     <div v-if="appearance === 'popover'" class="mb-1 flex items-center justify-between gap-2">
       <h2 class="px-1 text-headline font-semibold">{{ t("core.notifications.title") }}</h2>
       <div class="flex items-center gap-1">

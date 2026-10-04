@@ -173,6 +173,13 @@ describe("notificationsFeature", () => {
     expect(application.router.currentRoute.value.path).toBe("/profile/notifications");
   });
 
+  it("puts the gear in the sheet's header, beside the close button, on a phone", async () => {
+    await start({ compact: true });
+    await fireEvent.click(bell());
+    const gear = await screen.findByRole("link", { name: "Notification settings" });
+    expect(gear.parentElement?.querySelector("[data-part=close]")).not.toBeNull();
+  });
+
   it("leaves the gear, the entry and the page out with settings: false", async () => {
     const { application } = await start({ feature: { settings: false } });
     await fireEvent.click(bell());
