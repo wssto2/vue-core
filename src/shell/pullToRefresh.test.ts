@@ -3,7 +3,7 @@ import { defineComponent, h } from "vue";
 import { render } from "@testing-library/vue";
 import { PULL_THRESHOLD, usePullToRefresh } from "./pullToRefresh";
 
-function touch(type: "touchstart" | "touchmove" | "touchend", points: { x: number; y: number }[] = []) {
+function touch(type: "touchstart" | "touchmove" | "touchend" | "touchcancel", points: { x: number; y: number }[] = []) {
   const event = new Event(type, { bubbles: true });
   Object.defineProperty(event, "touches", { value: points.map((p) => ({ clientX: p.x, clientY: p.y })) });
   window.dispatchEvent(event);
@@ -38,6 +38,14 @@ describe("usePullToRefresh", () => {
     expect(pulled.refreshing.value).toBe(true);
     await vi.advanceTimersByTimeAsync(2);
     expect(pulled.refreshing.value).toBe(false);
+    expect(pulled.pull.value).toBe(0);
+  });
+
+  it("does not refresh when the system cancels the touch, however far it was pulled", () => {
+    touch("touchstart", [{ x: 100, y: 100 }]);
+    touch("touchmove", [{ x: 100, y: 100 + PULL_THRESHOLD * 2 }]);
+    touch("touchcancel");
+    expect(refresh).not.toHaveBeenCalled();
     expect(pulled.pull.value).toBe(0);
   });
 

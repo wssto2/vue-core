@@ -63,17 +63,23 @@ export function usePullToRefresh(
     }
   }
 
+  // The system took the touch over (an OS gesture, an incoming call): a pull, never a refresh.
+  function onTouchCancel() {
+    tracking = false;
+    if (!refreshing.value) pull.value = 0;
+  }
+
   onMounted(() => {
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("touchend", onTouchEnd);
-    window.addEventListener("touchcancel", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchCancel);
   });
   onBeforeUnmount(() => {
     window.removeEventListener("touchstart", onTouchStart);
     window.removeEventListener("touchmove", onTouchMove);
     window.removeEventListener("touchend", onTouchEnd);
-    window.removeEventListener("touchcancel", onTouchEnd);
+    window.removeEventListener("touchcancel", onTouchCancel);
   });
 
   return { pull, refreshing };
