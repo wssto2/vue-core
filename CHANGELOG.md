@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.4.3 — 2026-10-05
+
+A plain toast, and a typed `onDismiss`.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `toast.message(message, options?)`: the plain toast, no status icon, for a neutral fact usually with an action (`toast.message(t("filterDeleted"), { action: { label: t("undo"), onClick: undo }, onDismiss: commit })`). `success`, `info`, `warning`, `error` and `loading` keep their icons.
+- `ToastOptions.onDismiss(id)`, on every toast kind: runs when the user swipes the toast away (or closes it, where a close button is shown). It does not run when the toast times out, when its action is pressed, or when code calls `toast.dismiss(id)`. It receives the toast's id (Sonner itself passes the whole toast).
 
 ### Fixes
 - `keepSessionAlive` no longer reads the session back after a `renew` that ended it. An app that expired the session on a refused refresh was signed straight back in by that read (the access token was still valid), and the new session renewed at once: arv-next called `/auth/me` and `/auth/refresh` every ~150 ms until the access token ran out or the rate limiter answered 429. A `renew` that leaves the session signed in is read back as before.

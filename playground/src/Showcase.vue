@@ -186,6 +186,8 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         </Popover>
         <Tooltip text="Copy the VIN"><Button prominence="plain" icon="fileTextLine">Hover me</Button></Tooltip>
         <Button @click="toast.error('Could not save', { action: { label: 'Retry', onClick: () => {} } })">Toast</Button>
+        <Button @click="toast.info('Filter deleted', { action: { label: 'Undo', onClick: () => {} } })">Info toast</Button>
+        <Button @click="toast.message('Filter deleted', { action: { label: 'Undo', onClick: () => {} }, onDismiss: () => {} })">Plain toast</Button>
       </div>
       <p v-if="removed" class="mt-3 text-footnote text-content-muted">Deleted {{ removed }}</p>
       <Modal ref="modal" title="New lead" subtitle="Step 1 of 1" size="md" grouped primary-label="Create" :status="saving" processing-label="Saving…" done-label="Saved" @primary="save">

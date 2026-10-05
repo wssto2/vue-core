@@ -171,6 +171,8 @@ async function archive() {
 </template>
 ```
 
+`toast.message` is the plain toast, without a status icon: a neutral fact, usually with Undo (`success`, `info`, `warning`, `error` and `loading` carry a status; use one when the status is the news). `onDismiss(id)` runs when the user swipes the toast away or closes it, not when it times out, its action is pressed, or code calls `toast.dismiss(id)`; an undo that commits later can commit at once there: `toast.message(t("filterDeleted"), { action: { label: t("undo"), onClick: undo }, onDismiss: commit })`.
+
 Regions and forms word their own failures already (`useResource`, `useLoad`, `useForm` report to their frames and banners); this is for the places that do not.
 
 ## Startup and errors
