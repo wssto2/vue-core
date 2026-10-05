@@ -361,6 +361,27 @@ describe("AdaptivePageShell", () => {
     unmount();
     expect(chrome.focusMemory.take("/customers")).toEqual({ href: "/customers/1", top: 340 });
   });
+
+  it("remembers it under the url the page shows when it goes away, after the list rewrote its query", async () => {
+    const chrome = createPageChrome();
+    vi.spyOn(window, "scrollY", "get").mockReturnValue(80);
+    const router = makeRouter();
+    await router.push("/customers");
+    const { unmount } = render(AdaptivePageShell, {
+      props: { title: "Customers" },
+      slots: { default: () => h("a", { href: "/customers/1" }, "One") },
+      global: { plugins: [i18n, router], provide: { [pageChromeKey as symbol]: chrome } },
+    });
+    await router.replace("/customers?query=abc");
+    await nextTick();
+    screen.getByRole("link", { name: "One" }).focus();
+
+    await router.push("/customers/1");
+    await nextTick();
+    unmount();
+    expect(chrome.focusMemory.take("/customers")).toBeUndefined();
+    expect(chrome.focusMemory.take("/customers?query=abc")).toEqual({ href: "/customers/1", top: 80 });
+  });
 });
 
 describe("PageActions", () => {

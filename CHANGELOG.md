@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.4 — 2026-10-05
+
+Back to a list returns focus to the row you left from, also when the list keeps its state in the URL.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Fixes
+- `AdaptivePageShell` (and so `CollectionPage`) remembered the focused link under the URL the page had when it mounted. A list that keeps its state in the query rewrites the URL right after mounting (`/customers` → `/customers?query=…`), so Back from a row never found the memory: the row lost its focus. The memory is now kept under the URL the page shows when it goes away; query changes on the same route are followed, the navigation that leaves the page is not.
+
 ## 0.4.3 — 2026-10-05
 
 A plain toast, and a typed `onDismiss`.

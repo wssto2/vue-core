@@ -1,4 +1,4 @@
-import { onBeforeUnmount, onMounted, type Ref } from "vue";
+import { onBeforeUnmount, onMounted, watch, type Ref } from "vue";
 import { useRoute } from "vue-router";
 import type { PageChrome } from "./chrome";
 
@@ -11,8 +11,17 @@ import type { PageChrome } from "./chrome";
  */
 export function usePageFocus(root: Ref<HTMLElement | null>, chrome: PageChrome) {
   const route = useRoute();
-  // The url of this page while it is shown: by the time the page unmounts the route has changed.
-  const url = route.fullPath;
+  // The url of this page while it is shown. A list that keeps its state in the query rewrites it after
+  // mounting, so follow changes on this route record; by the time the page unmounts the route has moved
+  // on to another record, which is not followed.
+  let url = route.fullPath;
+  const record = route.matched[route.matched.length - 1];
+  watch(
+    () => route.fullPath,
+    (next) => {
+      if (route.matched[route.matched.length - 1] === record) url = next;
+    },
+  );
   let observer: MutationObserver | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
 
