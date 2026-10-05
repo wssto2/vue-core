@@ -209,6 +209,34 @@ describe("BackofficeShell signed out", () => {
   });
 });
 
+describe("the search slot", () => {
+  const field = (text: string) => defineComponent({ render: () => h("button", { "data-search-field": "" }, text) });
+  const searching = defineFeature({ id: "searching", contributions: [contribution("find", "search", field("Search…"))] });
+
+  it("renders nothing when nothing is contributed", async () => {
+    await startShell(backofficeShell(), { features: [navigation], session, extra });
+    expect(document.querySelector("[data-search-field]")).toBeNull();
+  });
+
+  it("sits in the sidebar between the brand and the menu", async () => {
+    await startShell(backofficeShell(), { features: [navigation, searching], session, extra });
+    const search = within(sidebar()!).getByText("Search…");
+    const menu = within(sidebar()!).getByRole("navigation", { name: "Menu" });
+    expect(sidebar()!.querySelector("[data-shell-brand]")!.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(search.compareDocumentPosition(menu) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("sits at the top of the phone drawer, once, and not in the sidebar", async () => {
+    media = mockMedia({ compact: true });
+    await startShell(backofficeShell(), { features: [navigation, searching], session, extra });
+    expect(sidebar()).toBeNull();
+    expect(document.querySelectorAll("[data-search-field]").length).toBe(1);
+    const drawer = document.querySelector<HTMLElement>("[data-shell-drawer-content]")!;
+    const search = within(drawer).getByText("Search…");
+    expect(search.compareDocumentPosition(within(drawer).getByRole("navigation", { name: "Menu" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
 describe("BackofficeShell on a phone", () => {
   beforeEach(() => {
     media = mockMedia({ compact: true });

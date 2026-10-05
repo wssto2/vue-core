@@ -3,12 +3,14 @@ import { useI18n } from "vue-i18n";
 import type { RouteLocationRaw } from "vue-router";
 import { Avatar } from "../content";
 import { Icon } from "../icon";
+import { ShellOutlet } from "../app/contributions";
 import NavigationList from "./NavigationList.vue";
 import ShellBrand from "./ShellBrand.vue";
 import type { ShellIdentity } from "./identity";
+import { useHasSearch } from "./search";
 
 /**
- * The phone navigation drawer's content (UI decision D18): the brand (home), the destinations (the
+ * The phone navigation drawer's content (UI decision D18): the brand (home), the shell's `search` field, the destinations (the
  * same model as the desktop rail), a `footer` slot, and the account row pinned at the bottom.
  * Presentation only: the `ShellStage` around it owns opening, closing, gestures and focus, and the
  * owner acts on the events:
@@ -26,6 +28,7 @@ defineSlots<{
 }>();
 
 const { t } = useI18n();
+const hasSearch = useHasSearch();
 </script>
 
 <template>
@@ -35,6 +38,7 @@ const { t } = useI18n();
         <template v-if="$slots.brand" #default="scope"><slot name="brand" v-bind="scope" /></template>
       </ShellBrand>
     </div>
+    <div v-if="hasSearch" class="shrink-0 pr-4 pb-3 pl-[max(1.125rem,env(safe-area-inset-left))]"><ShellOutlet name="search" /></div>
     <div class="mx-5.5 shrink-0 border-t border-border-separator" role="presentation"></div>
 
     <!-- Destinations scroll on their own; the last rows fade under the account row. -->

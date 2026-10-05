@@ -5,6 +5,7 @@ import type { RouteLocationRaw } from "vue-router";
 import { ShellOutlet } from "../app/contributions";
 import AccountMenu from "./AccountMenu.vue";
 import NavigationList from "./NavigationList.vue";
+import { useHasSearch } from "./search";
 import ShellBrand from "./ShellBrand.vue";
 import { headerSurfaceKey } from "./accountMenu";
 import type { ShellIdentity } from "./identity";
@@ -12,7 +13,8 @@ import type { ShellIdentity } from "./identity";
 /**
  * The desktop sidebar: an attached, full-height dark rail, the page's one dark surface (the
  * `anchor` palette), sticky and scrolling on its own when the menu is taller than the window. From
- * top to bottom: the brand (home) with the shell's `headerActions`, the server's menu, a `footer`
+ * top to bottom: the brand (home) with the shell's `headerActions`, the shell's `search` field,
+ * the server's menu, a `footer`
  * slot, and the account block. It renders from the md breakpoint up and nothing below it (phones use
  * the navigation drawer), so a header action contributed to the shell is mounted once, never in both.
  *
@@ -30,6 +32,7 @@ defineSlots<{
 provide(headerSurfaceKey, "rail");
 
 const wide = useMediaQuery("(min-width: 48rem)");
+const hasSearch = useHasSearch();
 </script>
 
 <template>
@@ -43,6 +46,8 @@ const wide = useMediaQuery("(min-width: 48rem)");
         </ShellBrand>
         <div class="flex shrink-0 items-center gap-1"><ShellOutlet name="headerActions" /></div>
       </div>
+
+      <div v-if="hasSearch" class="px-2 pb-1"><ShellOutlet name="search" /></div>
 
       <!-- Items fade out at the edges instead of being cut off under the logo. -->
       <NavigationList appearance="rail"

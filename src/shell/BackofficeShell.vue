@@ -20,7 +20,7 @@ import type { NavigationProgress } from "./progress";
 /**
  * The layout of a backoffice application: a sidebar with the server's menu on desktop, a top bar
  * and a push navigation drawer on phones, the page in between, the bottom dock and the toasts, and
- * the places features contribute to (`headerActions`, `accountMenu`, `banner`, `host`). Give it to
+ * the places features contribute to (`headerActions`, `search`, `accountMenu`, `banner`, `host`). Give it to
  * `createApplication` through `backofficeShell()`, or render it inside a shell of your own.
  *
  * Signed out (the login page) there is only the top bar with the brand and the page.

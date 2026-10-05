@@ -24,6 +24,7 @@ export function provideContext<T>(key: InjectionKey<T>, value: T): ContextProvis
  * shell that offers more augments this interface (declaration merging, like `IconRegistry`).
  *
  * - `headerActions`: the actions of the top bar (a notification bell, a search button)
+ * - `search`: a search field at the top of the sidebar, under the brand, and at the top of the phone drawer (a quick-search trigger that looks like a field)
  * - `accountMenu`: entries of the signed-in user's menu
  * - `banner`: a strip across the top of the whole shell, above everything (a notice that must stay in view: signed in as somebody else)
  * - `host`: components with no place of their own that must be mounted once (a command palette, a dialog host)
@@ -32,6 +33,7 @@ export function provideContext<T>(key: InjectionKey<T>, value: T): ContextProvis
 export interface ShellSlots {}
 interface DocumentedShellSlots {
   headerActions: true;
+  search: true;
   accountMenu: true;
   banner: true;
   host: true;
