@@ -135,6 +135,20 @@ describe("keepSessionAlive", () => {
     stop();
   });
 
+  it("does not read the session back after a renew that ended it (ARV signed straight back in, in a loop)", async () => {
+    const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: new Date(NOW + minutes(0.5)) }));
+    await platform.session.restore();
+    const loads = backend.loads;
+    const renew = async () => platform.session.expire(); // the refresh was refused; the access token still reads /me fine
+    const stop = keepSessionAlive({ renew }).start({ signal: new AbortController().signal, platform, report: vi.fn(), user: { id: 1 } }) as () => void;
+
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(backend.loads).toBe(loads);
+    expect(platform.session.state.value).toMatchObject({ status: "anonymous", reason: "expired" });
+    stop();
+  });
+
   it("without a renew call it reads the session again", async () => {
     const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: new Date(NOW + minutes(2)) }));
     await platform.session.restore();

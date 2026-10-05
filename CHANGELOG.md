@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixes
+- `keepSessionAlive` no longer reads the session back after a `renew` that ended it. An app that expired the session on a refused refresh was signed straight back in by that read (the access token was still valid), and the new session renewed at once: arv-next called `/auth/me` and `/auth/refresh` every ~150 ms until the access token ran out or the rate limiter answered 429. A `renew` that leaves the session signed in is read back as before.
+
 ## 0.4.2 — 2026-10-05
 
 A checked menu item now shows its tick.

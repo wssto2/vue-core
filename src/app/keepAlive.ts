@@ -44,6 +44,9 @@ export function keepSessionAlive(options: KeepSessionAliveOptions = {}): Session
         inFlight ??= (async () => {
           try {
             await options.renew?.(platform);
+            // A renew that ended the session (expired it on a refused refresh) stays ended: reading the session
+            // again would sign it back in on a still-valid access token, and the new session would renew at once.
+            if (platform.session.state.value.status !== "authenticated") return;
             await platform.session.refresh();
           } catch (error) {
             report(error);
