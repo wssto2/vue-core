@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.2 — 2026-10-05
+
+A checked menu item now shows its tick.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Changes to existing behaviour
+- A `Menu` item with `checked: true` draws a tick (the same one the account menu uses for its selected row) at the trailing end, after the label and before a `shortcut`; on phones it sits at the trailing end beside the icon. Unchecked items reserve nothing. The role stays `menuitemradio` with `aria-checked`; the tick is `aria-hidden`. This shows the current choice in every `CollectionFilterMenu` and in a location switcher built on `Menu`.
+
 ## 0.4.1 — 2026-10-05
 
 Shell fixes for the arv-next cutover: a search place in the shell, pull to refresh, and the dev-mode readonly warnings gone.

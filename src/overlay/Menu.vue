@@ -252,7 +252,7 @@ defineExpose({ present, presentAt, dismiss: () => dismiss(), toggle });
             <Icon v-if="row.item.processing" name="loader4Line" :size="16" class="animate-spin compact:order-last" />
             <Icon v-else-if="row.item.icon" :name="row.item.icon" :size="16" class="compact:order-last compact:w-5" />
             <span class="min-w-0 flex-1 truncate">{{ row.item.label }}</span>
-            <Icon v-if="row.item.checked" name="checkCustom" :size="16" aria-hidden="true" data-menu-tick
+            <Icon v-if="row.item.checked" name="checkCustom" :size="16" data-menu-tick
               class="shrink-0 text-content-link compact:order-last" />
             <span v-if="row.item.shortcut" aria-hidden="true" class="shrink-0 text-footnote opacity-60 compact:hidden">{{ row.item.shortcut }}</span>
           </button>
