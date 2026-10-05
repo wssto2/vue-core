@@ -43,7 +43,7 @@ defineProps<{ tone: "light" | "brand" }>();
 </template>
 ```
 
-The other options are `footer` (above the account block) and `topBarEnd`. Use one `backofficeShell()` per application: it owns that application's page-load indicator.
+The other options are `footer` (above the account block), `topBarEnd` and `pullToRefresh` (default `true`: while the application runs installed, pulling down from the top of a page reloads that page; the sidebar, top bar and drawer stay. `false` turns it off). Use one `backofficeShell()` per application: it owns that application's page-load indicator.
 
 ## Contributing to the shell
 

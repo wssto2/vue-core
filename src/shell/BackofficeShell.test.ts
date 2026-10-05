@@ -237,6 +237,57 @@ describe("the search slot", () => {
   });
 });
 
+describe("pull to refresh", () => {
+  const pageMounts = { n: 0 };
+  const counting = defineFeature({
+    id: "counting",
+    routes: [{ name: "counted", path: "/counted", component: defineComponent({ setup() { onMounted(() => pageMounts.n++); return () => h("p", "counted page"); } }) }],
+  });
+  const pull = () => {
+    const at = (type: string, y: number) => {
+      const event = new Event(type, { bubbles: true });
+      Object.defineProperty(event, "touches", { value: type === "touchend" ? [] : [{ clientX: 100, clientY: y }] });
+      window.dispatchEvent(event);
+    };
+    at("touchstart", 100);
+    at("touchmove", 300);
+    at("touchend", 300);
+  };
+
+  beforeEach(() => {
+    pageMounts.n = 0;
+  });
+
+  it("reloads the page and keeps the sidebar, when installed", async () => {
+    media = mockMedia({ standalone: true });
+    await startShell(backofficeShell(), { features: [navigation, counting], session, extra, location: "/counted" });
+    const rail = sidebar()!;
+    expect(pageMounts.n).toBe(1);
+
+    pull();
+    await settle();
+
+    expect(pageMounts.n).toBe(2);
+    expect(sidebar()).toBe(rail); // the same element: the shell was not remounted
+    expect(screen.getByRole("main").textContent).toContain("counted page");
+  });
+
+  it("does nothing in a browser tab, and can be turned off", async () => {
+    await startShell(backofficeShell(), { features: [navigation, counting], session, extra, location: "/counted" });
+    pull();
+    await settle();
+    expect(pageMounts.n).toBe(1);
+    stopShells();
+    pageMounts.n = 0;
+
+    media = mockMedia({ standalone: true });
+    await startShell(backofficeShell({ pullToRefresh: false }), { features: [navigation, counting], session, extra, location: "/counted" });
+    pull();
+    await settle();
+    expect(pageMounts.n).toBe(1); // mounted once, never again
+  });
+});
+
 describe("BackofficeShell on a phone", () => {
   beforeEach(() => {
     media = mockMedia({ compact: true });

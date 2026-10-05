@@ -17,6 +17,8 @@ export interface BackofficeShellOptions<U extends SessionUser = SessionUser> {
   footer?: Component;
   /** Extra content at the end of the top bar. */
   topBarEnd?: Component;
+  /** Pull down from the top of the page to reload it (the page only; the shell stays), while the application runs installed. Default `true`. */
+  pullToRefresh?: boolean;
 }
 
 /**
@@ -41,6 +43,7 @@ export function backofficeShell<U extends SessionUser = SessionUser>(options: Ba
             // The application's session produces U; the shell reads it as the SessionUser it is guaranteed to be.
             identity: options.identity as ((user: SessionUser) => ShellIdentity) | undefined,
             progress,
+            pullToRefresh: options.pullToRefresh,
           },
           {
             ...(brand && { brand: (scope: { tone: "light" | "brand" }) => h(brand, scope) }),

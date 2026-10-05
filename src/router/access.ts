@@ -3,6 +3,7 @@ import { RouterView, type RouteLocationNormalizedLoaded, type Router } from "vue
 import { defineFeatureContext } from "../platform/context";
 import type { AccessClient } from "../platform/access";
 import { isAllowed } from "./meta";
+import { pageRefreshKey } from "./pageRefresh";
 
 /**
  * The index in `route.matched` of the first record the session may not open, or -1. A denied record
@@ -36,7 +37,7 @@ const depthKey: InjectionKey<number> = Symbol("vue-core.routerViewDepth");
  * page's section outlet) is an `AppRouterView`, not a bare `RouterView`: it shows the no-access state
  * in place of a page the session may not open (parents around it keep rendering, so the layout stays),
  * and remounts a page when the route parameter named by `meta.remountOnParam` changes (a record pager
- * moving to the next record).
+ * moving to the next record), or when the shell's pull to refresh reloads the page (the shell's outlet only).
  *
  * Denial is shown here, not enforced: the server authorizes every request.
  */
@@ -46,6 +47,7 @@ export const AppRouterView = defineComponent({
     const depth = inject(depthKey, 0);
     provide(depthKey, depth + 1);
     const access = useRouteAccess();
+    const refreshed = depth === 0 ? inject(pageRefreshKey, null) : null;
     return () =>
       h(RouterView, null, {
         default: ({ Component, route }: { Component: Component | undefined; route: RouteLocationNormalizedLoaded }) => {
@@ -53,7 +55,8 @@ export const AppRouterView = defineComponent({
           if (denied !== -1 && depth >= denied) return h(access.noAccess);
           if (!Component) return null;
           const param = route.meta.remountOnParam;
-          return h(Component, { key: param ? `${param}:${String(route.params[param])}` : undefined });
+          const key = [param ? `${param}:${String(route.params[param])}` : "", refreshed?.value ? `refresh:${refreshed.value}` : ""].filter(Boolean).join("|");
+          return h(Component, { key: key || undefined });
         },
       });
   },

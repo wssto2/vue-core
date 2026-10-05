@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from "vue";
+import { computed, provide, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type { RouteLocationRaw } from "vue-router";
 import { ShellOutlet } from "../app/contributions";
@@ -9,8 +9,10 @@ import { BottomDock, usePageChromeContext } from "../page";
 import { usePlatform } from "../platform/platform";
 import { heldSession, type SessionUser } from "../platform/session";
 import { AppRouterView } from "../router";
+import { pageRefreshKey } from "../router/pageRefresh";
 import AccountSheet from "./AccountSheet.vue";
 import NavigationDrawer from "./NavigationDrawer.vue";
+import PullToRefresh from "./PullToRefresh.vue";
 import ShellSidebar from "./ShellSidebar.vue";
 import ShellStage from "./ShellStage.vue";
 import ShellTopBar from "./ShellTopBar.vue";
@@ -36,7 +38,9 @@ const props = withDefaults(defineProps<{
   identity?: (user: SessionUser) => ShellIdentity;
   /** The page-load indicator (`backofficeShell()` supplies it to the router as well). */
   progress?: NavigationProgress;
-}>(), { home: undefined, identity: undefined, progress: undefined });
+  /** Pull down from the top of the page to reload it, while the application runs installed (`display-mode: standalone`). Default on. */
+  pullToRefresh?: boolean;
+}>(), { home: undefined, identity: undefined, progress: undefined, pullToRefresh: true });
 
 defineSlots<{
   /** The logo, for the dark sidebar (`tone` `light`) and the light surfaces (`brand`). Default: the application's name. */
@@ -51,6 +55,9 @@ const { t } = useI18n();
 const { session } = usePlatform();
 const chrome = usePageChromeContext();
 const identity = useShellIdentity(props.identity);
+
+// The pull to refresh remounts the page outlet through this; AppRouterView at depth 0 reads it.
+provide(pageRefreshKey, ref(0));
 
 const authenticated = computed(() => heldSession(session.state.value) !== null);
 const accountSheet = useTemplateRef("accountSheet");
@@ -73,6 +80,8 @@ const accountSheet = useTemplateRef("accountSheet");
           <template v-if="$slots.footer" #footer><slot name="footer" /></template>
         </NavigationDrawer>
       </template>
+
+      <PullToRefresh v-if="pullToRefresh && authenticated" />
 
       <ShellTopBar :home="home">
         <template v-if="$slots.brand" #brand="scope"><slot name="brand" v-bind="scope" /></template>
