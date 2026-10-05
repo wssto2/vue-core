@@ -10,6 +10,7 @@ export { default as ResourceHeader } from "./ResourceHeader.vue";
 export {
   createPageChrome,
   installPageChrome,
+  useOptionalPageChrome,
   usePageChrome,
   usePageChromeContext,
   pageChromeKey,

@@ -160,7 +160,10 @@ export function installPageChrome(app: App): PageChrome {
   return chrome;
 }
 
-/** The chrome of an app that installed one, otherwise null. */
+/**
+ * The chrome of an app that installed one, otherwise null. Use it in a component that may be mounted without the
+ * application (a unit test, a story); inside an application use `usePageChromeContext`, which names the missing provider.
+ */
 export function useOptionalPageChrome(): PageChrome | null {
   return getCurrentInstance() ? inject(pageChromeKey, null) : null;
 }
