@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.1 — 2026-10-05
+
+Shell fixes for the arv-next cutover: a search place in the shell, pull to refresh, and the dev-mode readonly warnings gone.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**.
+- **`vue` 3.5.19 or later** (peer, was 3.5.0). Before 3.5.19 Vue wrote the element into the readonly ref `useTemplateRef` returns, so every first mount of a dev build logged `Set operation on key "value" failed: target is readonly` (about ten times in the shell, once at a sign-in route). Upgrade `vue` to clear them.
+
+### Added
+- The shell's `search` slot: a contribution `{ slot: "search", component }` renders at the top of the sidebar, under the brand, and at the top of the phone drawer. Nothing contributed, nothing rendered. `backofficeShell()` offers it; a custom shell lists `"search"` in its `slots` and renders `<ShellOutlet name="search" />`, or marks the contribution `optional`.
+- `useOptionalPageChrome` is exported from `@wssto2/vue-core/page` (the page chrome, or `null`, for a component that may be mounted without the application, e.g. in a unit test).
+
+### Changes to existing behaviour
+- Pull to refresh is on in `BackofficeShell` whenever the application runs installed (`display-mode: standalone`, or iOS `navigator.standalone`): pulling down from the top of the page reloads the page only (the shell's page outlet remounts; the sidebar, top bar, drawer and open popovers stay). Vertical downward drags from the scroll top only; never with a dialog or the drawer open; threshold 72, resistance 0.5, the indicator spins at least 600 ms, reduced motion keeps it still; unsaved changes ask first. Turn it off with `backofficeShell({ pullToRefresh: false })`. An application that had its own pull to refresh should remove it.
+- The readonly warnings above are gone with the `vue` peer bump; no source change.
+
 ## 0.4.0 — 2026-10-04
 
 The screens for go-core's notification module (in-app notifications, e-mail settings and quiet hours) and the failed events of its event queue. Built and checked against go-core `v1.7.0`.
