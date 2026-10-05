@@ -51,6 +51,8 @@ const tab = ref("overview");
 const menu: MenuItem[] = [
   { id: "copy", label: "Copy link", icon: "fileTextLine", shortcut: "⌘C", onSelect: () => toast.success("Copied") },
   { id: "call", label: "Call", icon: "phoneLine", onSelect: () => toast.info("Calling…") },
+  { id: "split", label: "Split", checked: true, onSelect: () => toast.info("Split") },
+  { id: "zagreb", label: "Zagreb", checked: false, onSelect: () => toast.info("Zagreb") },
   { id: "delete", label: "Delete", tone: "critical", onSelect: () => alert.value?.present({ id: 1 }) },
 ];
 

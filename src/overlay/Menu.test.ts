@@ -155,6 +155,19 @@ describe("Menu", () => {
     expect(screen.getByRole("menuitemradio", { name: "Zagreb" }).getAttribute("aria-checked")).toBe("false");
   });
 
+  it("only the checked row draws a tick", async () => {
+    mountMenu([
+      { id: "a", label: "Split", checked: true, onSelect: () => {} },
+      { id: "b", label: "Zagreb", checked: false, onSelect: () => {} },
+      { id: "c", label: "Plain", onSelect: () => {} },
+    ]);
+    await openMenu();
+
+    const ticks = document.querySelectorAll("[data-menu-tick]");
+    expect(ticks).toHaveLength(1);
+    expect(screen.getByRole("menuitemradio", { name: "Split" }).contains(ticks[0]!)).toBe(true);
+  });
+
   it("closes on a press outside and does not open with nothing to show", async () => {
     mountMenu();
     await openMenu();

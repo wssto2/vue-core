@@ -475,6 +475,8 @@ describe("filters", () => {
     await fireEvent.click(screen.getByRole("button", { name: "Open" }));
     await flush();
     expect(screen.getByRole("menuitemradio", { name: "Open" }).getAttribute("aria-checked")).toBe("true");
+    expect(screen.getByRole("menuitemradio", { name: "Open" }).querySelector("[data-menu-tick]")).not.toBeNull();
+    expect(document.querySelectorAll("[data-menu-tick]")).toHaveLength(1);
   });
 
   it("the panel applies several filters in one request and shows them as tokens", async () => {
