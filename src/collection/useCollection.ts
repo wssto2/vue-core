@@ -16,7 +16,7 @@ import { routerKey, type RouteLocationRaw, type Router } from "vue-router";
 import { isAborted } from "../client";
 import type { AsyncState } from "../state";
 import type { Column } from "./columns";
-import type { CollectionDefinition } from "./definition";
+import { defineCollection, type CollectionDefinition } from "./definition";
 import { isEmptyFilterValue, type FilterDescriptor, type ViewDescriptor } from "./filters";
 import { LIST_CONTEXT_PARAM, withQuery } from "./location";
 import type { SavedView, SavedViewState, SavedViews } from "./savedViews";
@@ -38,7 +38,7 @@ export interface LinkedQuery<Filter extends string> {
   consume?: readonly string[];
 }
 
-export interface UseCollectionOptions<Row, Filter extends string, View extends string, Col extends Column<Row>> {
+export interface UseCollectionOptions<Row, Filter extends string, View extends string, Col extends Column<Row>, Sort extends string = string> {
   /** Where the list keeps its state; two lists on one page need two URL keys. */
   state: CollectionStateSource;
   columns?: MaybeRefOrGetter<readonly Col[]>;
@@ -49,6 +49,15 @@ export interface UseCollectionOptions<Row, Filter extends string, View extends s
   /** Offers "Saved views" on the list. */
   savedViews?: SavedViews;
   linked?: LinkedQuery<Filter>;
+  /**
+   * This use's starting state, over the definition's `defaults` (each field given replaces the
+   * definition's): where the list opens when the URL holds none, and what `reset()` returns to. A list
+   * that opens on the user's own location starts here. It is where the list starts, not a search the
+   * user ran: `isFiltered` (so `display`) counts a filter or the search only when it differs from it,
+   * so an empty result under the start is `"empty"`, not `"no-matches"`. Clearing the filter shows
+   * everything, and the start is still sent to the backend like any filter.
+   */
+  defaults?: Readonly<{ filters?: Readonly<Partial<Record<NoInfer<Filter>, string>>>; search?: string; view?: NoInfer<View> | null; sort?: NoInfer<Sort> | null; direction?: SortDirection }>;
 }
 
 /** What the list shows, derived from its state: one branch to render per value. */
@@ -103,7 +112,7 @@ export interface Collection<Row, Sort extends string = string, Filter extends st
   readonly rows: ComputedRef<readonly Row[]>;
   readonly total: ComputedRef<number>;
   readonly display: ComputedRef<CollectionDisplay>;
-  /** A search or a filter applies. */
+  /** A search or a filter applies; one that is the use's starting state (`defaults`) does not count. */
   readonly isFiltered: ComputedRef<boolean>;
   /** The failure of the last request (an `ApiError` for requests made through the client); null when it did not fail. */
   readonly error: Readonly<Ref<unknown>>;
@@ -130,7 +139,7 @@ export interface Collection<Row, Sort extends string = string, Filter extends st
   /** Clears every filter and the search. */
   clearFilters(): void;
   setView(view: View | null): void;
-  /** Back to the definition's defaults. */
+  /** Back to the starting state: the use's `defaults` over the definition's. */
   reset(): void;
   /** The link of a row's record, carrying the list's state; null without `recordRoute`. */
   recordLocation(row: Row): RouteLocationRaw | null;
@@ -181,7 +190,7 @@ const messageOf = (error: unknown): string => (error instanceof Error && error.m
  */
 export function useCollection<Row, Sort extends string, Filter extends string, View extends string, const Col extends Column<Row> = Column<Row>>(
   definition: CollectionDefinition<Row, Sort, Filter, View>,
-  options: UseCollectionOptions<Row, Filter, View, Col>,
+  options: UseCollectionOptions<Row, Filter, View, Col, Sort>,
 ): Collection<Row, Sort, Filter, View, Col> {
   const where = `useCollection("${definition.id}")`;
   const source = options.state;
@@ -201,10 +210,21 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
 
   // --- state -------------------------------------------------------------------------------------
 
+  // The state the list starts from and `reset()` returns to: this use's `defaults` over the definition's, validated like the definition's own.
+  const begin: CollectionQuery<Sort, Filter, View> = options.defaults
+    ? defineCollection({
+        ...definition,
+        query: { ...definition.contract, sorts: definition.contract.sorts ?? undefined, filters: definition.contract.filters ?? undefined, views: definition.contract.views ?? undefined },
+        defaults: { ...definition.defaults, ...options.defaults },
+      }).defaults
+    : definition.defaults;
+  // Narrowing is measured against what the use gave, not the definition's defaults: those count as before.
+  const given = { search: options.defaults?.search ?? "", filters: (options.defaults?.filters ?? {}) as Readonly<Partial<Record<Filter, string>>> };
+  const startOption = options.defaults ? begin : undefined;
   const start = (() => {
-    if (!router) return definition.defaults;
+    if (!router) return begin;
     const raw = router.currentRoute.value.query[urlKey];
-    return decodeState(definition, Array.isArray(raw) ? raw[0] : raw) ?? definition.defaults;
+    return decodeState(definition, Array.isArray(raw) ? raw[0] : raw, startOption) ?? begin;
   })();
   const query = shallowRef<CollectionQuery<Sort, Filter, View>>(start);
   const state = shallowRef<AsyncState<ListPage<Row>>>({ status: "loading" });
@@ -331,7 +351,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
         const here = router.currentRoute.value;
         // Only this list's own page: a write after the user navigated away would change the next page's URL.
         if (disposed || here.path !== ownPath) return;
-        const encoded = encodeState(definition, query.value);
+        const encoded = encodeState(definition, query.value, startOption);
         const rest = { ...here.query };
         for (const name of consumed.splice(0)) delete rest[name];
         if (here.query[urlKey] === encoded && Object.keys(rest).length === Object.keys(here.query).length) continue;
@@ -352,7 +372,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
           const here = router!.currentRoute.value;
           if (disposed || writing || here.path !== ownPath) return;
           const stored = Array.isArray(raw) ? raw[0] : raw;
-          const next = decodeState(definition, stored) ?? definition.defaults;
+          const next = decodeState(definition, stored, startOption) ?? begin;
           if (JSON.stringify(next) !== JSON.stringify(query.value)) {
             query.value = next;
             changed();
@@ -377,7 +397,9 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     return filters;
   };
 
-  const isFiltered = computed(() => query.value.search !== "" || Object.values(query.value.filters).some((value) => !isEmptyFilterValue(value)));
+  const isFiltered = computed(
+    () => (query.value.search !== "" && query.value.search !== given.search) || Object.entries(query.value.filters).some(([key, value]) => !isEmptyFilterValue(value) && value !== given.filters[key as Filter]),
+  );
   const rows = computed(() => page.value?.rows ?? []);
   const display = computed<CollectionDisplay>(() => {
     const current = state.value;
@@ -399,7 +421,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
 
   function storedOf(view: SavedView): CollectionQuery<Sort, Filter, View> | null {
     const stored: Json = { v: view.state.version, f: view.state.filters, s: view.state.search, w: view.state.view ?? undefined };
-    return restoreState(definition, stored);
+    return restoreState(definition, stored, startOption);
   }
 
   function createSavedViewsHandle(adapter: SavedViews): SavedViewsHandle {
@@ -542,14 +564,14 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     clearFilters: () => commit({ filters: {} as CollectionQuery<Sort, Filter, View>["filters"], search: "" }, true),
     setView: (view) => commit({ view }, true),
     reset: () => {
-      query.value = definition.defaults;
+      query.value = begin;
       changed();
     },
     recordLocation: (row) => {
       const target = options.recordRoute?.(row);
       if (!target) return null;
-      return router ? withQuery(target, { [LIST_CONTEXT_PARAM]: encodeState(definition, query.value) }) : target;
+      return router ? withQuery(target, { [LIST_CONTEXT_PARAM]: encodeState(definition, query.value, startOption) }) : target;
     },
-    linkContext: () => (router ? { [LIST_CONTEXT_PARAM]: encodeState(definition, query.value) } : {}) as Record<string, string>,
+    linkContext: () => (router ? { [LIST_CONTEXT_PARAM]: encodeState(definition, query.value, startOption) } : {}) as Record<string, string>,
   };
 }

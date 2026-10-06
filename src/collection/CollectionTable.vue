@@ -183,7 +183,7 @@ const message = computed(() => {
         </template>
         <template #empty>
           <slot v-if="props.collection.display.value === 'empty' && slots.empty" name="empty" />
-          <CollectionEmptyResult v-else-if="activeChips.length > 0" :chips="activeChips" :last-chip="lastChip" @remove="removeChip" @clear-all="clearAll" />
+          <CollectionEmptyResult v-else-if="props.collection.display.value !== 'empty' && activeChips.length > 0" :chips="activeChips" :last-chip="lastChip" @remove="removeChip" @clear-all="clearAll" />
           <EmptyState v-else :title="t('core.collection.no_data')" :description="t('core.collection.no_results')" />
         </template>
       </CollectionRows>

@@ -20,6 +20,13 @@ export const customerRoutes = defineRoutes({
     component: () => import("./views/Index.vue"),
     meta: { access: "customers:view", titleKey: "customers.title" },
   },
+  // Opens on a starting filter (the user's own location): see `defaults` of `useCollection`.
+  local: {
+    name: "customers.local",
+    path: "/customers/local",
+    component: () => import("./views/Local.vue"),
+    meta: { access: "customers:view", titleKey: "customers.local_title" },
+  },
   record: {
     name: "customers.record",
     path: "/customers/:customerID",

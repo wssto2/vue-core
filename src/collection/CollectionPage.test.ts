@@ -59,6 +59,7 @@ type Setup = {
   state?: "url" | "memory";
   rows?: Customer[];
   lastPage?: number;
+  start?: { filters?: Record<string, string> };
 };
 
 let restoreViewport: () => void = () => undefined;
@@ -101,6 +102,7 @@ async function mountList(setup: Setup = {}) {
         state: setup.state === "memory" ? { kind: "memory" } : { kind: "url", key: "query" },
         recordRoute: setup.record === false ? undefined : (customer: Customer) => ({ name: "customer", params: { customerID: customer.id } }),
         savedViews: setup.savedViews,
+        defaults: setup.start as never,
       }) as never;
       return () =>
         h(props.mode === "page" ? CollectionPage : CollectionTable, { collection: list, title: "Customers", rowActions: setup.rowActions, actionsVisible: setup.actionsVisible, rowLabel: (c: Customer) => `${c.first_name} ${c.last_name}`, actions: setup.pageActions } as never, {
@@ -181,6 +183,19 @@ describe("states", () => {
     await flush();
     expect(screen.queryByText("Add your first customer")).toBeNull();
     expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeTruthy();
+  });
+
+  it("a list that opens on a starting filter shows the first-use slot, or the plain empty state, never the no-results chips", async () => {
+    const filters: FilterDescriptor<"phase" | "location">[] = [{ key: "phase", label: "Phase", type: "select", options: [{ value: "open", label: "Open" }] }];
+    const { list } = await mountList({ rows: [], emptySlot: true, filters, start: { filters: { phase: "open" } } });
+    expect(screen.getByText("Add your first customer")).toBeTruthy();
+    list.search("ana");
+    await flush();
+    expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeTruthy();
+    document.body.innerHTML = "";
+    await mountList({ rows: [], filters, start: { filters: { phase: "open" } } });
+    expect(screen.getByText("No data")).toBeTruthy();
+    expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeNull();
   });
 
   it("a cell slot that renders nothing is respected: no raw value comes back in its place", async () => {

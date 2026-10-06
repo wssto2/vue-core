@@ -43,8 +43,10 @@ function text(value: unknown, max = MAX_TEXT): string | null {
 export function sanitizeState<Row, Sort extends string, Filter extends string, View extends string>(
   definition: CollectionDefinition<Row, Sort, Filter, View>,
   candidate: Json,
+  start?: CollectionQuery<Sort, Filter, View>,
 ): CollectionQuery<Sort, Filter, View> {
-  const { defaults, contract } = definition;
+  const { contract } = definition;
+  const defaults = start ?? definition.defaults;
 
   const page = typeof candidate.p === "number" && Number.isInteger(candidate.p) && candidate.p >= 1 && candidate.p <= MAX_PAGE ? candidate.p : defaults.page;
   const pageSize = typeof candidate.l === "number" && contract.pageSizes.includes(candidate.l) ? candidate.l : defaults.pageSize;
@@ -58,7 +60,8 @@ export function sanitizeState<Row, Sort extends string, Filter extends string, V
 
   let view: View | null = defaults.view;
   const viewText = text(candidate.w, 64);
-  if (viewText !== null && (contract.views ? (contract.views as readonly string[]).includes(viewText) : IDENTIFIER.test(viewText))) view = viewText as View;
+  if (candidate.w === "") view = null; // a view cleared against a start that has one
+  else if (viewText !== null && (contract.views ? (contract.views as readonly string[]).includes(viewText) : IDENTIFIER.test(viewText))) view = viewText as View;
 
   // A stored `f` replaces the default filters (a cleared default stays cleared); without one the defaults apply.
   const filters: Partial<Record<Filter, string>> = isRecord(candidate.f) ? {} : { ...defaults.filters };
@@ -76,20 +79,26 @@ export function sanitizeState<Row, Sort extends string, Filter extends string, V
   return { page, pageSize, sort, direction, search, view, filters };
 }
 
-/** The compact text of a query. Sensitive filters are left out. */
+/**
+ * The compact text of a query. Sensitive filters are left out. `start` is a list's own starting
+ * state (see `UseCollectionOptions.defaults`): the text stays readable without it (a record page's
+ * `from` is decoded against the bare definition), so whatever either side defaults is written out,
+ * even when empty: `f` as `{}`, `s` as `""`, `w` as `""`.
+ */
 export function encodeState<Row, Sort extends string, Filter extends string, View extends string>(
   definition: CollectionDefinition<Row, Sort, Filter, View>,
   query: CollectionQuery<Sort, Filter, View>,
+  start?: CollectionQuery<Sort, Filter, View>,
 ): string {
   const compact: Record<string, unknown> = { v: definition.stateVersion, p: query.page, l: query.pageSize };
   if (query.sort) compact.c = query.sort;
   compact.d = query.direction;
-  if (query.search) compact.s = query.search;
-  if (query.view) compact.w = query.view;
+  if (query.search || (start && definition.defaults.search !== start.search)) compact.s = query.search;
+  if (query.view || (start && definition.defaults.view !== start.view)) compact.w = query.view ?? "";
   const filters = Object.fromEntries(
     Object.entries(query.filters).filter(([key, value]) => value !== undefined && value !== "" && !(definition.contract.sensitive as readonly string[]).includes(key)),
   );
-  if (Object.keys(filters).length > 0 || Object.keys(definition.defaults.filters).length > 0) compact.f = filters;
+  if (Object.keys(filters).length > 0 || Object.keys(definition.defaults.filters).length > 0 || Object.keys(start?.filters ?? {}).length > 0) compact.f = filters;
   return toBase64Url(JSON.stringify(compact));
 }
 
@@ -100,13 +109,14 @@ export function encodeState<Row, Sort extends string, Filter extends string, Vie
 export function restoreState<Row, Sort extends string, Filter extends string, View extends string>(
   definition: CollectionDefinition<Row, Sort, Filter, View>,
   stored: Json,
+  start?: CollectionQuery<Sort, Filter, View>,
 ): CollectionQuery<Sort, Filter, View> | null {
   const version = stored.v === undefined ? definition.stateVersion : stored.v;
   if (typeof version !== "number" || !Number.isInteger(version)) return null;
-  if (version === definition.stateVersion) return sanitizeState(definition, stored);
+  if (version === definition.stateVersion) return sanitizeState(definition, stored, start);
 
   const migrated = definition.migrate?.(stored, version);
-  return migrated ? sanitizeState(definition, migrated) : null;
+  return migrated ? sanitizeState(definition, migrated, start) : null;
 }
 
 /**
@@ -116,6 +126,7 @@ export function restoreState<Row, Sort extends string, Filter extends string, Vi
 export function decodeState<Row, Sort extends string, Filter extends string, View extends string>(
   definition: CollectionDefinition<Row, Sort, Filter, View>,
   raw: unknown,
+  start?: CollectionQuery<Sort, Filter, View>,
 ): CollectionQuery<Sort, Filter, View> | null {
   if (typeof raw !== "string" || raw === "" || raw.length > MAX_ENCODED) return null;
   let parsed: unknown;
@@ -124,7 +135,7 @@ export function decodeState<Row, Sort extends string, Filter extends string, Vie
   } catch {
     return null;
   }
-  return isRecord(parsed) ? restoreState(definition, parsed) : null;
+  return isRecord(parsed) ? restoreState(definition, parsed, start) : null;
 }
 
 /** A stable text of a query: the cache key of a page, and a cheap equality. */
