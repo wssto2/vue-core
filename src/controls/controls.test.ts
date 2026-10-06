@@ -21,6 +21,19 @@ describe("IconTile", () => {
     expect(root.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("draws the soft weight as a tint of the tone, and keeps the solid fill by default", () => {
+    const soft = render(IconTile, { props: { tone: "brand", icon: "save", weight: "soft", size: "sm" } }).container.firstElementChild!;
+    const solid = render(IconTile, { props: { tone: "brand", icon: "save" } }).container.firstElementChild!;
+
+    expect(soft.className).toContain("bg-tile-brand-soft");
+    expect(soft.className).toContain("text-tile-brand-soft-foreground");
+    expect(soft.className).not.toContain("bg-tile-brand ");
+    expect(soft.className).toContain("size-8");
+    expect(soft.getAttribute("data-weight")).toBe("soft");
+    expect(solid.className).toContain("bg-tile-brand ");
+    expect(solid.className).not.toContain("soft");
+  });
+
   it("renders letters when there is no icon", () => {
     const { container } = render(IconTile, { props: { tone: "anchor", text: "TV", size: "md" } });
 

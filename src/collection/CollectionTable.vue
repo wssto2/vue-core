@@ -25,7 +25,7 @@ import type { Collection } from "./useCollection";
  * long press or right click list the row's actions).
  *
  *   <CollectionTable :collection="customers" :row-actions="rowActions" :row-label="customerName">
- *     <template #leading="{ item }"><IconTile :icon="iconOf(item)" /></template>
+ *     <template #leading="{ item }"><IconTile weight="soft" size="sm" :icon="iconOf(item)" /></template>
  *     <template #cell-status="{ item }"><StatusBadge :status="item.status" /></template>
  *   </CollectionTable>
  */

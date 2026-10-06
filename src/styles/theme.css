@@ -254,6 +254,9 @@
      record avatars), neutral = system and export */
   --app-tile-neutral: #6B7773;
   --app-tile-neutral-foreground: #FFFFFF;
+  /* The soft weight of a brand tile (a list row's leading mark): a light brand tint, a brand glyph. */
+  --app-tile-brand-soft: var(--color-primary-50);
+  --app-tile-brand-soft-foreground: var(--color-primary-700);
 
   /* Elevation */
   --app-shadow-group: 0 0 0 1px rgb(18 38 32 / 0.05);
@@ -385,6 +388,8 @@
   --app-category-pink-surface: #42232E;
 
   --app-tile-neutral: #4F5B57;
+  --app-tile-brand-soft: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+  --app-tile-brand-soft-foreground: var(--color-primary-300);
 
   --app-shadow-group: 0 0 0 1px rgb(210 235 226 / 0.04);
   --app-shadow-float: 0 12px 40px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.07);
@@ -523,6 +528,8 @@
   --color-tile-anchor-foreground: var(--app-tile-anchor-foreground);
   --color-tile-neutral: var(--app-tile-neutral);
   --color-tile-neutral-foreground: var(--app-tile-neutral-foreground);
+  --color-tile-brand-soft: var(--app-tile-brand-soft);
+  --color-tile-brand-soft-foreground: var(--app-tile-brand-soft-foreground);
 
   --shadow-group: var(--app-shadow-group);
   --shadow-float: var(--app-shadow-float);

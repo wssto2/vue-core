@@ -50,6 +50,6 @@ function rowActions(customer: Customer): RowAction[] {
 <template>
   <CollectionPage :collection="customers" :title="t('customers.title')" :description="t('customers.description')" :actions="actions"
     :row-actions="rowActions" :row-label="name" :row-height="61">
-    <template #leading="{ item }"><IconTile tone="neutral" size="md" :text="name(item).slice(0, 1)" /></template>
+    <template #leading><IconTile weight="soft" size="sm" icon="user3Line" /></template>
   </CollectionPage>
 </template>
