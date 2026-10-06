@@ -37,7 +37,8 @@ const props = withDefaults(defineProps<{
 
 const mark = "rounded-sm bg-status-warning-surface text-status-warning-content";
 const SPREAD_TITLE = "col-start-1 row-start-1";
-const SPREAD_SUBTITLE = "col-span-full row-start-2";
+// max-w-full: `w-fit` alone would size a nowrap line to its whole text and let it run out of the card instead of ending in an ellipsis.
+const SPREAD_SUBTITLE = "col-span-full row-start-2 max-w-full";
 const parts = computed(() => highlightParts(props.title, props.highlight));
 </script>
 

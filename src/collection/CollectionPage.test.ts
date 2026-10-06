@@ -443,7 +443,7 @@ describe("phone rows", () => {
     expect(head.className).toContain("grid-cols-[minmax(0,1fr)_auto]");
     expect([title.className, subtitle.className, accessory.className]).toEqual([
       expect.stringContaining("col-start-1 row-start-1"),
-      expect.stringContaining("col-span-full row-start-2"),
+      expect.stringContaining("col-span-full row-start-2 max-w-full"),
       expect.stringContaining("col-start-2 row-start-1"),
     ]);
     // Nothing around the subtitle gives it the title's weight.
