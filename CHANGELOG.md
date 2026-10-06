@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.6 — 2026-10-06
+
+A list's own starting values: the state it opens on and that Reset returns to, which is not a search the user ran.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `useCollection` option `defaults?: { filters?, search?, view?, sort?, direction? }`, typed by the definition's keys, each field given replacing the definition's own `defaults` field. It is the state the list starts from when the URL (or a saved view without that field) holds none, and the state `reset()` returns to. The starting filter is sent to the backend like any filter. A URL with an explicit state, and `linked` params (`"any"` clears a starting filter), win over it. It is checked against the query contract like the definition's defaults (a filter or sort the contract does not list throws at creation).
+- `isFiltered`, and so `display`, count a filter or the search as narrowing only when it differs from the use's `defaults`: a list that opens on the user's own location and has nothing there is `"empty"` (the `#empty` first-use content), and becomes `"no-matches"` only after the user changes the filter or searches. A cleared starting filter shows everything and does not read as a search. A view never counted.
+- The URL state is written so it reads back the same with and without the start (a record page's `?from=` is decoded against the bare definition): a field either side defaults is written even when the user emptied it (`f` as `{}`, `s` as `""`, `w` as `""`).
+
+### Changes to existing behaviour
+- A list without `defaults` behaves exactly as in 0.4.5; the definition's own `defaults` still count as narrowing. One internal difference: with `display` `"empty"`, `CollectionTable` no longer draws the no-results chips (nothing could be narrowing then before, so nothing changes without `defaults`).
+- **API change:** `useDatePresetFilter(key, label?)` returns a `ComputedRef<FilterDescriptor<Filter>>` instead of a descriptor, and `label` is a `MaybeRefOrGetter<string>`. It takes `t` from `useI18n()` at setup, and the label and option labels follow the locale (a `label` getter such as `() => t("…")` follows it too). Call it once at setup and put `.value` in the computed: `const created = useDatePresetFilter("created_at"); const filters = computed(() => [created.value, …]);`. Callers add `.value` (arv-next's lists do).
+
+### Fixes
+- The `useDatePresetFilter` doc comment (and the list recipe, and the playground) told callers to call it inside the `filters` computed. It uses `useI18n`, which exists only during setup: it threw when the computed ran again, and options that load later never appeared. Call it once at setup. Calling it once, though, left the labels in the old language when the user changed language while a list was open, so it is now reactive (below).
+
 ## 0.4.5 — 2026-10-06
 
 The quiet row tile, a phone row subtitle that is a subtitle, and a status dot in a filter option.
