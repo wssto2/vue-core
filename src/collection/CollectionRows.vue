@@ -69,6 +69,10 @@ const withRole = (role: NonNullable<Column<Row>["mobile"]>) => props.columns.fil
 const primary = computed(() => withRole("primary"));
 const accessory = computed(() => withRole("accessory"));
 const meta = computed(() => withRole("meta"));
+// A lone standard identity in the first line shares the line with the accessory only through its title: the subtitle
+// runs under both, on the full width (and cannot inherit the title's weight).
+const spreadIdentity = computed(() => primary.value.length === 1 && primary.value[0]!.kind === "identity" && !hasSlot(primary.value[0]!));
+const hasAccessory = (item: Row) => accessory.value.length > 0 || (moreInColumn.value && hasActions(item));
 
 const slotName = (column: Column<Row>) => `cell-${String(column.key).replace(/\./g, "_")}`;
 const hasSlot = (column: Column<Row>) => !!allSlots[slotName(column)];
@@ -147,16 +151,17 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
               <slot name="leading" :item="item" :compact="true" />
             </div>
             <div class="flex min-w-0 flex-1 flex-col gap-1">
-              <div class="flex min-w-0 items-start gap-3">
-                <div class="min-w-0 flex-1">
+              <div class="grid min-w-0 items-start gap-x-3" :class="hasAccessory(item) ? 'grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[minmax(0,1fr)]'" data-test="collection-row-head">
+                <div :class="spreadIdentity ? 'contents' : 'col-start-1 row-start-1 min-w-0'">
                   <!-- A provided cell slot renders as is, even empty (a meta that has nothing to say); a column without one shows its standard cell. -->
                   <template v-for="column in primary" :key="String(column.key)">
                     <!-- @vue-ignore -->
                     <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="props.link(item)" :search="props.search" />
+                    <CollectionCell v-else-if="spreadIdentity" :column="column" :item="item" :compact="true" :to="props.link(item)" :search="props.search" spread />
                     <span v-else class="block truncate text-row-title"><CollectionCell :column="column" :item="item" :compact="true" :to="props.link(item)" :search="props.search" /></span>
                   </template>
                 </div>
-                <div v-if="accessory.length || (moreInColumn && hasActions(item))" class="flex shrink-0 items-center gap-2 pt-0.5">
+                <div v-if="hasAccessory(item)" class="col-start-2 row-start-1 flex shrink-0 items-center gap-2 pt-0.5">
                   <template v-for="column in accessory" :key="String(column.key)">
                     <!-- @vue-ignore -->
                     <slot v-if="hasSlot(column)" :name="slotName(column)" :item="item" :value="cellValue(item, column)" :compact="true" :to="props.link(item)" :search="props.search" />

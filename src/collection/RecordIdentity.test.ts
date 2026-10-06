@@ -32,6 +32,19 @@ describe("RecordIdentity", () => {
     expect(subtitle.closest("a")).toBeNull();
   });
 
+  it("as cells of its parent grid (spread): no box of its own, the subtitle spans the full width of the second row", () => {
+    const { container } = render(RecordIdentity, { props: { title: "Ada Lovelace", subtitle: "ada@example.com", spread: true }, global: { plugins: [router] } });
+    expect(container.firstElementChild!.className).toBe("contents");
+    expect(screen.getByText("Ada Lovelace").className).toContain("col-start-1 row-start-1");
+    expect(screen.getByText("ada@example.com").className).toContain("col-span-full row-start-2");
+  });
+
+  it("is a column of its own by default, unchanged", () => {
+    const { container } = render(RecordIdentity, { props: { title: "Ada Lovelace", subtitle: "ada@example.com" }, global: { plugins: [router] } });
+    expect(container.firstElementChild!.className).toBe("flex min-w-0 flex-col");
+    expect(screen.getByText("ada@example.com").className).not.toContain("col-span-full");
+  });
+
   it("does not reserve subtitle space when there is none", () => {
     const { container } = render(RecordIdentity, { props: { title: "Ada Lovelace" }, global: { plugins: [router] } });
     expect(container.querySelector(".text-row-subtitle")).toBeNull();

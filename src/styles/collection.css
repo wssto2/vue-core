@@ -5,7 +5,7 @@
 }
 
 @utility text-row-subtitle {
-  @apply text-xs text-content-muted;
+  @apply text-xs font-normal text-content-muted;
 }
 
 @utility text-row-meta {

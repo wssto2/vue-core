@@ -54,6 +54,7 @@ type Setup = {
   withSlots?: boolean;
   emptySlot?: boolean;
   blankCity?: boolean;
+  noAccessory?: boolean;
   record?: boolean;
   state?: "url" | "memory";
   rows?: Customer[];
@@ -94,7 +95,7 @@ async function mountList(setup: Setup = {}) {
     props: { mode: { type: String as PropType<"page" | "table">, default: "page" } },
     setup(props) {
       list = useCollection(definition as never, {
-        columns: computed(() => columns),
+        columns: computed(() => (setup.noAccessory ? columns.filter((column) => column.mobile !== "accessory") : columns)) as never,
         filters: setup.filters ? computed(() => setup.filters ?? []) : undefined,
         views: computed(() => [{ key: "all" as const, label: "All" }, { key: "mine" as const, label: "Mine" }]),
         state: setup.state === "memory" ? { kind: "memory" } : { kind: "url", key: "query" },
@@ -427,6 +428,37 @@ describe("phone rows", () => {
     expect(rows[0]!.querySelector("[data-test='lead']")).toBeTruthy();
     expect(rows[0]!.querySelector(".text-row-meta")!.textContent).toContain("Split");
     expect(rows[1]!.querySelector(".text-row-meta")!.textContent).not.toContain("null");
+  });
+
+  it("puts the accessory beside the title only: the subtitle is regular, muted and runs under both on the full width", async () => {
+    restoreViewport();
+    restoreViewport = viewport(true);
+    await mountList({ withSlots: true });
+    const row = document.querySelectorAll("[data-test='collection-mobile-rows'] [data-test='collection-row']")[0]!;
+    const head = row.querySelector("[data-test='collection-row-head']")!;
+    const title = screen.getByText("Ana Horvat");
+    const subtitle = screen.getByText("ana@example.com");
+    const accessory = row.querySelector("[data-test='phase']")!.parentElement!;
+
+    expect(head.className).toContain("grid-cols-[minmax(0,1fr)_auto]");
+    expect([title.className, subtitle.className, accessory.className]).toEqual([
+      expect.stringContaining("col-start-1 row-start-1"),
+      expect.stringContaining("col-span-full row-start-2"),
+      expect.stringContaining("col-start-2 row-start-1"),
+    ]);
+    // Nothing around the subtitle gives it the title's weight.
+    expect(subtitle.closest(".text-row-title")).toBeNull();
+    expect(subtitle.className).toContain("text-row-subtitle");
+    // The title and the subtitle are cells of the head grid itself (their wrappers are `display: contents`).
+    expect(title.closest("[data-test='collection-row-head']")).toBe(head);
+    expect(subtitle.closest("[data-test='collection-row-head']")).toBe(head);
+  });
+
+  it("keeps the first line to one column when a row has no accessory", async () => {
+    restoreViewport();
+    restoreViewport = viewport(true);
+    await mountList({ noAccessory: true });
+    expect(document.querySelector("[data-test='collection-row-head']")!.className).toContain("grid-cols-[minmax(0,1fr)]");
   });
 
   it("keeps the table on phones when no column has a role", async () => {

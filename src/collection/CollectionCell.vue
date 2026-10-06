@@ -20,6 +20,8 @@ const props = defineProps<{
   to: RouteLocationRaw | null;
   /** The list's search text: marked in an identity's title. */
   search?: string | null;
+  /** An identity's lines as cells of the parent grid (the phone row's first line has something beside the title). */
+  spread?: boolean;
 }>();
 
 defineSlots<{
@@ -40,7 +42,7 @@ const asNumber = computed(() => (typeof value.value === "number" ? value.value :
       <slot name="leading" />
       <RecordIdentity :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" :highlight="props.search" subtitle-selectable />
     </div>
-    <RecordIdentity v-else :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" :highlight="props.search" subtitle-selectable />
+    <RecordIdentity v-else :spread="props.spread" :to="props.to" :title="props.column.title?.(props.item) ?? text" :subtitle="props.column.subtitle?.(props.item)" :highlight="props.search" subtitle-selectable />
   </template>
 
   <template v-else-if="props.column.kind === 'timestamp'">

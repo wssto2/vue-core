@@ -11,6 +11,9 @@ import { highlightParts } from "./highlight";
  *
  *   <RecordIdentity :to="recordRoute" :title="name" :subtitle="email" subtitle-selectable />
  *
+ * `spread` (the phone row) lets the two lines be cells of the grid they sit in: the title in the first column of the first
+ * row, the subtitle across the full width of the second, so something beside the title (a status) never narrows the subtitle.
+ *
  * `highlight` (the list's search text) marks where it matches the title, in `<mark>`: what found the row is visible.
  */
 const props = withDefaults(defineProps<{
@@ -22,7 +25,10 @@ const props = withDefaults(defineProps<{
   subtitleSelectable?: boolean;
   /** The search text to mark in the title (its words, any case). */
   highlight?: string | null;
+  /** Lays the lines out as cells of the parent grid (see above) instead of a column of its own. */
+  spread?: boolean;
 }>(), {
+  spread: false,
   highlight: null,
   subtitle: null,
   to: null,
@@ -30,20 +36,22 @@ const props = withDefaults(defineProps<{
 });
 
 const mark = "rounded-sm bg-status-warning-surface text-status-warning-content";
+const SPREAD_TITLE = "col-start-1 row-start-1";
+const SPREAD_SUBTITLE = "col-span-full row-start-2";
 const parts = computed(() => highlightParts(props.title, props.highlight));
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col">
+  <div :class="props.spread ? 'contents' : 'flex min-w-0 flex-col'">
     <RouterLink v-if="props.to" :to="props.to"
-      class="block truncate rounded-sm text-row-title focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus">
+      class="block truncate rounded-sm text-row-title focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus" :class="props.spread ? SPREAD_TITLE : undefined">
       <template v-for="(part, index) in parts" :key="index"><mark v-if="part.match" :class="mark">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template>
     </RouterLink>
-    <span v-else class="truncate text-row-title"><template v-for="(part, index) in parts" :key="index"><mark v-if="part.match" :class="mark">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template></span>
+    <span v-else class="truncate text-row-title" :class="props.spread ? SPREAD_TITLE : undefined"><template v-for="(part, index) in parts" :key="index"><mark v-if="part.match" :class="mark">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template></span>
 
     <!-- A click in it is left to the text (selection), not taken by the row. -->
     <span v-if="props.subtitle" :data-row-click-ignore="props.subtitleSelectable ? '' : undefined"
-      class="truncate text-row-subtitle" :class="{ 'w-fit cursor-text select-text': props.subtitleSelectable }">
+      class="truncate text-row-subtitle" :class="[props.subtitleSelectable ? 'w-fit cursor-text select-text' : undefined, props.spread ? SPREAD_SUBTITLE : undefined]">
       {{ props.subtitle }}
     </span>
   </div>
