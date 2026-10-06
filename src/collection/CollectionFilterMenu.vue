@@ -3,6 +3,7 @@ import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
 import { Menu, Popover, type MenuItem } from "../overlay";
+import ToneDot from "../state/ToneDot.vue";
 import { isEmptyFilterValue, type FilterDescriptor } from "./filters";
 
 /**
@@ -33,6 +34,7 @@ const items = computed<MenuItem[]>(() => {
       id: `option-${String(option.value)}`,
       label: option.label,
       icon: option.icon,
+      dot: option.dot,
       checked: selected.value === String(option.value),
       onSelect: () => emit("update", String(option.value)),
     })),
@@ -105,6 +107,7 @@ async function focusField() {
     <template #trigger="{ toggle, attrs }">
       <button v-bind="attrs" type="button" :class="[CHIP, chipTone]" @click="toggle">
         <Icon v-if="props.filter.icon" :name="props.filter.icon" :size="16" />
+        <ToneDot v-if="selectedOption?.dot" :tone="selectedOption.dot" />
         <span class="max-w-56 truncate">{{ label }}</span>
         <Icon name="arrowDownSLine" :size="16" class="text-content-muted" />
       </button>

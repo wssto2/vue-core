@@ -19,6 +19,8 @@ const name = (lead: Lead) => `${lead.first_name} ${lead.last_name}`;
 const contact = (lead: Lead) => lead.email || lead.mobile_phone;
 const recordOf = (lead: Lead) => leadRoutes.record({ leadID: lead.id });
 const PHASE_TONES: Record<number, Tone> = { 1: "neutral", 2: "info", 3: "info", 4: "warning", 5: "warning", 6: "critical" };
+// The tones of the phase badges, for the dots of the phase filter's options.
+const PHASE_DOTS: Record<string, Tone> = { open: "info", 1: "neutral", 2: "info", 3: "info", 4: "warning", 5: "warning", 6: "critical", "7_bought": "positive", "7_rejected": "neutral" };
 const phaseTone = (lead: Lead): Tone => (lead.phase.phase === 7 ? (lead.phase.decision === "bought" ? "positive" : "neutral") : (PHASE_TONES[lead.phase.phase] ?? "neutral"));
 const phaseText = (lead: Lead) => (lead.phase.phase === 7 ? `${t("leads.phases.7")} | ${t(`leads.closed.${lead.phase.decision ?? "rejected"}`)}` : t(`leads.phases.${lead.phase.phase}`));
 const overdue = (lead: Lead) => lead.next_contact_at !== null && Date.parse(lead.next_contact_at) < Date.UTC(2026, 8, 30, 12);
@@ -37,8 +39,8 @@ const columns = computed(() => [
 const filters = computed<FilterDescriptor<"phase" | "assigned_to" | "followup" | "created_at">[]>(() => [
   useDatePresetFilter("created_at"),
   { key: "assigned_to", icon: "phoneLine", label: t("leads.filters.assigned"), type: "select", options: [{ value: "none", label: t("leads.filters.none") }, { value: 1, label: "Ana Horvat" }, { value: 2, label: "Marko Babić" }, { value: 3, label: "Iva Knežević" }] },
-  { key: "followup", icon: "mailLine", label: t("leads.filters.followup"), type: "select", options: [{ value: "overdue", label: t("leads.filters.overdue") }, { value: "today", label: t("leads.filters.today") }, { value: "none", label: t("leads.filters.without") }] },
-  { key: "phase", icon: "fileTextLine", label: t("leads.filters.phase"), type: "select", placement: "panel", options: ["open", "1", "2", "3", "4", "5", "6", "7_bought", "7_rejected"].map((value) => ({ value, label: t(`leads.phases.${value}`) })) },
+  { key: "followup", icon: "mailLine", label: t("leads.filters.followup"), type: "select", options: [{ value: "overdue", label: t("leads.filters.overdue"), dot: "critical" }, { value: "today", label: t("leads.filters.today"), dot: "warning" }, { value: "none", label: t("leads.filters.without"), dot: "neutral" }] },
+  { key: "phase", icon: "fileTextLine", label: t("leads.filters.phase"), type: "select", placement: "panel", options: ["open", "1", "2", "3", "4", "5", "6", "7_bought", "7_rejected"].map((value) => ({ value, label: t(`leads.phases.${value}`), dot: PHASE_DOTS[value] })) },
 ]);
 
 const leads = useCollection(list, {

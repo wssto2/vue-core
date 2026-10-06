@@ -1,9 +1,13 @@
+import type { Tone } from "../state";
+
 /** One choice of a select, chips, segments or cards. `Value` is what lands in the form. */
 export interface SelectOption<Value extends string | number = string | number> {
   readonly value: Value;
   readonly label: string;
   /** A caption at the end of the row (tells equal names apart). */
   readonly description?: string;
+  /** A status dot before the label, in the tone's colour. */
+  readonly dot?: Tone;
   readonly disabled?: boolean;
   /** Options with the same group are listed together, under its name, in the order the groups first appear. */
   readonly group?: string;

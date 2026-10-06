@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, useId, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
+import ToneDot from "../state/ToneDot.vue";
 import { groupOptions, matchOptions, type SelectOption } from "./options";
 import type { SuggestionStatus } from "./suggestions";
 
@@ -119,6 +120,7 @@ watch(() => props.status, (status, before) => {
                 </span>
               </span>
               <span class="flex min-h-row min-w-0 flex-1 items-center gap-3 py-2 pr-row-inset" :class="grouped ? 'border-t border-border-separator group-first/option:border-t-0' : ''">
+                <ToneDot v-if="option.dot" :tone="option.dot" class="-mr-1.5" />
                 <span class="min-w-0 flex-1 text-content-strong">{{ option.label }}</span>
                 <span v-if="option.description" class="shrink-0 text-footnote text-content-muted">{{ option.description }}</span>
                 <Icon v-if="!props.multiple && chosen(option)" name="checkCustom" :size="18" class="shrink-0 text-content-link" />

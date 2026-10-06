@@ -1,11 +1,14 @@
 <script lang="ts">
 import type { IconName } from "../icon";
+import type { Tone } from "../state";
 
 /** One command of a `Menu`. */
 export interface MenuItem {
   id: string;
   label: string;
   icon?: IconName;
+  /** A status dot before the label (an option that is a state). */
+  dot?: Tone;
   /** Items with a different section start a new block after a separator. */
   section?: string;
   /** `critical` commands go last, in their own block, in red. */
@@ -28,6 +31,7 @@ export interface MenuItem {
 import { computed, nextTick, onUnmounted, ref, useId, watch } from "vue";
 import type { Placement } from "@floating-ui/dom";
 import { Icon } from "../icon";
+import ToneDot from "../state/ToneDot.vue";
 import { useAnchoredPosition } from "./anchored";
 import { INERT_SKIP_ATTR } from "./dialogStack";
 import { CLOSE_OVERLAYS_EVENT } from "./closeOverlays";
@@ -251,6 +255,7 @@ defineExpose({ present, presentAt, dismiss: () => dismiss(), toggle });
             @click="choose(row.item)">
             <Icon v-if="row.item.processing" name="loader4Line" :size="16" class="animate-spin compact:order-last" />
             <Icon v-else-if="row.item.icon" :name="row.item.icon" :size="16" class="compact:order-last compact:w-5" />
+            <ToneDot v-if="row.item.dot" :tone="row.item.dot" data-menu-dot />
             <span class="min-w-0 flex-1 truncate">{{ row.item.label }}</span>
             <Icon v-if="row.item.checked" name="checkCustom" :size="16" data-menu-tick
               class="shrink-0 text-content-link compact:order-last" />

@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
 import { Icon } from "../icon";
 import { useCompactPresentation } from "../internal/mediaQuery";
+import ToneDot from "../state/ToneDot.vue";
 import Sheet from "../modal/Sheet.vue";
 import Popover from "../overlay/Popover.vue";
 import { useControlSurface } from "./control";
@@ -74,6 +75,7 @@ const triggerClass = computed(() => [
     <div class="inline-flex max-w-full min-w-0" :class="surface">
       <button v-if="compact" :id="id" type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="sheetOpen" :aria-required="props.required || undefined"
         :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="sheet?.present()">
+        <ToneDot v-if="selected?.dot" :tone="selected.dot" />
         <span class="min-w-0 truncate" :class="selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
         <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
       </button>
@@ -81,6 +83,7 @@ const triggerClass = computed(() => [
         <template #trigger="{ toggle, attrs }">
           <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined"
             :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="toggle">
+            <ToneDot v-if="selected?.dot" :tone="selected.dot" />
             <span class="min-w-0 truncate" :class="selected ? 'text-content-strong' : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
             <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
           </button>

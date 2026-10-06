@@ -3,6 +3,8 @@ import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
 import { Tabs } from "../controls";
+import type { Tone } from "../state";
+import ToneDot from "../state/ToneDot.vue";
 import NumberField from "../form/NumberField.vue";
 import SelectField from "../form/SelectField.vue";
 import { Icon } from "../icon";
@@ -108,11 +110,18 @@ function valueLabel(filter: FilterDescriptor): string {
   if (value === null || value === undefined) return allLabel(filter);
   return optionsFor(filter).find((option) => option.value === value)?.label ?? value;
 }
+/** What a touch list offers: "show all" (no value, no dot) and the options. */
+const choicesFor = (filter: FilterDescriptor): { value: string | null; label: string; dot?: Tone }[] => [{ value: null, label: allLabel(filter) }, ...optionsFor(filter)];
+/** The dot of the draft's option, for the touch row that shows it. */
+const valueDot = (filter: FilterDescriptor) => {
+  const value = draft.value[filter.key];
+  return value === null || value === undefined ? undefined : optionsFor(filter).find((option) => option.value === value)?.dot;
+};
 
 /** The options of a select as a `SelectField` lists them: values as text (the draft's), with "show all" as the empty one. */
 const selectOptions = (filter: FilterDescriptor) => [
   { value: "", label: allLabel(filter) },
-  ...optionsFor(filter).map((option) => ({ value: String(option.value), label: option.label })),
+  ...optionsFor(filter).map((option) => ({ value: String(option.value), label: option.label, dot: option.dot })),
 ];
 
 const segmentTabs = (filter: FilterDescriptor) => [
@@ -224,11 +233,11 @@ defineExpose({ present });
       </button>
       <p class="mb-3 text-headline font-semibold">{{ activeFilter.label }}</p>
       <ul class="overflow-hidden rounded-group bg-surface-cell shadow-group" role="listbox" :aria-label="activeFilter.label">
-        <li v-for="option in [{ value: null, label: allLabel(activeFilter) }, ...optionsFor(activeFilter)]" :key="String(option.value)" role="presentation">
+        <li v-for="option in choicesFor(activeFilter)" :key="String(option.value)" role="presentation">
           <button type="button" role="option" :aria-selected="(draft[activeFilter.key] ?? null) === option.value"
             class="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 px-row-inset text-left text-body active:bg-fill"
             @click="setValue(activeFilter.key, option.value); activeKey = null">
-            <span class="min-w-0 truncate">{{ option.label }}</span>
+            <span class="flex min-w-0 items-center gap-2"><ToneDot v-if="option.dot" :tone="option.dot" /><span class="min-w-0 truncate">{{ option.label }}</span></span>
             <Icon v-if="(draft[activeFilter.key] ?? null) === option.value" name="checkboxCircleFill" :size="18" class="shrink-0 text-content-link" />
           </button>
         </li>
@@ -276,12 +285,12 @@ defineExpose({ present });
           <div v-else-if="isTouch && asChips(filter)" role="group" :aria-label="filter.label" data-test="filter-chips">
             <p class="mb-2 text-footnote font-medium text-content-muted">{{ filter.label }}</p>
             <div class="flex flex-wrap gap-2">
-              <button v-for="option in [{ value: null, label: allLabel(filter) }, ...optionsFor(filter)]" :key="String(option.value)" type="button"
+              <button v-for="option in choicesFor(filter)" :key="String(option.value)" type="button"
                 :aria-pressed="(draft[filter.key] ?? null) === option.value"
                 class="min-h-9 cursor-pointer rounded-full px-3.5 text-subheadline ring-1 ring-inset transition-colors"
                 :class="(draft[filter.key] ?? null) === option.value ? 'bg-tint-soft font-semibold text-content-link ring-border-selected' : 'bg-surface-cell text-content ring-border-separator active:bg-fill'"
                 @click="setValue(filter.key, option.value)">
-                {{ option.label }}
+                <span class="inline-flex items-center gap-2"><ToneDot v-if="option.dot" :tone="option.dot" />{{ option.label }}</span>
               </button>
             </div>
           </div>
@@ -290,7 +299,9 @@ defineExpose({ present });
             class="flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-group bg-surface-cell px-3 text-left ring-1 ring-inset ring-border-separator active:bg-fill disabled:cursor-not-allowed disabled:opacity-50"
             @click="activeKey = filter.key">
             <span class="shrink-0 text-subheadline font-medium">{{ filter.label }}</span>
-            <span class="min-w-0 flex-1 truncate text-right text-subheadline" :class="draft[filter.key] == null ? 'text-content-disabled' : 'font-medium text-content-link'">{{ valueLabel(filter) }}</span>
+            <span class="flex min-w-0 flex-1 items-center justify-end gap-2 text-subheadline" :class="draft[filter.key] == null ? 'text-content-disabled' : 'font-medium text-content-link'">
+              <ToneDot v-if="valueDot(filter)" :tone="valueDot(filter)!" /><span class="truncate">{{ valueLabel(filter) }}</span>
+            </span>
             <Icon name="arrowRightSLine" :size="18" class="shrink-0 text-content-muted" />
           </button>
 

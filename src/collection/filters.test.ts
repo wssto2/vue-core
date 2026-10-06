@@ -29,6 +29,12 @@ const model: FilterDescriptor = {
 };
 
 describe("narrowedOptions", () => {
+  it("carries the dot of the first option of a merged label, and only when there is one", () => {
+    const filter: FilterDescriptor = { key: "k", label: "K", type: "select", options: [{ value: 1, label: "A", dot: "positive" }, { value: 2, label: "A" }, { value: 3, label: "B" }] };
+    expect(narrowedOptions(filter, null)).toEqual([{ value: "1,2", label: "A", dot: "positive" }, { value: "3", label: "B" }]);
+    expect(Object.keys(narrowedOptions(filter, null)[1]!)).toEqual(["label", "value"]);
+  });
+
   it("merges same-named options into one id list while the parent is empty", () => {
     expect(narrowedOptions(brand, null)).toEqual([
       { label: "Renault", value: "10,12" },

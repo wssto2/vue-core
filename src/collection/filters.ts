@@ -1,9 +1,12 @@
 import type { IconName } from "../icon";
+import type { Tone } from "../state";
 
 export interface FilterOption {
   value: string | number;
   label: string;
   icon?: IconName;
+  /** A status dot before the label, in the tone's colour, wherever the option is listed or shown as the chosen one. */
+  dot?: Tone;
   /** For a filter with `dependsOn`: the parent value this option belongs to; offered only while the parent is empty or includes it. */
   parentValue?: string | number;
 }
@@ -70,20 +73,20 @@ export function joinRange(from: string | number | null | undefined, until: strin
  * merged into one whose value is the comma-joined values ("Renault" under two categories becomes
  * "10,12"). A parent value may itself be such a list, so it is split before matching.
  */
-export function narrowedOptions(filter: FilterDescriptor, parentValue: string | number | null | undefined): { value: string; label: string }[] {
+export function narrowedOptions(filter: FilterDescriptor, parentValue: string | number | null | undefined): { value: string; label: string; dot?: Tone }[] {
   const parents = isEmptyFilterValue(parentValue) ? null : new Set(String(parentValue).split(","));
   const visible = (filter.options ?? []).filter(
     (option) => !filter.dependsOn || !parents || (option.parentValue !== undefined && parents.has(String(option.parentValue))),
   );
 
-  const merged = new Map<string, string[]>();
+  const merged = new Map<string, { values: string[]; dot?: Tone }>();
   for (const option of visible) {
-    const values = merged.get(option.label) ?? [];
+    const entry = merged.get(option.label) ?? { values: [], dot: option.dot };
     const value = String(option.value);
-    if (!values.includes(value)) values.push(value);
-    merged.set(option.label, values);
+    if (!entry.values.includes(value)) entry.values.push(value);
+    merged.set(option.label, entry);
   }
-  return [...merged.entries()].map(([label, values]) => ({ label, value: values.join(",") }));
+  return [...merged.entries()].map(([label, { values, dot }]) => ({ label, value: values.join(","), ...(dot ? { dot } : {}) }));
 }
 
 /** An applied filter as a removable token. */

@@ -70,7 +70,8 @@ export const LEADS: readonly Lead[] = Array.from({ length: 83 }, (_, index): Lea
     id,
     first_name: pick(FIRST, id * 5),
     last_name: pick(LAST, id * 3),
-    email: id % 5 === 0 ? null : `lead${id}@example.com`,
+    // Every seventh has an address longer than a phone row: it runs under the status badge, and is cut only at the edge.
+    email: id % 5 === 0 ? null : id % 7 === 0 ? `lead${id}.a-long-address@a-company-with-a-long-domain-name.example.com` : `lead${id}@example.com`,
     mobile_phone: id % 2 === 0 ? `+385 98 777 ${String(2000 + id)}` : null,
     city: pick(CITIES, id * 2),
     created_at: new Date(NOW - id * DAY * 0.6).toISOString(),

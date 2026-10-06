@@ -511,6 +511,56 @@ describe("filters", () => {
     expect(document.querySelectorAll("[data-menu-tick]")).toHaveLength(1);
   });
 
+  describe("an option's status dot", () => {
+    const withDots: FilterDescriptor<"phase" | "location">[] = [
+      { key: "phase", label: "Phase", type: "select", options: [{ value: 1, label: "Open", dot: "positive" }, { value: 2, label: "Closed", dot: "warning" }, { value: 3, label: "Other" }] },
+      { key: "location", label: "Location", type: "select", placement: "panel", options: [{ value: "a", label: "Split", dot: "positive" }, { value: "b", label: "Zagreb" }] },
+    ];
+    const dotOf = (node: Element | null) => node?.querySelector("[data-tone]")?.getAttribute("data-tone") ?? null;
+
+    it("shows in the toolbar menu before the label, and on the capsule of the applied option", async () => {
+      await mountList({ filters: withDots });
+      await fireEvent.click(screen.getByRole("button", { name: "Phase" }));
+      await flush();
+      expect(dotOf(screen.getByRole("menuitemradio", { name: "Open" }))).toBe("positive");
+      expect(dotOf(screen.getByRole("menuitemradio", { name: "Closed" }))).toBe("warning");
+      expect(dotOf(screen.getByRole("menuitemradio", { name: "Other" }))).toBeNull();
+      expect(dotOf(screen.getByRole("menuitemradio", { name: /Show all/ }))).toBeNull();
+      await fireEvent.click(screen.getByRole("menuitemradio", { name: "Closed" }));
+      await flush();
+      expect(dotOf(screen.getByRole("button", { name: "Closed" }))).toBe("warning");
+    });
+
+    it("shows in the desktop panel's select, in its list", async () => {
+      await mountList({ filters: withDots });
+      await fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
+      await flush();
+      await fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Location" }));
+      await flush();
+      expect(dotOf(screen.getByRole("option", { name: "Split" }))).toBe("positive");
+      expect(dotOf(screen.getByRole("option", { name: "Zagreb" }))).toBeNull();
+    });
+
+    it("shows on a phone in the chips, in the drill-down's rows, and on the row that names the chosen option", async () => {
+      restoreViewport();
+      restoreViewport = viewport(true);
+      const long = [{ value: "a", label: "A label too long for a chip", dot: "critical" as const }, { value: "b", label: "Plain" }];
+      await mountList({ filters: [withDots[0]!, { key: "location", label: "Location", type: "select", placement: "panel", options: long }] });
+      await fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
+      await flush();
+      const chips = document.querySelector("[data-test='filter-chips']")!;
+      expect(dotOf(within(chips as HTMLElement).getByRole("button", { name: "Open" }))).toBe("positive");
+      expect(dotOf(within(chips as HTMLElement).getByRole("button", { name: "Other" }))).toBeNull();
+
+      await fireEvent.click(document.querySelector("[data-test='filter-row']")!);
+      await flush();
+      expect(dotOf(screen.getByRole("option", { name: "A label too long for a chip" }))).toBe("critical");
+      await fireEvent.click(screen.getByRole("option", { name: "A label too long for a chip" }));
+      await flush();
+      expect(dotOf(document.querySelector("[data-test='filter-row']"))).toBe("critical");
+    });
+  });
+
   it("the panel applies several filters in one request and shows them as tokens", async () => {
     const { list, loader } = await mountList({ filters });
     await fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
