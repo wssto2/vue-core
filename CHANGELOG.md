@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.5 — 2026-10-06
+
+The quiet row tile, a phone row subtitle that is a subtitle, and a status dot in a filter option.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `IconTile` `weight="soft"` (default `solid`, so nothing existing changes): a light tint of the tone with its glyph and a hairline ring instead of the solid fill, light and dark. `brand` uses new tokens (`--app-tile-brand-soft`, `--app-tile-brand-soft-foreground`, derived from the primary palette, so a re-brand follows); `anchor` is the soft brand tint with the link colour, `neutral` the fill with the muted colour. The recipe for a list says a `#leading` slot is `<IconTile weight="soft" size="sm" icon="…" />`.
+- `IconTile` `size="sm"`: 32 px (`size-8`), the leading tile of a list row. `row` is unchanged (22 px desktop, 29 px compact): it is the metric of grouped rows and navigation.
+- `FilterOption.dot?: Tone`, `MenuItem.dot?: Tone` and `SelectOption.dot?: Tone`: a small status dot (a tone of the status roles, `positive` = success, `warning`, `critical`, `info`, `neutral`) before the label, in the toolbar filter menu and the capsule of the applied option, the desktop filter panel's select (list and trigger), and on phones the chips, the drill-down rows and the row that names the chosen option. Options merged by `dependsOn` keep the first one's dot. The applied-filter tokens that list a panel filter's value stay text.
+
+### Changes to existing behaviour
+- The phone row (`CollectionRows`, columns with `mobile` roles `primary` and `accessory`): when the primary column is a standard `identity` cell (no cell slot), the accessory sits beside the title only; the subtitle is regular weight (it inherited the title's semibold through the row's wrapper) and muted, and runs under both on the full width, ending in an ellipsis only at the card's edge. A primary column with a cell slot, a non-identity primary column, and several primary columns lay out as before. `text-row-subtitle` is now explicitly `font-normal`. The desktop table and `RecordIdentity` on its own are unchanged (`RecordIdentity` gains `spread`, used by the phone row).
+
 ## 0.4.4 — 2026-10-05
 
 Back to a list returns focus to the row you left from, also when the list keeps its state in the URL.
