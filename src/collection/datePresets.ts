@@ -1,3 +1,4 @@
+import { computed, toValue, type ComputedRef, type MaybeRefOrGetter } from "vue";
 import { useI18n } from "vue-i18n";
 import type { FilterDescriptor } from "./filters";
 
@@ -6,20 +7,21 @@ export const DATE_PRESETS = ["today", "yesterday", "this_week", "last_week", "th
 
 /**
  * A filter over a date column with go-core's presets (today, this week, last month...), its labels
- * translated. Call it once while a component is set up (it uses `useI18n`, which exists only then),
- * and use the result in the `filters` computed: calling it inside the computed throws when the
- * computed runs again, and options that load later never appear.
+ * translated. Call it once while a component is set up (it takes `t` from `useI18n`, which exists
+ * only then) and use the result in the `filters` computed: the descriptor's labels follow the locale,
+ * so changing the language while the list is open re-labels it. `label` may be a getter, which
+ * follows the locale too.
  *
  *   const created = useDatePresetFilter("created_at");
- *   const filters = computed(() => [created, …]);
+ *   const filters = computed(() => [created.value, …]);
  */
-export function useDatePresetFilter<Filter extends string>(key: Filter, label?: string): FilterDescriptor<Filter> {
+export function useDatePresetFilter<Filter extends string>(key: Filter, label?: MaybeRefOrGetter<string>): ComputedRef<FilterDescriptor<Filter>> {
   const { t } = useI18n();
-  return {
+  return computed(() => ({
     key,
     icon: "calendarEventFill",
-    label: label ?? t("core.collection.date_presets.label"),
+    label: toValue(label) ?? t("core.collection.date_presets.label"),
     type: "select",
     options: DATE_PRESETS.map((preset) => ({ value: preset, label: t(`core.collection.date_presets.options.${preset}`) })),
-  };
+  }));
 }

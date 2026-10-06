@@ -36,9 +36,9 @@ const columns = computed(() => [
   { key: "heard_from", label: t("leads.columns.heard"), kind: "badge", tone: () => "context", text: (lead: Lead) => t(`leads.heard.${lead.heard_from}`), width: 150, hideBelow: "md", mobile: "meta" },
 ] satisfies CollectionColumns<Lead>);
 
-const created = useDatePresetFilter("created_at"); // once at setup: it needs `useI18n`, which a computed that runs again does not have
+const created = useDatePresetFilter("created_at"); // once at setup; its labels follow the locale
 const filters = computed<FilterDescriptor<"phase" | "assigned_to" | "followup" | "created_at">[]>(() => [
-  created,
+  created.value,
   { key: "assigned_to", icon: "phoneLine", label: t("leads.filters.assigned"), type: "select", options: [{ value: "none", label: t("leads.filters.none") }, { value: 1, label: "Ana Horvat" }, { value: 2, label: "Marko Babić" }, { value: 3, label: "Iva Knežević" }] },
   { key: "followup", icon: "mailLine", label: t("leads.filters.followup"), type: "select", options: [{ value: "overdue", label: t("leads.filters.overdue"), dot: "critical" }, { value: "today", label: t("leads.filters.today"), dot: "warning" }, { value: "none", label: t("leads.filters.without"), dot: "neutral" }] },
   { key: "phase", icon: "fileTextLine", label: t("leads.filters.phase"), type: "select", placement: "panel", options: ["open", "1", "2", "3", "4", "5", "6", "7_bought", "7_rejected"].map((value) => ({ value, label: t(`leads.phases.${value}`), dot: PHASE_DOTS[value] })) },
