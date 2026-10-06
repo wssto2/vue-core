@@ -114,6 +114,8 @@ export interface Collection<Row, Sort extends string = string, Filter extends st
   readonly display: ComputedRef<CollectionDisplay>;
   /** A search or a filter applies; one that is the use's starting state (`defaults`) does not count. */
   readonly isFiltered: ComputedRef<boolean>;
+  /** The filters of the use's `defaults` that still apply, with the value the start gave (a filter the user changed or cleared is not listed). Empty without a start. */
+  readonly startFilters: ComputedRef<readonly Filter[]>;
   /** The failure of the last request (an `ApiError` for requests made through the client); null when it did not fail. */
   readonly error: Readonly<Ref<unknown>>;
   readonly columns: ComputedRef<readonly Col[]>;
@@ -139,6 +141,8 @@ export interface Collection<Row, Sort extends string = string, Filter extends st
   /** Clears every filter and the search. */
   clearFilters(): void;
   setView(view: View | null): void;
+  /** Clears the starting filters that still apply and nothing else (the search, other filters, the view and the sort stay); `reset()` would bring them back. */
+  clearStart(): void;
   /** Back to the starting state: the use's `defaults` over the definition's. */
   reset(): void;
   /** The link of a row's record, carrying the list's state; null without `recordRoute`. */
@@ -400,6 +404,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
   const isFiltered = computed(
     () => (query.value.search !== "" && query.value.search !== given.search) || Object.entries(query.value.filters).some(([key, value]) => !isEmptyFilterValue(value) && value !== given.filters[key as Filter]),
   );
+  const startFilters = computed(() => (Object.keys(given.filters) as Filter[]).filter((key) => !isEmptyFilterValue(given.filters[key]) && query.value.filters[key] === given.filters[key]));
   const rows = computed(() => page.value?.rows ?? []);
   const display = computed<CollectionDisplay>(() => {
     const current = state.value;
@@ -525,6 +530,7 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     total: computed(() => page.value?.total ?? 0),
     display,
     isFiltered,
+    startFilters,
     error,
     columns: computed(() => {
       const columns = toValue(options.columns) ?? [];
@@ -562,6 +568,9 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     setFilter: (key, value) => commit({ filters: filtersWith({ [key]: value } as Partial<Record<Filter, string | number | null>>) }, true),
     setFilters: (values) => commit({ filters: filtersWith(values) }, true),
     clearFilters: () => commit({ filters: {} as CollectionQuery<Sort, Filter, View>["filters"], search: "" }, true),
+    clearStart: () => {
+      if (startFilters.value.length > 0) commit({ filters: filtersWith(Object.fromEntries(startFilters.value.map((key) => [key, null])) as Partial<Record<Filter, null>>) }, true);
+    },
     setView: (view) => commit({ view }, true),
     reset: () => {
       query.value = begin;

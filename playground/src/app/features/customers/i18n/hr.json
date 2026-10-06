@@ -7,6 +7,8 @@
   "updated": "Zadnja promjena",
   "local_title": "Kupci u Dubrovniku",
   "local_description": "Otvara se na lokaciji korisnika, to je početak, a ne pretraga",
+  "library_empty": "Prazno stanje biblioteke",
+  "own_empty": "Vlastito prazno stanje",
   "reset": "Natrag na početak",
   "first_use_title": "Dodajte prvog kupca u Dubrovniku",
   "first_use_text": "Na ovoj lokaciji još nitko nije unesen.",

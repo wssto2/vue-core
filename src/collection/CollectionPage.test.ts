@@ -185,7 +185,7 @@ describe("states", () => {
     expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeTruthy();
   });
 
-  it("a list that opens on a starting filter shows the first-use slot, or the plain empty state, never the no-results chips", async () => {
+  it("a list that opens on a starting filter shows the first-use slot, or the start's empty state, never the no-results chips", async () => {
     const filters: FilterDescriptor<"phase" | "location">[] = [{ key: "phase", label: "Phase", type: "select", options: [{ value: "open", label: "Open" }] }];
     const { list } = await mountList({ rows: [], emptySlot: true, filters, start: { filters: { phase: "open" } } });
     expect(screen.getByText("Add your first customer")).toBeTruthy();
@@ -194,8 +194,62 @@ describe("states", () => {
     expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeTruthy();
     document.body.innerHTML = "";
     await mountList({ rows: [], filters, start: { filters: { phase: "open" } } });
-    expect(screen.getByText("No data")).toBeTruthy();
+    expect(document.querySelector("[data-test='collection-empty-start']")).toBeTruthy();
     expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeNull();
+  });
+
+  describe("empty under a starting filter", () => {
+    const filters: FilterDescriptor<"phase" | "location">[] = [
+      { key: "phase", label: "Phase", type: "select", options: [{ value: "open", label: "Open" }] },
+      { key: "location", label: "Location", type: "select", options: [{ value: "split", label: "Split" }] },
+    ];
+    const start = { filters: { phase: "open", location: "split" } };
+
+    it("names the starting filters and offers Show all, on desktop and phone", async () => {
+      for (const narrow of [false, true]) {
+        restoreViewport();
+        restoreViewport = viewport(narrow);
+        document.body.innerHTML = "";
+        await mountList({ rows: [], filters, start });
+        const empty = document.querySelector("[data-test='collection-empty-start']") as HTMLElement;
+        expect(empty.textContent).toContain("Nothing for Phase: Open, Location: Split");
+        expect(within(empty).getByRole("button", { name: "Show all" })).toBeTruthy();
+        expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeNull();
+      }
+    });
+
+    it("Show all clears the starting filters only and requests accordingly", async () => {
+      const { list, loader } = await mountList({ rows: [], filters, start, state: "memory" });
+      list.search("");
+      list.setView("mine");
+      await flush();
+      await fireEvent.click(screen.getByRole("button", { name: "Show all" }));
+      await flush();
+      expect(list.query.value.filters).toEqual({});
+      expect(list.query.value.view).toBe("mine");
+      expect(loader.calls.at(-1)!.query.filters).toEqual({});
+      expect(list.startFilters.value).toEqual([]);
+      expect(document.querySelector("[data-test='collection-empty-start']")).toBeNull();
+      expect(screen.getByText("No data")).toBeTruthy();
+    });
+
+    it("lists only the start filters still applied", async () => {
+      const { list } = await mountList({ rows: [], filters, start, state: "memory" });
+      list.setFilter("location", null);
+      await flush();
+      expect(list.startFilters.value).toEqual(["phase"]);
+      expect((document.querySelector("[data-test='collection-empty-start']") as HTMLElement).textContent).toContain("Nothing for Phase: Open");
+    });
+
+    it("without a start, or with the list's own empty slot, it is unchanged", async () => {
+      await mountList({ rows: [], filters });
+      expect(document.querySelector("[data-test='collection-empty-start']")).toBeNull();
+      expect(screen.getByText("No data")).toBeTruthy();
+      document.body.innerHTML = "";
+      await mountList({ rows: [], filters, start, emptySlot: true });
+      expect(screen.getByText("Add your first customer")).toBeTruthy();
+      expect(document.querySelector("[data-test='collection-empty-start']")).toBeNull();
+    });
   });
 
   it("a cell slot that renders nothing is respected: no raw value comes back in its place", async () => {

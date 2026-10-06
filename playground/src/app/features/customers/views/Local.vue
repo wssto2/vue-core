@@ -3,6 +3,7 @@ import { CollectionPage, useCollection, type CollectionColumns, type FilterDescr
 import { EmptyState } from "@wssto2/vue-core/state";
 import type { PageAction } from "@wssto2/vue-core/page";
 import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import type { Customer } from "../api";
 import { useCustomers } from "../context";
@@ -10,6 +11,10 @@ import { customerRoutes } from "../routes";
 
 const { t } = useI18n();
 const { list } = useCustomers();
+const route = useRoute();
+const router = useRouter();
+// `?library` drops the list's own #empty slot, to show the library's empty state under a start.
+const library = computed(() => "library" in route.query);
 
 const name = (customer: Customer) => (customer.type === 2 ? customer.company_name : `${customer.first_name} ${customer.last_name}`);
 const columns = computed(() => [
@@ -30,11 +35,12 @@ const customers = useCollection(list, {
   defaults: { filters: { city: "Dubrovnik" } },
 });
 
-const actions = computed<PageAction[]>(() => [{ id: "reset", label: t("customers.reset"), icon: "refreshLine", placement: "secondary", onClick: () => customers.reset() }]);
+const actions = computed<PageAction[]>(() => [
+  { id: "library", label: t(library.value ? "customers.own_empty" : "customers.library_empty"), icon: "filter3", placement: "secondary", onClick: () => router.replace({ query: { ...route.query, library: library.value ? undefined : null } }) },{ id: "reset", label: t("customers.reset"), icon: "refreshLine", placement: "secondary", onClick: () => customers.reset() }]);
 </script>
 
 <template>
   <CollectionPage :collection="customers" :title="t('customers.local_title')" :description="t('customers.local_description')" :actions="actions" :row-label="name">
-    <template #empty><EmptyState :title="t('customers.first_use_title')" :description="t('customers.first_use_text')" /></template>
+    <template v-if="!library" #empty><EmptyState :title="t('customers.first_use_title')" :description="t('customers.first_use_text')" /></template>
   </CollectionPage>
 </template>

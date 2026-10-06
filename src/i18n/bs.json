@@ -221,7 +221,10 @@
         "description": "Uklonite neki od filtera ili poništite sve.",
         "remove_last": "Ukloni: {filter}",
         "clear_all": "Poništi sve filtere",
-        "search": "Pretraga"
+        "search": "Pretraga",
+        "start_title": "Ništa za {filters}",
+        "start_description": "Popis se otvara na ovom filteru, ništa nije pretraživano.",
+        "show_all": "Prikaži sve"
       }
     },
     "state": {

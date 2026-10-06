@@ -221,7 +221,10 @@
         "description": "Odstranite katerega od filtrov ali ponastavite vse.",
         "remove_last": "Odstrani: {filter}",
         "clear_all": "Ponastavi vse filtre",
-        "search": "Iskanje"
+        "search": "Iskanje",
+        "start_title": "Nič za {filters}",
+        "start_description": "Seznam se odpre s tem filtrom, nič ni bilo iskano.",
+        "show_all": "Prikaži vse"
       }
     },
     "state": {

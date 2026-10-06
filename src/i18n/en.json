@@ -221,7 +221,10 @@
         "description": "Remove one of the filters or clear them all.",
         "remove_last": "Remove: {filter}",
         "clear_all": "Clear all filters",
-        "search": "Search"
+        "search": "Search",
+        "start_title": "Nothing for {filters}",
+        "start_description": "The list opens on this filter; nothing was searched.",
+        "show_all": "Show all"
       }
     },
     "state": {

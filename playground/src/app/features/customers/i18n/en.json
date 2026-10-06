@@ -7,6 +7,8 @@
   "updated": "Last change",
   "local_title": "Customers in Dubrovnik",
   "local_description": "Opens on the user's own location, which is a starting point, not a search",
+  "library_empty": "Library empty state",
+  "own_empty": "Own empty state",
   "reset": "Back to the start",
   "first_use_title": "Add your first customer in Dubrovnik",
   "first_use_text": "Nobody has been entered at this location yet.",

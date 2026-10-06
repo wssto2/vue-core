@@ -82,15 +82,24 @@ const SEARCH_CHIP = "__search";
 const touched = ref<string[]>([]);
 const touch = (keys: string[]) => (touched.value = [...touched.value.filter((key) => !keys.includes(key)), ...keys]);
 
+const chipWords = () => ({
+  formatNumber: (value: number) => format.number(value),
+  from: t("core.collection.filters.range_from"),
+  until: t("core.collection.filters.range_until"),
+});
+
 const activeChips = computed<FilterChip[]>(() => {
-  const chips = filterChips(props.collection.filters.value, props.collection.query.value.filters, {
-    formatNumber: (value) => format.number(value),
-    from: t("core.collection.filters.range_from"),
-    until: t("core.collection.filters.range_until"),
-  });
+  const chips = filterChips(props.collection.filters.value, props.collection.query.value.filters, chipWords());
   const search = props.collection.query.value.search;
   if (search) chips.push({ key: SEARCH_CHIP, label: t("core.collection.empty.search"), values: [search], clears: [] });
   return chips;
+});
+
+/** The starting filters still applied, named like the toolbar names them: what an empty list under its start is empty for. */
+const startNames = computed(() => {
+  const keys = props.collection.startFilters.value;
+  const selected = Object.fromEntries(keys.map((key) => [key, props.collection.query.value.filters[key]]));
+  return filterChips(props.collection.filters.value, selected, chipWords()).map((chip) => (chip.label ? `${chip.label}: ${chip.values.join(" › ")}` : chip.values.join(" › ")));
 });
 
 /** The chip "remove last" removes: the one changed most recently; state restored from the URL has no history, so the last listed. */
@@ -183,6 +192,10 @@ const message = computed(() => {
         </template>
         <template #empty>
           <slot v-if="props.collection.display.value === 'empty' && slots.empty" name="empty" />
+          <EmptyState v-else-if="props.collection.display.value === 'empty' && startNames.length > 0" data-test="collection-empty-start"
+            :title="t('core.collection.empty.start_title', { filters: startNames.join(', ') })" :description="t('core.collection.empty.start_description')" icon="filter3">
+            <template #actions><Button v-bind="{ 'data-test': 'collection-empty-show-all' }" size="sm" @click="props.collection.clearStart()">{{ t("core.collection.empty.show_all") }}</Button></template>
+          </EmptyState>
           <CollectionEmptyResult v-else-if="props.collection.display.value !== 'empty' && activeChips.length > 0" :chips="activeChips" :last-chip="lastChip" @remove="removeChip" @clear-all="clearAll" />
           <EmptyState v-else :title="t('core.collection.no_data')" :description="t('core.collection.no_results')" />
         </template>
