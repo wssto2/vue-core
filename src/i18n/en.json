@@ -222,8 +222,7 @@
         "remove_last": "Remove: {filter}",
         "clear_all": "Clear all filters",
         "search": "Search",
-        "start_title": "Nothing for {filters}",
-        "start_description": "The list opens on this filter; nothing was searched.",
+        "start_description": "Showing only: {filters}",
         "show_all": "Show all"
       }
     },

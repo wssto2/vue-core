@@ -212,7 +212,7 @@ describe("states", () => {
         document.body.innerHTML = "";
         await mountList({ rows: [], filters, start });
         const empty = document.querySelector("[data-test='collection-empty-start']") as HTMLElement;
-        expect(empty.textContent).toContain("Nothing for Phase: Open, Location: Split");
+        expect(empty.textContent).toContain("Showing only: Phase: Open, Location: Split");
         expect(within(empty).getByRole("button", { name: "Show all" })).toBeTruthy();
         expect(document.querySelector("[data-test='collection-empty-filtered']")).toBeNull();
       }
@@ -238,7 +238,7 @@ describe("states", () => {
       list.setFilter("location", null);
       await flush();
       expect(list.startFilters.value).toEqual(["phase"]);
-      expect((document.querySelector("[data-test='collection-empty-start']") as HTMLElement).textContent).toContain("Nothing for Phase: Open");
+      expect((document.querySelector("[data-test='collection-empty-start']") as HTMLElement).textContent).toContain("Showing only: Phase: Open");
     });
 
     it("without a start, or with the list's own empty slot, it is unchanged", async () => {

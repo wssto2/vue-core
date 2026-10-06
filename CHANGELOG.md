@@ -8,7 +8,7 @@ An empty list under its own start says what it is empty for and offers the way o
 - go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
 
 ### Added
-- The library's empty state under a `useCollection` start: when `display` is `"empty"`, the list has no `#empty` slot and starting filters (`defaults.filters`) still apply, it reads "Nothing for Location: Zagreb - Jankomir" (the filters named as the toolbar chip names them), says the list opens on that filter and nothing was searched, and offers one **Show all** button. On desktop and phone; `hr`, `bs`, `sl`, `en` (`core.collection.empty.start_title`, `start_description`, `show_all`).
+- The library's empty state under a `useCollection` start: when `display` is `"empty"`, the list has no `#empty` slot and starting filters (`defaults.filters`) still apply, it reads "No data" and "Showing only: Location: Zagreb - Jankomir" (the filters named as the toolbar chip names them) and offers one **Show all** button. On desktop and phone; `hr`, `bs`, `sl`, `en` (`core.collection.empty.start_description`, `show_all`).
 - `Collection.startFilters` (`ComputedRef<readonly Filter[]>`): the starting filters that still apply (a filter the user changed or cleared is not listed), and `Collection.clearStart()`: clears exactly those and keeps the search, other filters, view and sort. Not `reset()`, which would bring the start back. A consumer's `#empty` slot can offer the same action (see the list recipe).
 - Playground `/customers/local`: a toggle to drop the page's own `#empty` slot and show the library state.
 

@@ -193,7 +193,7 @@ const message = computed(() => {
         <template #empty>
           <slot v-if="props.collection.display.value === 'empty' && slots.empty" name="empty" />
           <EmptyState v-else-if="props.collection.display.value === 'empty' && startNames.length > 0" data-test="collection-empty-start"
-            :title="t('core.collection.empty.start_title', { filters: startNames.join(', ') })" :description="t('core.collection.empty.start_description')" icon="filter3">
+            :title="t('core.collection.no_data')" :description="t('core.collection.empty.start_description', { filters: startNames.join(', ') })" icon="filter3">
             <template #actions><Button v-bind="{ 'data-test': 'collection-empty-show-all' }" size="sm" @click="props.collection.clearStart()">{{ t("core.collection.empty.show_all") }}</Button></template>
           </EmptyState>
           <CollectionEmptyResult v-else-if="props.collection.display.value !== 'empty' && activeChips.length > 0" :chips="activeChips" :last-chip="lastChip" @remove="removeChip" @clear-all="clearAll" />
