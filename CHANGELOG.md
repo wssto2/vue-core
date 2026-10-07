@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.10 — 2026-10-07
+
+The record pager follows the page to another section.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Fixed
+- `useCollectionNeighbors` built each neighbor's `to` once, from the route when the neighbors resolved. After the page moved to another section (or hash) of the same record, previous and next still linked to the section it was opened on. `to` now reads the current route.
+
+### Changes to existing behaviour
+- None, apart from the fix.
+
 ## 0.4.9 — 2026-10-07
 
 A cell slot a page adds after the first render now shows.
