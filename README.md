@@ -187,7 +187,8 @@ Its texts are JSON files under the feature, loaded the first time one of its rou
   "note": "Note",
   "comment": "Comment",
   "change": "Status change",
-  "remove": "Remove"
+  "remove": "Remove",
+  "pick": "Choose a ticket"
 }
 ```
 

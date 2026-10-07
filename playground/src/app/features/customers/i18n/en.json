@@ -1,4 +1,10 @@
 {
+  "pick_title": "Customer picker",
+  "pick_description": "A dialog that chooses one customer: click a row, arrow to it and press Enter, or search down to one and press Enter",
+  "pick_open": "Choose a customer",
+  "pick_label": "Choose a customer",
+  "pick_none": "Nobody chosen yet",
+  "pick_chosen": "Chosen: {name}",
   "title": "Customers",
   "description": "People and companies",
   "name": "Name",

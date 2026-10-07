@@ -1,4 +1,10 @@
 {
+  "pick_title": "Odabir kupca",
+  "pick_description": "Dijalog koji bira jednog kupca: kliknite redak, strelicama dođite do njega i pritisnite Enter, ili pretražite do jednog i pritisnite Enter",
+  "pick_open": "Odaberi kupca",
+  "pick_label": "Odaberite kupca",
+  "pick_none": "Još nitko nije odabran",
+  "pick_chosen": "Odabrano: {name}",
   "title": "Kupci",
   "description": "Osobe i tvrtke",
   "name": "Naziv",

@@ -149,6 +149,8 @@ defineExpose({ focusRows });
 
 // A picked row's states: hover and press say it can be chosen, the current row has the focus ring.
 const PICK_ROW = "cursor-pointer hover:bg-fill/60 active:bg-fill-strong group-focus-visible/pick:data-current:bg-fill group-focus-visible/pick:data-current:outline-2 group-focus-visible/pick:data-current:-outline-offset-2 group-focus-visible/pick:data-current:outline-border-focus";
+// A phone row's swipe surface has its own background, which would cover the row's: the states are a translucent tint over it.
+const PICK_PHONE_ROW = "cursor-pointer after:pointer-events-none after:absolute after:inset-0 after:z-10 after:transition-colors hover:after:bg-content-strong/5 active:after:bg-content-strong/10 group-focus-visible/pick:data-current:after:bg-content-strong/5 group-focus-visible/pick:data-current:after:outline-2 group-focus-visible/pick:data-current:after:-outline-offset-2 group-focus-visible/pick:data-current:after:outline-border-focus";
 
 const rowMenu = useTemplateRef<InstanceType<typeof Menu>>("rowMenu");
 const interactions = useRowInteractions<Row>({
@@ -202,7 +204,7 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
     <template v-if="props.display === 'rows'">
       <li v-for="(item, index) in props.rows" :key="props.rowKey(item)" :style="rowIn(index)" data-test="collection-row" v-bind="option(index)"
         class="relative animate-row-in transition-colors duration-motion-fast active:bg-fill not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-row-inset not-first:before:z-10 not-first:before:h-px not-first:before:bg-border-separator"
-        :class="[props.link(item) ? 'cursor-pointer' : undefined, picking ? PICK_ROW : undefined, props.rowClass?.(item)]"
+        :class="[props.link(item) ? 'cursor-pointer' : undefined, picking ? PICK_PHONE_ROW : undefined, props.rowClass?.(item)]"
         @click.capture="interactions.onClickCapture" @click="interactions.onClick($event, item)" @contextmenu="interactions.onContextMenu($event, item)"
         @pointerdown="interactions.onPointerDown($event, item)" @pointermove="interactions.onPointerMove" @pointerup="interactions.cancelPress" @pointercancel="interactions.cancelPress">
         <SwipeActions :actions="interactions.swipeActions(item)" content-class="px-row-inset py-2.5">

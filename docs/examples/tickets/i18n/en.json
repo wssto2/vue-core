@@ -18,5 +18,6 @@
   "note": "Note",
   "comment": "Comment",
   "change": "Status change",
-  "remove": "Remove"
+  "remove": "Remove",
+  "pick": "Choose a ticket"
 }

@@ -18,5 +18,6 @@
   "note": "Bilješka",
   "comment": "Komentar",
   "change": "Promjena statusa",
-  "remove": "Ukloni"
+  "remove": "Ukloni",
+  "pick": "Odaberite tiket"
 }
