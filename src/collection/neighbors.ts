@@ -127,7 +127,13 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
     const indexIn = (data: ListPage<Row> | null) => (data ? data.rows.findIndex((row) => String(definition.key(row)) === String(current)) : -1);
     const at = (page: number, key: string | number): Neighbor => {
       const state = encodeState(definition, { ...query, page });
-      return { key, to: { name: route.name ?? undefined, params: { ...route.params, [options.param]: String(key) }, query: { ...route.query, [LIST_CONTEXT_PARAM]: state }, hash: route.hash } };
+      // A getter, so the link follows the page as it moves within the record (another section, a hash) without a new resolve.
+      return {
+        key,
+        get to(): RouteLocationRaw {
+          return { name: route.name ?? undefined, params: { ...route.params, [options.param]: String(key) }, query: { ...route.query, [LIST_CONTEXT_PARAM]: state }, hash: route.hash };
+        },
+      };
     };
 
     try {

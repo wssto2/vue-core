@@ -78,6 +78,15 @@ describe("useCollectionNeighbors", () => {
     expect(middle.next.value).toMatchObject({ key: 6, to: { query: { from: stateOf(definition, { page: 2 }) } } });
   });
 
+  it("links the neighbors to where the page is now, after it moves within the record (another section)", async () => {
+    const { definition } = setup();
+    const from = stateOf(definition, { page: 2 });
+    const { neighbors, router } = await open(definition, 6, from);
+    await router.push({ name: "record", params: { recordID: "6" }, query: { from, tab: "history" }, hash: "#notes" });
+    await flush();
+    expect(neighbors.next.value?.to).toMatchObject({ params: { recordID: "7" }, query: { from, tab: "history" }, hash: "#notes" });
+  });
+
   it("supplies the record page's list context: back with the list's state, the pager from the neighbors", async () => {
     const { definition } = setup();
     const { neighbors } = await open(definition, 6, stateOf(definition, { page: 2 }));
