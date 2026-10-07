@@ -46,6 +46,15 @@ const props = withDefaults(defineProps<{
    * as a lead's contact actions: swipe and the context menu are enough there.
    */
   actionsVisible?: boolean;
+  /**
+   * A picker: the list is for choosing one row, as in a modal that assigns or selects. A click or tap on
+   * the row calls `pick(row)` (a button or link inside it keeps its own click), the arrows move the
+   * current row, Enter picks it, Down in the search field moves into the rows, and Enter in the search
+   * field picks the only row left. Instead of `recordRoute`: a row is a choice or a link, never both.
+   */
+  pick?: (row: Row) => void;
+  /** The accessible name of the choices ("Choose one" by default); say what is chosen. */
+  pickLabel?: string;
 }>(), {
   rowActions: undefined,
   rowLabel: undefined,
@@ -53,6 +62,8 @@ const props = withDefaults(defineProps<{
   density: "regular",
   viewsPresentation: "segmented",
   actionsVisible: false,
+  pick: undefined,
+  pickLabel: undefined,
 });
 
 const slots = defineSlots<CollectionSlots<Row, Col>>();
@@ -67,7 +78,25 @@ const forwarded = computed(() => Object.keys(useSlots()).filter((name) => name !
 const columns = computed(() => props.collection.columns.value as readonly Col[]);
 const { narrow, phone: showRows } = useRowLayout(() => columns.value);
 const rows = computed(() => props.collection.rows.value);
-const link = (item: Row) => props.collection.recordLocation(item);
+const link = (item: Row) => (props.pick ? null : props.collection.recordLocation(item));
+
+// --- picking, from the search field --------------------------------------------------------
+
+const rowsView = useTemplateRef<{ focusRows(): boolean }>("rowsView");
+function onSearchKey(event: KeyboardEvent, settled: boolean) {
+  if (!props.pick || event.isComposing) return;
+  if (event.key === "ArrowDown") {
+    if (rowsView.value?.focusRows()) event.preventDefault();
+    return;
+  }
+  if (event.key !== "Enter") return;
+  // Only when the list shows exactly what was searched for: not while it loads, and not a page of many.
+  const only = rows.value[0];
+  if (settled && only !== undefined && rows.value.length === 1 && props.collection.total.value <= 1 && props.collection.state.value.status === "loaded") {
+    event.preventDefault();
+    props.pick(only);
+  }
+}
 
 // The search text marks where it matched in an identity cell.
 const search = computed(() => props.collection.query.value.search);
@@ -153,7 +182,7 @@ const message = computed(() => {
 
     <!-- Desktop: one grouped card holds the toolbar, the rows and the pager. Phone rows: the toolbar and pager sit on the canvas and the rows are an inset grouped list. -->
     <div ref="card" class="scroll-mt-16" :class="showRows ? '' : 'rounded-group bg-surface-cell shadow-group'">
-      <CollectionToolbar :collection="props.collection" :narrow="narrow" :flat="showRows" @touched="touch">
+      <CollectionToolbar :collection="props.collection" :narrow="narrow" :flat="showRows" @touched="touch" @search-key="onSearchKey">
         <slot name="toolbar" />
       </CollectionToolbar>
 
@@ -175,7 +204,7 @@ const message = computed(() => {
         </Banner>
       </div>
 
-      <CollectionRows :columns="columns" :rows="rows" :row-key="props.collection.rowKey" :display="props.collection.display.value" :phone="showRows" :link="link" :search="search"
+      <CollectionRows ref="rowsView" :pick="props.pick" :pick-label="props.pickLabel" :columns="columns" :rows="rows" :row-key="props.collection.rowKey" :display="props.collection.display.value" :phone="showRows" :link="link" :search="search"
         :sorted="sorted" :row-actions="props.rowActions" :row-label="props.rowLabel" :row-height="props.rowHeight" :density="props.density" :actions-visible="props.actionsVisible"
         :skeleton-rows="skeletonRows" :reserve-rows="loading ? skeletonRows : undefined" @sort="(key) => props.collection.toggleSort(key)">
         <template v-for="name in forwarded" :key="name" #[name]="scope">

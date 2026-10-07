@@ -161,6 +161,7 @@
       },
       "clear": "Ponastavi",
       "no_data": "Ni podatkov",
+      "pick_label": "Izberite enega",
       "no_results": "Za vaše iskanje ni najdenih podatkov.",
       "failed": {
         "title": "Seznama ni mogoče naložiti"

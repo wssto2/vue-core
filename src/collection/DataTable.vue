@@ -43,6 +43,9 @@ const props = withDefaults(defineProps<{
   actionsVisible?: boolean;
   /** Extra classes for a row, e.g. to set apart a total or the newest row. */
   rowClass?: (row: Row) => string | undefined;
+  /** A picker: a click or tap on the row calls `pick(row)`, the arrows and Enter do too (see `CollectionTable`); instead of `recordRoute`. */
+  pick?: (row: Row) => void;
+  pickLabel?: string;
 }>(), {
   loading: false,
   skeletonRows: 3,
@@ -53,6 +56,8 @@ const props = withDefaults(defineProps<{
   density: "regular",
   actionsVisible: false,
   rowClass: undefined,
+  pick: undefined,
+  pickLabel: undefined,
 });
 
 defineSlots<RowsSlots<Row, Col> & {
@@ -62,7 +67,7 @@ defineSlots<RowsSlots<Row, Col> & {
 
 const { phone } = useRowLayout(() => props.columns);
 const display = computed(() => (props.loading ? "loading" : props.rows.length === 0 ? "empty" : "rows"));
-const link = (row: Row) => (props.recordRoute ? props.recordRoute(row) : null);
+const link = (row: Row) => (props.recordRoute && !props.pick ? props.recordRoute(row) : null);
 
 // Every slot the page was given goes to the rows as it is, so the typed scopes stay the table's.
 const forwarded = computed(() => Object.keys(useSlots()));
@@ -72,7 +77,7 @@ const forwarded = computed(() => Object.keys(useSlots()));
   <div :aria-busy="props.loading || undefined" data-test="data-table">
     <CollectionRows :columns="props.columns" :rows="props.rows" :row-key="props.rowKey" :display="display" :phone="phone" :link="link" :row-actions="props.rowActions"
       :row-label="props.rowLabel" :row-height="props.rowHeight" :density="props.density" :actions-visible="props.actionsVisible" :skeleton-rows="props.skeletonRows"
-      :row-class="props.rowClass">
+      :row-class="props.rowClass" :pick="props.pick" :pick-label="props.pickLabel">
       <template v-for="name in forwarded" :key="name" #[name]="scope">
         <!-- @vue-ignore -->
         <slot :name="name" v-bind="(scope as Record<string, unknown> | undefined) ?? {}" />

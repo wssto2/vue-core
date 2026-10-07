@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="Row extends object, Col extends Column<Row>">
-import { computed, useSlots, useTemplateRef } from "vue";
+import { computed, nextTick, ref, useId, useSlots, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, type RouteLocationRaw } from "vue-router";
 import { SwipeActions } from "../controls";
@@ -43,6 +43,9 @@ const props = withDefaults(defineProps<{
   /** Rows to reserve the height of while loading, so the card does not jump when they land. */
   reserveRows?: number;
   rowClass?: (row: Row) => string | undefined;
+  /** A picker: the rows are choices (see `CollectionTable`). */
+  pick?: (row: Row) => void;
+  pickLabel?: string;
 }>(), {
   search: undefined,
   sorted: null,
@@ -53,6 +56,8 @@ const props = withDefaults(defineProps<{
   actionsVisible: false,
   reserveRows: undefined,
   rowClass: undefined,
+  pick: undefined,
+  pickLabel: undefined,
 });
 
 const emit = defineEmits<{ sort: [key: string] }>();
@@ -91,11 +96,66 @@ const JUSTIFY = { start: "justify-start", center: "justify-center", end: "justif
 
 const hasRecordLinks = computed(() => props.rows.length > 0 && props.link(props.rows[0] as Row) !== null);
 
+// --- a picker: the rows are a listbox ------------------------------------------------------------
+// One tab stop holds the focus (the list) and `aria-activedescendant` names the current row, so it
+// is the same on the table and on the phone rows, and a screen reader says "option, 2 of 5".
+
+const picking = computed(() => props.pick !== undefined && props.display === "rows" && props.rows.length > 0);
+const listId = useId();
+const optionId = (index: number) => `${listId}-option-${index}`;
+const current = ref(-1);
+const list = useTemplateRef<HTMLElement>("list");
+watch(() => props.rows, () => (current.value = -1));
+// The current row stays in view as the arrows move it.
+watch(current, (index) => void nextTick(() => list.value?.querySelector(`[id="${optionId(index)}"]`)?.scrollIntoView?.({ block: "nearest" })));
+
+function onListKey(event: KeyboardEvent) {
+  if (event.target !== event.currentTarget || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const last = props.rows.length - 1;
+  const at = current.value;
+  const moves: Record<string, number> = { ArrowDown: Math.min(at + 1, last), ArrowUp: Math.max(at - 1, 0), Home: 0, End: last };
+  if (event.key in moves) {
+    event.preventDefault();
+    current.value = moves[event.key]!;
+  } else if ((event.key === "Enter" || event.key === " ") && at >= 0 && props.rows[at] !== undefined) {
+    event.preventDefault();
+    props.pick?.(props.rows[at] as Row);
+  }
+}
+
+const listbox = computed(() =>
+  picking.value
+    ? {
+        role: "listbox",
+        tabindex: 0,
+        "aria-label": props.pickLabel ?? t("core.collection.pick_label"),
+        "aria-activedescendant": current.value >= 0 ? optionId(current.value) : undefined,
+        onKeydown: onListKey,
+        onFocus: () => {
+          if (current.value < 0) current.value = 0;
+        },
+      }
+    : {},
+);
+const option = (index: number) => (picking.value ? { role: "option", id: optionId(index), "data-current": index === current.value ? "" : undefined } : {});
+
+/** Moves the focus into the rows (from the search field); false when there is nothing to pick. */
+function focusRows(): boolean {
+  if (!picking.value) return false;
+  list.value?.focus();
+  return true;
+}
+defineExpose({ focusRows });
+
+// A picked row's states: hover and press say it can be chosen, the current row has the focus ring.
+const PICK_ROW = "cursor-pointer hover:bg-fill/60 active:bg-fill-strong group-focus-visible/pick:data-current:bg-fill group-focus-visible/pick:data-current:outline-2 group-focus-visible/pick:data-current:-outline-offset-2 group-focus-visible/pick:data-current:outline-border-focus";
+
 const rowMenu = useTemplateRef<InstanceType<typeof Menu>>("rowMenu");
 const interactions = useRowInteractions<Row>({
   actions: () => props.rowActions,
   label: () => props.rowLabel,
   target: (row) => props.link(row),
+  pick: () => props.pick,
   presentMenu: (x, y) => rowMenu.value?.presentAt(x, y),
   moreLabel: () => t("core.page.more_actions"),
 });
@@ -126,7 +186,7 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
 
 <template>
   <!-- Phone rows (below 1024 px): an inset grouped list with separators that start at the text. -->
-  <ul v-if="props.phone" class="overflow-hidden rounded-group bg-surface-cell shadow-group" data-test="collection-mobile-rows">
+  <ul v-if="props.phone" ref="list" v-bind="listbox" class="overflow-hidden rounded-group bg-surface-cell shadow-group" :class="picking ? 'group/pick outline-0' : undefined" data-test="collection-mobile-rows">
     <template v-if="loading">
       <li v-for="row in props.skeletonRows" :key="`skeleton-${row}`" aria-hidden="true"
         class="relative flex animate-pulse items-start gap-3 px-row-inset py-3 motion-reduce:animate-none not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-row-inset not-first:before:h-px not-first:before:bg-border-separator"
@@ -140,9 +200,9 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
     </template>
 
     <template v-if="props.display === 'rows'">
-      <li v-for="(item, index) in props.rows" :key="props.rowKey(item)" :style="rowIn(index)" data-test="collection-row"
+      <li v-for="(item, index) in props.rows" :key="props.rowKey(item)" :style="rowIn(index)" data-test="collection-row" v-bind="option(index)"
         class="relative animate-row-in transition-colors duration-motion-fast active:bg-fill not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-row-inset not-first:before:z-10 not-first:before:h-px not-first:before:bg-border-separator"
-        :class="[props.link(item) ? 'cursor-pointer' : undefined, props.rowClass?.(item)]"
+        :class="[props.link(item) ? 'cursor-pointer' : undefined, picking ? PICK_ROW : undefined, props.rowClass?.(item)]"
         @click.capture="interactions.onClickCapture" @click="interactions.onClick($event, item)" @contextmenu="interactions.onContextMenu($event, item)"
         @pointerdown="interactions.onPointerDown($event, item)" @pointermove="interactions.onPointerMove" @pointerup="interactions.cancelPress" @pointercancel="interactions.cancelPress">
         <SwipeActions :actions="interactions.swipeActions(item)" content-class="px-row-inset py-2.5">
@@ -200,7 +260,7 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
 
   <div v-else class="inline-block w-full align-middle">
     <div class="overflow-x-auto" :style="{ minHeight }">
-      <table class="collection-grid w-full" :class="{ condensed: props.density === 'condensed' }">
+      <table class="collection-grid w-full" :class="{ condensed: props.density === 'condensed' }" :role="picking ? 'presentation' : undefined">
         <thead class="border-b border-border-separator">
           <tr>
             <th v-for="column in props.columns" :key="String(column.key)" scope="col" :class="headerClass(column)" :style="{ width: column.width ? `${column.width}px` : undefined, textAlign: column.align ?? 'start' }" :aria-sort="ariaSort(column)">
@@ -220,7 +280,7 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
           </tr>
         </thead>
 
-        <tbody>
+        <tbody ref="list" v-bind="listbox" :class="picking ? 'group/pick outline-0' : undefined">
           <!-- Shaped like the cells they stand in for (a mark and two lines of uneven length), so the list does not jump when rows land. -->
           <template v-if="loading">
             <tr v-for="row in props.skeletonRows" :key="`skeleton-${row}`" aria-hidden="true" :style="props.rowHeight ? { height: `${props.rowHeight}px` } : undefined">
@@ -238,8 +298,8 @@ const showEmpty = computed(() => props.display === "empty" || props.display === 
           </template>
 
           <template v-if="props.display === 'rows'">
-            <tr v-for="(item, index) in props.rows" :key="props.rowKey(item)" class="animate-row-in" data-test="collection-row"
-              :class="[props.link(item) ? 'cursor-pointer' : undefined, props.rowClass?.(item)]" :style="[props.rowHeight ? { height: `${props.rowHeight}px` } : {}, rowIn(index)]"
+            <tr v-for="(item, index) in props.rows" :key="props.rowKey(item)" class="animate-row-in" data-test="collection-row" v-bind="option(index)"
+              :class="[props.link(item) ? 'cursor-pointer' : undefined, picking ? PICK_ROW : undefined, props.rowClass?.(item)]" :style="[props.rowHeight ? { height: `${props.rowHeight}px` } : {}, rowIn(index)]"
               @click.capture="interactions.onClickCapture" @click="interactions.onClick($event, item)" @contextmenu="interactions.onContextMenu($event, item)"
               @pointerdown="interactions.onPointerDown($event, item)">
               <td v-for="(column, columnIndex) in props.columns" :key="String(column.key)" :class="cellClass(column)">

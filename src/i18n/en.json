@@ -161,6 +161,7 @@
       },
       "clear": "Reset",
       "no_data": "No data",
+      "pick_label": "Choose one",
       "no_results": "No results found for your search.",
       "failed": {
         "title": "The list could not be loaded"

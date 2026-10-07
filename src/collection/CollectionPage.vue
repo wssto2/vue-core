@@ -33,6 +33,8 @@ const props = withDefaults(defineProps<{
   density?: "regular" | "condensed";
   viewsPresentation?: "segmented" | "scope";
   actionsVisible?: boolean;
+  pick?: (row: Row) => void;
+  pickLabel?: string;
 }>(), {
   description: undefined,
   icon: undefined,
@@ -43,6 +45,8 @@ const props = withDefaults(defineProps<{
   density: "regular",
   viewsPresentation: "segmented",
   actionsVisible: false,
+  pick: undefined,
+  pickLabel: undefined,
 });
 
 defineSlots<CollectionSlots<Row, Col> & {
@@ -58,7 +62,7 @@ const count = computed(() => props.collection.total.value || null);
 <template>
   <AdaptivePageShell :title="props.title" :description="props.description" :icon="props.icon" :count="count" :actions="props.actions">
     <CollectionTable :collection="props.collection" :row-actions="props.rowActions" :row-label="props.rowLabel" :row-height="props.rowHeight" :density="props.density"
-      :views-presentation="props.viewsPresentation" :actions-visible="props.actionsVisible">
+      :views-presentation="props.viewsPresentation" :actions-visible="props.actionsVisible" :pick="props.pick" :pick-label="props.pickLabel">
       <template v-for="name in forwarded" :key="name" #[name]="scope">
         <!-- @vue-ignore -->
         <slot :name="name" v-bind="(scope as Record<string, unknown> | undefined) ?? {}" />

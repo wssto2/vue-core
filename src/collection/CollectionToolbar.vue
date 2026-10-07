@@ -23,7 +23,11 @@ const props = defineProps<{
   flat: boolean;
 }>();
 
-const emit = defineEmits<{ touched: [keys: string[]] }>();
+const emit = defineEmits<{
+  touched: [keys: string[]];
+  /** A key pressed in the search field, and whether the list shows what the field says (no search pending). */
+  searchKey: [event: KeyboardEvent, settled: boolean];
+}>();
 defineSlots<{ default?: () => unknown }>();
 
 const { t } = useI18n();
@@ -130,7 +134,8 @@ const savedItems = computed<MenuItem[]>(() =>
         <Icon name="search" :size="16" />
         <input ref="field" v-model="text" type="text" name="collection-search" autocomplete="off" :placeholder="t('core.collection.search.placeholder')"
           :aria-label="t('core.collection.search.label')"
-          class="peer block min-w-0 flex-1 bg-transparent px-2 py-1.5 text-body text-content-strong outline-0 placeholder:text-content-disabled" @input="onInput" />
+          class="peer block min-w-0 flex-1 bg-transparent px-2 py-1.5 text-body text-content-strong outline-0 placeholder:text-content-disabled" @input="onInput"
+          @keydown="emit('searchKey', $event, timer === null && text.trim() === props.collection.query.value.search)" />
         <!-- "/" hint: gone while focused, filled, or on touch devices without a keyboard. -->
         <kbd aria-hidden="true"
           class="rounded border border-border-separator px-1.5 font-mono text-2xs leading-5 text-content-disabled peer-focus:hidden peer-[:not(:placeholder-shown)]:hidden [@media(pointer:coarse)]:hidden">/</kbd>

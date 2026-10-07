@@ -14,13 +14,15 @@ export interface RowInteractionOptions<Row> {
   label: () => ((row: Row) => string) | undefined;
   /** Where a click on the row goes. */
   target: (row: Row) => RouteLocationRaw | null;
+  /** A picker's choose: a click on the row picks it instead of going to `target`. */
+  pick?: () => ((row: Row) => void) | undefined;
   /** Opens the context menu at a point. */
   presentMenu: (x: number, y: number) => void;
   moreLabel: () => string;
 }
 
 /**
- * What makes a list row behave like a native one: a click opens the record (except on its links and
+ * What makes a list row behave like a native one: a click opens the record (or, in a picker, picks the row) (except on its links and
  * buttons, or while text is selected), a modified click opens a new tab, a right click or a long
  * press (iOS has no contextmenu for one) lists the row's actions, and the press that opened that
  * menu never also opens the record. Swipe actions are the row's links.
@@ -113,15 +115,20 @@ export function useRowInteractions<Row>(options: RowInteractionOptions<Row>) {
   }
 
   function onClick(event: MouseEvent, row: Row) {
-    const target = options.target(row);
-    if (!target || (event.target as HTMLElement).closest(INTERACTIVE)) return;
+    const pick = options.pick?.();
+    const target = pick ? null : options.target(row);
+    if ((!pick && !target) || (event.target as HTMLElement).closest(INTERACTIVE)) return;
     // Keep a text selection instead of navigating away from it.
     if (window.getSelection()?.toString()) return;
-    if (event.metaKey || event.ctrlKey) {
-      window.open(router.resolve(target).href, "_blank");
+    if (pick) {
+      pick(row);
       return;
     }
-    void router.push(target);
+    if (event.metaKey || event.ctrlKey) {
+      window.open(router.resolve(target as RouteLocationRaw).href, "_blank");
+      return;
+    }
+    void router.push(target as RouteLocationRaw);
   }
 
   if (getCurrentScope()) onScopeDispose(cancelPress);

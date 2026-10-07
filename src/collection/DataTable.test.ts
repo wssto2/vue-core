@@ -267,4 +267,37 @@ describe("DataTable", () => {
       expect(screen.getByText("No data")).toBeTruthy();
     });
   });
+
+  describe("pick mode", () => {
+    for (const narrow of [false, true]) {
+      it(`a click or Enter picks the row, not a button in it, and the row is no link (narrow: ${narrow})`, async () => {
+        const pick = vi.fn();
+        await mountTable({ narrow, props: { pick, recordRoute: (order: Order) => ({ name: "order", params: { id: order.id } }) }, slots: { "cell-status": () => h("button", { type: "button" }, "Pay") } });
+        const rows = [...document.querySelectorAll<HTMLElement>("[role='option']")];
+        expect(rows).toHaveLength(2);
+        expect(screen.queryAllByRole("link")).toHaveLength(0);
+        await fireEvent.click(within(rows[0]!).getByRole("button", { name: "Pay" }));
+        expect(pick).not.toHaveBeenCalled();
+        await fireEvent.click(rows[1]!);
+        expect(pick).toHaveBeenLastCalledWith(ORDERS[1]);
+        const list = screen.getByRole("listbox", { name: "Choose one" });
+        await fireEvent.focus(list);
+        await fireEvent.keyDown(list, { key: "ArrowDown" });
+        await fireEvent.keyDown(list, { key: "Enter" });
+        expect(pick).toHaveBeenLastCalledWith(ORDERS[1]);
+        expect(pick).toHaveBeenCalledTimes(2);
+      });
+    }
+
+    it("is a listbox only with rows, and takes the caller's name", async () => {
+      await mountTable({ rows: [], props: { pick: vi.fn(), pickLabel: "Choose an order" } });
+      expect(screen.queryByRole("listbox")).toBeNull();
+      expect(document.querySelector("[data-test='collection-empty']")).toBeTruthy();
+    });
+
+    it("names the choices", async () => {
+      await mountTable({ props: { pick: vi.fn(), pickLabel: "Choose an order" } });
+      expect(screen.getByRole("listbox", { name: "Choose an order" })).toBeTruthy();
+    });
+  });
 });

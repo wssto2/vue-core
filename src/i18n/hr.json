@@ -161,6 +161,7 @@
       },
       "clear": "Poništi",
       "no_data": "Nema podataka",
+      "pick_label": "Odaberite jedan",
       "no_results": "Prema traženom upitu nisu pronađeni podaci.",
       "failed": {
         "title": "Popis nije moguće učitati"
