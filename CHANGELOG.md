@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.9 — 2026-10-07
+
+A cell slot a page adds after the first render now shows.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Fixed
+- `DataTable`, `CollectionTable` and `CollectionPage` read their slots once, on the first render, and passed only those on to the rows. A `#cell-<key>` slot the page adds later (a column added while editing, one slot per line with `v-for`) never rendered. They read them on every render now.
+
+### Changes to existing behaviour
+- None, apart from the fix.
+
 ## 0.4.8 — 2026-10-07
 
 A list you pick from: `pick` mode on the collection's table, for modals that assign or select.
