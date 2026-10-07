@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.8 — 2026-10-07
+
+A list you pick from: `pick` mode on the collection's table, for modals that assign or select.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `pick?: (row) => void` on `CollectionTable`, `CollectionPage` and `DataTable`, and `pickLabel?: string` (the choices' accessible name, default "Choose one"; `core.collection.pick_label` in `hr`, `bs`, `sl`, `en`). Instead of `recordRoute` and the open-record link: a row is a choice or a link, never both.
+  - **Pointer:** a click or tap anywhere on the row picks it; a button or link inside the row keeps its own click (as in record rows). Hover and press are visible. Row actions still work if the caller gives them; otherwise there is no long press and no swipe.
+  - **Keyboard:** the rows are one listbox with one tab stop. Down and Up (Home, End) move the current row, which shows the focus ring; Enter or Space picks it. In the search field, Down moves into the rows, and Enter picks the only row when exactly one is shown (the list loaded, the search applied, no further page); with none, several, a pending search or a loading list it does nothing. Escape is not handled: the dialog closes as usual.
+  - **ARIA:** `role="listbox"` (named) with `role="option"` rows and `aria-activedescendant`, on the table (the table itself is `presentation` while picking) and on the phone rows.
+- Recipe "Picking a row" (`docs/recipes/list-page.md`); playground `/customers/pick`, a picker dialog with a search.
+
+### Changes to existing behaviour
+- None: a list without `pick` renders and behaves as in 0.4.7.
+
 ## 0.4.7 — 2026-10-06
 
 An empty list under its own start says what it is empty for and offers the way out.
