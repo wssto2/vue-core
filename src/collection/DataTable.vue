@@ -70,7 +70,9 @@ const display = computed(() => (props.loading ? "loading" : props.rows.length ==
 const link = (row: Row) => (props.recordRoute && !props.pick ? props.recordRoute(row) : null);
 
 // Every slot the page was given goes to the rows as it is, so the typed scopes stay the table's.
-const forwarded = computed(() => Object.keys(useSlots()));
+// Read on every render, not cached: the slots object is not reactive, and a parent may add a slot later (a column added while editing).
+const slots = useSlots();
+const forwarded = () => Object.keys(slots);
 </script>
 
 <template>
@@ -78,7 +80,7 @@ const forwarded = computed(() => Object.keys(useSlots()));
     <CollectionRows :columns="props.columns" :rows="props.rows" :row-key="props.rowKey" :display="display" :phone="phone" :link="link" :row-actions="props.rowActions"
       :row-label="props.rowLabel" :row-height="props.rowHeight" :density="props.density" :actions-visible="props.actionsVisible" :skeleton-rows="props.skeletonRows"
       :row-class="props.rowClass" :pick="props.pick" :pick-label="props.pickLabel">
-      <template v-for="name in forwarded" :key="name" #[name]="scope">
+      <template v-for="name in forwarded()" :key="name" #[name]="scope">
         <!-- @vue-ignore -->
         <slot :name="name" v-bind="(scope as Record<string, unknown> | undefined) ?? {}" />
       </template>

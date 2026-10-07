@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="Row extends object, Col extends Column<Row>">
-import { computed, ref, useSlots, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
 import { Tabs } from "../controls";
@@ -71,7 +71,8 @@ const slots = defineSlots<CollectionSlots<Row, Col>>();
 const { t } = useI18n();
 const format = useFormat();
 // Every slot the page was given but the toolbar goes to the rows as it is, so the typed scopes stay the table's.
-const forwarded = computed(() => Object.keys(useSlots()).filter((name) => name !== "toolbar" && name !== "empty"));
+// Read on every render, not cached: the slots object is not reactive, and a parent may add a slot later (a column added while editing).
+const forwarded = () => Object.keys(slots).filter((name) => name !== "toolbar" && name !== "empty");
 
 // --- columns and rows ---------------------------------------------------------------------
 
@@ -207,7 +208,7 @@ const message = computed(() => {
       <CollectionRows ref="rowsView" :pick="props.pick" :pick-label="props.pickLabel" :columns="columns" :rows="rows" :row-key="props.collection.rowKey" :display="props.collection.display.value" :phone="showRows" :link="link" :search="search"
         :sorted="sorted" :row-actions="props.rowActions" :row-label="props.rowLabel" :row-height="props.rowHeight" :density="props.density" :actions-visible="props.actionsVisible"
         :skeleton-rows="skeletonRows" :reserve-rows="loading ? skeletonRows : undefined" @sort="(key) => props.collection.toggleSort(key)">
-        <template v-for="name in forwarded" :key="name" #[name]="scope">
+        <template v-for="name in forwarded()" :key="name" #[name]="scope">
           <!-- @vue-ignore -->
           <slot :name="name" v-bind="(scope as Record<string, unknown> | undefined) ?? {}" />
         </template>

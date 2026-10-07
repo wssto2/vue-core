@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { defineComponent, h, nextTick } from "vue";
+import { defineComponent, h, nextTick, ref } from "vue";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { createTestI18n, mockMedia, testFormatting } from "../testing";
 import DataTable from "./DataTable.vue";
@@ -109,6 +109,25 @@ describe("DataTable", () => {
       slots: { "cell-status": ({ item, compact }) => h("b", { "data-test": "status" }, `${item.status}:${String(compact)}`) },
     });
     expect(Array.from(document.querySelectorAll("[data-test='status']")).map((node) => node.textContent)).toEqual(["open:false", "paid:false"]);
+  });
+
+  it("renders a cell slot the parent adds after the first render", async () => {
+    const shown = ref(false);
+    const router = createRouter({ history: createMemoryHistory(), routes: [{ path: "/", component: { render: () => h("div") } }] });
+    await router.push("/");
+    render(
+      defineComponent({
+        render: () =>
+          h(DataTable as never, { rows: ORDERS, columns, rowKey: (order: Order) => order.id } as never,
+            shown.value ? { "cell-status": ({ item }: { item: Order }) => h("span", { "data-test": "late" }, item.status) } : {}),
+      }),
+      { global: { plugins: [router, i18n, testFormatting(i18n)] } },
+    );
+    await flush();
+    expect(document.querySelectorAll("[data-test='late']")).toHaveLength(0);
+    shown.value = true;
+    await flush();
+    expect(document.querySelectorAll("[data-test='late']")).toHaveLength(2);
   });
 
   it("shows skeleton rows instead of the rows while loading", async () => {

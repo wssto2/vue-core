@@ -55,7 +55,9 @@ defineSlots<CollectionSlots<Row, Col> & {
 }>();
 
 // Every slot the page was given goes to the table as it is, so the typed scopes stay the table's.
-const forwarded = computed(() => Object.keys(useSlots()).filter((name) => name !== "default"));
+// Read on every render, not cached: the slots object is not reactive, and a parent may add a slot later (a column added while editing).
+const slots = useSlots();
+const forwarded = () => Object.keys(slots).filter((name) => name !== "default");
 const count = computed(() => props.collection.total.value || null);
 </script>
 
@@ -63,7 +65,7 @@ const count = computed(() => props.collection.total.value || null);
   <AdaptivePageShell :title="props.title" :description="props.description" :icon="props.icon" :count="count" :actions="props.actions">
     <CollectionTable :collection="props.collection" :row-actions="props.rowActions" :row-label="props.rowLabel" :row-height="props.rowHeight" :density="props.density"
       :views-presentation="props.viewsPresentation" :actions-visible="props.actionsVisible" :pick="props.pick" :pick-label="props.pickLabel">
-      <template v-for="name in forwarded" :key="name" #[name]="scope">
+      <template v-for="name in forwarded()" :key="name" #[name]="scope">
         <!-- @vue-ignore -->
         <slot :name="name" v-bind="(scope as Record<string, unknown> | undefined) ?? {}" />
       </template>
