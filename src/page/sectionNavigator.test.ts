@@ -374,3 +374,39 @@ describe("SectionNavigator as a workflow's steps", () => {
     expect(document.querySelectorAll("aside")).toHaveLength(0);
   });
 });
+
+describe("SectionNavigator as a hub", () => {
+  it.each([true, false])("shows no navigation (wide: %s): the first section is the hub, and every other one goes back to it", async (wide) => {
+    const page = await mountRecord(wide, { props: { desktop: "hub", compact: "hub", backLabel: "Record 3" }, summary: true });
+    expect(page.navigator()?.dataset.variant).toBe("hub");
+    expect(page.links()).toEqual([]);
+    expect(document.querySelector('[data-test="section-rows"]')).toBeNull();
+    expect(page.content()).toBe("general content");
+    expect(document.querySelector('[data-test="summary"]')).toBeTruthy();
+    expect(page.back.value).toBeNull();
+
+    await page.router.push("/records/3/audit");
+    await settle();
+    expect(page.content()).toBe("audit content");
+    expect(document.querySelector('[data-test="summary"]')).toBeNull();
+    expect(page.back.value).toMatchObject({ label: "Record 3" });
+  });
+
+  it("lists the sections of a long form inside a hub's section beside it on wide screens only", async () => {
+    await mountRecord(true, { props: { desktop: "hub", compact: "hub" }, path: "/records/3/notes" });
+    const form = document.querySelector('[data-test="section-steps-form"]')!;
+    expect([...form.querySelectorAll('aside [data-test="section-list"] a')].map((link) => link.textContent?.trim())).toEqual(["Identification", "Contact", "Equipment"]);
+    document.body.innerHTML = "";
+    await mountRecord(false, { props: { desktop: "hub", compact: "hub" }, path: "/records/3/notes" });
+    expect(document.querySelector('[data-test="section-steps-form"]')).toBeNull();
+  });
+
+  it("can be the hub on one width and a source list on the other", async () => {
+    const page = await mountRecord(true, { props: { desktop: "sidebar", compact: "hub" } });
+    expect(page.navigator()?.dataset.variant).toBe("sidebar");
+    document.body.innerHTML = "";
+    const phone = await mountRecord(false, { props: { desktop: "sidebar", compact: "hub" } });
+    expect(phone.navigator()?.dataset.variant).toBe("hub");
+    expect(phone.links()).toEqual([]);
+  });
+});

@@ -50,6 +50,8 @@ const neighbors = useCollectionNeighbors(list, { current: () => ticket.id.value,
 
 Sections are **child routes with `meta.section`**. The page's navigator lists them: a source list beside the content on desktop, drill-in rows on a phone. The bare record URL has no section of its own; the navigator moves it to the first section the user may open, and leaves out any section whose `access` they lack.
 
+A workflow record whose first section already leads to the others (its to-dos, each a row into a section) takes `desktop="hub" compact="hub"`: no navigation, every other section goes back to the first, and a long form in one lists its own sections beside it on wide screens.
+
 <!-- example: docs/examples/accounts/routes.ts -->
 ```ts
 import { defineRoutes } from "@wssto2/vue-core/router";

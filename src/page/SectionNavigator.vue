@@ -29,6 +29,7 @@ import type { SectionStep } from "./types";
  * | compact | `compact="segmented"` (default) | a segmented control of short labels, pinned under the phone nav bar while the section scrolls |
  * | compact | `compact="rows"` | drill-in rows at the top of the first section; every other section goes back to it |
  * | compact | `compact="auto"` | segmented up to five sections, rows beyond |
+ * | any | `hub` | no navigation: the first section is the record's hub, and its own content leads to the others (a workflow record's to-dos); every other section goes back to it, and a long form in one lists its sections beside it on wide screens |
  *
  * `steps` makes the record a workflow instead: the sections are large tiles in order, on every width (the `desktop` and `compact` variants
  * do not apply). Each tile is the section's link with its number (a ✓ once done), its label (short on phones), one line saying where the step
@@ -50,8 +51,8 @@ import type { SectionStep } from "./types";
 const props = withDefaults(defineProps<{
   /** The accessible name of the navigation ("Parts of the dealer"). */
   label: string;
-  desktop?: "sidebar" | "segments";
-  compact?: "segmented" | "rows" | "auto";
+  desktop?: "sidebar" | "segments" | "hub";
+  compact?: "segmented" | "rows" | "auto" | "hub";
   /** The back label of a nested section on compact screens, and the record's name in the path of a page inside a section. */
   backLabel?: string;
   /** A quiet count per section route name ("Locations 4"). */
@@ -86,13 +87,15 @@ const hasNav = computed(() => sections.value.length > 1);
 const noAccess = computed(() => state.declared.value > 0 && sections.value.length === 0);
 const onFirst = computed(() => !!active.value && active.value.name === first.value?.name && !subPage.value);
 const hasList = computed(() => index.sections.value.length > 1);
-// A long form inside a step lists its own sections beside it.
-const stepsAside = computed(() => variant.value === "steps" && wide.value && hasList.value);
+// A long form inside a step, or inside a hub's section, lists its own sections beside it.
+const stepsAside = computed(() => (variant.value === "steps" || variant.value === "hub") && wide.value && hasList.value);
+// Drill-in rows and a hub lead back to the first section from the others.
+const drillsIn = computed(() => variant.value === "rows" || variant.value === "hub");
 const stepOf = (name: string): SectionStep => props.steps?.[name] ?? { done: false };
 const STEP_TONE = { positive: "text-status-success-content", warning: "text-status-warning-content", critical: "text-status-danger-content" } as const;
 
 // A page inside a section goes back to the section on every width, with the record and the section
-// as the desktop path. Drill-in rows: a nested section goes back to the first one.
+// as the desktop path. Drill-in rows and a hub: a nested section goes back to the first one.
 const sectionBack = inject(pageSectionBackKey, null);
 watch(
   () => {
@@ -102,7 +105,7 @@ watch(
       const inFirst = active.value.name === first.value.name && !props.backLabel;
       return { label: active.value.shortLabel, to: active.value.to, path: inFirst ? [record] : [record, { label: active.value.label, to: active.value.to }] };
     }
-    return variant.value === "rows" && hasNav.value && !onFirst.value && first.value ? { label: props.backLabel || first.value.label, to: first.value.to } : null;
+    return drillsIn.value && hasNav.value && !onFirst.value && first.value ? { label: props.backLabel || first.value.label, to: first.value.to } : null;
   },
   (value) => {
     if (sectionBack) sectionBack.value = value;
@@ -179,8 +182,8 @@ const segmentLabel = (section: SectionLink) => (variant.value === "segments" && 
   </div>
 
   <div v-else data-test="section-navigator" :data-variant="hasNav ? variant : 'none'" class="flex min-w-0 flex-col gap-section-gap">
-    <!-- The summary sits with the navigation: above the segments, and with the rows on the first section. -->
-    <div v-if="$slots.summary && (variant !== 'rows' || onFirst || !hasNav)" data-test="section-summary"><slot name="summary" /></div>
+    <!-- The summary sits with the navigation: above the segments, and with the rows or the hub on the first section. -->
+    <div v-if="$slots.summary && (!drillsIn || onFirst || !hasNav)" data-test="section-summary"><slot name="summary" /></div>
 
     <!-- A workflow's steps: the number or a check, the label, where it stands, the shown step tinted -->
     <nav v-if="hasNav && variant === 'steps'" :aria-label="props.label" data-test="section-steps">
