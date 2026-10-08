@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.12 — 2026-10-08
+
+Back to the list keeps the user's place in more cases.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `useCollectionBack(definition, { list, backLabel })`: back to the list a record was opened from, with the list's state from `?from=`, for a record page without a pager. It asks nothing of the list. Pass it as `ResourcePage`'s `list`.
+
+### Fixed
+- `useCollectionNeighbors` led back to the plain list when the record was no longer in it (sold, removed, filtered out), dropping the user's page, filters and sort. Back now keeps the state the record was opened with.
+
+### Changes to existing behaviour
+- `listRoute` is set as soon as the state is read, also when the record is not found; it stays null without list state.
+
 ## 0.4.11 — 2026-10-08
 
 A record page can say what a missing record means.
