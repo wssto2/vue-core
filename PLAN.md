@@ -144,3 +144,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | 0.4.8 | Done | branch `release-048` | `pick` mode on `CollectionTable` / `CollectionPage` / `DataTable` (instead of `recordRoute`): row click or tap picks, a listbox with arrows, Home/End, Enter/Space, Down from the search field, Enter in the search field picks the only row; `pickLabel`. Recipe "Picking a row", playground `/customers/pick`. |
 | 0.4.9 | Done | branch `release-049` | Fix: `DataTable` / `CollectionTable` / `CollectionPage` forward the slots a page adds after the first render (they were read once). |
 | 0.4.10 | Done | branch `release-0410` | Fix: `useCollectionNeighbors` links previous/next to the current section of the record (was the section at resolve time). |
+| 0.4.11 | Done | branch `release-0411` | `ResourcePage` `#not-found` slot (a missing record that means something: ARV's internal market "not listed"). |

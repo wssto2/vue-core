@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.11 — 2026-10-08
+
+A record page can say what a missing record means.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `ResourcePage` takes a `#not-found` slot. It replaces the generic not-found state (404 or an invalid address) where a missing record means something, such as a vehicle sold or given to someone else, and offers the way on. Without the slot nothing changes.
+
+### Changes to existing behaviour
+- None.
+
 ## 0.4.10 — 2026-10-07
 
 The record pager follows the page to another section.
