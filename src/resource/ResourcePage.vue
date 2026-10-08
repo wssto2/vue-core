@@ -27,7 +27,7 @@ import type { Resource, ResourceId } from "./resource";
  *   being read again or a re-read failed: the record stays on screen, with a quiet refreshing or
  *   retry line). Before that the header is the plain title, and `loading` (a skeleton by default) stands
  *   where the content will be; a failed read shows the error with a retry, a missing record (404, or an
- *   invalid address) a not-found state.
+ *   invalid address) a not-found state, which `#not-found` replaces where a missing record means something.
  * - `title` is the large title until a `header` takes over, the phone bar's title and the browser tab's:
  *   pass the record's name once loaded, a fixed word before.
  * - A record opened from a list passes `list` (back with the list's state, the pager); a direct link
@@ -58,6 +58,8 @@ defineSlots<{
   loading?: () => unknown;
   /** Replaces the pager of `list`. */
   pager?: () => unknown;
+  /** Replaces the not-found state, for a record whose absence means something (taken off sale, given to someone else). */
+  "not-found"?: () => unknown;
 }>();
 
 const { t } = useI18n();
@@ -75,7 +77,9 @@ const back = computed(() => props.back ?? props.list?.back ?? null);
 
     <template v-if="record !== null && $slots.header" #header><slot name="header" :record="record" /></template>
 
-    <EmptyState v-if="missing" :title="t('core.resource.not_found.title')" :description="t('core.resource.not_found.body')" icon="errorWarningLine" />
+    <slot v-if="missing" name="not-found">
+      <EmptyState :title="t('core.resource.not_found.title')" :description="t('core.resource.not_found.body')" icon="errorWarningLine" />
+    </slot>
     <AsyncSection v-else :state="state" :is-empty="() => false" @retry="props.resource.reload()">
       <template #default="{ value }"><slot :record="value" /></template>
       <template v-if="$slots.loading" #skeleton><slot name="loading" /></template>

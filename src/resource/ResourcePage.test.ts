@@ -38,6 +38,7 @@ interface PageOptions {
   pagerSlot?: boolean;
   withHeader?: boolean;
   withLoading?: boolean;
+  notFoundSlot?: boolean;
   back?: { label: string; to: string };
 }
 
@@ -57,6 +58,7 @@ async function openPage(path: string, options: PageOptions) {
             default: ({ record }: { record: Ticket }) => h("p", { "data-test": "content" }, `content of ${record.subject}`),
             ...(options.withHeader === false ? {} : { header: ({ record }: { record: Ticket }) => h(RecordHeader, { title: `Header ${record.subject}` }) }),
             ...(options.withLoading ? { loading: () => h("p", { "data-test": "custom-loading" }, "custom skeleton") } : {}),
+            ...(options.notFoundSlot ? { "not-found": () => h("p", { "data-test": "custom-not-found" }, "Sold to someone else") } : {}),
             ...(options.pagerSlot ? { pager: () => h("p", { "data-test": "custom-pager" }, "my pager") } : {}),
           },
         );
@@ -109,6 +111,14 @@ describe("ResourcePage", () => {
     expect(screen.getByText("The record could not be found.")).toBeTruthy();
     expect(byTest("content")).toBeNull();
     expect(screen.queryByRole("button", { name: "Try again" })).toBeNull();
+  });
+
+  it("shows the page's own not-found state in place of the default one", async () => {
+    await openPage("/tickets/5", { load: async () => { throw new ApiError({ kind: "notFound", message: "no", status: 404 }); }, notFoundSlot: true });
+    await settle();
+    expect(byTest("custom-not-found")!.textContent).toBe("Sold to someone else");
+    expect(screen.queryByText("Not found")).toBeNull();
+    expect(byTest("content")).toBeNull();
   });
 
   it("does not ask for a record of an invalid address", async () => {
