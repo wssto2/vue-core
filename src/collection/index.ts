@@ -7,6 +7,8 @@ export { httpList, listParams, readListPage } from "./http";
 export { LIST_CONTEXT_PARAM } from "./location";
 export type { CollectionColumns, Column, ColumnKey, ColumnKind, ColumnValue, MobileRole, RowAction, SlotKey, TableColumns } from "./columns";
 export type { FilterDescriptor, FilterOption, ViewDescriptor } from "./filters";
+export { useCollectionBack } from "./back";
+export type { CollectionBackOptions } from "./back";
 export { useCollectionNeighbors } from "./neighbors";
 export type { CollectionNeighbors, Neighbor, NeighborOptions } from "./neighbors";
 export { createMemorySavedViews } from "./savedViews";

@@ -126,10 +126,13 @@ describe("useCollectionNeighbors", () => {
     expect(calls).toHaveLength(1);
   });
 
-  it("is empty when the record is not in the list any more", async () => {
+  it("is empty when the record is not in the list any more, and back still keeps the list's state", async () => {
     const { definition } = setup();
-    const { neighbors } = await open(definition, 99, stateOf(definition, { page: 1 }));
+    const from = stateOf(definition, { page: 2, search: "Ticket", pageSize: 8 });
+    const { neighbors } = await open(definition, 99, from);
     expect(neighbors.position.value).toBeNull();
+    expect(neighbors.context.neighbors).toBeNull();
+    expect(neighbors.context.back).toEqual({ label: "Tickets", to: { name: "list", query: { query: from } } });
   });
 
   it("caches pages, and does not cache a failure", async () => {

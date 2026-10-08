@@ -2,6 +2,7 @@ import { getCurrentScope, onScopeDispose, ref, shallowRef, watch, type Ref } fro
 import { useRoute, type RouteLocationRaw } from "vue-router";
 import { isAborted } from "../client";
 import type { RecordListContext } from "../resource/listContext";
+import { listRouteOf } from "./back";
 import type { CollectionDefinition } from "./definition";
 import { LIST_CONTEXT_PARAM } from "./location";
 import { onSessionChange } from "./session";
@@ -23,7 +24,7 @@ export interface CollectionNeighbors {
   readonly previous: Readonly<Ref<Neighbor | null>>;
   readonly next: Readonly<Ref<Neighbor | null>>;
   readonly loading: Readonly<Ref<boolean>>;
-  /** The list as the user left it (its route with the state in the query); null without list state. */
+  /** The list as the user left it (its route with the state in the query, also when the record is no longer in it); null without list state. */
   readonly listRoute: Readonly<Ref<RouteLocationRaw | null>>;
   /**
    * What a record page takes as `list` (`<ResourcePage :list="neighbors.context">`, or its `back` and pager in a page of its own):
@@ -105,7 +106,6 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
     previous.value = null;
     next.value = null;
     total.value = 0;
-    listRoute.value = null;
   }
 
   async function resolve() {
@@ -114,6 +114,8 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
     const query = decodeState(definition, from());
     const current = options.current();
 
+    // Back keeps the state the user left the list with, whether or not the record is still in it.
+    listRoute.value = query ? listRouteOf(definition, options.list, stateKey, query) : null;
     if (!query || current === null || current === undefined || current === "") {
       reset();
       loading.value = false;
@@ -180,8 +182,7 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
       position.value = (page - 1) * size + index + 1;
       previous.value = before;
       next.value = after;
-      const target = options.list;
-      listRoute.value = typeof target === "string" ? target : { ...target, query: { ...target.query, [stateKey]: encodeState(definition, { ...query, page }) } };
+      listRoute.value = listRouteOf(definition, options.list, stateKey, { ...query, page });
     } catch (failure) {
       if (!isAborted(failure)) throw failure; // anything else was turned into "no data" by fetchPage
     } finally {
