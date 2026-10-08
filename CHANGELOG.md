@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.13 — 2026-10-08
+
+A record can open on its own hub.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `SectionNavigator` takes `desktop="hub"` and `compact="hub"`. This is for a workflow record whose first section already leads to the others (its to-dos, each a row into a section). The navigator shows no navigation, every other section gets a back link to the first, and a long form in a section lists its own sections beside it on wide screens. The summary shows on the first section only, as with drill-in rows.
+
+### Changes to existing behaviour
+- None.
+
 ## 0.4.12 — 2026-10-08
 
 Back to the list keeps the user's place in more cases.

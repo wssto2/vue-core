@@ -146,3 +146,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | 0.4.10 | Done | branch `release-0410` | Fix: `useCollectionNeighbors` links previous/next to the current section of the record (was the section at resolve time). |
 | 0.4.11 | Done | branch `release-0411` | `ResourcePage` `#not-found` slot (a missing record that means something: ARV's internal market "not listed"). |
 | 0.4.12 | Done | branch `release-0412` | Back keeps the list's state when the record is no longer in it; `useCollectionBack` for record pages without a pager. |
+| 0.4.13 | Done | branch `release-0413` | `SectionNavigator` hub layout (`desktop`/`compact` `"hub"`), for ARV's vehicle records. |
