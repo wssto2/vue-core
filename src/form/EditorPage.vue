@@ -68,6 +68,7 @@ const chrome = computed(() =>
         form: props.form,
         label: () => props.saveLabel ?? t("core.actions.save"),
         allowed: () => props.canSave,
+        disabledWhileClean: false, // a create page: an untouched form is submitted to learn what is missing
         save: () => {
           if (!props.form?.submitting.value) emit("save");
         },

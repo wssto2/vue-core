@@ -103,7 +103,7 @@ async function save() {
   }
 }
 
-useSaveChrome({ form, label: () => t("core.access.save"), allowed: () => !readonly.value, save: () => void save(), cancel: () => form.reset() });
+useSaveChrome({ form, label: () => t("core.access.save"), allowed: () => !readonly.value, disabledWhileClean: () => props.role !== null, save: () => void save(), cancel: () => form.reset() });
 const attrs = computed(() => (props.role ?? props.source)?.attrs ?? []);
 defineExpose({ form, save });
 </script>

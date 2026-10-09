@@ -15,18 +15,23 @@ export interface SaveChromeOptions {
   readonly ready?: MaybeRefOrGetter<boolean>;
   /** The action id (for tests and shortcuts). Default `save`. */
   readonly id?: string;
+  /** Save is disabled while the form has no changes (nothing to save). Default true; a page that creates a record passes false so an untouched form can still be submitted and say what is missing. */
+  readonly disabledWhileClean?: MaybeRefOrGetter<boolean>;
   readonly save: () => void;
-  /** Cancel: put the saved values back. */
-  readonly cancel: () => void;
+  /** Cancel: put the saved values back. Without it there is no Cancel (a section edited in place, where leaving is guarded anyway). */
+  readonly cancel?: () => void;
 }
 
 /**
  * The page chrome of a page that edits directly (a long form, a settings section): Save as the page's primary action with
- * a spinner while it works, "Unsaved changes" beside it, Cancel (while there are edits) in place of Back, and the leave guard.
+ * a spinner while it works (disabled while there is nothing to save), "Unsaved changes" beside it, Cancel (while there are edits, if you
+ * give one) in place of Back, and the leave guard.
  * Inside an `EditorPage` this is done for you; use it for a page of your own. Call it from a component rendered inside the
  * page shell (or where the app's page chrome is installed).
  *
  *   useSaveChrome({ form, label: () => t("save"), allowed: () => can("tickets:update"), save: submit, cancel: () => form.reset() });
+ *   useSaveChrome({ form, allowed: () => can("dealer:update"), save: submit });                // a section edited in place: no Cancel
+ *   useSaveChrome({ form, disabledWhileClean: false, save: submit });                          // a create page: Save is always there
  */
 export function useSaveChrome(options: SaveChromeOptions): void {
   const { t } = useI18n();
@@ -46,11 +51,12 @@ export function useSaveChrome(options: SaveChromeOptions): void {
               icon: "save",
               placement: "primary" as const,
               processing: options.form.submitting.value,
+              disabled: (toValue(options.disabledWhileClean) ?? true) && !options.form.dirty.value,
               onClick: options.save,
             },
           ]
         : [],
-    leading: () => (editing.value ? { id: `${options.id ?? "save"}-cancel`, label: t("core.actions.cancel"), prominence: "plain" as const, onClick: options.cancel } : null),
+    leading: () => (editing.value && options.cancel ? { id: `${options.id ?? "save"}-cancel`, label: t("core.actions.cancel"), prominence: "plain" as const, onClick: options.cancel } : null),
     status: () => (editing.value ? t("core.form.unsaved_changes") : null),
   });
 }
