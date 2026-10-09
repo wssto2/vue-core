@@ -46,6 +46,8 @@ The app's validator is whatever has Zod's `safeParse` shape (Zod 3 and 4, or a h
     <NumberField v-bind="props.form.bind('priority')" :label="t('forms.priority')" />
 ```
 
+`describeFieldError` turns a server's field message (often a code or a translation key) into a sentence. Say it once for the application with `createApplication({ describeFieldError })` ([app setup](app-setup.md#error-sentences)); a form that words it differently passes its own, which wins. Without either, messages show as sent.
+
 `bind()` is typed from the draft: `bind('subjct')` or a number field bound to text does not compile. It supplies the value, the change, the error and a marker the page uses to count errors. Changing a field clears its message.
 
 `form.submit(send)` validates a copy of the draft (the schema never rewrites what was typed), calls `send(payload, { idempotencyKey })`, and ends as one of:
@@ -156,7 +158,7 @@ async function save() {
 }
 ```
 
-With a `form` the page does the rest: Save in the page chrome with a spinner, "Unsaved changes" and Cancel, the leave guard, the failure banner, an error count and a check per section, a required-fields progress bar, and after a refused submit focus on the first error with its (collapsed) section opened. Derived values (totals) are plain `computed`s over `form.values` in the feature. A page of your own uses `useSaveChrome({ form, save, cancel })`.
+With a `form` the page does the rest: Save in the page chrome with a spinner, "Unsaved changes" and Cancel, the leave guard, the failure banner, an error count and a check per section, a required-fields progress bar, and after a refused submit focus on the first error with its (collapsed) section opened. Derived values (totals) are plain `computed`s over `form.values` in the feature. A page of your own uses `useSaveChrome({ form, save, cancel })`; see [a section edited in place](#a-section-edited-in-place).
 
 ## 3. A command
 
@@ -352,6 +354,8 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
 
 - A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a time `"14:35"`, a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
+- **A select that cannot be cleared never hands back `null`.** Without `clearable`, `SelectField` emits its option's value, so a draft field typed `1 | 2 | 3` binds to it; with `clearable` it emits `Value | null`. Either takes `null` as the value it is given (a select that starts empty shows its placeholder). One exception the type cannot see: options that load drop a value the new options lack, so a field bound to a select whose options change should be able to hold `null`.
+- **`label-hidden`** (any field): the label is still the control's accessible name (and the read row's) but is not drawn. For a field whose group header already says it.
 - Dates, times and months are [their own fields](#dates-and-times): typed first, a calendar when you would rather pick. None of them has a `Date` value.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
 
@@ -391,6 +395,48 @@ A year, a code or a coordinate is a number that must not read "2.024". `:groupin
 ```vue
     <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="6" negative :grouping="false" />
     <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="6" negative :grouping="false" />
+```
+
+### Codes of a fixed length
+
+`:max-digits="5"` is `maxlength` for a number: the most digits the field takes (the fraction's included; the sign, separators and decimal mark are not counted). A sixth digit typed does nothing; pasting a longer number keeps its first five. A postal code is `:grouping="false" :max-digits="5"`.
+
+<!-- example: docs/examples/forms/views/Section.vue:29-29 -->
+```vue
+      <NumberField v-bind="form.bind('postalCode')" :label="t('forms.postalCode')" :grouping="false" :max-digits="5" />
+```
+
+## A section edited in place
+
+A settings-style section (a dealer's record sections) edits where it reads, with no sheet and no Cancel. `useSaveChrome` puts Save in the page chrome, disabled while there is nothing to save; `cancel` is optional (without it there is no Cancel, and leaving with edits is still guarded). A page that *creates* passes `disabledWhileClean: false` so an untouched form can be submitted to learn what is missing (`EditorPage` does). `useHiddenFieldErrors({ form })` lists the errors whose field is not on screen, the same list `FormErrors` shows, for a toast of your own; read it after `await nextTick()` once a submit has refused.
+
+<!-- example: docs/examples/forms/views/Section.vue:10-20 -->
+```ts
+const form = useForm({ defaults: () => ({ name: "", title: 1 as 1 | 2 | 3, postalCode: null as number | null, brands: [] as string[] }) });
+const hidden = useHiddenFieldErrors({ form });
+
+async function save() {
+  const result = await form.submit(async () => undefined);
+  await nextTick(); // the errors whose field is not on screen are worked out after the render
+  if (result.status === "failed" && hidden.value.length) toast.error(hidden.value.map((each) => `${each.field}: ${each.message}`).join("; "));
+}
+
+// A section edited in place: Save is disabled until something changed, and there is no Cancel (leaving is guarded anyway).
+useSaveChrome({ form, save });
+```
+
+<!-- example: docs/examples/forms/views/Section.vue:24-33 -->
+```vue
+  <FormView :form="form" @submit="save">
+    <FormGroup :header="t('forms.vehicles')">
+      <TextField v-bind="form.bind('name')" :label="t('forms.name')" />
+      <!-- Not clearable: it emits 1 | 2 | 3, never null, so the draft says so. -->
+      <SelectField v-bind="form.bind('title')" :label="t('forms.title')" :options="titles" />
+      <NumberField v-bind="form.bind('postalCode')" :label="t('forms.postalCode')" :grouping="false" :max-digits="5" />
+      <!-- The group's header says what the chips are; the label stays their accessible name. -->
+      <ChoiceChips v-bind="form.bind('brands')" :label="t('forms.brands')" label-hidden :options="brands" />
+    </FormGroup>
+  </FormView>
 ```
 
 ## Dates and times

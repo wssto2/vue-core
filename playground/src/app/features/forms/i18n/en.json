@@ -137,5 +137,20 @@
     "nameRequired": "Enter a name.",
     "saved": "Label saved.",
     "addAnother": "Save and add another"
+  },
+  "section": {
+    "title": "A section edited in place",
+    "intro": "Save is disabled until something changes, there is no Cancel, a hidden label still names its chips, and a postal code takes five digits.",
+    "link": "A section edited in place",
+    "group": "Dealer",
+    "name": "Name",
+    "salutation": "Salutation",
+    "mr": "Mr",
+    "ms": "Ms",
+    "mx": "Mx",
+    "postalCode": "Postal code",
+    "vehicles": "Vehicle brands",
+    "saved": "Section saved.",
+    "hint": "Type a postal code longer than five digits, or paste one: the extra digits are not taken."
   }
 }

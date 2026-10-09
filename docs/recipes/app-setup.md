@@ -171,6 +171,17 @@ async function archive() {
 </template>
 ```
 
+The same goes for the messages a server sends for a field (`{ fields: { oib: ["validation_errors.required"] } }`): say once how one becomes a sentence, beside `describeError`, and every form (`useForm`, `useResourceForm`, `useCommand`) uses it unless it has its own `describeFieldError`. Without either, messages show as sent.
+
+<!-- example: docs/examples/app/describeFieldError.ts -->
+```ts
+import type { AppFieldErrorDescriber } from "@wssto2/vue-core/i18n";
+
+// The server sends a field's message as a key ("validation_errors.required"); `createApplication({ describeFieldError })` words it once for every form.
+const sentences: Readonly<Record<string, string>> = { "validation_errors.required": "This field is required.", "validation_errors.unique": "Already in use." };
+export const describeFieldError: AppFieldErrorDescriber = (message, field) => sentences[message] ?? (field === "oib" ? `OIB: ${message}` : message);
+```
+
 `toast.message` is the plain toast, without a status icon: a neutral fact, usually with Undo (`success`, `info`, `warning`, `error` and `loading` carry a status; use one when the status is the news). `onDismiss(id)` runs when the user swipes the toast away or closes it, not when it times out, its action is pressed, or code calls `toast.dismiss(id)`; an undo that commits later can commit at once there: `toast.message(t("filterDeleted"), { action: { label: t("undo"), onClick: undo }, onDismiss: commit })`.
 
 Regions and forms word their own failures already (`useResource`, `useLoad`, `useForm` report to their frames and banners); this is for the places that do not.

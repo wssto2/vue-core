@@ -1,6 +1,7 @@
 import { render } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
 import { defineComponent, h, nextTick } from "vue";
+import { ApiError } from "../client";
 import { settle } from "../testing";
 import { createTestI18n } from "../testing/i18n";
 import FormErrors from "./FormErrors.vue";
@@ -26,8 +27,10 @@ describe("useHiddenFieldErrors", () => {
     await settle();
     expect(hidden.value).toEqual([]);
 
-    form.errors.set({ name: ["Too short"], oib: ["Invalid OIB"] });
-    await settle();
+    // As an app uses it: the refused submit sets the errors, and the answer is there one tick after the submit resolves.
+    await form.submit(async () => {
+      throw new ApiError({ kind: "validation", message: "no", status: 422, fields: { name: ["Too short"], oib: ["Invalid OIB"] } });
+    });
     await nextTick();
     expect(hidden.value).toEqual([{ field: "oib", message: "Invalid OIB" }]);
     const listed = [...document.querySelectorAll("[data-test=form-errors-hidden] li")].map((li) => li.textContent);

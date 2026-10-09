@@ -137,5 +137,20 @@
     "nameRequired": "Unesite naziv.",
     "saved": "Oznaka je spremljena.",
     "addAnother": "Spremi i dodaj novi"
+  },
+  "section": {
+    "title": "Odjeljak koji se uređuje na mjestu",
+    "intro": "Spremi je onemogućeno dok se ništa ne promijeni, nema Odustani, skrivena oznaka i dalje imenuje čipove, a poštanski broj prima pet znamenki.",
+    "link": "Odjeljak koji se uređuje na mjestu",
+    "group": "Koncesionar",
+    "name": "Naziv",
+    "salutation": "Oslovljavanje",
+    "mr": "Gospodin",
+    "ms": "Gospođa",
+    "mx": "Gospodin/Gospođa",
+    "postalCode": "Poštanski broj",
+    "vehicles": "Marke vozila",
+    "saved": "Odjeljak je spremljen.",
+    "hint": "Upišite ili zalijepite poštanski broj dulji od pet znamenki: višak se ne prima."
   }
 }

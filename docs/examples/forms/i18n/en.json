@@ -37,5 +37,8 @@
   "category": "Category",
   "queue": "Queue",
   "latitude": "Latitude",
-  "longitude": "Longitude"
+  "longitude": "Longitude",
+  "vehicles": "Vehicles",
+  "postalCode": "Postal code",
+  "brands": "Brands"
 }
