@@ -16,18 +16,20 @@ const supportRow = summary({ ref: "7", id: 7, name: "Support", description: "Ans
 const all = [accessPermissions.viewRoles, accessPermissions.manageRoles, accessPermissions.deleteRoles];
 
 describe("the roles list", () => {
-  it("lists every role with its kind and holders, and filters by kind and search", async () => {
+  // The first render loads the whole access screen, which takes seconds when the full suite loads the machine.
+  it("lists every role with its kind and holders, and filters by kind and search", { timeout: 30_000 }, async () => {
     running = await startAccess({ "GET /v1/iam/roles": data({ roles: [sellerRow, supportRow] }) }, all, "/iam/roles");
-    await screen.findByText("Seller");
+    await screen.findByText("Seller", {}, { timeout: 10_000 });
     expect(screen.getByText("Support")).toBeTruthy();
     expect(screen.getByText("Predefined", { selector: "span" })).toBeTruthy();
     expect(queryAllTest("role-holders").map((cell) => cell.textContent)).toEqual(["People: 0", "People: 2"]);
 
     await fireEvent.click(screen.getByRole("tab", { name: /^Custom/ }));
-    expect(screen.queryByText("Seller")).toBeNull();
+    await waitFor(() => expect(screen.queryByText("Seller")).toBeNull());
     await fireEvent.click(screen.getByRole("tab", { name: /^All/ }));
+    await screen.findByText("Seller");
     await fireEvent.update(screen.getByPlaceholderText("Search roles"), "answers");
-    expect(screen.queryByText("Seller")).toBeNull();
+    await waitFor(() => expect(screen.queryByText("Seller")).toBeNull());
     expect(screen.getByText("Support")).toBeTruthy();
   });
 

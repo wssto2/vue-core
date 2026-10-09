@@ -36,7 +36,10 @@ const FULL = ["iam.user:view", "iam.user.activity:view"];
 describe("a person's activity", () => {
   it("is a section only for whoever holds iam.user.activity:view", async () => {
     const without = await open(["iam.user:view"]);
-    expect(without.target.textContent).toContain(en.core.no_access.title);
+    // A denied section moves to the first one the person may open, once the record page has loaded.
+    await waitFor(() => expect(without.application.router.currentRoute.value.name).toBe("users.record.general"), { timeout: 10_000 });
+    await screen.findByText(en.core.users.intro.general);
+    expect(without.target.querySelector('a[href="/users/2/activity"]')).toBeNull();
     expect(without.target.querySelector("[data-person-activity]")).toBeNull();
   });
 
