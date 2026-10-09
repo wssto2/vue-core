@@ -407,3 +407,43 @@ describe("labelHidden", () => {
     expect(sr(document.querySelector("label"))).toBe(false);
   });
 });
+
+describe("NumberField maxDigits", () => {
+  const field = (props: Record<string, unknown> = {}) => {
+    const view = mount(NumberField, { modelValue: null, label: "Postal", maxDigits: 5, grouping: false, ...props });
+    return { ...view, input: screen.getByLabelText("Postal") as HTMLInputElement };
+  };
+
+  it("does not take a digit past the limit when typing", async () => {
+    const { input, update } = field();
+    await fireEvent.focus(input);
+    await fireEvent.update(input, "12345");
+    expect(update).toHaveBeenLastCalledWith(12345);
+    await fireEvent.update(input, "123456");
+    expect(input.value).toBe("12345");
+    expect(update).toHaveBeenLastCalledWith(12345);
+  });
+
+  it("keeps the first digits of a pasted longer number", async () => {
+    const { input, update } = field();
+    await fireEvent.update(input, "1234567890");
+    expect(input.value).toBe("12345");
+    expect(update).toHaveBeenLastCalledWith(12345);
+  });
+
+  it("counts the fraction digits, and neither the sign, the separators nor the decimal mark", async () => {
+    const { input, update } = field({ decimals: 2, negative: true, maxDigits: 4, grouping: true });
+    await fireEvent.update(input, "-1,234.567");
+    expect(input.value).toBe("-1,234.");
+    expect(update).toHaveBeenLastCalledWith(-1234);
+    await fireEvent.update(input, "-12.345");
+    expect(input.value).toBe("-12.34");
+    expect(update).toHaveBeenLastCalledWith(-12.34);
+  });
+
+  it("takes any length without it", async () => {
+    const { input } = field({ maxDigits: undefined });
+    await fireEvent.update(input, "1234567890");
+    expect(input.value).toBe("1234567890");
+  });
+});

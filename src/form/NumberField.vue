@@ -18,6 +18,7 @@ import { numberMarks, parseNumber } from "./number";
  * is always a decimal mark, never a group mark.
  *
  * Typing "1,5" mid-edit is never rewritten under the cursor: the text is the user's until the field loses focus.
+ * `:max-digits="5"` takes at most five digits (a postal code): typing a sixth does nothing, pasting a longer number keeps its first five.
  * Limits (`min`, `max`) are the validator's job; the field only keeps what cannot be a number out.
  */
 const props = withDefaults(
@@ -27,13 +28,15 @@ const props = withDefaults(
     negative?: boolean;
     /** Separates thousands ("1.234.567"); off for years, coordinates and codes. */
     grouping?: boolean;
+    /** The most digits the field takes, fraction digits included (the sign, separators and decimal mark are not counted): a postal code is `:max-digits="5"`. Further digits are not accepted, as `maxlength` does for text; a pasted longer number keeps its first digits. */
+    maxDigits?: number;
     placeholder?: string;
     prefix?: string;
     suffix?: string;
     /** sm 10rem (the default for numbers) · md · lg · full. */
     width?: Exclude<ControlWidth, "content">;
   }>(),
-  { ...fieldDefaults, decimals: 0, negative: false, grouping: true, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
+  { ...fieldDefaults, decimals: 0, negative: false, grouping: true, maxDigits: undefined, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
 );
 
 const model = defineModel<number | null>({ default: null });
@@ -64,6 +67,19 @@ function onInput(event: Event) {
   let next = element.value.replace(/[^\d.,\-\s]/g, "");
   if (!props.negative) next = next.replace(/-/g, "");
   else next = next.replace(/(?!^)-/g, "");
+  const digits = next.replace(/\D/g, "").length;
+  if (props.maxDigits !== undefined && digits > props.maxDigits) {
+    if (next.length === text.value.length + 1) {
+      // One typed digit past the limit is not accepted: the text and the caret stay as they were.
+      const caret = Math.max(0, (element.selectionStart ?? next.length) - 1);
+      element.value = text.value;
+      element.setSelectionRange(caret, caret);
+      return;
+    }
+    // A paste (or autofill) keeps its first digits; the separators in between stay.
+    let kept = 0;
+    next = [...next].filter((char) => !/\d/.test(char) || ++kept <= props.maxDigits!).join("");
+  }
   if (next !== element.value) element.value = next;
   text.value = next;
   const parsed = read(next);
