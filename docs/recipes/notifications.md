@@ -94,7 +94,7 @@ export const title = (notification: Notification) => notification.title;
 
 ## Texts
 
-`core.notifications.*` (the inbox), `core.notifications.settings.*` and `core.notifications.dead_letters.*` in en, hr, bs and sl; an application overrides any of them. go-core's reasons are `core.errors.notification.*` (`setting.enforced`, `email.unavailable`, `quiet_hours.invalid`, `category.unknown`), looked up after the application's own `errors.<reason>`. The application adds the names of its categories under `notifications.categories`:
+`core.notifications.*` (the inbox), `core.notifications.settings.*` and `core.notifications.dead_letters.*` in en, hr, bs, sl and sr-Latn; an application overrides any of them. go-core's reasons are `core.errors.notification.*` (`setting.enforced`, `email.unavailable`, `quiet_hours.invalid`, `category.unknown`), looked up after the application's own `errors.<reason>`. The application adds the names of its categories under `notifications.categories`:
 
 <!-- example: docs/examples/notifications/messages.json -->
 ```json

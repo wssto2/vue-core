@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Button } from "@wssto2/vue-core/button";
 import { FormGroup, NumberField, SelectField, useForm, useOptions } from "@wssto2/vue-core/form";
 import { useI18n } from "vue-i18n";
 import { useTicketFormsApi } from "../context";
@@ -15,8 +16,10 @@ const queues = useOptions({ for: () => form.values.category, load: (category, { 
 <template>
   <FormGroup>
     <SelectField v-bind="form.bind('category')" :label="t('forms.category')" :options="categories" />
-    <SelectField v-bind="form.bind('queue')" :label="t('forms.queue')" :options="queues" :disabled="form.values.category === null" />
-    <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="6" negative :grouping="false" />
-    <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="6" negative :grouping="false" />
+    <SelectField v-bind="form.bind('queue')" :label="t('forms.queue')" :options="queues" :disabled="form.values.category === null">
+      <template #trailing><Button prominence="primary" size="sm">{{ t("forms.save") }}</Button></template>
+    </SelectField>
+    <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
+    <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
   </FormGroup>
 </template>

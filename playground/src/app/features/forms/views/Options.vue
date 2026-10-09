@@ -13,7 +13,7 @@ const delay = ref(1500);
 const failing = ref(false);
 const asked = ref(0);
 
-const values = reactive({ make: null as string | null, model: null as string | null, equipment: [] as string[], year: 2024 as number | null, latitude: 45.815399 as number | null, longitude: 15.966568 as number | null, sum: 1234567 as number | null });
+const values = reactive({ make: null as string | null, model: null as string | null, equipment: [] as string[], year: 2024 as number | null, latitude: 43.566139 as number | null, longitude: 18.413029 as number | null, sum: 1234567 as number | null });
 
 const catalogue: Record<string, readonly string[]> = {
   audi: ["A3", "A4", "Q3", "Q5"],
@@ -72,14 +72,16 @@ const edit = (label: Label) => ((editing.value = label), save.present({ name: la
 
     <FormView :editable="true">
       <FormGroup :header="t('forms.options.vehicle')" :footer="t('forms.options.vehicleHint')">
-        <SelectField v-model="values.make" :label="t('forms.options.make')" :options="makes" clearable />
+        <SelectField v-model="values.make" :label="t('forms.options.make')" :options="makes" clearable>
+          <template #trailing><Button prominence="primary" size="sm">{{ t("forms.options.save") }}</Button></template>
+        </SelectField>
         <SelectField v-model="values.model" :label="t('forms.options.model')" :options="models" :disabled="values.make === null" />
         <MultiSelectField v-model="values.equipment" :label="t('forms.options.equipment')" :options="equipment" :disabled="values.model === null" />
       </FormGroup>
       <FormGroup :header="t('forms.options.numbers')" :footer="t('forms.options.numbersHint')">
         <NumberField v-model="values.year" :label="t('forms.options.year')" :grouping="false" />
-        <NumberField v-model="values.latitude" :label="t('forms.options.latitude')" :decimals="6" negative :grouping="false" />
-        <NumberField v-model="values.longitude" :label="t('forms.options.longitude')" :decimals="6" negative :grouping="false" />
+        <NumberField v-model="values.latitude" :label="t('forms.options.latitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
+        <NumberField v-model="values.longitude" :label="t('forms.options.longitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
         <NumberField v-model="values.sum" :label="t('forms.options.grouped')" />
       </FormGroup>
     </FormView>

@@ -59,7 +59,7 @@ export const platform = createPlatform({ config: readBootstrap(), ...identityPla
 
 ## Refusals
 
-The page says what go-core says; the texts are `core.errors.identity.*` in en, hr, bs and sl, and an app overrides any with `errors.identity.…` of its own.
+The page says what go-core says; the texts are `core.errors.identity.*` in en, hr, bs, sl and sr-Latn, and an app overrides any with `errors.identity.…` of its own.
 
 | Answer | Reason | Said |
 |---|---|---|

@@ -355,6 +355,7 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
 - A field's value type is honest: text is `string` (`""` is empty), a number is `number | null`, a day is `"2026-09-30"` (never a `Date`), a time `"14:35"`, a switch is a boolean, a choice is its option's `value` or `null`. Mapping a nullable column, a 0/1 flag or an instant to these is the record mapping's job.
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
 - **A select that cannot be cleared never hands back `null`.** Without `clearable`, `SelectField` emits its option's value, so a draft field typed `1 | 2 | 3` binds to it; with `clearable` it emits `Value | null`. Either takes `null` as the value it is given (a select that starts empty shows its placeholder). One exception the type cannot see: options that load drop a value the new options lack, so a field bound to a select whose options change should be able to hold `null`.
+- **A field passes `Field`'s slots through.** `#trailing` puts an action after the control (a per-row Save beside a select; in a group's row, or beside a field on its own), `#labelTrailing` ends the label's line, `#readonly` replaces the read value. Editing only, as on `Field`; the control stays the label's target and the action is reached by Tab after it. See the select in [Options that load](#options-that-load).
 - **`label-hidden`** (any field): the label is still the control's accessible name (and the read row's) but is not drawn. For a field whose group header already says it.
 - Dates, times and months are [their own fields](#dates-and-times): typed first, a calendar when you would rather pick. None of them has a `Date` value.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
@@ -363,17 +364,19 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
 
 A select whose options come from the server (the queues of the chosen category, the models of a make) takes a `useOptions` where it takes a list. The state is typed (`idle`, `loading`, `loaded`, `failed`) and the field does the rest.
 
-<!-- example: docs/examples/forms/components/RoutingFields.vue:10-12 -->
+<!-- example: docs/examples/forms/components/RoutingFields.vue:11-13 -->
 ```ts
 // The queues load from the category: the latest category wins, and a queue the new category does not have is cleared.
 const categories = useOptions({ load: ({ signal }) => api.categories(signal) });
 const queues = useOptions({ for: () => form.values.category, load: (category, { signal }) => api.queues(category, signal) });
 ```
 
-<!-- example: docs/examples/forms/components/RoutingFields.vue:17-18 -->
+<!-- example: docs/examples/forms/components/RoutingFields.vue:18-21 -->
 ```vue
     <SelectField v-bind="form.bind('category')" :label="t('forms.category')" :options="categories" />
-    <SelectField v-bind="form.bind('queue')" :label="t('forms.queue')" :options="queues" :disabled="form.values.category === null" />
+    <SelectField v-bind="form.bind('queue')" :label="t('forms.queue')" :options="queues" :disabled="form.values.category === null">
+      <template #trailing><Button prominence="primary" size="sm">{{ t("forms.save") }}</Button></template>
+    </SelectField>
 ```
 
 - `for` is a getter of the input the options depend on. `null` or `undefined` asks nothing (the list is empty, `idle`: also set `:disabled`); any other value asks, again whenever it changes. Without `for` the options load once.
@@ -391,10 +394,12 @@ The desktop list is a popover that is never clipped by a dialog or a scrolling p
 
 A year, a code or a coordinate is a number that must not read "2.024". `:grouping="false"` writes none, shown or typed, and then a `.` or `,` the user types is always the decimal mark (with grouping on, `1.000` in Croatian is a thousand).
 
-<!-- example: docs/examples/forms/components/RoutingFields.vue:19-20 -->
+`decimals` is the most fraction digits the field takes and keeps; **`min-decimals`** is how many are always shown (default: `decimals`, so an amount reads `1.50`). A coordinate passes `:min-decimals="0"` and reads `43.566139`, not `43.5661390`. **`mono`** sets the number in the monospaced face of `TextField mono`, editing and reading. `MoneyField` keeps its two fixed decimals.
+
+<!-- example: docs/examples/forms/components/RoutingFields.vue:22-23 -->
 ```vue
-    <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="6" negative :grouping="false" />
-    <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="6" negative :grouping="false" />
+    <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
+    <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
 ```
 
 ### Codes of a fixed length

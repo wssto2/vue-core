@@ -88,7 +88,7 @@ export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm
 
 ## Refusals
 
-The texts are `core.errors.identity.*` in en, hr, bs and sl (an application overrides any with `errors.identity.…`): a field's reason (`identity.email.taken`, `identity.login.taken`, `identity.password.weak`…) lands under its field; a refusal of the whole action (a wrong code with its attempts left, a lock with the time of day, the deactivation hook's veto) is said above the form or under the code. Go-core's password rules are the server's: the screens say "does not meet the password rules" and do not mirror a checklist, since the application can set its own policy.
+The texts are `core.errors.identity.*` in en, hr, bs, sl and sr-Latn (an application overrides any with `errors.identity.…`): a field's reason (`identity.email.taken`, `identity.login.taken`, `identity.password.weak`…) lands under its field; a refusal of the whole action (a wrong code with its attempts left, a lock with the time of day, the deactivation hook's veto) is said above the form or under the code. Go-core's password rules are the server's: the screens say "does not meet the password rules" and do not mirror a checklist, since the application can set its own policy.
 
 ## Testing
 

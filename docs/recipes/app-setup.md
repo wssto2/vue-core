@@ -36,7 +36,7 @@ export const application = createApplication({
   shell: backofficeShell(),
   features: [sessionFeature, defineFeature({ id: "push", effects: [pushCleanup] })],
 
-  // Locales: the server's choice when offered, else `fallback`. The library ships en, hr, bs and sl.
+  // Locales: the server's choice when offered, else `fallback`. The library ships en, hr, bs, sl and sr-Latn (Serbian, ekavian, Latin).
   locale: {
     supported: ["hr", "en"],
     fallback: "en",
@@ -97,6 +97,8 @@ export const pushCleanup: SessionEffect = {
 The start locale is the server's (`config.locale`) when it is among `locale.supported`, else `locale.fallback`. `application.setLocale(code)` loads the namespaces in use for the new locale and only then switches, so a switch never shows a raw key; a slower earlier switch that finishes late is dropped. `locale.onChange(locale)` is called once after each switch that committed, for persisting it on the user; its failure goes to `onError` with `source: "locale"` and does not undo the switch.
 
 The account menu (desktop popover and phone sheet) lists the languages by their own name. With `locale.flags` (`{ en: "GB", hr: "HR" }`, ISO country codes) each row also shows that country's flag, as an SVG that loads when it is first shown; a locale without an entry shows its name alone. The mapping is yours because a flag stands for a language, not a country.
+
+The library's Bosnian is `bs` and its Serbian is `sr-Latn` (ekavian, Latin script; a bare `sr` would print Cyrillic): name the locales that way, not by market (`ba`, `rs`), which `Intl` reads as other languages. A locale the library has no texts for shows the `locale.fallback` language's.
 
 ## Permissions in the UI
 

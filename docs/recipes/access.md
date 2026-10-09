@@ -124,7 +124,7 @@ export const userRoutes = defineRoutes({
 
 ## Refusals
 
-go-core's delegation rules refuse with a reason; the screens say it in words (en, hr, bs, sl: `core.errors.authz.*`, an app overrides any with `errors.authz.*`) where the failure belongs: under the save, in the dialog, in a toast for a delete.
+go-core's delegation rules refuse with a reason; the screens say it in words (en, hr, bs, sl, sr-Latn: `core.errors.authz.*`, an app overrides any with `errors.authz.*`) where the failure belongs: under the save, in the dialog, in a toast for a delete.
 
 | Reason | Said |
 |---|---|

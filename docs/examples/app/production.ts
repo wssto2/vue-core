@@ -30,7 +30,7 @@ export const application = createApplication({
   shell: backofficeShell(),
   features: [sessionFeature, defineFeature({ id: "push", effects: [pushCleanup] })],
 
-  // Locales: the server's choice when offered, else `fallback`. The library ships en, hr, bs and sl.
+  // Locales: the server's choice when offered, else `fallback`. The library ships en, hr, bs, sl and sr-Latn (Serbian, ekavian, Latin).
   locale: {
     supported: ["hr", "en"],
     fallback: "en",
