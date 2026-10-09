@@ -2,18 +2,18 @@
   "core": {
     "access": {
       "title": "Uloge",
-      "description": "Skupovi dozvola. Osobi se uloga dodjeljuje na njenom zapisu, zajedno s obimom.",
+      "description": "Skupovi ovlaštenja. Osobi se uloga dodjeljuje na njenom zapisu, zajedno s opsegom.",
       "new_title": "Nova uloga",
-      "new_description": "Prilagođena uloga: odaberite dozvole i čije zapise obuhvataju.",
-      "new_copy_description": "Kopija postojeće uloge: dorada se sprema kao nova prilagođena uloga.",
+      "new_description": "Prilagođena uloga: izaberite ovlaštenja i čije zapise obuhvataju.",
+      "new_copy_description": "Kopija postojeće uloge: dorada se čuva kao nova prilagođena uloga.",
       "create": "Nova uloga",
-      "save": "Spremi ulogu",
+      "save": "Sačuvaj ulogu",
       "copy": "Kopiraj",
       "copy_name": "{name} (kopija)",
       "search": "Pretraži uloge",
       "list_footer": "Standardne uloge dolaze s aplikacijom i ne uređuju se — Kopiraj daje prilagođenu ulogu za doradu.",
       "empty": "Nema uloga koje odgovaraju.",
-      "permissions": "Dozvole: {count}",
+      "permissions": "Ovlaštenja: {count}",
       "holders_count": "Osoba: {count}",
       "kinds": {
         "all": "Sve",
@@ -34,16 +34,16 @@
       },
       "notes": {
         "predefined": "Standardna uloga dolazi s aplikacijom i ne uređuje se. Kopiraj daje prilagođenu ulogu za doradu.",
-        "computed": "Dozvole se dodjeljuju automatski: kad aplikacija dobije novu dozvolu, uloga je dobija odmah, bez ručnog dodavanja. Dozvole označene Sistem imaju samo uloge koje vode sistem."
+        "computed": "Ovlaštenja se dodjeljuju automatski: kad aplikacija dobije novo ovlaštenje, uloga ga dobija odmah, bez ručnog dodavanja. Ovlaštenja označena Sistem imaju samo uloge koje vode sistem."
       },
       "requires": "Zahtijeva: {names}.",
       "modules": "Moduli",
       "turn_on_all": "Uključi sve",
       "turn_off_all": "Isključi sve",
-      "completed": "Uloga nije imala sve dozvole koje trebaju njene druge dozvole, pa su uključene: {names}. Spremite ulogu da se promjena primijeni.",
+      "completed": "Uloga nije imala sva ovlaštenja koja trebaju njena druga ovlaštenja, pa su uključena: {names}. Sačuvajte ulogu da se promjena primijeni.",
       "name_required": "Unesite naziv.",
       "too_long": "Prekoračena je najveća dužina.",
-      "saved": "Uloga je spremljena",
+      "saved": "Uloga je sačuvana",
       "deleted": "Uloga je obrisana",
       "sensitive": "Osjetljivo",
       "system": "Sistem",
@@ -56,7 +56,7 @@
         "all": "Sve"
       },
       "qualifier_hint": {
-        "own": "Samo zapisi dodijeljeni osobi ili koje je izradila",
+        "own": "Samo zapisi dodijeljeni osobi ili koje je kreirala",
         "own_location": "Zapisi lokacije na kojoj osoba ima ulogu",
         "all": "Svi zapisi na mjestu na kojem osoba ima ulogu"
       },
@@ -69,12 +69,12 @@
         "organization": "Organizacija"
       },
       "compare": {
-        "action": "Usporedi sa standardnom ulogom",
-        "title": "Usporedba sa standardnom ulogom",
+        "action": "Uporedi sa standardnom ulogom",
+        "title": "Poređenje sa standardnom ulogom",
         "footer": "Pokazuje koliko se prilagođena uloga udaljila od standardne.",
         "with": "Standardna uloga",
         "loading": "Upoređujem…",
-        "failed": "Usporedba nije uspjela. Pokušajte ponovo.",
+        "failed": "Poređenje nije uspjelo. Pokušajte ponovo.",
         "identical": "Uloge se ne razlikuju.",
         "only_in_role": "Samo u ovoj ulozi ({count})",
         "only_in_other": "Samo u standardnoj ({count})",
@@ -84,9 +84,9 @@
       "replace": {
         "action": "Zamijeni",
         "title": "Zamijeni ulogu",
-        "footer": "Svi koji imaju ovu ulogu dobijaju odabranu standardnu ulogu na istom obimu. Važe ista pravila kao pri dodjeli: ne možete dati više nego što i sami imate.",
+        "footer": "Svi koji imaju ovu ulogu dobijaju izabranu standardnu ulogu na istom opsegu. Vrijede ista pravila kao pri dodjeli: ne možete dati više nego što i sami imate.",
         "with": "Zamijeni standardnom ulogom",
-        "choose": "Odaberite ulogu.",
+        "choose": "Izaberite ulogu.",
         "confirm": "Zamijeni",
         "moves": "Osobe koje prelaze na standardnu ulogu: {count}.",
         "done": "Osobe prebačene na standardnu ulogu: {count}"
@@ -125,13 +125,13 @@
         "role": "Uloga",
         "role_gives": "Šta uloga daje",
         "role_gives_footer": "Određuje uloga; mijenja se u Ulogama, ne ovdje.",
-        "choose_role": "Odaberite ulogu.",
-        "choose_place": "Odaberite gdje uloga vrijedi."
+        "choose_role": "Izaberite ulogu.",
+        "choose_place": "Izaberite gdje uloga vrijedi."
       },
       "effective": {
         "title": "Šta {name} može",
         "footer": "Zbir svih uloga osobe; mijenja se dodavanjem ili uklanjanjem uloga. Svoji – zapisi dodijeljeni osobi ili koje je sama izradila · Lokacije – zapisi njene lokacije · Svi – svi zapisi na mjestu uloge.",
-        "empty": "Bez uloga nema nijedne dozvole.",
+        "empty": "Bez uloga nema ni jednog ovlaštenja.",
         "from_roles": "iz uloge: {roles}",
         "unavailable": "Isključeno",
         "why_row": "{role} · {whose} · {scope}",
@@ -146,9 +146,9 @@
       "close": "Zatvori",
       "confirm": "Potvrdi",
       "retry": "Pokušaj ponovo",
-      "save": "Spremi",
-      "saving": "Spremam…",
-      "saved": "Spremljeno",
+      "save": "Sačuvaj",
+      "saving": "Čuvam…",
+      "saved": "Sačuvano",
       "more": "Više",
       "edit": "Uredi",
       "clear": "Očisti",
@@ -161,7 +161,7 @@
       },
       "clear": "Poništi",
       "no_data": "Nema podataka",
-      "pick_label": "Odaberite jedan",
+      "pick_label": "Izaberite jedan",
       "no_results": "Prema traženom upitu nisu pronađeni podaci.",
       "failed": {
         "title": "Popis nije moguće učitati"
@@ -192,8 +192,8 @@
         "options": {
           "today": "Danas",
           "yesterday": "Jučer",
-          "this_week": "Ovaj tjedan",
-          "last_week": "Prošli tjedan",
+          "this_week": "Ova sedmica",
+          "last_week": "Prošla sedmica",
           "this_month": "Ovaj mjesec",
           "last_month": "Prošli mjesec",
           "this_year": "Ova godina",
@@ -201,24 +201,24 @@
         }
       },
       "saved": {
-        "title": "Spremljeni filteri",
-        "menu": "Spremljeni filteri",
-        "save": "Spremi",
+        "title": "Sačuvani filteri",
+        "menu": "Sačuvani filteri",
+        "save": "Sačuvaj",
         "name_placeholder": "Naziv, npr. Novi Renault",
-        "saved_toast": "Filteri „{name}” spremljeni i primijenjeni.",
+        "saved_toast": "Filteri „{name}” sačuvani i primijenjeni.",
         "deleted_toast": "Filteri „{name}” obrisani.",
         "delete": "Obriši „{name}”",
-        "save_button": "Spremi filtere",
+        "save_button": "Sačuvaj filtere",
         "name_label": "Naziv filtera",
         "replace": "Zamijeni",
         "replace_hint": "Postojeći filter „{name}” bit će zamijenjen.",
-        "nothing_to_save": "Odaberite barem jedan filter za spremanje.",
-        "save_failed": "Filtere nije moguće spremiti.",
+        "nothing_to_save": "Izaberite barem jedan filter za čuvanje.",
+        "save_failed": "Filtere nije moguće sačuvati.",
         "delete_failed": "Filtere nije moguće obrisati.",
         "undo": "Poništi"
       },
       "empty": {
-        "title": "Nema rezultata za odabrane filtere",
+        "title": "Nema rezultata za izabrane filtere",
         "description": "Uklonite neki od filtera ili poništite sve.",
         "remove_last": "Ukloni: {filter}",
         "clear_all": "Poništi sve filtere",
@@ -242,13 +242,13 @@
       "seconds": "{count} s"
     },
     "discard_changes": {
-      "title": "Nespremljene promjene",
-      "body": "Uneseni podaci nisu spremljeni. Ako nastavite, izmjene će biti izgubljene.",
+      "title": "Nesačuvane promjene",
+      "body": "Uneseni podaci nisu sačuvani. Ako nastavite, izmjene će biti izgubljene.",
       "confirm": "Odbaci promjene",
       "cancel": "Nastavi s uređivanjem"
     },
     "toast": {
-      "notifications": "Obavijesti"
+      "notifications": "Obavještenja"
     },
     "shell": {
       "menu": "Meni",
@@ -266,7 +266,7 @@
     },
     "no_access": {
       "title": "Nemate pristup",
-      "body": "Vaše privilegije ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."
+      "body": "Vaša ovlaštenja ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."
     },
     "startup": {
       "title": "Aplikacija se nije mogla pokrenuti",
@@ -294,7 +294,7 @@
       "label": "Napredak",
       "position": "Korak {current} od {total}",
       "next_named": "Dalje: {step}",
-      "done": "završeno",
+      "done": "dovršeno",
       "draft_saved": "nacrt sačuvan",
       "restored": "Nastavljate sa sačuvanim nacrtom.",
       "start_over": "Počni ispočetka"
@@ -312,15 +312,15 @@
       "next": "Sljedeća fotografija"
     },
     "form": {
-      "unsaved_changes": "Nespremljene promjene",
+      "unsaved_changes": "Nesačuvane promjene",
       "failure": {
         "invalid": "Provjerite označena polja i pokušajte ponovo.",
         "conflict": "Zapis se promijenio dok ste ga uređivali.",
         "forbidden": "Nemate ovlaštenje za ovu radnju.",
         "unauthorized": "Vaša sesija je istekla. Prijavite se ponovo.",
         "offline": "Server nije dostupan. Provjerite vezu i pokušajte ponovo.",
-        "failed": "Promjene nisu spremljene. Pokušajte ponovo.",
-        "refresh": "Promjene su spremljene, ali se ažurirani zapis nije mogao učitati. Osvježite stranicu."
+        "failed": "Promjene nisu sačuvane. Pokušajte ponovo.",
+        "refresh": "Promjene su sačuvane, ali se ažurirani zapis nije mogao učitati. Osvježite stranicu."
       },
       "errors": {
         "hidden_title": "Greške u poljima koja trenutno nisu prikazana:",
@@ -328,7 +328,7 @@
       },
       "sections": {
         "errors": "Greške: {count}",
-        "done": "završeno"
+        "done": "dovršeno"
       },
       "required": {
         "label": "Obavezna polja",
@@ -337,10 +337,10 @@
       },
       "group": {
         "edit": "Uredi",
-        "foreign": "Spremanje traži i podatke iz grupe: {groups}. Prvo dopunite tu grupu."
+        "foreign": "Čuvanje traži i podatke iz grupe: {groups}. Najprije dopunite tu grupu."
       },
       "select": {
-        "choose": "Odaberite…",
+        "choose": "Izaberite…",
         "search": "Pretraži",
         "no_matches": "Nema rezultata",
         "loading": "Učitavanje…",
@@ -353,7 +353,7 @@
         "invalid": "Unesite broj."
       },
       "file": {
-        "choose": "Odaberi datoteku",
+        "choose": "Izaberi datoteku",
         "drop": "ili prevucite datoteku ovdje",
         "remove": "Ukloni",
         "allowed": "Dozvoljeni formati: {formats}",
@@ -400,7 +400,7 @@
       "suggestions": {
         "recent": "Nedavno",
         "keys_complete": "Tab prihvata · ↑↓ bira · Esc zatvara",
-        "keys_pick": "↑↓ bira · Enter odabira · Esc zatvara"
+        "keys_pick": "↑↓ bira · Enter izabira · Esc zatvara"
       },
       "i18n": {
         "languages": "Jezik",
@@ -427,7 +427,7 @@
         "kind_toll_free": "Besplatni broj",
         "kind_premium_rate": "Broj s posebnom tarifom",
         "kind_voip": "Internetski (VoIP) broj",
-        "call": "Nazovi",
+        "call": "Pozovi",
         "message": "Poruka",
         "copy": "Kopiraj",
         "copied": "Kopirano"
@@ -438,13 +438,13 @@
         "next_month": "Sljedeći mjesec",
         "previous_year": "Prethodna godina",
         "next_year": "Sljedeća godina",
-        "choose_month": "Odaberi mjesec i godinu",
+        "choose_month": "Izaberi mjesec i godinu",
         "open": "Otvori kalendar",
         "invalid": "Unesite datum, na primjer {example}.",
         "unavailable": "Taj datum nije dostupan.",
         "placeholder": "npr. {example} ili +7",
         "keys": "Strelice mijenjaju dan, PgUp/PgDn mjesec, Enter bira.",
-        "quick": "Brzi odabir",
+        "quick": "Brzi izbor",
         "today": "Danas",
         "tomorrow": "Sutra",
         "week": "Za 7 dana",
@@ -466,7 +466,7 @@
         "now": "Sada",
         "invalid": "Unesite vrijeme, na primjer 14:35.",
         "step": "Minute su u koracima od {step}.",
-        "open": "Odaberi vrijeme",
+        "open": "Izaberi vrijeme",
         "placeholder": "npr. 14:35",
         "at": "{date} u {time}",
         "words": {
@@ -485,12 +485,12 @@
       "cancelled": "Zahtjev je otkazan.",
       "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo.",
       "authz": {
-        "forbidden": "Nemate pravo na ovu promjenu na tom obimu.",
-        "escalation": "Ta uloga ima dozvole koje ni sami nemate, pa je ne možete dodijeliti.",
+        "forbidden": "Nemate pravo na ovu promjenu na tom opsegu.",
+        "escalation": "Ta uloga ima ovlaštenja koja i sami nemate, pa je ne možete dodijeliti.",
         "self_assignment": "Ne možete dodijeliti ulogu sebi.",
         "last_admin": "Ne možete ukloniti svoj zadnji pristup ulogama i korisnicima.",
-        "role_in_use": "Uloga je još dodijeljena osobama. Najprije je zamijenite ili uklonite iz njihovog pristupa.",
-        "invalid": "Uloga ili obim nisu ispravni."
+        "role_in_use": "Uloga je još dodijeljena osobama. Najprije je zamijenite ili uklonite iz njihova pristupa.",
+        "invalid": "Uloga ili opseg nisu ispravni."
       },
       "identity": {
         "signin": {
@@ -535,7 +535,7 @@
         },
         "list": {
           "dir_invalid": "Smjer sortiranja nije ispravan.",
-          "order_invalid": "Spisak se ne može sortirati po toj koloni.",
+          "order_invalid": "Popis se ne može sortirati po tom stupcu.",
           "view_invalid": "Taj prikaz ne postoji."
         },
         "login": {
@@ -585,7 +585,7 @@
       "focus_search": "Pretraži popis",
       "open_filters": "Otvori filtere",
       "groups": {
-        "general": "Općenito",
+        "general": "Opšte",
         "list": "Popis",
         "record": "Zapis"
       }
@@ -634,7 +634,7 @@
       },
       "create": {
         "title": "Novi korisnik",
-        "subtitle": "Nakon spremanja otvara se stranica osobe.",
+        "subtitle": "Nakon čuvanja otvara se stranica osobe.",
         "action": "Kreiraj korisnika",
         "done": "Korisnik {name} je kreiran"
       },
@@ -676,7 +676,7 @@
         "contact": "Kontakt"
       },
       "general": {
-        "saved": "Podaci su spremljeni",
+        "saved": "Podaci su sačuvani",
         "created": "Račun kreiran {when}",
         "last_sign_in": "zadnja prijava {when}",
         "never_signed_in": "nikad se nije prijavila",
@@ -847,8 +847,8 @@
       "details": {
         "title": "Lični podaci",
         "login_hint": "Korisničko ime može promijeniti samo administrator.",
-        "submit": "Spremi podatke",
-        "saved": "Lični podaci su spremljeni"
+        "submit": "Sačuvaj podatke",
+        "saved": "Lični podaci su sačuvani"
       },
       "email": {
         "title": "E-mail adresa",
@@ -896,15 +896,15 @@
       }
     },
     "notifications": {
-      "title": "Obavijesti",
-      "open": "Obavijesti",
-      "open_unread": "Obavijesti, nepročitano: {count}",
+      "title": "Obavještenja",
+      "open": "Obavještenja",
+      "open_unread": "Obavještenja, nepročitano: {count}",
       "unread": "nepročitano",
-      "empty_title": "Nemate obavijesti",
+      "empty_title": "Nemate obavještenja",
       "empty_description": "Ovdje ćete vidjeti sve što traži vašu pažnju.",
-      "load_error": "Obavijesti se nisu mogle učitati.",
+      "load_error": "Obavještenja se nisu mogla učitati.",
       "load_more": "Prikaži starije",
-      "load_more_error": "Starije obavijesti se nisu mogle učitati.",
+      "load_more_error": "Starija obavještenja se nisu mogla učitati.",
       "mark_all_read": "Označi sve kao pročitano",
       "dead_letters": {
         "title": "Neuspjeli događaji",
@@ -914,7 +914,7 @@
           "consumer": "Potrošač",
           "attempts": "Pokušaji",
           "last_error": "Zadnja greška",
-          "dead_at": "Odustalo se"
+          "dead_at": "Odustano"
         },
         "event_id": "Događaj #{id}",
         "event_gone": "Događaj više ne postoji",
@@ -939,7 +939,7 @@
       },
       "settings": {
         "title": "Postavke obavještenja",
-        "description": "Odaberite šta vam stiže e-poštom i kada e-pošta čeka.",
+        "description": "Izaberite šta vam stiže e-poštom i kada e-pošta čeka.",
         "open": "Postavke obavještenja",
         "email": {
           "title": "Obavijesti me e-poštom o",
@@ -947,7 +947,7 @@
           "in_app": "U aplikaciji: uvijek uključeno",
           "locked": "Određuje vaša organizacija",
           "unavailable": "E-pošta ovdje nije dostupna pa obavještenja stižu samo u aplikaciji.",
-          "save_failed": "Postavka nije spremljena."
+          "save_failed": "Postavka nije sačuvana."
         },
         "quiet": {
           "title": "Tihi sati",
@@ -958,9 +958,9 @@
           "summary_on_no_zone": "Između {start} i {end} e-pošta čeka do kraja tihih sati.",
           "summary_off": "Tihi sati su isključeni: e-pošta se šalje čim obavještenje nastane.",
           "same": "Od i do moraju biti različita vremena.",
-          "required": "Odaberite vrijeme.",
-          "submit": "Spremi tihe sate",
-          "saved": "Tihi sati su spremljeni."
+          "required": "Izaberite vrijeme.",
+          "submit": "Sačuvaj tihe sate",
+          "saved": "Tihi sati su sačuvani."
         }
       }
     }
