@@ -15,7 +15,7 @@ import TimeColumns from "./date/TimeColumns.vue";
 import { useTimeText } from "./date/useTimeText";
 import { useTypedEntry } from "./date/useTypedEntry";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 
 /**
  * A time of day on the clock of the user, without a date or a zone: `"14:35"`, or `null`. Typing is forgiving (`1435`,
@@ -79,37 +79,43 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 defineExpose({ focus: () => input.value?.focus() });
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="{ ...fieldProps(props), error: shownError }" :value="shown" value-style="numeric">
-    <template v-if="compact">
-      <DateButton v-bind="{ id, 'aria-describedby': describedby }" :disabled="props.disabled" :invalid="invalid" :placeholder="t('core.form.select.choose')" @click="sheet?.present()">
-        <template v-if="model">{{ model }}</template>
-      </DateButton>
-      <DatePickerSheet ref="sheet" :title="props.label ?? t('core.form.time.label')" mode="time" :model-value="model" :shortcuts="shortcuts" :step="props.minuteStep" :clearable="!props.required"
-        @update:model-value="entry.set" />
+  <Field v-bind="{ ...fieldProps(props), error: shownError }" :value="shown" value-style="numeric">
+    <template #default="{ id, describedby, invalid }">
+      <template v-if="compact">
+        <DateButton v-bind="{ id, 'aria-describedby': describedby }" :disabled="props.disabled" :invalid="invalid" :placeholder="t('core.form.select.choose')" @click="sheet?.present()">
+          <template v-if="model">{{ model }}</template>
+        </DateButton>
+        <DatePickerSheet ref="sheet" :title="props.label ?? t('core.form.time.label')" mode="time" :model-value="model" :shortcuts="shortcuts" :step="props.minuteStep" :clearable="!props.required"
+          @update:model-value="entry.set" />
+      </template>
+
+      <Popover v-else ref="popover" :label="props.label ?? t('core.form.time.label')" width="sm" placement="bottom-start" :arrow="false" :autofocus="false">
+        <template #trigger="{ attrs, presented }">
+          <div class="inline-flex max-w-full items-center gap-2" :class="surface">
+            <input :id="id" ref="input" v-bind="attrs" type="text" role="combobox" autocomplete="off" size="10" :name="props.name" :value="entry.text.value" :placeholder="text.placeholder.value"
+              :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
+              class="block min-h-7 min-w-0 border-0 bg-transparent py-1 pl-2.5 text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
+              @input="entry.input(($event.target as HTMLInputElement).value)" @blur="entry.commit()" @keydown="onKeydown" @click="open(false)" />
+            <button v-if="!props.disabled" type="button" tabindex="-1" :aria-label="t('core.form.time.open')" class="mr-2 flex shrink-0 cursor-pointer items-center text-content-link" @click="presented ? popover?.dismiss() : open(true)">
+              <Icon name="timeLine" :size="18" />
+            </button>
+          </div>
+        </template>
+
+        <template #default="{ dismiss }">
+          <div ref="panel" class="flex flex-col gap-2.5">
+            <TimeColumns :model-value="picked" :step="props.minuteStep" @update:model-value="entry.set" />
+            <QuickChips :items="shortcuts" :selected="picked" @pick="entry.set($event); dismiss()" />
+          </div>
+        </template>
+      </Popover>
     </template>
-
-    <Popover v-else ref="popover" :label="props.label ?? t('core.form.time.label')" width="sm" placement="bottom-start" :arrow="false" :autofocus="false">
-      <template #trigger="{ attrs, presented }">
-        <div class="inline-flex max-w-full items-center gap-2" :class="surface">
-          <input :id="id" ref="input" v-bind="attrs" type="text" role="combobox" autocomplete="off" size="10" :name="props.name" :value="entry.text.value" :placeholder="text.placeholder.value"
-            :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
-            class="block min-h-7 min-w-0 border-0 bg-transparent py-1 pl-2.5 text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
-            @input="entry.input(($event.target as HTMLInputElement).value)" @blur="entry.commit()" @keydown="onKeydown" @click="open(false)" />
-          <button v-if="!props.disabled" type="button" tabindex="-1" :aria-label="t('core.form.time.open')" class="mr-2 flex shrink-0 cursor-pointer items-center text-content-link" @click="presented ? popover?.dismiss() : open(true)">
-            <Icon name="timeLine" :size="18" />
-          </button>
-        </div>
-      </template>
-
-      <template #default="{ dismiss }">
-        <div ref="panel" class="flex flex-col gap-2.5">
-          <TimeColumns :model-value="picked" :step="props.minuteStep" @update:model-value="entry.set" />
-          <QuickChips :items="shortcuts" :selected="picked" @pick="entry.set($event); dismiss()" />
-        </div>
-      </template>
-    </Popover>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

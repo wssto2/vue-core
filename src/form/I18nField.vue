@@ -5,7 +5,7 @@ import { applicationKey } from "../app/environment";
 import { Icon } from "../icon";
 import { useControlSurface } from "./control";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, useFieldMode, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, useFieldMode, type FieldProps, type FieldSlots } from "./field";
 import { missingLocales, type I18nText } from "./i18nText";
 
 /**
@@ -106,6 +106,7 @@ const more = ref(false);
 const fieldLabel = computed(() => (props.label && !editable.value && shown.value ? `${props.label} · ${code(shown.value)}` : props.label));
 
 defineExpose({ focus: () => field.value?.focus() });
+defineSlots<Pick<FieldSlots, "trailing">>();
 </script>
 
 <template>
@@ -163,5 +164,6 @@ defineExpose({ focus: () => field.value?.focus() });
         </template>
       </div>
     </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
   </Field>
 </template>

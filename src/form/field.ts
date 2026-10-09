@@ -38,6 +38,16 @@ export const fieldDefaults = {
   name: undefined,
 };
 
+/** The slots every field passes through to its `Field` row (see `Field`). */
+export interface FieldSlots {
+  /** A custom read-only presentation (a picked record's card) when the value is not enough. */
+  readonly?: () => unknown;
+  /** A row action after the control (a per-row Save). */
+  trailing?: () => unknown;
+  /** At the end of the label's line while editing. */
+  labelTrailing?: () => unknown;
+}
+
 /** How a row lays out: a label column with a control, a label with a trailing control, a label over a full-width control, or a value. */
 export type FormRowLayout = "entry" | "setting" | "stacked" | "value";
 

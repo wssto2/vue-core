@@ -16,7 +16,7 @@ import { useDateText } from "./date/useDateText";
 import { useDayShortcuts } from "./date/useShortcuts";
 import { useTypedEntry } from "./date/useTypedEntry";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 
 /**
  * A calendar day, without a time or a zone: `"2026-09-30"`, or `null`. Typing is the main way in and is forgiving: the
@@ -98,41 +98,47 @@ function pick(day: string, dismiss: () => void) {
 }
 
 defineExpose({ focus: () => input.value?.focus() });
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="{ ...fieldProps(props), error: shownError }" :value="shown" value-style="numeric">
-    <template v-if="compact">
-      <DateButton v-bind="{ id, 'aria-describedby': describedby }" :disabled="props.disabled" :invalid="invalid" :placeholder="t('core.form.select.choose')" @click="sheet?.present()">
-        <template v-if="shown">{{ shown }}</template>
-      </DateButton>
-      <DatePickerSheet ref="sheet" :title="props.label ?? t('core.form.date.calendar')" mode="date" :model-value="model" :min="props.min" :max="props.max" :disabled-dates="props.disabledDates"
-        :open-on="props.openOn" :shortcuts="shortcuts" :clearable="!props.required" @update:model-value="entry.set" />
-    </template>
-
-    <Popover v-else ref="popover" :label="props.label ?? t('core.form.date.calendar')" width="lg" placement="bottom-start" :arrow="false" :autofocus="false">
-      <template #trigger="{ attrs, presented }">
-        <div class="inline-flex max-w-full items-center gap-2" :class="surface">
-          <input :id="id" ref="input" v-bind="attrs" type="text" role="combobox" autocomplete="off" size="16" :name="props.name" :value="entry.text.value" :placeholder="text.placeholder.value"
-            :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
-            class="block min-h-7 min-w-0 border-0 bg-transparent py-1 pl-2.5 text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
-            @input="entry.input(($event.target as HTMLInputElement).value)" @blur="entry.commit()" @keydown="onKeydown" @click="open(false)" />
-          <button v-if="!props.disabled" type="button" tabindex="-1" :aria-label="t('core.form.date.open')" class="mr-2 flex shrink-0 cursor-pointer items-center text-content-link" @click="presented ? popover?.dismiss() : open(true)">
-            <Icon name="calendarLine" :size="18" />
-          </button>
-        </div>
+  <Field v-bind="{ ...fieldProps(props), error: shownError }" :value="shown" value-style="numeric">
+    <template #default="{ id, describedby, invalid }">
+      <template v-if="compact">
+        <DateButton v-bind="{ id, 'aria-describedby': describedby }" :disabled="props.disabled" :invalid="invalid" :placeholder="t('core.form.select.choose')" @click="sheet?.present()">
+          <template v-if="shown">{{ shown }}</template>
+        </DateButton>
+        <DatePickerSheet ref="sheet" :title="props.label ?? t('core.form.date.calendar')" mode="date" :model-value="model" :min="props.min" :max="props.max" :disabled-dates="props.disabledDates"
+          :open-on="props.openOn" :shortcuts="shortcuts" :clearable="!props.required" @update:model-value="entry.set" />
       </template>
 
-      <template #default="{ dismiss }">
-        <div class="flex flex-col gap-2.5">
-          <Calendar ref="calendar" :model-value="calendarDay" :min="props.min" :max="props.max" :disabled-dates="props.disabledDates" :open-on="props.openOn" month-picker
-            @update:model-value="pick($event!, dismiss)" />
-          <div v-if="shortcuts.length > 0" class="border-t border-border-separator pt-2.5">
-            <QuickChips :items="shortcuts" :selected="calendarDay" @pick="pick($event, dismiss)" />
+      <Popover v-else ref="popover" :label="props.label ?? t('core.form.date.calendar')" width="lg" placement="bottom-start" :arrow="false" :autofocus="false">
+        <template #trigger="{ attrs, presented }">
+          <div class="inline-flex max-w-full items-center gap-2" :class="surface">
+            <input :id="id" ref="input" v-bind="attrs" type="text" role="combobox" autocomplete="off" size="16" :name="props.name" :value="entry.text.value" :placeholder="text.placeholder.value"
+              :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
+              class="block min-h-7 min-w-0 border-0 bg-transparent py-1 pl-2.5 text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
+              @input="entry.input(($event.target as HTMLInputElement).value)" @blur="entry.commit()" @keydown="onKeydown" @click="open(false)" />
+            <button v-if="!props.disabled" type="button" tabindex="-1" :aria-label="t('core.form.date.open')" class="mr-2 flex shrink-0 cursor-pointer items-center text-content-link" @click="presented ? popover?.dismiss() : open(true)">
+              <Icon name="calendarLine" :size="18" />
+            </button>
           </div>
-          <p class="text-footnote text-content-muted">{{ t("core.form.date.keys") }}</p>
-        </div>
-      </template>
-    </Popover>
+        </template>
+
+        <template #default="{ dismiss }">
+          <div class="flex flex-col gap-2.5">
+            <Calendar ref="calendar" :model-value="calendarDay" :min="props.min" :max="props.max" :disabled-dates="props.disabledDates" :open-on="props.openOn" month-picker
+              @update:model-value="pick($event!, dismiss)" />
+            <div v-if="shortcuts.length > 0" class="border-t border-border-separator pt-2.5">
+              <QuickChips :items="shortcuts" :selected="calendarDay" @pick="pick($event, dismiss)" />
+            </div>
+            <p class="text-footnote text-content-muted">{{ t("core.form.date.keys") }}</p>
+          </div>
+        </template>
+      </Popover>
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

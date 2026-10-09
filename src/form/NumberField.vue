@@ -4,7 +4,7 @@ import { controlWidth, type ControlWidth } from "../controls";
 import { useFormat } from "../format";
 import { useControlSurface } from "./control";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, useFormGroup, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
 import { numberMarks, parseNumber } from "./number";
 
 /**
@@ -98,17 +98,23 @@ function onBlur() {
 }
 
 defineExpose({ focus: () => input.value?.focus() });
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="model === null ? null : shown(model)" :prefix="props.prefix" :suffix="props.suffix" value-style="numeric">
-    <div class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
-      <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
-      <input :id="id" ref="input" :value="text" type="text" inputmode="decimal" autocomplete="off" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
-        :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
-        class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-right text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
-        @input="onInput" @focus="onFocus" @blur="onBlur" />
-      <span v-if="props.suffix" class="shrink-0 text-footnote text-content-muted">{{ props.suffix }}</span>
-    </div>
+  <Field v-bind="fieldProps(props)" :value="model === null ? null : shown(model)" :prefix="props.prefix" :suffix="props.suffix" value-style="numeric">
+    <template #default="{ id, describedby, invalid }">
+      <div class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
+        <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
+        <input :id="id" ref="input" :value="text" type="text" inputmode="decimal" autocomplete="off" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
+          :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
+          class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-right text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
+          @input="onInput" @focus="onFocus" @blur="onBlur" />
+        <span v-if="props.suffix" class="shrink-0 text-footnote text-content-muted">{{ props.suffix }}</span>
+      </div>
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

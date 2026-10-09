@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef } from "vue";
 import type { ControlWidth } from "../controls";
-import { fieldDefaults, fieldProps, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 import NumberField from "./NumberField.vue";
 
 /**
@@ -18,8 +18,13 @@ const props = withDefaults(
 const model = defineModel<number | null>({ default: null });
 const field = useTemplateRef<InstanceType<typeof NumberField>>("field");
 defineExpose({ focus: () => field.value?.focus() });
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <NumberField ref="field" v-model="model" v-bind="fieldProps(props)" :decimals="props.decimals" :negative="props.negative" :suffix="props.currency" :width="props.width" />
+  <NumberField ref="field" v-model="model" v-bind="fieldProps(props)" :decimals="props.decimals" :negative="props.negative" :suffix="props.currency" :width="props.width">
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
+  </NumberField>
 </template>

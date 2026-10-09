@@ -5,7 +5,7 @@ import { Icon } from "../icon";
 import { controlWidth, type ControlWidth } from "../controls";
 import { useControlSurface } from "./control";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, useFormGroup, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
 import type { SelectOption } from "./options";
 import SuggestionList from "./SuggestionList.vue";
 import { listShows, useSuggestions } from "./suggestions";
@@ -106,20 +106,26 @@ function onBlur() {
 
 const expanded = computed(() => listShows(open.value, items.value.length, status.value, true));
 defineExpose({ focus: () => input.value?.focus() });
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="current?.label ?? null">
-    <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
-      <input :id="id" ref="input" role="combobox" type="text" autocomplete="off" :value="text" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
-        aria-autocomplete="list" :aria-expanded="expanded" :aria-controls="`${id}-list`" :aria-activedescendant="expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined" :aria-required="props.required || undefined"
-        :aria-invalid="invalid || undefined" :aria-describedby="describedby"
-        class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed" :class="inRow ? 'compact:text-right' : ''"
-        @input="onInput" @focus="onFocus" @blur="onBlur" @keydown="suggestions.keydown($event, { pick: choose, enterNeedsMove: false })" />
-      <Icon name="search" :size="14" class="shrink-0 text-content-muted" />
-    </div>
+  <Field v-bind="fieldProps(props)" :value="current?.label ?? null">
+    <template #default="{ id, describedby, invalid }">
+      <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
+        <input :id="id" ref="input" role="combobox" type="text" autocomplete="off" :value="text" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
+          aria-autocomplete="list" :aria-expanded="expanded" :aria-controls="`${id}-list`" :aria-activedescendant="expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined" :aria-required="props.required || undefined"
+          :aria-invalid="invalid || undefined" :aria-describedby="describedby"
+          class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed" :class="inRow ? 'compact:text-right' : ''"
+          @input="onInput" @focus="onFocus" @blur="onBlur" @keydown="suggestions.keydown($event, { pick: choose, enterNeedsMove: false })" />
+        <Icon name="search" :size="14" class="shrink-0 text-content-muted" />
+      </div>
 
-    <SuggestionList :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="text" :status="status" :recent="showingRecent" :empty-message="true"
-      :hint="t('core.form.suggestions.keys_pick')" @pick="choose" @hover="suggestions.highlight($event)" />
+      <SuggestionList :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="text" :status="status" :recent="showingRecent" :empty-message="true"
+        :hint="t('core.form.suggestions.keys_pick')" @pick="choose" @hover="suggestions.highlight($event)" />
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

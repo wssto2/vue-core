@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, useFieldMode, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, useFieldMode, type FieldProps, type FieldSlots } from "./field";
 
 /**
  * An on/off setting, iOS style: the label with a switch at the row's end. The value is a boolean: a column that
@@ -16,7 +16,7 @@ import { fieldDefaults, fieldProps, useFieldMode, type FieldProps } from "./fiel
 const props = withDefaults(defineProps<FieldProps & { size?: "sm" | "md" | "lg" }>(), { ...fieldDefaults, size: "md" });
 
 const model = defineModel<boolean>({ default: false });
-defineSlots<{ before?: () => unknown }>();
+defineSlots<FieldSlots & { before?: () => unknown }>();
 
 const { t } = useI18n();
 const { editable } = useFieldMode(props);
@@ -33,17 +33,22 @@ function toggle() {
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="model" row-layout="setting">
-    <div class="flex items-center gap-2">
-      <slot name="before" />
-      <button :id="id" type="button" role="switch" :aria-checked="model" :aria-label="props.label" :aria-describedby="describedby" :aria-invalid="invalid || undefined" :disabled="props.disabled"
-        :style="style" class="hit-target relative inline-flex h-(--switch-h) w-(--switch-w) shrink-0 cursor-pointer rounded-full transition-colors duration-motion-fast ease-motion-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-45"
-        :class="model ? 'bg-control-on' : 'bg-fill-strong'" @click="toggle">
-        <!-- The knob: the track's height less a hairline on each side, sliding the track's width less its own. -->
-        <span class="pointer-events-none absolute left-0.5 top-0.5 size-[calc(var(--switch-h)-0.25rem)] rounded-full bg-white shadow-knob transition-transform duration-motion-normal ease-motion-standard"
-          :class="model ? 'translate-x-[calc(var(--switch-w)-var(--switch-h))]' : ''" />
-        <span class="sr-only">{{ model ? t("core.form.yes") : t("core.form.no") }}</span>
-      </button>
-    </div>
+  <Field v-bind="fieldProps(props)" :value="model" row-layout="setting">
+    <template #default="{ id, describedby, invalid }">
+      <div class="flex items-center gap-2">
+        <slot name="before" />
+        <button :id="id" type="button" role="switch" :aria-checked="model" :aria-label="props.label" :aria-describedby="describedby" :aria-invalid="invalid || undefined" :disabled="props.disabled"
+          :style="style" class="hit-target relative inline-flex h-(--switch-h) w-(--switch-w) shrink-0 cursor-pointer rounded-full transition-colors duration-motion-fast ease-motion-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-45"
+          :class="model ? 'bg-control-on' : 'bg-fill-strong'" @click="toggle">
+          <!-- The knob: the track's height less a hairline on each side, sliding the track's width less its own. -->
+          <span class="pointer-events-none absolute left-0.5 top-0.5 size-[calc(var(--switch-h)-0.25rem)] rounded-full bg-white shadow-knob transition-transform duration-motion-normal ease-motion-standard"
+            :class="model ? 'translate-x-[calc(var(--switch-w)-var(--switch-h))]' : ''" />
+          <span class="sr-only">{{ model ? t("core.form.yes") : t("core.form.no") }}</span>
+        </button>
+      </div>
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

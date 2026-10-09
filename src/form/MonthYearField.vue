@@ -6,7 +6,7 @@ import { Icon } from "../icon";
 import Popover from "../overlay/Popover.vue";
 import MonthYearPanel from "./date/MonthYearPanel.vue";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 
 /**
  * A month and a year shown as one date button, kept as two numbers (`month` 1 to 12, `year`), the way a record stores a
@@ -44,22 +44,28 @@ function clear(dismiss: () => void) {
   year.value = null;
   dismiss();
 }
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="shown || null">
-    <Popover :label="props.label ?? shown" width="sm" placement="bottom-start" :arrow="false">
-      <template #trigger="{ toggle, presented }">
-        <DateButton v-bind="{ id, 'aria-describedby': describedby }" :expanded="presented" :disabled="props.disabled" :invalid="invalid" @click="toggle">
-          <template v-if="shown">{{ shown }}<Icon name="calendarLine" :size="16" class="ml-2 shrink-0 text-content-muted" /></template>
-        </DateButton>
-      </template>
-      <template #default="{ dismiss }">
-        <div class="flex flex-col gap-2">
-          <MonthYearPanel :month="month" :year="year" :min-year="props.minYear" :max-year="props.maxYear" @pick="pick($event, dismiss)" />
-          <button v-if="hasMonth || year !== null" type="button" class="cursor-pointer self-start rounded-control px-1 text-footnote text-content-link" @click="clear(dismiss)">{{ t("core.form.select.clear") }}</button>
-        </div>
-      </template>
-    </Popover>
+  <Field v-bind="fieldProps(props)" :value="shown || null">
+    <template #default="{ id, describedby, invalid }">
+      <Popover :label="props.label ?? shown" width="sm" placement="bottom-start" :arrow="false">
+        <template #trigger="{ toggle, presented }">
+          <DateButton v-bind="{ id, 'aria-describedby': describedby }" :expanded="presented" :disabled="props.disabled" :invalid="invalid" @click="toggle">
+            <template v-if="shown">{{ shown }}<Icon name="calendarLine" :size="16" class="ml-2 shrink-0 text-content-muted" /></template>
+          </DateButton>
+        </template>
+        <template #default="{ dismiss }">
+          <div class="flex flex-col gap-2">
+            <MonthYearPanel :month="month" :year="year" :min-year="props.minYear" :max-year="props.maxYear" @pick="pick($event, dismiss)" />
+            <button v-if="hasMonth || year !== null" type="button" class="cursor-pointer self-start rounded-control px-1 text-footnote text-content-link" @click="clear(dismiss)">{{ t("core.form.select.clear") }}</button>
+          </div>
+        </template>
+      </Popover>
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

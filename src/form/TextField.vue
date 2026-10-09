@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import { controlWidth, type ControlWidth } from "../controls";
 import { useControlSurface } from "./control";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, useFormGroup, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
 import type { SelectOption } from "./options";
 import SuggestionList from "./SuggestionList.vue";
 import { completionOf, listShows, useSuggestions, type SuggestionSource, type TextSuggestion } from "./suggestions";
@@ -113,28 +113,34 @@ const onKeydown = (event: KeyboardEvent) => {
 };
 
 defineExpose({ focus: () => input.value?.focus() });
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="model" :prefix="props.prefix" :suffix="props.suffix" :value-style="props.mono ? 'mono' : undefined">
-    <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
-      <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
-      <div class="relative min-w-0 flex-1">
-        <input :id="id" ref="input" v-model="model" :type="props.type" :name="props.name" :placeholder="props.placeholder" :maxlength="props.maxLength" :autocomplete="suggesting ? 'off' : props.autocomplete"
-          :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
-          :role="suggesting ? 'combobox' : undefined" :aria-autocomplete="suggesting ? 'both' : undefined" :aria-expanded="suggesting ? expanded : undefined" :aria-controls="suggesting ? `${id}-list` : undefined"
-          :aria-activedescendant="suggesting && expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined"
-          class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
-          :class="[props.mono ? 'font-mono' : '', inRow && !suggesting ? 'compact:text-right' : '']"
-          @input="onInput" @keyup="noteCaret" @click="noteCaret" @keydown="onKeydown" @focus="onFocus" @blur="engine.close()" />
-        <!-- The grey completion: the typed text takes its room invisibly, the rest shows after it. -->
-        <span v-if="completion" aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-pre py-1 text-body" :class="props.mono ? 'font-mono' : ''" data-test="completion">
-          <span class="invisible">{{ model }}</span><span class="text-content-disabled">{{ completion }}</span>
-        </span>
+  <Field v-bind="fieldProps(props)" :value="model" :prefix="props.prefix" :suffix="props.suffix" :value-style="props.mono ? 'mono' : undefined">
+    <template #default="{ id, describedby, invalid }">
+      <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
+        <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
+        <div class="relative min-w-0 flex-1">
+          <input :id="id" ref="input" v-model="model" :type="props.type" :name="props.name" :placeholder="props.placeholder" :maxlength="props.maxLength" :autocomplete="suggesting ? 'off' : props.autocomplete"
+            :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
+            :role="suggesting ? 'combobox' : undefined" :aria-autocomplete="suggesting ? 'both' : undefined" :aria-expanded="suggesting ? expanded : undefined" :aria-controls="suggesting ? `${id}-list` : undefined"
+            :aria-activedescendant="suggesting && expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined"
+            class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
+            :class="[props.mono ? 'font-mono' : '', inRow && !suggesting ? 'compact:text-right' : '']"
+            @input="onInput" @keyup="noteCaret" @click="noteCaret" @keydown="onKeydown" @focus="onFocus" @blur="engine.close()" />
+          <!-- The grey completion: the typed text takes its room invisibly, the rest shows after it. -->
+          <span v-if="completion" aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-pre py-1 text-body" :class="props.mono ? 'font-mono' : ''" data-test="completion">
+            <span class="invisible">{{ model }}</span><span class="text-content-disabled">{{ completion }}</span>
+          </span>
+        </div>
+        <span v-if="props.suffix" class="shrink-0 text-footnote text-content-muted">{{ props.suffix }}</span>
       </div>
-      <span v-if="props.suffix" class="shrink-0 text-footnote text-content-muted">{{ props.suffix }}</span>
-    </div>
-    <SuggestionList v-if="suggesting" :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="model" :status="status" :recent="showingRecent" :empty-message="false"
-      :hint="completion ? t('core.form.suggestions.keys_complete') : t('core.form.suggestions.keys_pick')" @pick="pick" @hover="engine.highlight($event)" />
+      <SuggestionList v-if="suggesting" :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="model" :status="status" :recent="showingRecent" :empty-message="false"
+        :hint="completion ? t('core.form.suggestions.keys_complete') : t('core.form.suggestions.keys_pick')" @pick="pick" @hover="engine.highlight($event)" />
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

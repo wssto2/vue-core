@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
 import PhotoViewer, { type PhotoViewerItem } from "../overlay/PhotoViewer.vue";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 import { checkFile, formatBytes } from "./file";
 
 /**
@@ -54,6 +54,7 @@ function take(file: File | undefined) {
     model.value = file;
   }
 }
+defineSlots<Pick<FieldSlots, "trailing" | "labelTrailing">>();
 </script>
 
 <template>
@@ -76,5 +77,7 @@ function take(file: File | undefined) {
     </div>
     <PhotoViewer v-if="preview" ref="viewer" :items="items" />
     </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
   </Field>
 </template>

@@ -7,7 +7,7 @@ import { useCompactPresentation } from "../internal/mediaQuery";
 import Sheet from "../modal/Sheet.vue";
 import Popover from "../overlay/Popover.vue";
 import Field from "./Field.vue";
-import { fieldDefaults, fieldProps, type FieldProps } from "./field";
+import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 import OptionList from "./OptionList.vue";
 import type { SelectOption } from "./options";
 import { useOptionSource, type OptionsSource } from "./useOptions";
@@ -57,43 +57,49 @@ function toggle(value: Value | null) {
 const remove = (value: Value) => (model.value = model.value.filter((each) => each !== value));
 
 const trigger = "inline-flex min-h-7 cursor-pointer items-center gap-1 rounded-control bg-fill px-2.5 py-1 text-body text-content-muted hover:bg-fill-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-45";
+defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-slot="{ id, describedby, invalid }" v-bind="fieldProps(props)" :value="chosen.length ? chosen.map((option) => option.label).join(', ') : null" row-layout="stacked">
-    <div class="flex min-w-0 flex-wrap items-center gap-1.5 py-0.5">
-      <span v-for="option in chosen" :key="String(option.value)" data-test="chip" class="inline-flex min-h-7 max-w-full items-center gap-1 rounded-full bg-tint-soft pl-3 pr-1 text-subheadline font-medium text-content-link">
-        <span class="truncate">{{ option.label }}</span>
-        <button type="button" :disabled="props.disabled" :aria-label="`${t('core.form.select.clear')}: ${option.label}`" class="flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full hover:bg-fill focus-visible:outline-2 focus-visible:outline-border-focus disabled:cursor-not-allowed" @click="remove(option.value)">
-          <Icon name="close" :size="12" />
-        </button>
-      </span>
-
-      <button v-if="compact" :id="id" type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="sheetOpen" :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="trigger" @click="sheet?.present()">
-        <Icon v-if="choices.loading.value" name="loader4Line" :size="14" class="shrink-0 animate-spin" />
-        {{ chosen.length ? t("core.actions.edit") : placeholder }}
-      </button>
-      <Popover v-else :label="props.label ?? placeholder" width="md" match-trigger-width placement="bottom-start" :arrow="false">
-        <template #trigger="{ toggle: open, attrs }">
-          <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="trigger" @click="open">
-            <Icon v-if="choices.loading.value" name="loader4Line" :size="14" class="shrink-0 animate-spin" />
-            {{ chosen.length ? t("core.actions.edit") : placeholder }}
+  <Field v-bind="fieldProps(props)" :value="chosen.length ? chosen.map((option) => option.label).join(', ') : null" row-layout="stacked">
+    <template #default="{ id, describedby, invalid }">
+      <div class="flex min-w-0 flex-wrap items-center gap-1.5 py-0.5">
+        <span v-for="option in chosen" :key="String(option.value)" data-test="chip" class="inline-flex min-h-7 max-w-full items-center gap-1 rounded-full bg-tint-soft pl-3 pr-1 text-subheadline font-medium text-content-link">
+          <span class="truncate">{{ option.label }}</span>
+          <button type="button" :disabled="props.disabled" :aria-label="`${t('core.form.select.clear')}: ${option.label}`" class="flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full hover:bg-fill focus-visible:outline-2 focus-visible:outline-border-focus disabled:cursor-not-allowed" @click="remove(option.value)">
+            <Icon name="close" :size="12" />
           </button>
-        </template>
-        <div class="max-h-72 overflow-y-auto">
-          <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" presentation="plain" @select="toggle" @retry="choices.reload()" />
-        </div>
-      </Popover>
-    </div>
+        </span>
 
-    <Sheet v-if="compact" ref="sheet" :title="props.label ?? placeholder" grouped @presented="sheetOpen = true" @dismissed="sheetOpen = false">
-      <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" @select="toggle" @retry="choices.reload()" />
-      <template #footer>
-        <div class="flex items-center justify-between gap-2">
-          <Button prominence="plain" :disabled="model.length === 0" @click="model = []">{{ t("core.form.select.clear") }}</Button>
-          <Button prominence="primary" @click="sheet?.dismiss()">{{ t("core.form.select.done") }}</Button>
-        </div>
-      </template>
-    </Sheet>
+        <button v-if="compact" :id="id" type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="sheetOpen" :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="trigger" @click="sheet?.present()">
+          <Icon v-if="choices.loading.value" name="loader4Line" :size="14" class="shrink-0 animate-spin" />
+          {{ chosen.length ? t("core.actions.edit") : placeholder }}
+        </button>
+        <Popover v-else :label="props.label ?? placeholder" width="md" match-trigger-width placement="bottom-start" :arrow="false">
+          <template #trigger="{ toggle: open, attrs }">
+            <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="trigger" @click="open">
+              <Icon v-if="choices.loading.value" name="loader4Line" :size="14" class="shrink-0 animate-spin" />
+              {{ chosen.length ? t("core.actions.edit") : placeholder }}
+            </button>
+          </template>
+          <div class="max-h-72 overflow-y-auto">
+            <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" presentation="plain" @select="toggle" @retry="choices.reload()" />
+          </div>
+        </Popover>
+      </div>
+
+      <Sheet v-if="compact" ref="sheet" :title="props.label ?? placeholder" grouped @presented="sheetOpen = true" @dismissed="sheetOpen = false">
+        <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" @select="toggle" @retry="choices.reload()" />
+        <template #footer>
+          <div class="flex items-center justify-between gap-2">
+            <Button prominence="plain" :disabled="model.length === 0" @click="model = []">{{ t("core.form.select.clear") }}</Button>
+            <Button prominence="primary" @click="sheet?.dismiss()">{{ t("core.form.select.done") }}</Button>
+          </div>
+        </template>
+      </Sheet>
+    </template>
+    <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
+    <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
+    <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
   </Field>
 </template>

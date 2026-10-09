@@ -42,7 +42,7 @@ defineSlots<{
   default?: (scope: { id: string; describedby: string | undefined; invalid: boolean; required: boolean; disabled: boolean }) => unknown;
   /** A custom read-only presentation (a picked record's card) when `value` is not enough. */
   readonly?: () => unknown;
-  /** A row action after the control (a per-row Save). */
+  /** A row action after the control (a per-row Save), in a group's row and on a field of its own. */
   trailing?: () => unknown;
   /** At the end of the label's line while editing (the language tabs of `I18nField`). */
   labelTrailing?: () => unknown;
@@ -112,7 +112,11 @@ const progress = computed(() =>
       </label>
       <slot v-if="editable" name="labelTrailing" />
     </div>
-    <slot v-if="editable" :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" />
+    <div v-if="editable && slots.trailing" class="flex min-w-0 items-center gap-2">
+      <div class="min-w-0 flex-1"><slot :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" /></div>
+      <slot name="trailing" />
+    </div>
+    <slot v-else-if="editable" :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" />
     <slot v-else-if="slots.readonly" name="readonly" />
     <span v-else class="text-body" :class="hasValue ? 'text-content-strong' : 'text-content-disabled'">{{ hasValue ? `${props.prefix ?? ""}${shown}${props.suffix ?? ""}` : t("core.state.no_value") }}</span>
     <p v-if="props.hint && editable" :id="hintId" class="text-footnote text-content-muted">{{ props.hint }}</p>
