@@ -27,6 +27,19 @@ export type AppErrorDescriber = (error: unknown) => string | undefined;
 
 export const appErrorDescriberKey: InjectionKey<AppErrorDescriber> = Symbol("vue-core.describeError");
 
+/**
+ * The application's one sentence for a field message the server sent (`createApplication({ describeFieldError })`): often a
+ * code or a translation key. Asked by every form that has no `describeFieldError` of its own; `(message, field) => sentence`.
+ */
+export type AppFieldErrorDescriber = (message: string, field: string) => string;
+
+export const appFieldErrorDescriberKey: InjectionKey<AppFieldErrorDescriber> = Symbol("vue-core.describeFieldError");
+
+/** The application's field-message describer, when one was installed and this runs in a setup. */
+export function useAppFieldErrorDescriber(): AppFieldErrorDescriber | null {
+  return hasInjectionContext() ? inject(appFieldErrorDescriberKey, null) : null;
+}
+
 /** The application's describer, when one was installed and this runs in a setup. */
 export function useAppErrorDescriber(): AppErrorDescriber | null {
   return hasInjectionContext() ? inject(appErrorDescriberKey, null) : null;

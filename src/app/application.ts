@@ -25,7 +25,7 @@ import { bindNavigation, createNavigation, navigationKey } from "../router/navig
 import NoAccess from "../router/NoAccess.vue";
 import { createShellContributions, shellContributionsKey, type OwnedContribution } from "./contributions";
 import { applicationKey, type ApplicationEnvironment, type ApplicationState } from "./environment";
-import { appErrorDescriberKey, type AppErrorDescriber } from "../i18n/describeError";
+import { appErrorDescriberKey, appFieldErrorDescriberKey, type AppErrorDescriber, type AppFieldErrorDescriber } from "../i18n/describeError";
 import { createEffectRunner, type OwnedEffect } from "./effects";
 import type { Feature, ShellSlot } from "./feature";
 import StartupFailure from "./StartupFailure.vue";
@@ -121,6 +121,12 @@ export interface ApplicationOptions {
    * client's. Return `undefined` to leave an error to the library.
    */
   describeError?: AppErrorDescriber;
+  /**
+   * The application's one sentence for a field message the server sent (often a code or a translation key), for every form
+   * (`useForm`, `useResourceForm`, `useCommand`) that has no `describeFieldError` of its own; a form's own wins. Without either,
+   * messages show as sent.
+   */
+  describeFieldError?: AppFieldErrorDescriber;
   /** Called with every error the application catches (component errors, unhandled rejections, failed effects and loads). Default: `console.error`. */
   onError?: (report: ApplicationErrorReport) => void;
 }
@@ -199,7 +205,7 @@ export function createApplication(options: ApplicationOptions): Application {
   const initialLocale = options.locale?.initial ?? (supportedLocales.includes(platform.config.locale) ? platform.config.locale : fallbackLocale);
   if (!supportedLocales.includes(initialLocale)) appIssues.push({ owner: "application", message: `the initial locale "${initialLocale}" is not among the supported locales (${supportedLocales.join(", ")}).` });
 
-  const reservedContexts = [platformKey, formattingKey, pageChromeKey, bottomDockKey, iconSetKey, navigationKey, shellContributionsKey, routeAccessKey, applicationKey, appErrorDescriberKey];
+  const reservedContexts = [platformKey, formattingKey, pageChromeKey, bottomDockKey, iconSetKey, navigationKey, shellContributionsKey, routeAccessKey, applicationKey, appErrorDescriberKey, appFieldErrorDescriberKey];
   const composition = validateComposition({
     features: options.features,
     platform,
@@ -350,6 +356,7 @@ export function createApplication(options: ApplicationOptions): Application {
   if (options.icons) installIcons(app, ...(Array.isArray(options.icons) ? options.icons : [options.icons as IconSet]));
   app.provide(applicationKey, environment);
   if (options.describeError) app.provide(appErrorDescriberKey, options.describeError);
+  if (options.describeFieldError) app.provide(appFieldErrorDescriberKey, options.describeFieldError);
   app.provide(navigationKey, navigation);
   app.provide(shellContributionsKey, contributions);
   app.provide(routeAccessKey, routeAccess);

@@ -46,7 +46,7 @@ export function useCreateTicketForm(t: (key: string) => string) {
     validator: {
       safeParse: (input) => ((input as { subject: string }).subject.trim() === "" ? { success: false, error: { issues: [{ path: ["subject"], message: "Enter a subject." }] } } : { success: true, data: input as { subject: string; priority: number | null; tags: string[] } }),
     },
-    translate: (message) => t(message), // server codes into sentences
+    describeFieldError: (message) => t(message), // server codes into sentences
     serverField: camel, // `due_on` is `dueOn` in the draft
   });
 }

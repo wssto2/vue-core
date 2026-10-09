@@ -262,5 +262,5 @@ export { localeMessages } from "./messages";
 export type { LocaleMessagesOptions, MessageLoader, MessageNamespace, Messages } from "./messages";
 export { createMessageRuntime } from "./runtime";
 export type { MessageFailure, MessageRuntime, MessageRuntimeOptions, MessageTarget } from "./runtime";
-export { appErrorDescriberKey, useDescribeError } from "./describeError";
-export type { AppErrorDescriber, DescribeError, DescribeErrorOptions } from "./describeError";
+export { appErrorDescriberKey, appFieldErrorDescriberKey, useDescribeError } from "./describeError";
+export type { AppErrorDescriber, AppFieldErrorDescriber, DescribeError, DescribeErrorOptions } from "./describeError";

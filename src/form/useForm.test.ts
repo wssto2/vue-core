@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../client";
 import { deferred } from "../platform/testing";
-import { withSetup } from "../testing";
+import { appFieldErrorDescriberKey } from "../i18n/describeError";
+import { createTestApp, withSetup } from "../testing";
 import { useForm } from "./useForm";
 import type { FormValidator } from "./validation";
 
@@ -233,7 +234,7 @@ describe("useForm: submit", () => {
   });
 
   it("lands a server validation answer on the fields, translated, and keeps the draft", async () => {
-    const form = withSetup(() => useForm({ defaults: empty, translate: (message) => `t:${message}` })).result;
+    const form = withSetup(() => useForm({ defaults: empty, describeFieldError: (message) => `t:${message}` })).result;
     form.values.subject = "x";
     const result = await form.submit(async () => {
       throw api("validation", { status: 422, fields: { subject: ["validation_errors.unique"], "contact.email": ["bad"] } });
@@ -322,5 +323,31 @@ describe("useForm: submitting some fields (a group with an endpoint of its own)"
     expect(result.status).toBe("failed");
     expect(form.errors.first("contact.email")).toBe("Not an e-mail");
     expect(form.errors.has("subject")).toBe(false);
+  });
+});
+
+describe("the application's describeFieldError", () => {
+  const withApp = <T>(setup: () => T) => withSetup(setup, { plugins: [...createTestApp().plugins, { install: (app) => app.provide(appFieldErrorDescriberKey, (message, field) => `app:${field}:${message}`) }] }).result;
+  const refuse = (form: ReturnType<typeof useForm<Ticket>>) =>
+    form.submit(async () => {
+      throw api("validation", { status: 422, fields: { subject: ["required"] } });
+    });
+
+  it("turns the server's field messages into sentences for a form with no describeFieldError of its own", async () => {
+    const form = withApp(() => useForm({ defaults: empty }));
+    await refuse(form);
+    expect(form.errors.first("subject")).toBe("app:subject:required");
+  });
+
+  it("yields to a form's own describeFieldError", async () => {
+    const form = withApp(() => useForm({ defaults: empty, describeFieldError: (message) => `own:${message}` }));
+    await refuse(form);
+    expect(form.errors.first("subject")).toBe("own:required");
+  });
+
+  it("leaves messages as sent when neither says anything", async () => {
+    const form = withSetup(() => useForm({ defaults: empty })).result;
+    await refuse(form);
+    expect(form.errors.first("subject")).toBe("required");
   });
 });

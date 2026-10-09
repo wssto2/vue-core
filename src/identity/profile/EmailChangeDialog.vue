@@ -88,7 +88,7 @@ async function verify(value: string) {
       pending.value = null;
       emit("pending", null);
       step.value = "request";
-      form.errors.set({ email: [messages.translate(error.fields.email[0])] });
+      form.errors.set({ email: [messages.describeFieldError(error.fields.email[0])] });
       return;
     }
     expired.value = isApiError(error) && error.code !== null && EXHAUSTED.includes(error.code);

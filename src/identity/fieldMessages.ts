@@ -32,7 +32,7 @@ export function useServerMessages() {
 
   return {
     sentence,
-    translate: (message: string): string => {
+    describeFieldError: (message: string): string => {
       const key = keyOf(message);
       return key === undefined ? message : t(key);
     },

@@ -1,6 +1,7 @@
 import { computed, reactive, ref, shallowRef, type ComputedRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { isAborted, isApiError } from "../client";
+import { useAppFieldErrorDescriber } from "../i18n/describeError";
 import { ErrorBag } from "./errors";
 import { cloneValue, sameValue } from "./snapshot";
 import { fieldOfPath, issuesToMessages, type FieldMessages, type FormValidator } from "./validation";
@@ -82,8 +83,8 @@ export interface FormOptions<Values extends object, Output = Values> {
   readonly defaults: Values | (() => Values);
   /** The app's schema (anything with Zod's `safeParse`). Without one the server is the only validator. */
   readonly validator?: FormValidator<Output>;
-  /** Server messages are often codes: turn one into a sentence (`t(message)`). Default: as sent. */
-  readonly translate?: (message: string, field: string) => string;
+  /** A field message into a sentence, for a form that says it differently from the rest of the app. Default: the application's (`createApplication({ describeFieldError })`), else as sent. */
+  readonly describeFieldError?: (message: string, field: string) => string;
   /** The draft's name for a field the server names, given the whole dotted path (`tax_id` is `taxId`, `lines.0.unit_price` is `lines.0.unitPrice`). Default: the same name. */
   readonly serverField?: (field: string) => string;
   /** The sentence for a failure; return undefined for the library's default of that kind. */
@@ -150,6 +151,7 @@ const newKey = (): string =>
  */
 export function useForm<Values extends object, Output = Values>(options: FormOptions<Values, Output>): Form<Values, Output> {
   const { t } = useI18n();
+  const describeFieldError = options.describeFieldError ?? useAppFieldErrorDescriber();
   const initial = (): Values => cloneValue(typeof options.defaults === "function" ? (options.defaults as () => Values)() : options.defaults);
 
   const values = reactive(initial() as object) as Values;
@@ -180,7 +182,8 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
   }
 
   function place(messages: FieldMessages, fromServer = false) {
-    const { translate, serverField } = options;
+    const { serverField } = options;
+    const translate = describeFieldError;
     const named = fromServer && serverField ? Object.entries(messages).map(([field, list]) => [serverField(field), list] as const) : Object.entries(messages);
     errors.set(Object.fromEntries(translate ? named.map(([field, list]) => [field, list.map((message) => translate(message, field))]) : named));
   }
