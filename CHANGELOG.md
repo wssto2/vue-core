@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.14 — 2026-10-09
+
+An app can say its own error sentences once, and a load can be abandoned.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `createApplication({ describeError })`: the app's own sentence for an error, asked before the library's. `useDescribeError` and the default failure text of `useLoad` and `useResource` all use it. Return `undefined` to leave an error to the library. This is for error types the library does not know, such as an older HTTP client's.
+- `useLoad`'s context has `abandon()`. It ends the load with nothing to show and no error, for a page that is leaving instead (a 403 that redirects). The state stays as it was.
+
+### Changes to existing behaviour
+- None without `describeError`.
+
 ## 0.4.13 — 2026-10-08
 
 A record can open on its own hub.
