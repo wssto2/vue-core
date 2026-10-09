@@ -152,6 +152,52 @@ describe("TextareaField", () => {
   });
 });
 
+describe("NumberField decimals as written, and mono", () => {
+  const inputOf = (label: string) => screen.getByLabelText(label) as HTMLInputElement;
+  /** What the input of a field with these props holds when it is not focused. */
+  function shownBy(props: Record<string, unknown>): string {
+    const view = mount(NumberField, { label: "Field", ...props });
+    const value = inputOf("Field").value;
+    view.unmount();
+    return value;
+  }
+
+  it("a coordinate with decimals 7 and minDecimals 0 reads 43.566139, an amount keeps its two decimals", () => {
+    expect(shownBy({ modelValue: 43.566139, decimals: 7, minDecimals: 0 })).toBe("43.566139");
+    expect(shownBy({ modelValue: 1.5, decimals: 2 })).toBe("1.50");
+  });
+
+  it("minDecimals is how many fraction digits are always shown, and never more than decimals", () => {
+    expect(shownBy({ modelValue: 2, decimals: 3, minDecimals: 1 })).toBe("2.0");
+    expect(shownBy({ modelValue: 2.25, decimals: 3, minDecimals: 1 })).toBe("2.25");
+    expect(shownBy({ modelValue: 1.5, decimals: 2, minDecimals: 5 })).toBe("1.50");
+  });
+
+  it("the read page shows the same, and still takes 7 decimals when typing", async () => {
+    const read = mountGroup((f) => { f.values.age = 43.566139; return h(NumberField, { ...f.bind("age"), label: "Latitude", decimals: 7, minDecimals: 0 }); }, { editable: false });
+    expect(read.container.textContent).toContain("43.566139");
+    expect(read.container.textContent).not.toContain("43.5661390");
+    read.unmount();
+    const { update } = mount(NumberField, { modelValue: null, label: "Longitude", decimals: 7, minDecimals: 0 });
+    await fireEvent.update(inputOf("Longitude"), "16.4401234");
+    expect(update).toHaveBeenLastCalledWith(16.4401234);
+  });
+
+  it("mono sets the number in the monospaced face of TextField mono, editing and reading", () => {
+    const plain = mount(NumberField, { modelValue: 43.5, label: "Plain", decimals: 1 });
+    expect(inputOf("Plain").className).not.toContain("font-mono");
+    plain.unmount();
+    const mono = mount(NumberField, { modelValue: 43.5, label: "Mono", decimals: 1, mono: true });
+    expect(inputOf("Mono").className).toContain("font-mono");
+    mono.unmount();
+    const text = mount(TextField, { modelValue: "x", label: "Code", mono: true });
+    expect(inputOf("Code").className).toContain("font-mono"); // the face NumberField mono matches
+    text.unmount();
+    const read = mountGroup((f) => { f.values.age = 43; return h(NumberField, { ...f.bind("age"), label: "Mono read", mono: true }); }, { editable: false });
+    expect(read.container.querySelector(".font-mono")?.textContent).toContain("43");
+  });
+});
+
 describe("NumberField", () => {
   it("reads what the user types in the locale's way and emits a number, rounded to the decimals", async () => {
     const { update } = mount(NumberField, { modelValue: null, label: "Weight", decimals: 2 });

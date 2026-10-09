@@ -14,6 +14,10 @@ import { numberMarks, parseNumber } from "./number";
  *   <NumberField v-bind="form.bind('quantity')" :label="t('quantity')" suffix="pcs" />
  *   <NumberField v-bind="form.bind('weight')" :decimals="2" suffix="kg" />
  *
+ * `decimals` is the most fraction digits the field takes and keeps; `minDecimals` is how many are always shown (default: `decimals`, so an
+ * amount reads `1.50`). A coordinate is `:decimals="7" :min-decimals="0" mono` and reads `43.566139`, not `43.5661390`. `mono` sets the
+ * number in the monospaced face of `TextField mono`, when it is read character by character.
+ *
  * `:grouping="false"` writes no thousands separator, shown or typed (a year 2024, a coordinate 45.815123), and then a "."
  * is always a decimal mark, never a group mark.
  *
@@ -23,20 +27,25 @@ import { numberMarks, parseNumber } from "./number";
  */
 const props = withDefaults(
   defineProps<FieldProps & {
+    /** The most fraction digits the field takes and keeps. */
     decimals?: number;
+    /** The fraction digits always shown, at most `decimals`: `1.50` for `decimals: 2`. Default: `decimals`; `0` shows only the digits the number has. */
+    minDecimals?: number;
     /** Allows a leading minus sign. */
     negative?: boolean;
     /** Separates thousands ("1.234.567"); off for years, coordinates and codes. */
     grouping?: boolean;
     /** The most digits the field takes, fraction digits included (the sign, separators and decimal mark are not counted): a postal code is `:max-digits="5"`. Further digits are not accepted, as `maxlength` does for text; a pasted longer number keeps its first digits. */
     maxDigits?: number;
+    /** The monospaced face of `TextField mono` (coordinates, codes). */
+    mono?: boolean;
     placeholder?: string;
     prefix?: string;
     suffix?: string;
     /** sm 10rem (the default for numbers) · md · lg · full. */
     width?: Exclude<ControlWidth, "content">;
   }>(),
-  { ...fieldDefaults, decimals: 0, negative: false, grouping: true, maxDigits: undefined, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
+  { ...fieldDefaults, decimals: 0, minDecimals: undefined, negative: false, grouping: true, maxDigits: undefined, mono: false, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
 );
 
 const model = defineModel<number | null>({ default: null });
@@ -47,7 +56,8 @@ const surface = useControlSurface("text", () => (props.error ? "error" : props.d
 const fieldWidth = computed(() => (inRow ? controlWidth(props.width) : "w-full"));
 
 const marks = computed(() => numberMarks(format));
-const shown = (value: number | null) => (value === null ? "" : format.number(value, { minimumFractionDigits: props.decimals, maximumFractionDigits: props.decimals, useGrouping: props.grouping }));
+const fixed = computed(() => Math.min(props.minDecimals ?? props.decimals, props.decimals));
+const shown = (value: number | null) => (value === null ? "" : format.number(value, { minimumFractionDigits: fixed.value, maximumFractionDigits: props.decimals, useGrouping: props.grouping }));
 const editing = (value: number | null) => (value === null ? "" : String(value).replace(".", marks.value.decimal));
 const read = (text: string) => parseNumber(text, { decimals: props.decimals, group: props.grouping ? marks.value.group : "" });
 
@@ -58,7 +68,7 @@ watch(model, (value) => {
   if (!focused.value) text.value = shown(value);
   else if (read(text.value) !== value) text.value = editing(value);
 });
-watch(() => [props.decimals, props.grouping, marks.value.decimal], () => {
+watch(() => [props.decimals, fixed.value, props.grouping, marks.value.decimal], () => {
   if (!focused.value) text.value = shown(model.value);
 });
 
@@ -102,13 +112,14 @@ defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-bind="fieldProps(props)" :value="model === null ? null : shown(model)" :prefix="props.prefix" :suffix="props.suffix" value-style="numeric">
+  <Field v-bind="fieldProps(props)" :value="model === null ? null : shown(model)" :prefix="props.prefix" :suffix="props.suffix" :value-style="props.mono ? 'mono' : 'numeric'">
     <template #default="{ id, describedby, invalid }">
       <div class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
         <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
         <input :id="id" ref="input" :value="text" type="text" inputmode="decimal" autocomplete="off" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
           :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
           class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-right text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
+          :class="props.mono ? 'font-mono' : ''"
           @input="onInput" @focus="onFocus" @blur="onBlur" />
         <span v-if="props.suffix" class="shrink-0 text-footnote text-content-muted">{{ props.suffix }}</span>
       </div>
