@@ -1,5 +1,5 @@
-<script setup lang="ts" generic="Value extends string | number">
-import { computed, ref, useTemplateRef } from "vue";
+<script setup lang="ts" generic="Value extends string | number, Clearable extends boolean = false">
+import { computed, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
 import { Icon } from "../icon";
@@ -24,6 +24,11 @@ import { useOptionSource, type OptionsSource } from "./useOptions";
  * On wide screens the options open in a popover; on phones and touch screens in a bottom sheet. Lists of nine
  * or more get a search box. `clearable` adds a way back to "no value".
  *
+ * The type says what the select hands back: without `clearable` the user can only pick, so it emits a `Value` and binds a field
+ * that is never null; with `clearable` it emits `Value | null`. It still accepts `null` as the value (a select that starts empty
+ * shows its placeholder). Exception: options that load (`useOptions`) drop a value the new options lack, so a field bound to a
+ * select with changing options should be able to hold `null`.
+ *
  * Options from the server (`useOptions`, say the models of the chosen make) work the same way: the field keeps its label and
  * value and shows a spinner while they load, the opened list says "Loading…" or offers "Try again", and a value the new options
  * do not contain is cleared, but only once the options of a different input land: a saved value the first answer lacks (a
@@ -37,14 +42,25 @@ const props = withDefaults(
     /** The option of the current value when the caller already has it (a saved record's model): its label shows before the options arrive, or when they do not contain it. */
     selected?: SelectOption<Value> | null;
     placeholder?: string;
-    clearable?: boolean;
+    clearable?: Clearable;
+    modelValue?: Value | null;
     /** Shows the search box from this many options. */
     searchFrom?: number;
   }>(),
-  { ...fieldDefaults, selected: null, placeholder: undefined, clearable: false, searchFrom: 9 },
+  { ...fieldDefaults, selected: null, placeholder: undefined, clearable: undefined, modelValue: undefined, searchFrom: 9 },
 );
 
-const model = defineModel<Value | null>({ default: null });
+const emit = defineEmits<{ "update:modelValue": [value: Clearable extends true ? Value | null : Value] }>();
+// Uncontrolled use (no v-model) keeps its own value; the emitted type is narrower than what the internals pass.
+const local = ref<Value | null>(props.modelValue ?? null);
+watch(() => props.modelValue, (next) => (local.value = next ?? null));
+const model = computed<Value | null>({
+  get: () => local.value,
+  set: (next) => {
+    local.value = next;
+    emit("update:modelValue", next as Clearable extends true ? Value | null : Value);
+  },
+});
 const { t } = useI18n();
 const compact = useCompactPresentation();
 const inRow = !!useFormGroup();

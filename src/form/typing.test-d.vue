@@ -29,6 +29,7 @@ const form = useForm({
     month: null as number | null,
     year: null as number | null,
     mode: "a" as "a" | "b",
+    title3: 1 as 1 | 2 | 3,
     title: {} as Record<string, string>,
     customerId: null as number | null,
     mobile: "",
@@ -55,6 +56,9 @@ const tagOptions: readonly SelectOption<string>[] = [{ value: "a", label: "A" }]
   <!-- a segmented control never emits null, so a field that is never null binds to it -->
   <SegmentedField v-bind="form.bind('mode')" :options="[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]" />
   <MonthYearField v-bind="form.bindMonthYear('month', 'year')" />
+  <!-- a select that cannot be emptied never emits null, so a field that is never null binds to it; a clearable one binds a nullable field -->
+  <SelectField v-bind="form.bind('title3')" :options="[{ value: 1, label: 'Mr' }, { value: 2, label: 'Ms' }, { value: 3, label: 'Mx' }]" />
+  <SelectField v-bind="form.bind('status')" clearable :options="statuses" />
   <I18nField v-bind="form.bind('title')" :required-locales="['hr']" />
   <PhoneField v-bind="form.bind('mobile')" default-country="BA" :common-countries="['DE', 'AT']" />
   <!-- free text stays a string whatever it suggests; a record pick keeps its id type -->
@@ -82,8 +86,8 @@ const tagOptions: readonly SelectOption<string>[] = [{ value: "a", label: "A" }]
   <NumberField v-bind="form.bind('name')" />
   <!-- @vue-expect-error the switch is a boolean -->
   <SwitchField v-bind="form.bind('name')" />
-  <!-- @vue-expect-error a select can be cleared, so the field it edits can be null -->
-  <SelectField v-bind="form.bind('mode')" :options="[{ value: 'a', label: 'A' }]" />
+  <!-- @vue-expect-error a clearable select can emit null, so the field it edits can be null -->
+  <SelectField v-bind="form.bind('mode')" clearable :options="[{ value: 'a', label: 'A' }]" />
   <!-- @vue-expect-error the options must be able to produce the field's values: "archived" is not a status -->
   <SelectField v-bind="form.bind('status')" :options="[{ value: 'archived', label: 'Archived' }]" />
   <!-- @vue-expect-error a date is text: a number field of the form is not a day -->
