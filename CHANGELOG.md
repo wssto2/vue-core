@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.15 — 2026-10-09
+
+Six gaps in forms, found when the first two ARV forms moved onto the library.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- `SelectField` without `clearable` emits `Value`, not `Value | null`, so a draft field typed `1 | 2 | 3` binds to it (a second generic, `Clearable`). With `clearable` it still emits `Value | null`. It still takes `null` as the value it is given.
+- `labelHidden` on every field: the label stays the control's accessible name (and the read row's) but is not drawn, and the row lays out without a label column.
+- `NumberField` `maxDigits`: the most digits the field takes (fraction digits count; sign, separators and decimal mark do not). A digit past the limit is not accepted; a pasted longer number keeps its first digits.
+- `useSaveChrome`: `disabledWhileClean` (default `true`), and `cancel` is optional (without it there is no Cancel).
+- `useHiddenFieldErrors({ form, root })` returns the errors whose field is not on screen, as `ComputedRef<readonly { field, message }[]>`. `FormErrors` uses it.
+- `createApplication({ describeFieldError })`: the application's one sentence for a server field message, `(message, field) => string`, asked by every `useForm`, `useResourceForm` and `useCommand` that has none of its own. Without either, messages show as sent.
+
+### Changes to existing behaviour
+- **`useSaveChrome` disables Save while the form has no changes.** `EditorPage` and the new-role editor pass `disabledWhileClean: false` (a create page submits an untouched form to learn what is missing); the user's General section and an edited role start with Save disabled.
+- **The form option `translate` is renamed `describeFieldError`**, to match the application's. `useServerMessages()` returns `describeFieldError` instead of `translate`.
+
 ## 0.4.14 — 2026-10-09
 
 An app can say its own error sentences once, and a load can be abandoned.

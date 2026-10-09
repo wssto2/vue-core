@@ -148,3 +148,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | 0.4.12 | Done | branch `release-0412` | Back keeps the list's state when the record is no longer in it; `useCollectionBack` for record pages without a pager. |
 | 0.4.13 | Done | branch `release-0413` | `SectionNavigator` hub layout (`desktop`/`compact` `"hub"`), for ARV's vehicle records. |
 | 0.4.14 | Done | branch `release-0.4.14` | `createApplication({ describeError })` and `useLoad`'s `abandon()`, for ARV's d7 screens. |
+| 0.4.15 | Done | branch `release-0415` | Six form gaps from ARV's cutover e1: a non-clearable `SelectField` emits its value, `labelHidden`, `NumberField` `maxDigits`, `useSaveChrome` (Save disabled while clean, optional Cancel), `useHiddenFieldErrors`, `createApplication({ describeFieldError })`. |
