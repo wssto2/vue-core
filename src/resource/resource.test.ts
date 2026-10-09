@@ -6,6 +6,7 @@ import { ApiError } from "../client";
 import { MissingContextError } from "../platform/context";
 import { deferred } from "../platform/testing";
 import { createTestI18n } from "../testing/i18n";
+import { appErrorDescriberKey } from "../i18n/describeError";
 import { positiveInteger, useResource } from "./resource";
 import { useRouteResource, useRouteResourceContext, type RouteResource } from "./routeResource";
 
@@ -285,6 +286,22 @@ describe("useResource", () => {
     render(Host, { global: { plugins: [i18n] } });
     return { resource: holder.resource! };
   }
+
+  it("a failed read says the application's sentence first, and the library's for what it leaves", async () => {
+    const holder: { legacy?: ReturnType<typeof useResource<string>>; other?: ReturnType<typeof useResource<string>> } = {};
+    const own = (error: unknown) => (error instanceof TypeError ? "Our own sentence" : undefined);
+    const Host = defineComponent({
+      setup() {
+        holder.legacy = useResource({ for: () => 1, load: () => Promise.reject(new TypeError("x")) });
+        holder.other = useResource({ for: () => 1, load: () => Promise.reject(new ApiError({ kind: "network", message: "offline" })) });
+        return () => null;
+      },
+    });
+    render(Host, { global: { plugins: [i18n], provide: { [appErrorDescriberKey as symbol]: own } } });
+    await settle();
+    expect(holder.legacy!.state.value).toMatchObject({ status: "failed", reason: "unavailable", error: "Our own sentence" });
+    expect(holder.other!.state.value).toMatchObject({ status: "failed", reason: "unavailable", error: "The server could not be reached. Check your connection and try again." });
+  });
 
   it("loads for an identity, follows it, and is independent of any other resource", async () => {
     const identity = ref<number | null>(1);

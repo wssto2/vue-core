@@ -1,3 +1,4 @@
+import { hasInjectionContext, inject, type InjectionKey } from "vue";
 import { useI18n } from "vue-i18n";
 import { isApiError } from "../client";
 
@@ -16,6 +17,19 @@ export type DescribeError = (error: unknown, options?: DescribeErrorOptions) => 
 interface Translator {
   t(key: string, params?: Record<string, unknown>): string;
   te(key: string): boolean;
+}
+
+/**
+ * The application's own sentence for an error, ahead of the library's (`createApplication({ describeError })`):
+ * for error types the library does not know (an app's older HTTP client). `undefined` leaves the error to the library.
+ */
+export type AppErrorDescriber = (error: unknown) => string | undefined;
+
+export const appErrorDescriberKey: InjectionKey<AppErrorDescriber> = Symbol("vue-core.describeError");
+
+/** The application's describer, when one was installed and this runs in a setup. */
+export function useAppErrorDescriber(): AppErrorDescriber | null {
+  return hasInjectionContext() ? inject(appErrorDescriberKey, null) : null;
 }
 
 /** `describeError` over a translator; exported for the composable and tests. */
@@ -71,9 +85,12 @@ export function describeErrorWith({ t, te }: Translator): DescribeError {
  * `core.errors.<code>`, with the error's `params`); the server's own text when it sent a code (it is
  * already translated); then by kind: 401, 403, 404, 409, no answer, cancelled, 429, "check the marked
  * fields" for a validation answer with fields; server faults and anything unreadable give `fallback`;
- * any other 4xx gives `fallback` too, or the server's text.
+ * any other 4xx gives `fallback` too, or the server's text. The application's own describer
+ * (`createApplication({ describeError })`) is asked first.
  */
 export function useDescribeError(): DescribeError {
   const { t, te } = useI18n();
-  return describeErrorWith({ t: (key, params) => t(key, params ?? {}), te: (key) => te(key) });
+  const own = useAppErrorDescriber();
+  const library = describeErrorWith({ t: (key, params) => t(key, params ?? {}), te: (key) => te(key) });
+  return own ? (error, options) => own(error) ?? library(error, options) : library;
 }

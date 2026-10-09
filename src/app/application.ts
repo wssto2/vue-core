@@ -25,6 +25,7 @@ import { bindNavigation, createNavigation, navigationKey } from "../router/navig
 import NoAccess from "../router/NoAccess.vue";
 import { createShellContributions, shellContributionsKey, type OwnedContribution } from "./contributions";
 import { applicationKey, type ApplicationEnvironment, type ApplicationState } from "./environment";
+import { appErrorDescriberKey, type AppErrorDescriber } from "../i18n/describeError";
 import { createEffectRunner, type OwnedEffect } from "./effects";
 import type { Feature, ShellSlot } from "./feature";
 import StartupFailure from "./StartupFailure.vue";
@@ -114,6 +115,12 @@ export interface ApplicationOptions {
   noAccess?: Component;
   /** Identifies a session for session effects: they restart when it changes. Default: the user's id. */
   sessionKey?: (session: SessionSnapshot) => string;
+  /**
+   * The application's own sentence for an error, asked before the library's own (`useDescribeError`, the default
+   * failure text of `useLoad` and `useResource`): for error types the library does not know, such as an older HTTP
+   * client's. Return `undefined` to leave an error to the library.
+   */
+  describeError?: AppErrorDescriber;
   /** Called with every error the application catches (component errors, unhandled rejections, failed effects and loads). Default: `console.error`. */
   onError?: (report: ApplicationErrorReport) => void;
 }
@@ -192,7 +199,7 @@ export function createApplication(options: ApplicationOptions): Application {
   const initialLocale = options.locale?.initial ?? (supportedLocales.includes(platform.config.locale) ? platform.config.locale : fallbackLocale);
   if (!supportedLocales.includes(initialLocale)) appIssues.push({ owner: "application", message: `the initial locale "${initialLocale}" is not among the supported locales (${supportedLocales.join(", ")}).` });
 
-  const reservedContexts = [platformKey, formattingKey, pageChromeKey, bottomDockKey, iconSetKey, navigationKey, shellContributionsKey, routeAccessKey, applicationKey];
+  const reservedContexts = [platformKey, formattingKey, pageChromeKey, bottomDockKey, iconSetKey, navigationKey, shellContributionsKey, routeAccessKey, applicationKey, appErrorDescriberKey];
   const composition = validateComposition({
     features: options.features,
     platform,
@@ -342,6 +349,7 @@ export function createApplication(options: ApplicationOptions): Application {
   installLeaveGuard(app);
   if (options.icons) installIcons(app, ...(Array.isArray(options.icons) ? options.icons : [options.icons as IconSet]));
   app.provide(applicationKey, environment);
+  if (options.describeError) app.provide(appErrorDescriberKey, options.describeError);
   app.provide(navigationKey, navigation);
   app.provide(shellContributionsKey, contributions);
   app.provide(routeAccessKey, routeAccess);

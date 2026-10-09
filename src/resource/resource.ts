@@ -1,6 +1,7 @@
 import { computed, getCurrentScope, onScopeDispose, shallowRef, toValue, watch, type ComputedRef, type MaybeRefOrGetter } from "vue";
 import { useI18n } from "vue-i18n";
 import { isApiError } from "../client";
+import { useAppErrorDescriber } from "../i18n/describeError";
 import type { AsyncState } from "../state/async";
 
 /** What an identity is: the number or text a record is addressed by. */
@@ -51,7 +52,7 @@ export interface ResourceOptions<T, Id extends ResourceId = number> {
   readonly load: (id: Id, context: ResourceContext) => Promise<T>;
   /** Which identity a value belongs to, for `update`; by default its `id`. A value with neither is taken to be the current one. */
   readonly identify?: (value: T) => Id;
-  /** The text of a failed read; by default a sentence per kind of failure, in the app's language. */
+  /** The text of a failed read; by default the application's describer, then a sentence per kind of failure, in the app's language. */
   readonly errorMessage?: (error: unknown) => string;
 }
 
@@ -92,9 +93,12 @@ export function useResource<T, Id extends ResourceId = number>(options: Resource
   let version = 0;
   let reading: AbortController | null = null;
 
+  const own = useAppErrorDescriber();
   const messageOf =
     options.errorMessage ??
     ((error: unknown) => {
+      const described = own?.(error);
+      if (described !== undefined) return described;
       if (isApiError(error) && error.kind === "network") return t("core.resource.offline");
       if (isApiError(error) && error.kind === "forbidden") return t("core.no_access.body");
       return t("core.resource.unavailable");

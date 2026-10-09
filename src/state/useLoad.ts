@@ -6,7 +6,17 @@ import type { AsyncState } from "./async";
 export interface LoadContext {
   /** Aborted when the load is no longer wanted: a newer load or an `update` superseded it, the watch source changed, the scope ended. */
   readonly signal: AbortSignal;
+  /**
+   * Ends this load with nothing to show and nothing to report, for a page that is leaving instead (a 403 that
+   * redirects): the state stays as it is (loading, or the value on screen) and no error flashes on the way out.
+   *
+   *   if (isForbidden(error)) { void router.replace(elsewhere); return abandon(); }
+   */
+  readonly abandon: () => never;
 }
+
+/** Thrown by `abandon()`; caught by the load it belongs to. */
+const abandoned = Symbol("vue-core.load.abandoned");
 
 export interface LoadOptions {
   /**
@@ -67,13 +77,17 @@ export function useLoad<T>(load: (context: LoadContext) => Promise<T>, options: 
     const own = new AbortController();
     reading = own;
     try {
-      const value = await load({ signal: own.signal });
+      const value = await load({ signal: own.signal, abandon });
       if (current === version) state.value = { status: "loaded", value };
     } catch (error) {
-      if (current !== version) return;
+      if (current !== version || error === abandoned) return;
       const message = messageOf(error);
       state.value = keep ? { status: "stale", value: keep.value, error: message } : { status: "failed", error: message };
     }
+  }
+
+  function abandon(): never {
+    throw abandoned;
   }
 
   function update(value: T): void {

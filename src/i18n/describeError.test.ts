@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { defineComponent, h } from "vue";
 import { ApiError, type ApiErrorInit } from "../client";
 import { createTestI18n } from "../testing/i18n";
-import { describeErrorWith, useDescribeError } from "./describeError";
+import { appErrorDescriberKey, describeErrorWith, useDescribeError } from "./describeError";
 
 const failure = (init: Partial<ApiErrorInit> & Pick<ApiErrorInit, "kind">) => new ApiError({ message: "log text", ...init });
 
@@ -61,5 +61,15 @@ describe("useDescribeError", () => {
       global: { plugins: [createTestI18n({ locale: "hr" })] },
     });
     expect(view.getByText("Nemate ovlasti za ovu radnju.")).toBeTruthy();
+  });
+
+  it("useDescribeError asks the application's describer first, and the library for what it leaves", () => {
+    let describe!: ReturnType<typeof useDescribeError>;
+    const own = (error: unknown) => (error instanceof TypeError ? "Our own sentence" : undefined);
+    render(defineComponent({ setup() { describe = useDescribeError(); return () => h("p"); } }), {
+      global: { plugins: [createTestI18n({ locale: "en" })], provide: { [appErrorDescriberKey as symbol]: own } },
+    });
+    expect(describe(new TypeError("x"))).toBe("Our own sentence");
+    expect(describe(failure({ kind: "forbidden", status: 403 }))).toBe("You are not authorized to perform this action.");
   });
 });

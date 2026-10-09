@@ -4,14 +4,16 @@ import { render } from "@testing-library/vue";
 import { ApiError } from "../client";
 import { deferred } from "../platform/testing";
 import { createTestI18n } from "../testing/i18n";
+import { appErrorDescriberKey, type AppErrorDescriber } from "../i18n/describeError";
 import { useLoad, type Load, type LoadContext, type LoadOptions } from "./useLoad";
 
 const i18n = createTestI18n({ locale: "en" });
 
 /** Runs `useLoad` inside a mounted component (it reads the i18n composer) and returns what it gave. */
-function mount<T>(load: (context: LoadContext) => Promise<T>, options?: LoadOptions) {
+function mount<T>(load: (context: LoadContext) => Promise<T>, options?: LoadOptions, describeError?: AppErrorDescriber) {
   let result!: Load<T>;
-  const view = render(defineComponent({ setup() { result = useLoad(load, options); return () => h("p"); } }), { global: { plugins: [i18n] } });
+  const provide = describeError ? { [appErrorDescriberKey as symbol]: describeError } : {};
+  const view = render(defineComponent({ setup() { result = useLoad(load, options); return () => h("p"); } }), { global: { plugins: [i18n], provide } });
   return { ...view, load: result };
 }
 const status = (load: Load<unknown>) => load.state.value.status;
@@ -53,6 +55,30 @@ describe("useLoad", () => {
     const { load } = mount(async () => { throw new Error("boom"); });
     await load.reload();
     expect(load.state.value).toEqual({ status: "failed", error: "An error occurred while loading data. Please try again." });
+  });
+
+  it("asks the application's describer first, and falls back to the library for what it leaves", async () => {
+    class LegacyError extends Error {}
+    const describe: AppErrorDescriber = (error) => (error instanceof LegacyError ? `legacy: ${error.message}` : undefined);
+    const legacy = mount(async () => { throw new LegacyError("Centar je zatvoren"); }, {}, describe);
+    await legacy.load.reload();
+    expect(legacy.load.state.value).toEqual({ status: "failed", error: "legacy: Centar je zatvoren" });
+    const other = mount(async () => { throw new Error("boom"); }, {}, describe);
+    await other.load.reload();
+    expect(other.load.state.value).toEqual({ status: "failed", error: "An error occurred while loading data. Please try again." });
+  });
+
+  it("an abandoned load ends with nothing to show and no error, and the value on screen stays", async () => {
+    let leave = false;
+    const { load } = mount(async ({ abandon }) => (leave ? abandon() : "one"));
+    await settle();
+    expect(load.state.value).toEqual({ status: "loaded", value: "one" });
+    leave = true;
+    await load.reload();
+    expect(load.state.value).toEqual({ status: "refreshing", value: "one" });
+    const first = mount(async ({ abandon }) => abandon());
+    await first.load.reload();
+    expect(first.load.state.value).toEqual({ status: "loading" });
   });
 
   it("the latest load wins and an older one is aborted and dropped", async () => {
