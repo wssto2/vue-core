@@ -129,6 +129,6 @@ describe("I18nField", () => {
 
   it("takes the app's languages from the translations the app loaded when none are given", () => {
     mount({ locales: undefined });
-    expect(tabs().map((tab) => tab.textContent?.trim().toLowerCase()).sort()).toEqual(["bs", "en", "hr", "sl"]);
+    expect(tabs().map((tab) => tab.textContent?.trim().toLowerCase()).sort()).toEqual(["bs", "en", "hr", "sl", "sr-latn"]);
   });
 });

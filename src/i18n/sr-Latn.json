@@ -1,0 +1,968 @@
+{
+  "core": {
+    "access": {
+      "title": "Uloge",
+      "description": "Skupovi dozvola. Osobi se uloga dodeljuje na njenom zapisu, zajedno sa opsegom.",
+      "new_title": "Nova uloga",
+      "new_description": "Prilagođena uloga: izaberite dozvole i čije zapise obuhvataju.",
+      "new_copy_description": "Kopija postojeće uloge: dorada se čuva kao nova prilagođena uloga.",
+      "create": "Nova uloga",
+      "save": "Sačuvaj ulogu",
+      "copy": "Kopiraj",
+      "copy_name": "{name} (kopija)",
+      "search": "Pretraži uloge",
+      "list_footer": "Standardne uloge dolaze sa aplikacijom i ne uređuju se — Kopiraj daje prilagođenu ulogu za doradu.",
+      "empty": "Nema uloga koje odgovaraju.",
+      "permissions": "Dozvole: {count}",
+      "holders_count": "Osoba: {count}",
+      "kinds": {
+        "all": "Sve",
+        "predefined": "Standardne",
+        "custom": "Prilagođene"
+      },
+      "role_kind": {
+        "predefined": "Standardna",
+        "custom": "Prilagođena",
+        "computed": "Automatska"
+      },
+      "groups": {
+        "role": "Uloga"
+      },
+      "fields": {
+        "name": "Naziv",
+        "description": "Opis"
+      },
+      "notes": {
+        "predefined": "Standardna uloga dolazi sa aplikacijom i ne uređuje se. Kopiraj daje prilagođenu ulogu za doradu.",
+        "computed": "Dozvole se dodeljuju automatski: kad aplikacija dobije novu dozvolu, uloga je dobija odmah, bez ručnog dodavanja. Dozvole označene Sistem imaju samo uloge koje vode sistem."
+      },
+      "requires": "Zahteva: {names}.",
+      "modules": "Moduli",
+      "turn_on_all": "Uključi sve",
+      "turn_off_all": "Isključi sve",
+      "completed": "Uloga nije imala sve dozvole koje trebaju njenim drugim dozvolama, pa su uključene: {names}. Sačuvajte ulogu da se promena primeni.",
+      "name_required": "Unesite naziv.",
+      "too_long": "Prekoračena je najveća dužina.",
+      "saved": "Uloga je sačuvana",
+      "deleted": "Uloga je obrisana",
+      "sensitive": "Osetljivo",
+      "system": "Sistem",
+      "system_group": "Sistem",
+      "organization_only": "Samo cela organizacija",
+      "unowned": "Uključuje i zapise koji još nisu nikome dodeljeni, kako bi ih osoba mogla preuzeti.",
+      "qualifier": {
+        "own": "Svoje",
+        "own_location": "Moja lokacija",
+        "all": "Sve"
+      },
+      "qualifier_hint": {
+        "own": "Samo zapisi dodeljeni osobi ili oni koje je ona kreirala",
+        "own_location": "Zapisi lokacije na kojoj osoba ima ulogu",
+        "all": "Svi zapisi na mestu na kojem osoba ima ulogu"
+      },
+      "qualifier_noun": {
+        "own": "Svoji",
+        "own_location": "Lokacije",
+        "all": "Svi"
+      },
+      "levels": {
+        "organization": "Organizacija"
+      },
+      "compare": {
+        "action": "Uporedi sa standardnom ulogom",
+        "title": "Poređenje sa standardnom ulogom",
+        "footer": "Pokazuje koliko se prilagođena uloga udaljila od standardne.",
+        "with": "Standardna uloga",
+        "loading": "Upoređujem…",
+        "failed": "Poređenje nije uspelo. Pokušajte ponovo.",
+        "identical": "Uloge se ne razlikuju.",
+        "only_in_role": "Samo u ovoj ulozi ({count})",
+        "only_in_other": "Samo u standardnoj ({count})",
+        "different": "Različito čije zapise vidi ({count})",
+        "whose": "{role}, standardna: {other}"
+      },
+      "replace": {
+        "action": "Zameni",
+        "title": "Zameni ulogu",
+        "footer": "Svi koji imaju ovu ulogu dobijaju izabranu standardnu ulogu na istom opsegu. Važe ista pravila kao pri dodeli: ne možete dati više nego što i sami imate.",
+        "with": "Zameni standardnom ulogom",
+        "choose": "Izaberite ulogu.",
+        "confirm": "Zameni",
+        "moves": "Osobe koje prelaze na standardnu ulogu: {count}.",
+        "done": "Osobe prebačene na standardnu ulogu: {count}"
+      },
+      "delete": {
+        "action": "Obriši ulogu",
+        "title": "Obrisati ulogu?",
+        "body": "Uloga „{name}” se briše. Dok je neko ima, brisanje nije moguće — najpre je zamenite.",
+        "failed": "Uloga nije obrisana."
+      },
+      "holders": {
+        "title": "Osobe sa ovom ulogom",
+        "empty": "Niko trenutno nema ovu ulogu.",
+        "service": "Servisni nalog"
+      },
+      "person_roles": "Uloge",
+      "roles_footer": "Uloga kaže šta osoba sme da radi i čije zapise vidi (svoje ili sve), mesto gde. Više uloga se sabira. Možete dodeliti samo ono što i sami imate, najviše do svog mesta.",
+      "no_roles_title": "Nema nijedne uloge",
+      "no_roles_description": "Bez uloge ne može ništa videti ni raditi. Dodajte ulogu i gde važi.",
+      "add_role": "Dodaj ulogu",
+      "remove": "Ukloni",
+      "remove_title": "Ukloniti ulogu?",
+      "remove_body": "{name} više neće imati ulogu „{role}” ({scope}).",
+      "added": "Uloga je dodata",
+      "removed": "Uloga je uklonjena",
+      "remove_failed": "Uloga nije uklonjena. Pokušajte ponovo.",
+      "add": {
+        "confirm": "Dodaj",
+        "scope_header": "Gde važi",
+        "scope_level": "Nivo",
+        "scopes_failed": "Mesta na kojima možete dodeliti ulogu nisu učitana.",
+        "no_places": "Ovoj osobi ne možete nigde dodeliti ulogu.",
+        "roles_loading": "Učitavam uloge…",
+        "roles_failed": "Uloge nisu učitane. Pokušajte ponovo.",
+        "no_roles": "Tamo ne možete dodeliti nijednu ulogu.",
+        "role": "Uloga",
+        "role_gives": "Šta uloga daje",
+        "role_gives_footer": "Određuje uloga; menja se u Ulogama, ne ovde.",
+        "choose_role": "Izaberite ulogu.",
+        "choose_place": "Izaberite gde uloga važi."
+      },
+      "effective": {
+        "title": "Šta {name} može",
+        "footer": "Zbir svih uloga osobe; menja se dodavanjem ili uklanjanjem uloga. Svoji – zapisi dodeljeni osobi ili koje je sama kreirala · Lokacije – zapisi njene lokacije · Svi – svi zapisi na mestu uloge.",
+        "empty": "Bez uloga nema nijedne dozvole.",
+        "from_roles": "iz uloge: {roles}",
+        "unavailable": "Isključeno",
+        "why_row": "{role} · {whose} · {scope}",
+        "show_why": "Zašto",
+        "hide_why": "Sakrij",
+        "all_modules": "Svih {count} modula",
+        "fewer_modules": "Manje modula"
+      }
+    },
+    "actions": {
+      "cancel": "Odustani",
+      "close": "Zatvori",
+      "confirm": "Potvrdi",
+      "retry": "Pokušaj ponovo",
+      "save": "Sačuvaj",
+      "saving": "Čuvanje…",
+      "saved": "Sačuvano",
+      "more": "Više",
+      "edit": "Uredi",
+      "clear": "Očisti",
+      "done": "Gotovo"
+    },
+    "collection": {
+      "search": {
+        "label": "Pretraži",
+        "placeholder": "Upišite za pretragu..."
+      },
+      "clear": "Poništi",
+      "no_data": "Nema podataka",
+      "pick_label": "Izaberite jedan",
+      "no_results": "Prema traženom upitu nisu pronađeni podaci.",
+      "failed": {
+        "title": "Spisak nije moguće učitati"
+      },
+      "open_record": "Pogledaj detalje",
+      "views_label": "Prikazi",
+      "page": {
+        "label": "Stranice",
+        "previous": "Prethodna stranica",
+        "next": "Sledeća stranica",
+        "page_of": "Stranica {current} od {total}",
+        "total": "Prikaz {from} do {to} od ukupno {total} zapisa",
+        "per_page": "Zapisa po stranici"
+      },
+      "filters": {
+        "show_all": "Prikaži sve",
+        "apply": "Primeni",
+        "clear": "Očisti",
+        "type_to_filter": "Upišite za filtriranje...",
+        "panel_title": "Filteri",
+        "panel_button": "Filteri",
+        "reset_all": "Poništi sve",
+        "range_from": "Od",
+        "range_until": "Do"
+      },
+      "date_presets": {
+        "label": "Uneto",
+        "options": {
+          "today": "Danas",
+          "yesterday": "Juče",
+          "this_week": "Ova nedelja",
+          "last_week": "Prošla nedelja",
+          "this_month": "Ovaj mesec",
+          "last_month": "Prošli mesec",
+          "this_year": "Ova godina",
+          "last_year": "Prošla godina"
+        }
+      },
+      "saved": {
+        "title": "Sačuvani filteri",
+        "menu": "Sačuvani filteri",
+        "save": "Sačuvaj",
+        "name_placeholder": "Naziv, npr. Novi Renault",
+        "saved_toast": "Filteri „{name}” sačuvani i primenjeni.",
+        "deleted_toast": "Filteri „{name}” obrisani.",
+        "delete": "Obriši „{name}”",
+        "save_button": "Sačuvaj filtere",
+        "name_label": "Naziv filtera",
+        "replace": "Zameni",
+        "replace_hint": "Postojeći filter „{name}” biće zamenjen.",
+        "nothing_to_save": "Izaberite barem jedan filter za čuvanje.",
+        "save_failed": "Filtere nije moguće sačuvati.",
+        "delete_failed": "Filtere nije moguće obrisati.",
+        "undo": "Poništi"
+      },
+      "empty": {
+        "title": "Nema rezultata za izabrane filtere",
+        "description": "Uklonite neki od filtera ili poništite sve.",
+        "remove_last": "Ukloni: {filter}",
+        "clear_all": "Poništi sve filtere",
+        "search": "Pretraga",
+        "start_description": "Prikazano je samo: {filters}",
+        "show_all": "Prikaži sve"
+      }
+    },
+    "state": {
+      "loading": "Učitavanje sadržaja",
+      "stale": "Prikazani su prethodni podaci. Možda nisu ažurni.",
+      "refreshing": "Osvežavanje. Prikazani su prethodni podaci.",
+      "empty": "Nema podataka",
+      "no_value": "Nije uneto"
+    },
+    "page": {
+      "breadcrumbs": "Navigaciona putanja",
+      "more_actions": "Više radnji"
+    },
+    "wait": {
+      "seconds": "{count} s"
+    },
+    "discard_changes": {
+      "title": "Nesačuvane promene",
+      "body": "Uneseni podaci nisu sačuvani. Ako nastavite, izmene će biti izgubljene.",
+      "confirm": "Odbaci izmene",
+      "cancel": "Nastavi sa uređivanjem"
+    },
+    "toast": {
+      "notifications": "Obaveštenja"
+    },
+    "shell": {
+      "menu": "Meni",
+      "home": "Početna",
+      "account": {
+        "open": "Otvori korisnički meni",
+        "language": "Jezik",
+        "sign_out": "Odjava",
+        "sign_out_failed": "Server nije završio vašu sesiju. Pokušajte ponovo."
+      },
+      "update": {
+        "available": "Dostupna je nova verzija aplikacije",
+        "reload": "Osveži"
+      }
+    },
+    "no_access": {
+      "title": "Nemate pristup",
+      "body": "Vaša ovlašćenja ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."
+    },
+    "startup": {
+      "title": "Aplikacija se nije mogla pokrenuti",
+      "session": "Server nije dostupan pa se sesija nije mogla proveriti. Proverite vezu i pokušajte ponovo.",
+      "messages": "Tekstovi aplikacije nisu se mogli učitati. Proverite vezu i pokušajte ponovo.",
+      "other": "Nešto je pošlo naopako prilikom pokretanja. Pokušajte ponovo."
+    },
+    "resource": {
+      "not_found": {
+        "title": "Nije pronađeno",
+        "body": "Traženi zapis nije pronađen."
+      },
+      "unavailable": "Dogodila se greška prilikom učitavanja podataka. Molimo pokušajte ponovo.",
+      "offline": "Server nije dostupan. Proverite vezu i pokušajte ponovo.",
+      "pager": {
+        "previous": "Prethodni zapis",
+        "next": "Sledeći zapis",
+        "records": "Zapisi"
+      }
+    },
+    "sections": {
+      "label": "Odeljci"
+    },
+    "steps": {
+      "label": "Napredak",
+      "position": "Korak {current} od {total}",
+      "next_named": "Dalje: {step}",
+      "done": "dovršeno",
+      "draft_saved": "nacrt sačuvan",
+      "restored": "Nastavljate sa sačuvanim nacrtom.",
+      "start_over": "Počni ispočetka"
+    },
+    "viewer": {
+      "label": "Pregled fotografija",
+      "open": "Pogledaj fotografiju",
+      "counter": "{current} / {total}",
+      "zoom_in": "Uvećaj",
+      "zoom_out": "Umanji",
+      "zoom_percent": "{percent} %",
+      "rotate": "Rotiraj",
+      "download": "Preuzmi",
+      "previous": "Prethodna fotografija",
+      "next": "Sledeća fotografija"
+    },
+    "form": {
+      "unsaved_changes": "Nesačuvane promene",
+      "failure": {
+        "invalid": "Proverite označena polja i pokušajte ponovo.",
+        "conflict": "Zapis se promenio dok ste ga uređivali.",
+        "forbidden": "Nemate ovlašćenje za ovu radnju.",
+        "unauthorized": "Vaša sesija je istekla. Prijavite se ponovo.",
+        "offline": "Server nije dostupan. Proverite vezu i pokušajte ponovo.",
+        "failed": "Izmene nisu sačuvane. Pokušajte ponovo.",
+        "refresh": "Izmene su sačuvane, ali se ažurirani zapis nije mogao učitati. Osvežite stranicu."
+      },
+      "errors": {
+        "hidden_title": "Greške u poljima koja trenutno nisu prikazana:",
+        "request": "Zahtev {id}"
+      },
+      "sections": {
+        "errors": "Greške: {count}",
+        "done": "dovršeno"
+      },
+      "required": {
+        "label": "Obavezna polja",
+        "count": "{filled} od {total}",
+        "marker": "obavezno"
+      },
+      "group": {
+        "edit": "Uredi",
+        "foreign": "Čuvanje traži i podatke iz grupe: {groups}. Najpre dopunite tu grupu."
+      },
+      "select": {
+        "choose": "Izaberite…",
+        "search": "Pretraži",
+        "no_matches": "Nema rezultata",
+        "loading": "Učitavanje…",
+        "clear": "Očisti",
+        "done": "Gotovo",
+        "failed": "Pretraga nije uspela. Pokušajte ponovo.",
+        "load_failed": "Opcije nisu učitane."
+      },
+      "number": {
+        "invalid": "Unesite broj."
+      },
+      "file": {
+        "choose": "Izaberi datoteku",
+        "drop": "ili prevucite datoteku ovde",
+        "remove": "Ukloni",
+        "allowed": "Dozvoljeni formati: {formats}",
+        "max_size": "Najveća veličina: {size}",
+        "invalid_type": "Format datoteke nije podržan.",
+        "too_large": "Datoteka je veća od {size}."
+      },
+      "yes": "Da",
+      "no": "Ne",
+      "otp": {
+        "label": "Kod za potvrdu, {length} cifara"
+      },
+      "months": {
+        "long": {
+          "1": "januar",
+          "2": "februar",
+          "3": "mart",
+          "4": "april",
+          "5": "maj",
+          "6": "juni",
+          "7": "juli",
+          "8": "august",
+          "9": "septembar",
+          "10": "oktobar",
+          "11": "novembar",
+          "12": "decembar"
+        },
+        "short": {
+          "1": "jan",
+          "2": "feb",
+          "3": "mar",
+          "4": "apr",
+          "5": "maj",
+          "6": "jun",
+          "7": "jul",
+          "8": "aug",
+          "9": "sep",
+          "10": "okt",
+          "11": "nov",
+          "12": "dec"
+        },
+        "with_year": "{month} {year}."
+      },
+      "suggestions": {
+        "recent": "Nedavno",
+        "keys_complete": "Tab prihvata · ↑↓ bira · Esc zatvara",
+        "keys_pick": "↑↓ bira · Enter izabira · Esc zatvara"
+      },
+      "i18n": {
+        "languages": "Jezik",
+        "tab_written": "{language}, popunjeno",
+        "tab_empty": "{language}, prazno",
+        "missing": "Još nije napisano: {languages}.",
+        "required": "Obavezno za: {languages}.",
+        "copy": "Kopiraj {language} u prazne",
+        "more": "Još jezika: {count} · popunjeno: {filled}"
+      },
+      "phone": {
+        "country": "Država: {country}",
+        "countries": "Države",
+        "search": "Upišite državu ili pozivni broj…",
+        "common": "Često",
+        "all": "Sve države",
+        "no_match": "Nema države koja odgovara.",
+        "too_short": "Broj je prekratak za: {country}.",
+        "too_long": "Broj je predug za: {country}.",
+        "invalid": "Ovo nije ispravan broj za: {country}.",
+        "invalid_any": "Ovo nije ispravan telefonski broj.",
+        "kind_mobile": "Mobilni broj",
+        "kind_landline": "Fiksni broj",
+        "kind_toll_free": "Besplatni broj",
+        "kind_premium_rate": "Broj sa posebnom tarifom",
+        "kind_voip": "Internet (VoIP) broj",
+        "call": "Pozovi",
+        "message": "Poruka",
+        "copy": "Kopiraj",
+        "copied": "Kopirano"
+      },
+      "date": {
+        "calendar": "Kalendar",
+        "previous_month": "Prethodni mesec",
+        "next_month": "Sledeći mesec",
+        "previous_year": "Prethodna godina",
+        "next_year": "Sledeća godina",
+        "choose_month": "Izaberi mesec i godinu",
+        "open": "Otvori kalendar",
+        "invalid": "Unesite datum, na primer {example}.",
+        "unavailable": "Taj datum nije dostupan.",
+        "placeholder": "npr. {example} ili +7",
+        "keys": "Strelice menjaju dan, PgUp/PgDn mesec, Enter bira.",
+        "quick": "Brzi izbor",
+        "today": "Danas",
+        "tomorrow": "Sutra",
+        "week": "Za 7 dana",
+        "month_end": "Kraj meseca",
+        "next_working_day": "Sledeći radni dan",
+        "years": "Godine",
+        "previous_years": "Prethodne godine",
+        "next_years": "Sledeće godine",
+        "words": {
+          "today": "danas",
+          "tomorrow": "sutra",
+          "yesterday": "juče"
+        }
+      },
+      "time": {
+        "label": "Vreme",
+        "hour": "Sat",
+        "minute": "Minut",
+        "now": "Sada",
+        "invalid": "Unesite vreme, na primer 14:35.",
+        "step": "Minuti su u koracima od {step}.",
+        "open": "Izaberi vreme",
+        "placeholder": "npr. 14:35",
+        "at": "{date} u {time}",
+        "words": {
+          "now": "sada"
+        }
+      }
+    },
+    "errors": {
+      "unauthenticated": "Niste prijavljeni. Molimo prijavite se.",
+      "forbidden": "Nemate ovlašćenja za ovu radnju.",
+      "not_found": "Traženi zapis nije pronađen.",
+      "conflict": "Zapis je promenjen ili već postoji. Osvežite stranicu i pokušajte ponovo.",
+      "rate_limited": "Previše zahteva u kratkom vremenu. Sačekajte minutu pa pokušajte ponovo.",
+      "check_fields": "Proverite označena polja.",
+      "offline": "Server nije dostupan. Proverite vezu i pokušajte ponovo.",
+      "cancelled": "Zahtev je otkazan.",
+      "unexpected": "Došlo je do neočekivane greške. Molimo pokušajte ponovo.",
+      "authz": {
+        "forbidden": "Nemate pravo na ovu promenu na tom opsegu.",
+        "escalation": "Ta uloga ima dozvole koje i sami nemate, pa je ne možete dodeliti.",
+        "self_assignment": "Ne možete dodeliti ulogu sebi.",
+        "last_admin": "Ne možete ukloniti svoj poslednji pristup ulogama i korisnicima.",
+        "role_in_use": "Uloga je još dodeljena osobama. Najpre je zamenite ili uklonite iz njihovog pristupa.",
+        "invalid": "Uloga ili opseg nisu ispravni."
+      },
+      "identity": {
+        "signin": {
+          "failed": "Pogrešno korisničko ime ili lozinka.",
+          "locked": "Previše pogrešnih lozinki. Prijava je zaključana do {locked_until}.",
+          "inactive": "Ovaj korisnički nalog nije aktivan."
+        },
+        "session": {
+          "invalid": "Vaša sesija je istekla. Prijavite se ponovo.",
+          "current": "Ovo je sesija koju upravo koristite. Za izlaz se odjavite.",
+          "not_found": "Taj uređaj više nije prijavljen."
+        },
+        "locale": {
+          "invalid": "Ovaj jezik nije podržan."
+        },
+        "impersonation": {
+          "disabled": "Prijava kao druga osoba nije omogućena.",
+          "not_active": "Niste prijavljeni kao druga osoba."
+        },
+        "account": {
+          "not_found": "Ovaj korisnički nalog ne postoji.",
+          "inactive": "Ovaj korisnički nalog nije aktivan.",
+          "already_active": "Nalog je već aktivan.",
+          "already_inactive": "Nalog je već neaktivan.",
+          "self_deactivation": "Ne možete deaktivirati sopstveni nalog."
+        },
+        "code": {
+          "expired": "Kod više ne važi. Zatražite novi kod.",
+          "invalid": "Unesite šestocifreni kod.",
+          "mismatch": "Kod nije ispravan. Preostalo pokušaja: {attempts_left}.",
+          "no_pending": "Nema aktivnog koda. Zatražite novi kod.",
+          "not_delivered": "Kod nije moguće poslati. Pokušajte ponovo za minutu.",
+          "resend_too_soon": "Novi kod možete zatražiti za {retry_after} s.",
+          "too_many_attempts": "Previše neispravnih pokušaja. Zatražite novi kod.",
+          "too_many_requests": "Zatražili ste previše kodova. Pokušajte ponovo kasnije."
+        },
+        "email": {
+          "disabled": "E-adresu ovde nije moguće promeniti.",
+          "invalid": "Unesite ispravnu e-adresu.",
+          "taken": "Tu e-adresu već koristi drugi nalog.",
+          "unchanged": "To je već vaša e-adresa."
+        },
+        "list": {
+          "dir_invalid": "Smer sortiranja nije ispravan.",
+          "order_invalid": "Spisak se ne može sortirati po toj koloni.",
+          "view_invalid": "Taj prikaz ne postoji."
+        },
+        "login": {
+          "invalid": "Korisničko ime ne sme biti prazno, imati razmake niti biti predugo.",
+          "taken": "To korisničko ime je već zauzeto."
+        },
+        "name": {
+          "invalid": "Ime ne sme biti prazno niti predugo."
+        },
+        "password": {
+          "mismatch": "Lozinke se ne podudaraju.",
+          "unchanged": "Nova lozinka mora se razlikovati od trenutne.",
+          "weak": "Lozinka ne zadovoljava pravila za lozinke.",
+          "wrong": "Lozinka nije ispravna."
+        },
+        "phone": {
+          "invalid": "Broj telefona je predug."
+        },
+        "reauth": {
+          "locked": "Previše pogrešnih lozinki. Zbog bezbednosti pokušajte ponovo posle {locked_until}."
+        },
+        "activity": {
+          "area_unknown": "Ta oblast ne postoji.",
+          "range_invalid": "Kraj perioda je pre njegovog početka."
+        }
+      },
+      "notification": {
+        "setting": {
+          "enforced": "Ovo podešavanje određuje vaša organizacija pa ga ne možete promeniti."
+        },
+        "email": {
+          "unavailable": "E-pošta nije dostupna pa se ne može uključiti."
+        },
+        "quiet_hours": {
+          "invalid": "Tihi sati treba da imaju početak i kraj koji se razlikuju."
+        },
+        "category": {
+          "unknown": "Ta vrsta obaveštenja ne postoji."
+        }
+      }
+    },
+    "shortcuts": {
+      "title": "Prečice na tastaturi",
+      "or": "ili",
+      "hint": "Prečice ne rade dok pišete u polje ili je otvoren prozor.",
+      "show_help": "Prikaži prečice",
+      "focus_search": "Pretraži spisak",
+      "open_filters": "Otvori filtere",
+      "groups": {
+        "general": "Opšte",
+        "list": "Spisak",
+        "record": "Zapis"
+      }
+    },
+    "identity": {
+      "username": "Korisničko ime",
+      "signin": {
+        "title": "Prijavite se u svoj nalog",
+        "password": "Lozinka",
+        "submit": "Prijava",
+        "required": "Obavezno polje."
+      },
+      "expired": {
+        "title": "Vaša sesija je istekla",
+        "body": "Prijavite se ponovo da nastavite gde ste stali.",
+        "kept": "Vaše nesačuvane izmene na ovoj stranici su zadržane.",
+        "sign_out": "Odjavi me umesto toga"
+      },
+      "impersonation": {
+        "banner": "Prijavljeni ste kao {name}. Sve što ovde radite, radi se u njihovo ime.",
+        "banner_short": "Prijavljeni ste kao {name}",
+        "return": "Povratak na moj nalog",
+        "sign_in_as": "Prijavi se kao {name}"
+      }
+    },
+    "users": {
+      "title": "Korisnici",
+      "description": "Osobe koje se prijavljuju: njihovi podaci, prijave i sesije.",
+      "views": {
+        "active": "Aktivni",
+        "locked": "Zaključani",
+        "inactive": "Neaktivni",
+        "all": "Svi"
+      },
+      "columns": {
+        "person": "Osoba",
+        "login": "Korisničko ime",
+        "last_sign_in": "Poslednja prijava",
+        "status": "Status"
+      },
+      "never": "Nikad",
+      "status": {
+        "active": "Aktivna",
+        "locked": "Zaključana",
+        "inactive": "Neaktivna"
+      },
+      "create": {
+        "title": "Novi korisnik",
+        "subtitle": "Nakon čuvanja otvara se stranica osobe.",
+        "action": "Kreiraj korisnika",
+        "done": "Korisnik {name} je kreiran"
+      },
+      "fields": {
+        "login": "Korisničko ime",
+        "name": "Ime i prezime",
+        "email": "E-adresa",
+        "phone": "Broj telefona",
+        "locale": "Jezik",
+        "password": "Lozinka",
+        "password_repeat": "Ponovite lozinku"
+      },
+      "record": "Korisnik",
+      "sections_label": "Delovi osobe",
+      "sections": {
+        "general": "Osnovni podaci",
+        "signin": "Prijava",
+        "sessions": "Sesije",
+        "signins": "Istorija prijava",
+        "changes": "Promene",
+        "activity": "Radnje"
+      },
+      "section_groups": {
+        "person": "Osoba",
+        "access": "Pristup",
+        "activity": "Aktivnost"
+      },
+      "intro": {
+        "general": "Ko je osoba. Prijava i sesije imaju svoje stranice.",
+        "signin": "Kako se osoba prijavljuje: zaključavanje posle pogrešnih lozinki, nova lozinka i prijava u njeno ime.",
+        "sessions": "Uređaji na kojima je osoba sada prijavljena.",
+        "signins": "Svaka prijava u nalog osobe, uspešna i neuspešna.",
+        "changes": "Šta je promenjeno na nalogu osobe i ko je to uradio.",
+        "activity": "Šta je osoba radila: zapisi koje je kreirala, promenila ili obrisala, po oblastima i danima."
+      },
+      "groups": {
+        "person": "Osoba",
+        "person_footer": "Korisničkim imenom se osoba prijavljuje.",
+        "contact": "Kontakt"
+      },
+      "general": {
+        "saved": "Podaci su sačuvani",
+        "created": "Nalog kreiran {when}",
+        "last_sign_in": "poslednja prijava {when}",
+        "never_signed_in": "nikad se nije prijavila",
+        "all_changes": "Sve promene"
+      },
+      "actions": {
+        "deactivate": "Deaktiviraj…",
+        "deactivate_short": "Deaktiviraj",
+        "activate": "Aktiviraj"
+      },
+      "deactivate": {
+        "title": "Deaktivacija osobe",
+        "busy": "Deaktiviranje…",
+        "done_label": "Deaktivirana",
+        "done": "Osoba je deaktivirana: {name}",
+        "row_sub": "Odjavljuje osobu sa svih uređaja",
+        "signs_out": "Odjavljuje se sa svih uređaja ({n})",
+        "signs_out_sub": "Odmah, bez čekanja da sesija istekne",
+        "cannot_sign_in": "Više ne može da se prijavi",
+        "cannot_sign_in_sub": "Uloge i istorija ostaju; ponovnom aktivacijom sve važi kao pre"
+      },
+      "activate": {
+        "title": "Aktivirati osobu?",
+        "body": "{name} će ponovo moći da se prijavi. Uloge i istorija ostaju kakve su bile.",
+        "row_sub": "Ponovo omogućava prijavu; uloge i istorija ostaju",
+        "done": "Osoba je aktivirana: {name}",
+        "failed": "Osoba nije aktivirana. Pokušajte ponovo."
+      },
+      "password": {
+        "title": "Nova lozinka",
+        "action": "Postavi lozinku",
+        "footer": "Lozinku ne vidi niko, ni administrator; može se samo postaviti nova. Nova lozinka odjavljuje osobu sa svih uređaja i otključava je.",
+        "done": "Lozinka je postavljena: {name}"
+      },
+      "signin": {
+        "lock": "Zaključavanje",
+        "lock_footer": "Posle ponovljenih pogrešnih lozinki prijava se neko vreme zaključava. Ko je otključa, zapisano je u Izmenama i u istoriji prijava.",
+        "locked_title": "Prijava je zaključana",
+        "not_locked": "Prijava nije zaključana",
+        "not_locked_sub": "Zaključava se posle ponovljenih pogrešnih lozinki.",
+        "unlocks_at": "otključava se sama u {time}",
+        "unlock": "Otključaj",
+        "unlocked": "Prijava je otključana",
+        "unlock_failed": "Prijava nije otključana. Pokušajte ponovo.",
+        "password": "Lozinka",
+        "password_footer": "Lozinku ne vidi niko, ni administrator; može se samo postaviti nova. Nova lozinka odjavljuje osobu sa svih uređaja i otključava je.",
+        "set_password": "Postavi novu lozinku…",
+        "set_password_sub": "Recite je osobi lično; može je promeniti u Mom profilu",
+        "as_header": "Prijava u nalog: {name}",
+        "as_title": "Prijava kao ova osoba",
+        "as_sub": "Aplikaciju vidite kao ona, sa njenim pristupom.",
+        "as_footer": "Beleži se u istoriju prijava sa vašim imenom."
+      },
+      "sessions": {
+        "header": "Prijavljena na uređajima: {n}",
+        "footer": "Odjava važi odmah: sledeći klik na tom uređaju vodi na prijavu. Deaktivacija i nova lozinka odjavljuju sa svih uređaja.",
+        "own_footer": "Ovo je vaš nalog: svoje uređaje odjavljujete u Mom profilu.",
+        "end_all": "Odjavi sa svih uređaja",
+        "end_all_title": "Odjaviti sa svih uređaja?",
+        "end_all_body": "Osoba {name} moraće ponovo da se prijavi na svakom uređaju, uključujući prijave koje su otvorili drugi prijavom u njen nalog.",
+        "ended_all": "Osoba je odjavljena sa svih uređaja"
+      },
+      "changes": {
+        "empty": "Nema zabeleženih izmena.",
+        "diff": "{field}: {before} → {after}",
+        "actions": {
+          "created": "Nalog je kreiran",
+          "updated": "Podaci su promenjeni",
+          "deactivated": "Deaktivirana",
+          "activated": "Aktivirana",
+          "password": "Lozinka je promenjena",
+          "email": "E-adresa je promenjena",
+          "profile": "Profil je promenjen",
+          "unknown": "Nalog je promenjen"
+        },
+        "fields": {
+          "login": "Korisničko ime",
+          "name": "Ime i prezime",
+          "email": "E-adresa",
+          "phone": "Broj telefona",
+          "locale": "Jezik",
+          "password": "Lozinka",
+          "active": "Status"
+        },
+        "views": {
+          "all": "Sve",
+          "access": "Pristup",
+          "details": "Podaci"
+        }
+      },
+      "activity": {
+        "areas": {
+          "all": "Sve",
+          "identity": "Nalozi",
+          "other": "Ostalo"
+        },
+        "areas_label": "Oblasti",
+        "since": "Od",
+        "until": "Do",
+        "empty": "Nema radnji u ovom periodu.",
+        "footer": "Ovde je samo ono što aplikacija beleži. Radnja obavljena dok je neko bio prijavljen kao osoba to i kaže.",
+        "actions": {
+          "created": "Kreirala zapis",
+          "changed": "Promenila zapis",
+          "deleted": "Obrisala zapis",
+          "other": "Uradila nešto sa zapisom"
+        },
+        "signed_in_as": "Prijava kao · {name}",
+        "signed_in_as_other": "Prijava kao, neko drugi"
+      }
+    },
+    "account": {
+      "validation": {
+        "required": "Obavezno polje.",
+        "mismatch": "Lozinke se ne podudaraju."
+      },
+      "somebody_else": "Neko drugi",
+      "sessions": {
+        "empty": "Nema prijavljenih uređaja.",
+        "unknown_device": "Nepoznat uređaj",
+        "last_active": "poslednja aktivnost {when}",
+        "expires": "ističe {when}",
+        "this_device": "Ovaj uređaj",
+        "opened_by": "Prijava kao · {name}",
+        "opened_by_other": "Prijava kao, neko drugi",
+        "end": "Odjavi",
+        "end_title": "Odjaviti uređaj?",
+        "end_body": "Uređaj „{device}” odjavljuje se odmah.",
+        "ended": "Uređaj je odjavljen",
+        "end_failed": "Odjava nije uspela. Pokušajte ponovo."
+      },
+      "signins": {
+        "columns": {
+          "time": "Vreme",
+          "event": "Događaj",
+          "device": "Uređaj",
+          "ip": "IP adresa"
+        },
+        "empty": "Nema zapisa o prijavama.",
+        "footer_user": "Beleži se svaki pokušaj prijave u nalog, i odbijeni.",
+        "events": {
+          "signed_in": "Prijava",
+          "wrong_password": "Pogrešna lozinka",
+          "locked_out": "Zaključano",
+          "refused_inactive": "Neaktivan nalog",
+          "signed_in_as": "Prijava kao",
+          "unlocked": "Otključano",
+          "signed_out_everywhere": "Odjava sa svih uređaja",
+          "session_revoked": "Sesija završena",
+          "unknown": "Drugi događaj"
+        },
+        "events_by": {
+          "signed_in_as": "Prijava kao · {name}",
+          "unlocked": "Otključano · {name}",
+          "signed_out_everywhere": "Odjava sa svih uređaja · {name}",
+          "session_revoked": "Sesija završena · {name}"
+        },
+        "views": {
+          "all": "Sve",
+          "failed": "Neuspele"
+        }
+      }
+    },
+    "profile": {
+      "title": "Moj profil",
+      "description": "Vaši lični podaci, e-adresa, lozinka i sesije",
+      "menu": "Moj profil",
+      "details": {
+        "title": "Lični podaci",
+        "login_hint": "Korisničko ime može promeniti samo administrator.",
+        "submit": "Sačuvaj podatke",
+        "saved": "Lični podaci su sačuvani"
+      },
+      "email": {
+        "title": "E-adresa",
+        "current": "Trenutna adresa",
+        "change": "Promeni e-adresu",
+        "pending": "Čeka se potvrda nove adrese {email}.",
+        "valid_until": "Kod važi do {time}.",
+        "enter_code": "Unesi kod",
+        "cancel_change": "Odustani od promene",
+        "change_title": "Promena e-adrese",
+        "new_email": "Nova e-adresa",
+        "current_password": "Trenutna lozinka",
+        "request_hint": "Na novu adresu poslaćemo kod za potvrdu. Adresa se menja tek kad unesete taj kod.",
+        "send_code": "Pošalji kod",
+        "verify_title": "Potvrdite novu adresu",
+        "verify_description": "Unesite šestocifreni kod koji smo poslali na {email}.",
+        "verify": "Potvrdi",
+        "resend": "Pošalji novi kod",
+        "resend_in": "Novi kod za {time}",
+        "request_new": "Zatraži novi kod",
+        "changed": "E-adresa je promenjena",
+        "cancelled": "Promena e-adrese je otkazana",
+        "code_sent": "Novi kod poslat je na {email}",
+        "verify_failed": "Kod nije moguće proveriti. Pokušajte ponovo.",
+        "resend_failed": "Kod nije moguće poslati. Pokušajte ponovo.",
+        "cancel_failed": "Promena nije otkazana. Pokušajte ponovo."
+      },
+      "password": {
+        "title": "Promena lozinke",
+        "current": "Trenutna lozinka",
+        "new": "Nova lozinka",
+        "repeat": "Ponovite novu lozinku",
+        "show": "Prikaži lozinke",
+        "hide": "Sakrij lozinke",
+        "submit": "Promeni lozinku",
+        "changed": "Lozinka je promenjena. Odjavljeni ste na ostalim uređajima."
+      },
+      "sessions": {
+        "title": "Sesije",
+        "footer": "Ovaj uređaj je označen; sa njega se izlazi odjavom. Svaki drugi uređaj možete odjaviti ovde."
+      },
+      "signins": {
+        "title": "Istorija prijava",
+        "footer": "Svaka prijava u vaš nalog, i odbijena. Ako neku ne prepoznajete, promenite lozinku."
+      }
+    },
+    "notifications": {
+      "title": "Obaveštenja",
+      "open": "Obaveštenja",
+      "open_unread": "Obaveštenja, nepročitano: {count}",
+      "unread": "nepročitano",
+      "empty_title": "Nemate obaveštenja",
+      "empty_description": "Ovde ćete videti sve što traži vašu pažnju.",
+      "load_error": "Obaveštenja se nisu mogla učitati.",
+      "load_more": "Prikaži starija",
+      "load_more_error": "Starija obaveštenja se nisu mogla učitati.",
+      "mark_all_read": "Označi sve kao pročitano",
+      "dead_letters": {
+        "title": "Neuspeli događaji",
+        "description": "Događaji koje potrošač nije uspeo da obradi ni posle ponovnih pokušaja. Ponovni pokušaj vraća događaj u red.",
+        "columns": {
+          "event": "Događaj",
+          "consumer": "Potrošač",
+          "attempts": "Pokušaji",
+          "last_error": "Poslednja greška",
+          "dead_at": "Odustalo"
+        },
+        "event_id": "Događaj #{id}",
+        "event_gone": "Događaj više ne postoji",
+        "actions": {
+          "retry": "Pošalji ponovo",
+          "retry_all": "Pošalji ponovo sve za ovog potrošača"
+        },
+        "retry_all": {
+          "title": "Poslati ponovo sve za ovog potrošača?",
+          "message": "Svi neuspeli događaji potrošača „{consumer}” vraćaju se u red i ponovo se obrađuju.",
+          "confirm": "Pošalji sve ponovo"
+        },
+        "toasts": {
+          "retried": "Događaj je vraćen u red i uskoro će se ponovo obraditi.",
+          "retried_all": "Događaja vraćeno u red: {count}"
+        },
+        "errors": {
+          "not_found": "Ovaj događaj je već vraćen u red ili više ne postoji.",
+          "event_gone": "Događaj je obrisan pa se ne može ponovo poslati."
+        },
+        "all_consumers": "Svi potrošači"
+      },
+      "settings": {
+        "title": "Podešavanja obaveštenja",
+        "description": "Izaberite šta vam stiže e-poštom i kada e-pošta čeka.",
+        "open": "Podešavanja obaveštenja",
+        "email": {
+          "title": "Obavesti me e-poštom o",
+          "note": "U aplikaciji stiže svako obaveštenje, uvek.",
+          "in_app": "U aplikaciji: uvek uključeno",
+          "locked": "Određuje vaša organizacija",
+          "unavailable": "E-pošta ovde nije dostupna pa obaveštenja stižu samo u aplikaciji.",
+          "save_failed": "Podešavanje nije sačuvano."
+        },
+        "quiet": {
+          "title": "Tihi sati",
+          "enabled": "Zadrži e-poštu tokom tihih sati",
+          "start": "Od",
+          "end": "Do",
+          "summary_on": "Između {start} i {end} ({zone}) e-pošta čeka do kraja tihih sati.",
+          "summary_on_no_zone": "Između {start} i {end} e-pošta čeka do kraja tihih sati.",
+          "summary_off": "Tihi sati su isključeni: e-pošta se šalje čim obaveštenje nastane.",
+          "same": "Od i do moraju biti različita vremena.",
+          "required": "Izaberite vreme.",
+          "submit": "Sačuvaj tihe sate",
+          "saved": "Tihi sati su sačuvani."
+        }
+      }
+    }
+  }
+}

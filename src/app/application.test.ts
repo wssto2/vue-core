@@ -474,7 +474,7 @@ describe("start failures", () => {
     const probe = defineComponent({ setup() { environment = useApplication(); return () => h("p", "x"); } });
     const feature = defineFeature({ id: "f", routes: [{ name: "f", path: "/f", component: probe }] });
     await start(createApplication(options(platform, [loginFeature, feature], "/f")));
-    expect(environment!.locales).toEqual(["en", "hr", "bs", "sl"]);
+    expect(environment!.locales).toEqual(["en", "hr", "bs", "sl", "sr-Latn"]);
     expect(environment!.locale.value).toBe("en");
     await nextTick();
   });

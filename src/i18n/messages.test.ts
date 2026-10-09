@@ -13,11 +13,11 @@ const texts = (locale: keyof typeof coreMessages) => Object.fromEntries(entries(
 describe("core messages", () => {
   const reference = entries(coreMessages.en);
 
-  it.each(["hr", "bs", "sl"] as const)("%s has exactly the keys of en", (locale) => {
+  it.each(["hr", "bs", "sl", "sr-Latn"] as const)("%s has exactly the keys of en", (locale) => {
     expect(entries(coreMessages[locale]).map(([key]) => key).sort()).toEqual(reference.map(([key]) => key).sort());
   });
 
-  it.each(["hr", "bs", "sl"] as const)("%s keeps the placeholders of en and the count of | segments", (locale) => {
+  it.each(["hr", "bs", "sl", "sr-Latn"] as const)("%s keeps the placeholders of en and the count of | segments", (locale) => {
     const own = texts(locale);
     for (const [key, text] of reference) {
       expect(placeholders(own[key]!), key).toEqual(placeholders(text));
@@ -40,7 +40,16 @@ describe("core messages", () => {
     expect(bs["core.toast.notifications"]).toBe("Obavještenja");
   });
 
-  it("keeps no Croatian save or choose verb in Bosnian", () => {
-    for (const locale of ["bs"] as const) for (const [key, text] of entries(coreMessages[locale])) expect(text, `${locale} ${key}`).not.toMatch(/\b(spremi|sprem|odaberi|nespremljen)/i);
+  it("says the same in ekavian Latin Serbian", () => {
+    const sr = texts("sr-Latn");
+    expect(sr["core.actions.save"]).toBe("Sačuvaj");
+    expect(sr["core.form.unsaved_changes"]).toBe("Nesačuvane promene");
+    expect(sr["core.form.select.choose"]).toBe("Izaberite…");
+    expect(sr["core.toast.notifications"]).toBe("Obaveštenja");
+    expect(sr["core.form.date.next_month"]).toBe("Sledeći mesec");
+  });
+
+  it("keeps no Croatian save or choose verb in Bosnian or Serbian", () => {
+    for (const locale of ["bs", "sr-Latn"] as const) for (const [key, text] of entries(coreMessages[locale])) expect(text, `${locale} ${key}`).not.toMatch(/\b(spremi|sprem|odaberi|nespremljen)/i);
   });
 });

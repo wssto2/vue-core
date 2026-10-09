@@ -2,6 +2,7 @@ import bs from "./bs.json";
 import en from "./en.json";
 import hr from "./hr.json";
 import sl from "./sl.json";
+import srLatn from "./sr-Latn.json";
 
 /** A group of texts: every key is a sentence. */
 type Texts<Key extends string> = { [K in Key]: string };
@@ -249,11 +250,12 @@ export type CoreMessages = {
  * merges them into its vue-i18n messages (`i18n.global.mergeLocaleMessage(locale, coreMessages[locale])`)
  * and may override any key afterwards.
  */
-export const coreMessages: { readonly en: CoreMessages; readonly hr: CoreMessages; readonly bs: CoreMessages; readonly sl: CoreMessages } = {
+export const coreMessages: { readonly en: CoreMessages; readonly hr: CoreMessages; readonly bs: CoreMessages; readonly sl: CoreMessages; readonly "sr-Latn": CoreMessages } = {
   en,
   hr,
   bs,
   sl,
+  "sr-Latn": srLatn,
 };
 
 export type CoreLocale = keyof typeof coreMessages;

@@ -78,7 +78,7 @@ export interface ApplicationLocaleOptions {
   initial?: string;
   /** The locale whose texts stand in for missing ones. Default `en`. */
   fallback?: string;
-  /** The locales the application offers. Default: the library's (`en`, `hr`, `bs`, `sl`). */
+  /** The locales the application offers. Default: the library's (`en`, `hr`, `bs`, `sl`, `sr-Latn`). */
   supported?: readonly string[];
   /**
    * The flag shown beside each locale's name in the language menu, as an ISO 3166-1 country code: `{ en: "GB", sl: "SI" }`.

@@ -83,7 +83,7 @@ describe("createApplication validates the composition at startup", () => {
     });
 
     expect(issuesOf([login, f]).map((issue) => issue.message)).toEqual([
-      'the namespace "f" has a loader for "de", which is not a supported locale (en, hr, bs, sl).',
+      'the namespace "f" has a loader for "de", which is not a supported locale (en, hr, bs, sl, sr-Latn).',
       'the route "f" needs the message namespace "nobody", which nobody declares.',
       'the contribution "bell" needs the message namespace "alsonobody", which nobody declares.',
     ]);
@@ -138,10 +138,10 @@ describe("createApplication validates the composition at startup", () => {
 
   it("checks the locales", () => {
     expect(issuesOf([login], { locale: { fallback: "de" } }).map((issue) => issue.message)).toEqual([
-      'the fallback locale "de" is not among the supported locales (en, hr, bs, sl).',
+      'the fallback locale "de" is not among the supported locales (en, hr, bs, sl, sr-Latn).',
     ]);
     expect(issuesOf([login], { locale: { flags: { en: "GB", de: "DE" } } }).map((issue) => issue.message)).toEqual([
-      'locale.flags names the locale "de", which is not among the supported locales (en, hr, bs, sl).',
+      'locale.flags names the locale "de", which is not among the supported locales (en, hr, bs, sl, sr-Latn).',
     ]);
   });
 });
