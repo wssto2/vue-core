@@ -20,7 +20,7 @@ export { default as DateField } from "./DateField.vue";
 export { default as DateTimeField } from "./DateTimeField.vue";
 export { default as Field } from "./Field.vue";
 export { fieldDefaults, fieldProps, formEditableKey, useFieldMode } from "./field";
-export type { FieldProps, FormRowLayout } from "./field";
+export type { FieldProps, FieldSlots, FormRowLayout } from "./field";
 export { default as FileField } from "./FileField.vue";
 export { checkFile, formatBytes } from "./file";
 export type { FileProblem } from "./file";

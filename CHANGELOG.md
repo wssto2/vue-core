@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.16 — 2026-10-09
+
+Bosnian and Serbian in the library's own words, a trailing slot on every field, and numbers as written. Found when ARV's dealer, location and follow-up forms moved onto the library.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`sr-Latn`: the library's Serbian** (ekavian, Latin script), every `core` key, registered beside `bs` in `coreMessages`. The default `locale.supported` is now `en`, `hr`, `bs`, `sl`, `sr-Latn`. Name the locale `sr-Latn` (a bare `sr` prints Cyrillic) and `bs`, not a market code (`ba`, `rs`). Before, an application that listed `sr-Latn` showed the `fallback` language's library texts; now it shows Serbian.
+- **`#trailing`, `#labelTrailing` and `#readonly` on every field**, as `Field` has them: `TextField`, `TextareaField`, `NumberField`, `MoneyField`, `SelectField`, `MultiSelectField`, `ComboField`, `SegmentedField`, `ChoiceChips`, `CardSelectField`, `SwitchField`, `DateField`, `DateTimeField`, `TimeField`, `MonthYearField`, `FileField` (`PhotoField` and `I18nField` pass the ones they do not use themselves). Until now every field swallowed them, so a per-row Save beside a select was not possible. Typed as `FieldSlots` (`@wssto2/vue-core/form`).
+- `NumberField` **`minDecimals`**: the fraction digits always shown, at most `decimals` (default `decimals`, so an amount still reads `1.50`). `:decimals="7" :min-decimals="0"` reads `43.566139`, not `43.5661390`.
+- `NumberField` **`mono`**: the monospaced face of `TextField mono`, editing and reading.
+
+### Changes to existing behaviour
+- **The `bs` texts are Bosnian**: 70 of 688 values changed, to the words ARV's own Bosnian screens use (`Sačuvaj`, `Nesačuvane promjene`, `Izaberite…`, `Ova sedmica`, `Obavještenja`, `ovlaštenja`, `opseg`, `Popis`). Keys, placeholders and `|` counts are unchanged. An application that overrode a key to say the Bosnian word is unaffected; one that pins a Croatian word in a `bs` test is not.
+- **A `Field` on its own renders `#trailing`** beside the control (it used to render it only in a group's row).
+- The language tab of an `I18nField` for `sr-Latn` reads `SR-LATN`.
+
 ## 0.4.15 — 2026-10-09
 
 Six gaps in forms, found when the first two ARV forms moved onto the library.

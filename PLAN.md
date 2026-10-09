@@ -149,3 +149,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | 0.4.13 | Done | branch `release-0413` | `SectionNavigator` hub layout (`desktop`/`compact` `"hub"`), for ARV's vehicle records. |
 | 0.4.14 | Done | branch `release-0.4.14` | `createApplication({ describeError })` and `useLoad`'s `abandon()`, for ARV's d7 screens. |
 | 0.4.15 | Done | branch `release-0415` | Six form gaps from ARV's cutover e1: a non-clearable `SelectField` emits its value, `labelHidden`, `NumberField` `maxDigits`, `useSaveChrome` (Save disabled while clean, optional Cancel), `useHiddenFieldErrors`, `createApplication({ describeFieldError })`. |
+| 0.4.16 | Done | branch `release-0416` | Bosnian and Serbian wording from cutover e2a: `bs` in the words ARV's screens use, a new `sr-Latn` catalogue, `#trailing` / `#labelTrailing` / `#readonly` passed through by every field (`FieldSlots`), `NumberField` `minDecimals` and `mono`. |
