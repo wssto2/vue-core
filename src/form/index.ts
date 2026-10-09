@@ -61,6 +61,8 @@ export { useGroupSheet } from "./useGroupSheet";
 export type { GroupSheetForm, GroupSheetOptions, GroupSheetState } from "./useGroupSheet";
 export { default as EditorPage } from "./EditorPage.vue";
 export { useSectionStates } from "./sectionStates";
+export { useHiddenFieldErrors } from "./useHiddenFieldErrors";
+export type { HiddenFieldError } from "./useHiddenFieldErrors";
 export { useSaveChrome } from "./useSaveChrome";
 export type { SaveChromeOptions } from "./useSaveChrome";
 export { default as CommandDialog } from "./CommandDialog.vue";

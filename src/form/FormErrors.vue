@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import Banner from "../state/Banner.vue";
 import type { Form } from "./useForm";
+import { useHiddenFieldErrors } from "./useHiddenFieldErrors";
 
 /**
  * What a form tells in words when the fields cannot: why a submit failed (conflict, no permission, expired
@@ -13,7 +14,7 @@ import type { Form } from "./useForm";
  *   <FormErrors :form="form" :label="fieldLabel" />
  *
  * A field counts as shown while an element carries `data-field-key="<name>"` (`form.bind()` sets it; `fieldKey(path)` does for a field wired by hand,
- * such as one inside a list), or carries the name of something that contains it.
+ * such as one inside a list), or carries the name of something that contains it. `useHiddenFieldErrors` is the same list for your own use.
  */
 const props = withDefaults(defineProps<{
   form: Pick<Form<object>, "failure" | "errors">;
@@ -24,20 +25,10 @@ const props = withDefaults(defineProps<{
 }>(), { label: (field: string) => field, scope: null });
 
 const { t } = useI18n();
-const hidden = ref<readonly { field: string; message: string }[]>([]);
-
-watch(
-  () => props.form.errors.all(),
-  async (errors) => {
-    await nextTick();
-    const root = props.scope ?? document;
-    // A path is shown when some element carries it, or one of the paths it is inside (`lines` holds `lines.0.quantity`).
-    const shown = new Set([...root.querySelectorAll("[data-field-key]")].flatMap((element) => (element.getAttribute("data-field-key") ?? "").split(/\s+/)));
-    const isShown = (path: string) => path.split(".").some((_, index, parts) => shown.has(parts.slice(0, index + 1).join(".")));
-    hidden.value = Object.entries(errors).flatMap(([path, messages]) => (messages[0] && !isShown(path) ? [{ field: path, message: messages[0] }] : []));
-  },
-  { immediate: true },
-);
+const hidden = useHiddenFieldErrors({
+  get form() { return props.form; },
+  root: () => props.scope,
+});
 
 const failure = computed(() => props.form.failure.value);
 const tone = computed(() => (failure.value?.kind === "conflict" || failure.value?.kind === "refresh" ? "warning" : "critical"));
