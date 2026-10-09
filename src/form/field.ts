@@ -4,6 +4,8 @@ import { useCompactPresentation } from "../internal/mediaQuery";
 /** What every field takes besides its value. A field is one labelled row: the label, the control, a hint, the error. */
 export interface FieldProps {
   label?: string;
+  /** The label stays the control's accessible name (and the read-mode row's) but is not drawn: for a field whose group header already says it. */
+  labelHidden?: boolean;
   /** A sentence under the label (under the control outside a group) that says what to enter. */
   hint?: string;
   /** The message to show; `form.bind()` supplies it. */
@@ -25,6 +27,7 @@ export interface FieldProps {
 /** Defaults of `FieldProps` for `withDefaults(defineProps<FieldProps & …>(), { ...fieldDefaults, … })`. */
 export const fieldDefaults = {
   label: undefined,
+  labelHidden: false,
   hint: undefined,
   error: undefined,
   required: false,
@@ -80,7 +83,7 @@ export function useFieldMode(props: { editable?: boolean; disabled?: boolean; pr
   return { editable, locked };
 }
 
-const FIELD_KEYS = ["label", "hint", "error", "required", "editable", "disabled", "lockedReason", "presentation", "name"] as const;
+const FIELD_KEYS = ["label", "labelHidden", "hint", "error", "required", "editable", "disabled", "lockedReason", "presentation", "name"] as const;
 
 /** The `FieldProps` part of a control's props, to pass on to its `Field`: `<Field v-bind="fieldProps(props)">`. */
 export function fieldProps(props: FieldProps): FieldProps {

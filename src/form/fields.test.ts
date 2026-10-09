@@ -374,3 +374,36 @@ describe("compact presentation", () => {
     media.restore();
   });
 });
+
+describe("labelHidden", () => {
+  const sr = (el: Element | null) => el?.classList.contains("sr-only");
+
+  it("keeps the label as the control's accessible name but does not draw it (ungrouped and grouped, TextField and ChoiceChips)", () => {
+    const text = mount(TextField, { modelValue: "", label: "Name", labelHidden: true });
+    expect(sr(screen.getByLabelText("Name").ownerDocument.querySelector("label"))).toBe(true);
+    expect((screen.getByLabelText("Name") as HTMLInputElement).tagName).toBe("INPUT");
+    text.unmount();
+
+    const grouped = mountGroup((f) => h(TextField, { ...f.bind("name"), label: "Name", labelHidden: true }));
+    expect(screen.getByLabelText("Name").tagName).toBe("INPUT");
+    expect(sr(grouped.container.querySelector("label"))).toBe(true);
+    expect(grouped.container.querySelector('[data-test="form-row"]')?.getAttribute("data-layout")).toBe("stacked");
+    grouped.unmount();
+
+    mount(ChoiceChips, { modelValue: [], label: "Brands", labelHidden: true, options: [{ value: "a", label: "A" }] });
+    expect(screen.getByRole("group", { name: "Brands" })).toBeTruthy();
+  });
+
+  it("hides the label in read mode too, while screen readers still get it", () => {
+    const { container } = mountGroup((f) => { f.values.name = "Ann"; return h(TextField, { ...f.bind("name"), label: "Name", labelHidden: true }); }, { editable: false });
+    const label = container.querySelector("span.sr-only, label.sr-only");
+    expect(label?.textContent?.trim()).toBe("Name");
+    expect(container.textContent).toContain("Ann");
+    expect(container.querySelector('[data-test="form-row"]')?.getAttribute("data-layout")).toBe("stacked");
+  });
+
+  it("is a visible label by default", () => {
+    mount(TextField, { modelValue: "", label: "Name" });
+    expect(sr(document.querySelector("label"))).toBe(false);
+  });
+});

@@ -76,14 +76,18 @@ const shown = computed(() => (typeof props.value === "boolean" ? (props.value ? 
 const hiddenInGroup = computed(() => !!group && !editable.value && group.hideEmpty.value && !hasValue.value && !slots.readonly);
 
 const describedby = computed(() => [props.hint && editable.value ? hintId.value : null, props.error ? errorId.value : null].filter(Boolean).join(" ") || undefined);
-const row = computed(() => (editable.value ? props.rowLayout : props.rowLayout === "stacked" ? "stacked" : "value"));
+// A hidden label leaves no label column: an entry or a value row stacks.
+const row = computed(() => {
+  const layout = editable.value ? props.rowLayout : props.rowLayout === "stacked" ? "stacked" : "value";
+  return props.labelHidden && (layout === "entry" || layout === "value") ? "stacked" : layout;
+});
 const progress = computed(() =>
   editable.value && !locked.value && props.required ? { "data-field-required": "true", "data-field-filled": hasValue.value ? "true" : undefined } : {},
 );
 </script>
 
 <template>
-  <FormRow v-if="group && !hiddenInGroup" v-bind="progress" :label="props.label" :for="editable ? controlId : undefined" :sub="editable ? props.hint : undefined"
+  <FormRow v-if="group && !hiddenInGroup" v-bind="progress" :label="props.label" :label-hidden="props.labelHidden" :for="editable ? controlId : undefined" :sub="editable ? props.hint : undefined"
     :sub-id="hintId" :required="editable && !locked && props.required" :layout="row" :label-align="row === 'entry' ? props.rowLabelAlign : undefined"
     :error="editable ? props.error : undefined" :error-id="errorId" :data-field-locked="locked ? 'true' : undefined">
     <div class="relative w-full min-w-0" :title="locked ? props.lockedReason : undefined">
@@ -102,8 +106,8 @@ const progress = computed(() =>
   </FormRow>
 
   <div v-else-if="!group" v-bind="progress" :data-field-error="props.error ? 'true' : undefined" class="flex min-w-0 flex-col gap-1">
-    <div v-if="props.label || (editable && slots.labelTrailing)" class="flex items-center justify-between gap-3">
-      <label v-if="props.label" :for="editable ? controlId : undefined" class="text-footnote font-medium text-content-muted">
+    <div v-if="props.label || (editable && slots.labelTrailing)" :class="props.labelHidden && !(editable && slots.labelTrailing) ? 'contents' : 'flex items-center justify-between gap-3'">
+      <label v-if="props.label" :for="editable ? controlId : undefined" :class="props.labelHidden ? 'sr-only' : 'text-footnote font-medium text-content-muted'">
         {{ props.label }}<span v-if="editable && props.required" class="text-content-destructive" aria-hidden="true"> *</span>
       </label>
       <slot v-if="editable" name="labelTrailing" />
