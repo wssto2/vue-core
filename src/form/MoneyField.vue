@@ -11,19 +11,18 @@ import NumberField from "./NumberField.vue";
  *   <MoneyField v-bind="form.bind('price')" currency="EUR" :label="t('price')" />
  */
 const props = withDefaults(
-  defineProps<FieldProps & { currency: string; decimals?: number; negative?: boolean; width?: Exclude<ControlWidth, "content"> }>(),
-  { ...fieldDefaults, decimals: 2, negative: false, width: "sm" },
+  defineProps<FieldProps & { modelValue?: number | null; currency: string; decimals?: number; negative?: boolean; width?: Exclude<ControlWidth, "content"> }>(),
+  { ...fieldDefaults, modelValue: undefined, decimals: 2, negative: false, width: "sm" },
 );
 
-const model = defineModel<number | null>({ default: null });
-const emit = defineEmits<{ focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
+const emit = defineEmits<{ "update:modelValue": [value: number | null]; focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 const field = useTemplateRef<InstanceType<typeof NumberField>>("field");
 defineExpose({ focus: () => field.value?.focus() });
 defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <NumberField ref="field" v-model="model" v-bind="fieldProps(props)" :decimals="props.decimals" :negative="props.negative" :suffix="props.currency" :width="props.width" @focus="emit('focus', $event)" @blur="emit('blur', $event)">
+  <NumberField ref="field" :model-value="props.modelValue" @update:model-value="emit('update:modelValue', $event)" v-bind="fieldProps(props)" :decimals="props.decimals" :negative="props.negative" :suffix="props.currency" :width="props.width" @focus="emit('focus', $event)" @blur="emit('blur', $event)">
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
     <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
     <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>

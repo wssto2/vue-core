@@ -23,6 +23,7 @@ import { numberMarks, parseNumber } from "./number";
  *
  * Typing "1,5" mid-edit is never rewritten under the cursor: the text is the user's until the field loses focus.
  * `:max-digits="5"` takes at most five digits (a postal code): typing a sixth does nothing, pasting a longer number keeps its first five.
+ * However the field is emptied (typing, a paste of nothing, a cut, a test's `fill("")`) it emits `null`, also when the value it was given was already `null`.
  * Limits (`min`, `max`) are the validator's job; the field only keeps what cannot be a number out.
  */
 const props = withDefaults(
@@ -39,17 +40,24 @@ const props = withDefaults(
     maxDigits?: number;
     /** The monospaced face of `TextField mono` (coordinates, codes). */
     mono?: boolean;
+    modelValue?: number | null;
     placeholder?: string;
     prefix?: string;
     suffix?: string;
     /** sm 10rem (the default for numbers) · md · lg · full. */
     width?: Exclude<ControlWidth, "content">;
   }>(),
-  { ...fieldDefaults, decimals: 0, minDecimals: undefined, negative: false, grouping: true, maxDigits: undefined, mono: false, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
+  { ...fieldDefaults, modelValue: undefined, decimals: 0, minDecimals: undefined, negative: false, grouping: true, maxDigits: undefined, mono: false, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
 );
 
-const model = defineModel<number | null>({ default: null });
-const emit = defineEmits<{ focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
+const emit = defineEmits<{ "update:modelValue": [value: number | null]; focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
+// Not `defineModel`: it drops an update equal to the value it was given, and a parent that shows a 0 as empty (null) would never hear the field cleared.
+const local = ref<number | null>(null);
+const model = computed(() => (props.modelValue !== undefined ? props.modelValue : local.value));
+function update(next: number | null) {
+  local.value = next;
+  emit("update:modelValue", next);
+}
 const format = useFormat();
 const input = useTemplateRef<HTMLInputElement>("input");
 const inRow = !!useFormGroup();
@@ -94,17 +102,28 @@ function onInput(event: Event) {
   if (next !== element.value) element.value = next;
   text.value = next;
   const parsed = read(next);
-  if (parsed !== undefined) model.value = parsed;
-  else model.value = null;
+  update(parsed ?? null);
 }
 
+// A select-all made around the focus (select(), then focus(): a test's fill("") or "select on focus") is lost when the text is swapped for the typed one;
+// the `select` event it fires arrives with the caret collapsed, and the first key or pointer press after that is the user's own.
+let swapped = false;
+function onSelect(event: Event) {
+  const element = event.target as HTMLInputElement;
+  if (swapped && element.selectionStart === element.selectionEnd) element.select();
+  swapped = false;
+}
 function onFocus(event: FocusEvent) {
   focused.value = true;
   text.value = editing(model.value);
+  // Now, not on Vue's next render: a select() right after focus() must select the text that stays.
+  (event.target as HTMLInputElement).value = text.value;
+  swapped = true;
   emit("focus", event);
 }
 
 function onBlur(event: FocusEvent) {
+  swapped = false;
   focused.value = false;
   text.value = shown(model.value);
   emit("blur", event);
@@ -123,7 +142,7 @@ defineSlots<FieldSlots>();
           :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
           class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-right text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
           :class="props.mono ? 'font-mono' : ''"
-          @input="onInput" @focus="onFocus" @blur="onBlur" />
+          @input="onInput" @focus="onFocus" @blur="onBlur" @select="onSelect" @keydown="swapped = false" @pointerdown="swapped = false" />
         <span v-if="props.suffix" class="shrink-0 text-footnote text-content-muted">{{ props.suffix }}</span>
       </div>
     </template>
