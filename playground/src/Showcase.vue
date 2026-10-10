@@ -18,6 +18,7 @@ import {
   type AsyncState,
 } from "@wssto2/vue-core/state";
 import { ref, useTemplateRef } from "vue";
+import LocalePanel from "./LocalePanel.vue";
 
 const modal = useTemplateRef<InstanceType<typeof Modal>>("modal");
 const sheet = useTemplateRef<InstanceType<typeof Sheet>>("sheet");
@@ -159,6 +160,8 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         <Button size="xs" @click="progress = Math.min(progress + 25, 100)">Advance</Button>
       </div>
     </Panel>
+
+    <LocalePanel />
 
     <Panel title="Content" collapsible>
       <div class="flex flex-col gap-4">

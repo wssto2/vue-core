@@ -187,7 +187,7 @@ const assign = useCommand({
   </CommandDialog>
 ```
 
-Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
+Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. While the page still waits for something the call needs (a proposal loading), `:confirm-disabled="loading"` disables the primary action: the fields keep what was typed, Cancel and the discard guard work, and `run()` does nothing until it clears. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
 
 ### One record in a dialog (create and edit)
 

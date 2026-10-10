@@ -17,7 +17,7 @@ installPlatform(app, platform);
 
 // What the library's components need from their app: the texts, the routes their links go to, the app's
 // icons, the page chrome (the phone nav bar would read it) and the bottom dock.
-const i18n = createI18n({ legacy: false, locale: "en", fallbackLocale: "en", messages: coreMessages });
+const i18n = createI18n({ legacy: false, locale: new URLSearchParams(location.search).get("locale") ?? "en", fallbackLocale: "en", messages: coreMessages });
 app.use(i18n);
 installFormatting(app, createFormatting({ locale: () => i18n.global.locale.value }));
 app.use(createRouter({ history: createWebHashHistory(), routes: [{ path: "/:rest(.*)*", component: { render: () => null } }] }));

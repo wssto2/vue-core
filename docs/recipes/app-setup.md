@@ -98,7 +98,7 @@ The start locale is the server's (`config.locale`) when it is among `locale.supp
 
 The account menu (desktop popover and phone sheet) lists the languages by their own name. With `locale.flags` (`{ en: "GB", hr: "HR" }`, ISO country codes) each row also shows that country's flag, as an SVG that loads when it is first shown; a locale without an entry shows its name alone. The mapping is yours because a flag stands for a language, not a country.
 
-The library's Bosnian is `bs` and its Serbian is `sr-Latn` (ekavian, Latin script; a bare `sr` would print Cyrillic): name the locales that way, not by market (`ba`, `rs`), which `Intl` reads as other languages. A locale the library has no texts for shows the `locale.fallback` language's.
+The library's Bosnian is `bs` and its Serbian is `sr-Latn` (ekavian, Latin script; a bare `sr` would print Cyrillic): name the locales that way, not by market (`ba`, `rs`), which `Intl` reads as other languages. A locale the library has no texts for shows the `locale.fallback` language's. Chromium's `Intl` has no Bosnian data (it formats `bs` as English and still reports `bs`), so the library hands `Intl` `sr-Latn-BA` for `bs`: numbers, amounts, dates, calendars, relative times and country names read Bosnian in every browser, with nothing to configure.
 
 ## Permissions in the UI
 
