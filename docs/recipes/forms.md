@@ -189,6 +189,20 @@ const assign = useCommand({
 
 Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. While the page still waits for something the call needs (a proposal loading), `:confirm-disabled="loading"` disables the primary action: the fields keep what was typed, Cancel and the discard guard work, and `run()` does nothing until it clears. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
 
+### A command that asks first
+
+An irreversible command puts its question after the inputs check out and before anything is sent. `ask` reads the validated input (and whatever the page holds, such as what is still unpaid) and returns the question, or `null` for none this time; `CommandDialog` presents it over the filled form. Cancel returns to the form untouched and sends nothing; Yes calls with the usual idempotency key, and a refusal from the server lands on the form like any other. Name the consequence in the title and say exactly what Yes does in `confirmLabel`.
+
+<!-- example: docs/examples/forms/components/ArchiveDialog.vue:13-18 -->
+```ts
+const close = useCommand({
+  defaults: () => ({ closedOn: null as string | null }),
+  run: (input, { idempotencyKey }) => api.assign(ticket.id.value ?? 0, { assignee_id: 0, note: input.closedOn ?? "" }, idempotencyKey),
+  done: (saved) => ticket.update(saved),
+  ask: (input) => (input.closedOn === null ? null : { title: t("forms.closeTitle"), message: t("forms.closeBody", { date: input.closedOn }), confirmLabel: t("forms.close"), tone: "warning" }),
+});
+```
+
 ### One record in a dialog (create and edit)
 
 An admin list where each row is a small record is one dialog used twice: **new** (defaults, with "Save and add another") and **edit** (filled with the row). `useRecordDialog` is a `useCommand` whose call is `create` for a new record and `update` for an edited one, and `CommandDialog` brings the discard guard ("Discard changes?" when closing with typed input, however it is dismissed), the "Saving…" then "Saved" beat, field errors on the fields with focus on the first, and the failure banner. The feature says what it saves, how it creates, how it updates and what shows when it is done.
@@ -304,7 +318,7 @@ What the flow does for you:
 - **Sending.** The last step's Next sends the whole form with `submit`; the validator's or the server's refusal puts the user on the first step with an error, a failure that is not about a field (a conflict, no permission) is said in the banner and the user stays, and the draft is kept in every case. On success `onSaved` runs and the draft is gone.
 - **Leaving.** Closing the dialog (Escape, the close button, the scrim) with something entered asks "Discard changes?" through the app's leave guard: `bindDialog()` hands the dialog the question as its `before-dismiss`. On a page the leave guard asks on navigation by itself.
 - **Draft.** With `draft: { key }` what was entered, the step and the steps passed are kept in `sessionStorage` (or `storage: "local"`) a moment after each change, and put back after a reload; the step form says "Continuing your saved draft" and offers "Start over". It is removed on submit and on discard. Change `version` when the form's shape changes: a draft of another version is ignored, and only keys the form has, holding the same kind of value, are restored. Values must be JSON (a file is never kept). A browser that blocks storage simply has no draft.
-- **Motion.** A step slides in from the side the user came from; under reduced motion it fades. Focus follows the step (to the step itself, never into a field, which would raise a phone's keyboard) and goes to the first field in error after a refused Next. Enter inside a field is Next.
+- **Motion.** A step slides in from the side the user came from; under reduced motion it fades. A step opens at its top (in a sheet or a page scrolled past the progress, the view returns to it) and focus goes to the step itself without scrolling it, never into a field, which would raise a phone's keyboard; focus goes to the first field in error after a refused Next. Enter inside a field is Next.
 
 ### On a page, with dots, and steps that change
 

@@ -9,5 +9,5 @@ export const formsFeature = defineFeature({
   routes: formsRoutes.records,
   // Essential: the sidebar shows this feature's name before any of its routes is entered.
   messages: localeMessages("forms", { en: () => import("./i18n/en.json"), hr: () => import("./i18n/hr.json") }, { essential: true }),
-  navigation: [{ destination: "forms", to: formsRoutes.index, within: ["forms.account", "forms.offer.new", "forms.dates", "forms.options", "forms.pickers"] }],
+  navigation: [{ destination: "forms", to: formsRoutes.index, within: ["forms.account", "forms.offer.new", "forms.dates", "forms.options", "forms.pickers", "forms.steps"] }],
 });

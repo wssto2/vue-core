@@ -181,5 +181,27 @@
     "vehicles": "Marke vozila",
     "saved": "Odjeljak je spremljen.",
     "hint": "Upišite ili zalijepite poštanski broj dulji od pet znamenki: višak se ne prima."
+  },
+  "steps": {
+    "title": "Koraci i pitanja",
+    "link": "Koraci i pitanja",
+    "intro": "Dugi korak u listu na telefonu otvara se na vrhu; naredba pita prije izvršenja.",
+    "first": "Osnovno",
+    "long": "Detalji",
+    "last": "Pregled",
+    "finish": "Završi",
+    "open": "Otvori korake",
+    "deliver": "Završi isporuku",
+    "sheet": "Novi zapis",
+    "name": "Naziv",
+    "longHeader": "Dvadeset četiri bilješke",
+    "note": "Bilješka {n}",
+    "extra": "Još nešto",
+    "date": "Isporučeno",
+    "askTitle": "Završiti isporuku?",
+    "askBody": "Vozilo prelazi u arhivu {date}. To se ne može poništiti.",
+    "askConfirm": "Završi isporuku",
+    "sent": "Poslano: {count}",
+    "lastHeader": "Pregled bilješki"
   }
 }

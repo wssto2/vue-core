@@ -12,6 +12,7 @@ export const formsRoutes = defineRoutes({
   dates: { name: "forms.dates", path: "/forms/dates", component: () => import("./views/Dates.vue"), meta: { titleKey: "forms.dates.title" } },
   options: { name: "forms.options", path: "/forms/options", component: () => import("./views/Options.vue"), meta: { titleKey: "forms.options.title" } },
   events: { name: "forms.events", path: "/forms/events", component: () => import("./views/Events.vue"), meta: { titleKey: "forms.events.title" } },
+  steps: { name: "forms.steps", path: "/forms/steps", component: () => import("./views/Steps.vue"), meta: { titleKey: "forms.steps.title" } },
   pickers: { name: "forms.pickers", path: "/forms/pickers", component: () => import("./views/Pickers.vue"), meta: { titleKey: "forms.pickers.title" } },
   section: { name: "forms.section", path: "/forms/section", component: () => import("./views/Section.vue"), meta: { titleKey: "forms.section.title" } },
   newOffer: { name: "forms.offer.new", path: "/forms/offers/new", component: () => import("./views/NewOffer.vue"), meta: { titleKey: "forms.newOffer" } },

@@ -36,6 +36,7 @@ const actions = computed<PageAction[]>(() => [{ id: "new-offer", label: t("forms
           <FormRow :label="t('forms.options.link')" :sub="t('forms.options.intro')" :to="formsRoutes.options" layout="setting" />
           <FormRow :label="t('forms.events.link')" :sub="t('forms.events.intro')" :to="formsRoutes.events" layout="setting" />
           <FormRow :label="t('forms.pickers.link')" :sub="t('forms.pickers.intro')" :to="formsRoutes.pickers" layout="setting" />
+          <FormRow :label="t('forms.steps.link')" :sub="t('forms.steps.intro')" :to="formsRoutes.steps" layout="setting" />
           <FormRow :label="t('forms.section.link')" :sub="t('forms.section.intro')" :to="formsRoutes.section" layout="setting" />
         </FormGroup>
       </template>

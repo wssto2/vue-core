@@ -181,5 +181,27 @@
     "vehicles": "Vehicle brands",
     "saved": "Section saved.",
     "hint": "Type a postal code longer than five digits, or paste one: the extra digits are not taken."
+  },
+  "steps": {
+    "title": "Steps and questions",
+    "link": "Steps and questions",
+    "intro": "A long step in a phone sheet opens at its top; a command asks before it runs.",
+    "first": "Basics",
+    "long": "Details",
+    "last": "Review",
+    "finish": "Finish",
+    "open": "Open the steps",
+    "deliver": "Complete delivery",
+    "sheet": "New record",
+    "name": "Name",
+    "longHeader": "Twenty-four notes",
+    "note": "Note {n}",
+    "extra": "Anything else",
+    "date": "Delivered on",
+    "askTitle": "Complete the delivery?",
+    "askBody": "The vehicle moves to the archive on {date}. This cannot be undone.",
+    "askConfirm": "Complete delivery",
+    "sent": "Sent: {count}",
+    "lastHeader": "Review the notes"
   }
 }
