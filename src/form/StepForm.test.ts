@@ -127,6 +127,39 @@ describe("StepForm with a bar", () => {
     expect((screen.getByLabelText("Name") as HTMLInputElement).value).toBe("Ana"); // nothing lost
   });
 
+  it("opens a step at its top on Next and on Back: the form scrolled into view, the step focused without scrolling; a refusal does not", async () => {
+    const { flow } = mountFlow(PAGE);
+    const scrolled: Element[] = [];
+    const scroll = vi.fn(function (this: Element) { scrolled.push(this); });
+    Element.prototype.scrollIntoView = scroll;
+    const above = vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({ top: -80 } as DOMRect); // scrolled past the progress
+    const focus = vi.spyOn(HTMLElement.prototype, "focus");
+    try {
+      await fireEvent.click(screen.getByRole("button", { name: "Next: Vehicle" })); // refused: the field in error, not the top
+      await settle();
+      expect(scrolled).not.toContain(q("step-form"));
+      await type("Name", "Ana");
+      await type("E-mail", "ana@example.com");
+      scrolled.length = 0;
+      focus.mockClear();
+      await fireEvent.click(screen.getByRole("button", { name: "Next: Vehicle" }));
+      await settle();
+      expect(scroll).toHaveBeenCalledWith({ block: "start" });
+      expect(scrolled).toEqual([q("step-form")]);
+      const at = focus.mock.contexts.findIndex((each) => (each as HTMLElement).dataset.test === "step-body");
+      expect(at).toBeGreaterThanOrEqual(0);
+      expect(focus.mock.calls[at]).toEqual([{ preventScroll: true }]);
+      scrolled.length = 0;
+      flow.back();
+      await settle();
+      expect(scrolled).toEqual([q("step-form")]);
+    } finally {
+      above.mockRestore();
+      focus.mockRestore();
+      delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    }
+  });
+
   it("Back is named after the previous step", async () => {
     const { flow } = mountFlow(PAGE);
     expect(screen.queryByRole("button", { name: /Customer/ })).toBeNull();

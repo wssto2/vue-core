@@ -23,7 +23,7 @@ import type { StepFlow } from "./steps";
  *
  * `progress`: `bar` (default; named steps) or `dots` (steps that depend on answers) or `none` when a dialog renders `StepProgress` in
  * its header. `navigation`: `inline` (default) renders Back, Cancel and Next under the step; `host` leaves them to a `Modal` (`flow.bindDialog()`)
- * or a footer of your own (`StepNavigation`). It works in a `Modal`, a `Sheet` and on a page.
+ * or a footer of your own (`StepNavigation`). A new step opens at its top (the progress in view; focus on the step, without scrolling). It works in a `Modal`, a `Sheet` and on a page.
  */
 const props = withDefaults(defineProps<{
   flow: StepFlow<Name>;
@@ -36,11 +36,24 @@ defineSlots<{ [Step in Name]?: () => unknown }>();
 
 const { t } = useI18n();
 const body = useTemplateRef<HTMLElement>("body");
+const root = useTemplateRef<HTMLElement>("root");
 
-// Moving on: focus the step itself (never a field, which would raise the phone's keyboard before it is wanted).
+// Whether the form's top is scrolled out above its scroll container (a sheet's body, else the page): only then does it need bringing back,
+// so a page that shows the top does not jump. (`scrollIntoView` with `nearest` does nothing for a form taller than the container.)
+function topIsAbove(element: HTMLElement): boolean {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const overflow = getComputedStyle(parent).overflowY;
+    if ((overflow === "auto" || overflow === "scroll") && parent.scrollHeight > parent.clientHeight) return element.getBoundingClientRect().top < parent.getBoundingClientRect().top;
+  }
+  return element.getBoundingClientRect().top < 0;
+}
+
+// Moving on or back: the step opens at its top (the progress, the title, then the first field), and focus goes to the step itself
+// for screen readers without moving the view (never to a field, which would raise the phone's keyboard before it is wanted).
 watch(() => props.flow.current.value.name, async () => {
   await nextTick();
-  body.value?.focus();
+  if (root.value && topIsAbove(root.value)) root.value.scrollIntoView?.({ block: "start" });
+  body.value?.focus({ preventScroll: true });
 });
 // A refused attempt: the first field in error.
 watch(() => props.flow.refusals.value, async () => {
@@ -50,7 +63,7 @@ watch(() => props.flow.refusals.value, async () => {
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-group-gap" data-test="step-form" :data-step="props.flow.current.value.name">
+  <div ref="root" class="flex min-w-0 flex-col gap-group-gap" data-test="step-form" :data-step="props.flow.current.value.name">
     <StepProgress v-if="props.progress !== 'none'" :flow="props.flow" :progress="props.progress" />
     <p class="sr-only" aria-live="polite">{{ props.flow.subtitle.value }}</p>
 
