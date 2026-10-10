@@ -48,6 +48,13 @@ declare function emitsNoNull<T>(value: null extends T ? never : T): void;
 // 0.4.17 inferred Value from the options too: a literal-typed v-model with string options, and a literal model value, still compile
 const stringOptions = [{ value: "x", label: "X" }] as { value: string; label: string }[];
 const modes: Record<string, "user" | "off" | "on"> = {};
+// an option's own data reaches the `#option` slot with its type, no casts
+interface Vehicle { readonly vin: string; readonly kw: number }
+const vehicles: readonly SelectOption<number, Vehicle>[] = [{ value: 1, label: "Clio", meta: { vin: "VF1", kw: 67 } }];
+declare function isString(value: string): void;
+declare function isNumber(value: number): void;
+declare function isUndefined(value: undefined): void;
+const loadedVehicles = useOptions({ load: async () => vehicles });
 const loadedStatuses = useOptions({ load: async () => statuses });
 const loadedTags = useOptions({ load: async () => tagOptions });
 </script>
@@ -84,6 +91,13 @@ const loadedTags = useOptions({ load: async () => tagOptions });
   <ComboField :options="tagOptions" @update:model-value="emitsNull" />
   <ComboField :search="async () => tagOptions" @update:model-value="emitsNull" />
   <MultiSelectField :options="loadedTags" @update:model-value="emitsNoNull" />
+  <SelectField :options="vehicles"><template #option="{ option, active, selected }">{{ isString(option.meta.vin) }}{{ isNumber(option.meta.kw) }}{{ option.value + 1 }}{{ active || selected }}</template></SelectField>
+  <SelectField :options="loadedVehicles"><template #option="{ option }">{{ isString(option.meta.vin) }}</template></SelectField>
+  <MultiSelectField :options="vehicles"><template #option="{ option }">{{ isNumber(option.meta.kw) }}</template></MultiSelectField>
+  <ComboField :options="vehicles"><template #option="{ option }">{{ isString(option.meta.vin) }}</template></ComboField>
+  <ComboField :search="async () => vehicles"><template #option="{ option }">{{ isNumber(option.meta.kw) }}</template></ComboField>
+  <!-- options without meta: the slot's meta is undefined, not any -->
+  <SelectField :options="statuses"><template #option="{ option }">{{ isUndefined(option.meta) }}</template></SelectField>
   <I18nField v-bind="form.bind('title')" :required-locales="['hr']" />
   <PhoneField v-bind="form.bind('mobile')" default-country="BA" :common-countries="['DE', 'AT']" />
   <!-- free text stays a string whatever it suggests; a record pick keeps its id type -->

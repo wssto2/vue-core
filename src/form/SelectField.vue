@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Value extends string | number, Clearable extends boolean = false, Source extends OptionsSource<Value> = OptionsSource<Value>">
+<script setup lang="ts" generic="Value extends string | number, Clearable extends boolean = false, Meta = undefined, Source extends OptionsSource<Value, Meta> = OptionsSource<Value, Meta>">
 import { computed, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
@@ -11,7 +11,7 @@ import { useControlSurface } from "./control";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
 import OptionList from "./OptionList.vue";
-import type { SelectOption } from "./options";
+import type { OptionSlotScope, SelectOption } from "./options";
 import { useOptionSource, type AsyncOptions, type OptionsSource } from "./useOptions";
 
 /**
@@ -38,9 +38,9 @@ import { useOptionSource, type AsyncOptions, type OptionsSource } from "./useOpt
  */
 const props = withDefaults(
   defineProps<FieldProps & {
-    options: Source & OptionsSource<Value>;
+    options: Source & OptionsSource<Value, Meta>;
     /** The option of the current value when the caller already has it (a saved record's model): its label shows before the options arrive, or when they do not contain it. */
-    selected?: SelectOption<Value> | null;
+    selected?: SelectOption<Value, Meta> | null;
     placeholder?: string;
     clearable?: Clearable;
     modelValue?: Value | null;
@@ -51,7 +51,7 @@ const props = withDefaults(
 );
 
 // What the select hands back: `null` when the user can clear it, or when options that load can (they drop a value the new options lack).
-type Emitted = Clearable extends true ? Value | null : Source extends AsyncOptions<Value> ? Value | null : Value;
+type Emitted = Clearable extends true ? Value | null : Source extends AsyncOptions<Value, Meta> ? Value | null : Value;
 const emit = defineEmits<{ "update:modelValue": [value: Emitted] }>();
 // Uncontrolled use (no v-model) keeps its own value; the emitted type is narrower than what the internals pass.
 const local = ref<Value | null>(props.modelValue ?? null);
@@ -69,7 +69,7 @@ const inRow = !!useFormGroup();
 const sheet = useTemplateRef<{ present: () => void; dismiss: () => void }>("sheet");
 const sheetOpen = ref(false);
 
-const choices = useOptionSource(() => props.options as OptionsSource<Value>, (arrived) => {
+const choices = useOptionSource<Value, Meta>(() => props.options as OptionsSource<Value, Meta>, (arrived) => {
   if (model.value !== null && !arrived.some((option) => option.value === model.value)) model.value = null;
 });
 const selected = computed(() => choices.known.value.find((option) => option.value === model.value) ?? (props.selected?.value === model.value ? props.selected : null));
@@ -86,7 +86,10 @@ const triggerClass = computed(() => [
   inRow ? "compact:pl-0 compact:pr-0" : "",
   props.disabled ? "cursor-not-allowed" : "cursor-pointer",
 ]);
-defineSlots<FieldSlots>();
+defineSlots<FieldSlots & {
+  /** Replaces what an option row says (an icon, a badge); the row, its check, keys and roles stay. */
+  option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
+}>();
 </script>
 
 <template>
@@ -111,14 +114,18 @@ defineSlots<FieldSlots>();
           <template #default="{ dismiss }">
             <div class="max-h-72 overflow-y-auto">
               <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" presentation="plain"
-                @select="(value) => { model = value; dismiss(); }" @retry="choices.reload()" />
+                @select="(value) => { model = value; dismiss(); }" @retry="choices.reload()">
+                <template v-if="$slots.option" #option="scope"><slot name="option" v-bind="scope" /></template>
+              </OptionList>
             </div>
           </template>
         </Popover>
       </div>
 
       <Sheet v-if="compact" ref="sheet" :title="props.label ?? placeholder" grouped @presented="sheetOpen = true" @dismissed="sheetOpen = false">
-        <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" @select="pick" @retry="choices.reload()" />
+        <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" :search-from="props.searchFrom" :none-label="props.clearable ? t('core.form.select.clear') : undefined" @select="pick" @retry="choices.reload()">
+          <template v-if="$slots.option" #option="scope"><slot name="option" v-bind="scope" /></template>
+        </OptionList>
         <template v-if="props.clearable && model !== null" #footer>
           <Button prominence="plain" @click="pick(null)">{{ t("core.form.select.clear") }}</Button>
         </template>

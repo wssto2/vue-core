@@ -7,9 +7,9 @@ import { foldText, type SelectOption } from "./options";
  * `ComboField` (a record pick: what lands is the option's id). A source is a list filtered as the user types, or a
  * function that asks the server for the text typed.
  */
-export type SuggestionSource<Value extends string | number> =
-  | readonly SelectOption<Value>[]
-  | ((query: string, context: { signal: AbortSignal }) => Promise<readonly SelectOption<Value>[]>);
+export type SuggestionSource<Value extends string | number, Meta = undefined> =
+  | readonly SelectOption<Value, Meta>[]
+  | ((query: string, context: { signal: AbortSignal }) => Promise<readonly SelectOption<Value, Meta>[]>);
 
 /** A text suggested to a free-text field, with a line of detail under it in the list ("Zagreb", "Croatia · 10 000"). What lands in the field is the text. */
 export type TextSuggestion = string | { readonly text: string; readonly detail?: string };
@@ -78,11 +78,11 @@ export function completionOf(typed: string, label: string): string {
 }
 
 /** The options that match the text, the ones that start with it first (the order inside each is kept). */
-function filterLocal<Value extends string | number>(options: readonly SelectOption<Value>[], query: string): SelectOption<Value>[] {
+function filterLocal<Value extends string | number, Meta = undefined>(options: readonly SelectOption<Value, Meta>[], query: string): SelectOption<Value, Meta>[] {
   const needle = foldText(query.trim());
   if (needle === "") return [...options];
-  const starts: SelectOption<Value>[] = [];
-  const contains: SelectOption<Value>[] = [];
+  const starts: SelectOption<Value, Meta>[] = [];
+  const contains: SelectOption<Value, Meta>[] = [];
   for (const option of options) {
     const label = foldText(option.label);
     if (label.startsWith(needle)) starts.push(option);
@@ -135,8 +135,8 @@ export function useLatestLoad<Item>() {
   return { items, status, run, cancel };
 }
 
-export interface SuggestionsOptions<Value extends string | number> {
-  source: () => SuggestionSource<Value> | undefined;
+export interface SuggestionsOptions<Value extends string | number, Meta = undefined> {
+  source: () => SuggestionSource<Value, Meta> | undefined;
   /** The fewest characters before a function source is asked. */
   minLength: () => number;
   /** Milliseconds to wait after the last key before a function source is asked. */
@@ -148,8 +148,8 @@ export interface SuggestionsOptions<Value extends string | number> {
   recents: () => string | undefined;
 }
 
-export interface KeyHooks<Value extends string | number> {
-  pick(option: SelectOption<Value>): void;
+export interface KeyHooks<Value extends string | number, Meta = undefined> {
+  pick(option: SelectOption<Value, Meta>): void;
   /** Free text: Enter picks only a row the user moved to, so Enter keeps meaning "done" while a first suggestion merely waits for Tab. */
   enterNeedsMove: boolean;
   /** Tab: accept the completion; true when there was one (the key is then taken). */
@@ -161,11 +161,11 @@ export interface KeyHooks<Value extends string | number> {
  * lands), keeps the highlighted row, the recent choices shown before typing, and the keys. The field owns the text and
  * the input; it calls `ask` on every keystroke, `show` on focus, `close` on blur and `remember` on a pick.
  */
-export function useSuggestions<Value extends string | number>(options: SuggestionsOptions<Value>) {
+export function useSuggestions<Value extends string | number, Meta = undefined>(options: SuggestionsOptions<Value, Meta>) {
   const store = inject(recentChoicesKey, browserRecents);
-  const latest = useLatestLoad<SelectOption<Value>>();
+  const latest = useLatestLoad<SelectOption<Value, Meta>>();
   const { items: results, status } = latest;
-  const recent = shallowRef<readonly SelectOption<Value>[]>([]);
+  const recent = shallowRef<readonly SelectOption<Value, Meta>[]>([]);
   const open = ref(false);
   const highlighted = ref(0);
   const moved = ref(false);
@@ -173,7 +173,7 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
   let timer: ReturnType<typeof setTimeout> | null = null;
 
   /** Recent choices while nothing is asked; otherwise the answer. */
-  const items = computed<readonly SelectOption<Value>[]>(() => (status.value === "idle" ? recent.value : results.value));
+  const items = computed<readonly SelectOption<Value, Meta>[]>(() => (status.value === "idle" ? recent.value : results.value));
   const showingRecent = computed(() => status.value === "idle" && recent.value.length > 0);
   const current = computed(() => items.value[highlighted.value]);
 
@@ -184,13 +184,13 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
   }
   onBeforeUnmount(cancel);
 
-  function settle(next: readonly SelectOption<Value>[]) {
+  function settle(next: readonly SelectOption<Value, Meta>[]) {
     highlighted.value = 0;
     moved.value = false;
     return next.slice(0, options.limit());
   }
 
-  const run = (query: string, source: Extract<SuggestionSource<Value>, (...args: never[]) => unknown>) => latest.run((signal) => source(query, { signal }), settle);
+  const run = (query: string, source: Extract<SuggestionSource<Value, Meta>, (...args: never[]) => unknown>) => latest.run((signal) => source(query, { signal }), settle);
 
   /** The text changed: ask for suggestions for it. */
   function ask(next: string) {
@@ -216,7 +216,7 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
   /** The field got focus: what shows before anything is typed (the recent choices, a fixed list). */
   function show(next: string) {
     const id = options.recents();
-    recent.value = id ? (store.read(id) as readonly SelectOption<Value>[]) : [];
+    recent.value = id ? (store.read(id) as readonly SelectOption<Value, Meta>[]) : [];
     ask(next);
     open.value = items.value.length > 0;
   }
@@ -227,11 +227,13 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
     if (status.value === "loading") status.value = "idle";
   }
 
-  function remember(option: SelectOption<Value>) {
+  function remember(option: SelectOption<Value, Meta>) {
     const id = options.recents();
     if (!id) return;
-    const kept = (store.read(id) as readonly SelectOption<Value>[]).filter((choice) => choice.value !== option.value);
-    store.write(id, [{ value: option.value, label: option.label, ...(option.description !== undefined ? { description: option.description } : {}) }, ...kept].slice(0, RECENT_LIMIT));
+    const kept = (store.read(id) as readonly SelectOption<Value, Meta>[]).filter((choice) => choice.value !== option.value);
+    // `meta` is kept with the choice (the `#option` slot reads it on the recent rows): plain data, as the store keeps JSON.
+    const entry = { value: option.value, label: option.label, ...(option.description !== undefined ? { description: option.description } : {}), ...(option.meta !== undefined ? { meta: option.meta } : {}) };
+    store.write(id, [entry, ...kept].slice(0, RECENT_LIMIT) as readonly SelectOption<string | number>[]);
   }
 
   function highlight(index: number, byUser = true) {
@@ -239,7 +241,7 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
     if (byUser) moved.value = true;
   }
 
-  function keydown(event: KeyboardEvent, hooks: KeyHooks<Value>) {
+  function keydown(event: KeyboardEvent, hooks: KeyHooks<Value, Meta>) {
     if (event.key === "Escape" && open.value) {
       event.stopPropagation(); // closes the list, not the dialog around it
       event.preventDefault();
@@ -267,4 +269,4 @@ export function useSuggestions<Value extends string | number>(options: Suggestio
   return { items, showingRecent, status, open, highlighted, moved, current, ask, show, close, cancel, remember, highlight, keydown };
 }
 
-export type Suggestions<Value extends string | number> = ReturnType<typeof useSuggestions<Value>>;
+export type Suggestions<Value extends string | number, Meta = undefined> = ReturnType<typeof useSuggestions<Value, Meta>>;

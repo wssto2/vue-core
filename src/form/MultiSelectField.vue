@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Value extends string | number">
+<script setup lang="ts" generic="Value extends string | number, Meta = undefined">
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
@@ -9,7 +9,7 @@ import Popover from "../overlay/Popover.vue";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./field";
 import OptionList from "./OptionList.vue";
-import type { SelectOption } from "./options";
+import type { OptionSlotScope, SelectOption } from "./options";
 import { useOptionSource, type OptionsSource } from "./useOptions";
 
 /**
@@ -25,9 +25,9 @@ import { useOptionSource, type OptionsSource } from "./useOptions";
  */
 const props = withDefaults(
   defineProps<FieldProps & {
-    options: OptionsSource<Value>;
+    options: OptionsSource<Value, Meta>;
     /** The options of the current values when the caller already has them (a saved record's equipment): their labels show before the options arrive, or when they do not contain them. */
-    selected?: readonly SelectOption<Value>[];
+    selected?: readonly SelectOption<Value, Meta>[];
     placeholder?: string;
     searchFrom?: number;
   }>(),
@@ -40,7 +40,7 @@ const compact = useCompactPresentation();
 const sheet = useTemplateRef<{ present: () => void; dismiss: () => void }>("sheet");
 const sheetOpen = ref(false);
 
-const choices = useOptionSource(() => props.options, (arrived) => {
+const choices = useOptionSource<Value, Meta>(() => props.options, (arrived) => {
   const kept = model.value.filter((value) => arrived.some((option) => option.value === value));
   if (kept.length !== model.value.length) model.value = kept;
 });
@@ -57,7 +57,10 @@ function toggle(value: Value | null) {
 const remove = (value: Value) => (model.value = model.value.filter((each) => each !== value));
 
 const trigger = "inline-flex min-h-7 cursor-pointer items-center gap-1 rounded-control bg-fill px-2.5 py-1 text-body text-content-muted hover:bg-fill-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-45";
-defineSlots<FieldSlots>();
+defineSlots<FieldSlots & {
+  /** Replaces what an option row says (an icon, a badge); the row, its check, keys and roles stay. */
+  option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
+}>();
 </script>
 
 <template>
@@ -83,13 +86,17 @@ defineSlots<FieldSlots>();
             </button>
           </template>
           <div class="max-h-72 overflow-y-auto">
-            <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" presentation="plain" @select="toggle" @retry="choices.reload()" />
+            <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" presentation="plain" @select="toggle" @retry="choices.reload()">
+          <template v-if="$slots.option" #option="scope"><slot name="option" v-bind="scope" /></template>
+        </OptionList>
           </div>
         </Popover>
       </div>
 
       <Sheet v-if="compact" ref="sheet" :title="props.label ?? placeholder" grouped @presented="sheetOpen = true" @dismissed="sheetOpen = false">
-        <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" @select="toggle" @retry="choices.reload()" />
+        <OptionList :options="choices.rows.value" :status="choices.status.value" :model-value="model" multiple :search-from="props.searchFrom" @select="toggle" @retry="choices.reload()">
+          <template v-if="$slots.option" #option="scope"><slot name="option" v-bind="scope" /></template>
+        </OptionList>
         <template #footer>
           <div class="flex items-center justify-between gap-2">
             <Button prominence="plain" :disabled="model.length === 0" @click="model = []">{{ t("core.form.select.clear") }}</Button>

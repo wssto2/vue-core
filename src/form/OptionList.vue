@@ -1,9 +1,9 @@
-<script setup lang="ts" generic="Value extends string | number">
-import { computed, nextTick, ref, useId, useTemplateRef, watch } from "vue";
+<script setup lang="ts" generic="Value extends string | number, Meta = undefined">
+import { computed, nextTick, ref, shallowRef, useId, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
 import ToneDot from "../state/ToneDot.vue";
-import { groupOptions, matchOptions, type SelectOption } from "./options";
+import { groupOptions, matchOptions, type OptionSlotScope, type OptionWithMeta, type SelectOption } from "./options";
 import type { SuggestionStatus } from "./suggestions";
 
 /**
@@ -19,7 +19,7 @@ import type { SuggestionStatus } from "./suggestions";
  * so with a "Try again" row (`@retry`).
  */
 const props = withDefaults(defineProps<{
-  options: readonly SelectOption<Value>[];
+  options: readonly SelectOption<Value, Meta>[];
   /** The chosen value, or the chosen values when `multiple`. */
   modelValue?: Value | null | readonly Value[];
   multiple?: boolean;
@@ -34,6 +34,14 @@ const props = withDefaults(defineProps<{
 }>(), { modelValue: null, multiple: false, searchFrom: 9, noneLabel: undefined, presentation: "grouped", status: "loaded" });
 
 const emit = defineEmits<{ select: [value: Value | null]; retry: [] }>();
+defineSlots<{
+  /** Replaces what a row says (the dot, label and description): an icon, a badge. The row, its check, keys and roles stay. */
+  option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
+}>();
+const focused = shallowRef<Value | null>(null);
+const withMeta = (option: SelectOption<Value, Meta>) => option as OptionWithMeta<Value, Meta>; // the app promised a `meta` on every option it reads in the slot
+const focus = (value: Value | null) => void (focused.value = value);
+const isFocused = (option: SelectOption<Value, Meta>) => focused.value === option.value;
 
 const { t } = useI18n();
 const query = ref("");
@@ -42,7 +50,7 @@ const root = useTemplateRef<HTMLElement>("root");
 
 const showSearch = computed(() => props.options.length >= props.searchFrom);
 const visible = computed(() => groupOptions(matchOptions(props.options, query.value)));
-const chosen = (option: SelectOption<Value>) => (props.multiple ? Array.isArray(props.modelValue) && (props.modelValue as readonly Value[]).includes(option.value) : props.modelValue === option.value);
+const chosen = (option: SelectOption<Value, Meta>) => (props.multiple ? Array.isArray(props.modelValue) && (props.modelValue as readonly Value[]).includes(option.value) : props.modelValue === option.value);
 const nothingChosen = computed(() => (props.multiple ? false : props.modelValue === null));
 
 function move(event: KeyboardEvent) {
@@ -113,16 +121,18 @@ watch(() => props.status, (status, before) => {
           <li v-for="option in section.options" :key="String(option.value)" role="option" :aria-selected="chosen(option)" class="group/option">
             <button type="button" data-option data-test="option" :disabled="option.disabled"
               class="flex w-full cursor-pointer items-stretch gap-3 pl-row-inset text-left text-body hover:bg-fill focus-visible:bg-fill focus-visible:outline-none active:bg-fill disabled:cursor-not-allowed disabled:opacity-45"
-              :class="grouped ? 'group-first/option:rounded-t-group group-last/option:rounded-b-group' : 'rounded-control'" @click="emit('select', option.value)">
+              :class="grouped ? 'group-first/option:rounded-t-group group-last/option:rounded-b-group' : 'rounded-control'" @focus="focus(option.value)" @blur="focus(null)" @click="emit('select', option.value)">
               <span v-if="props.multiple" aria-hidden="true" class="flex shrink-0 items-center">
                 <span class="flex size-5.5 items-center justify-center rounded-full border" :class="chosen(option) ? 'border-control-on bg-control-on text-white' : 'border-border-control'">
                   <Icon v-if="chosen(option)" name="checkCustom" :size="12" />
                 </span>
               </span>
               <span class="flex min-h-row min-w-0 flex-1 items-center gap-3 py-2 pr-row-inset" :class="grouped ? 'border-t border-border-separator group-first/option:border-t-0' : ''">
-                <ToneDot v-if="option.dot" :tone="option.dot" class="-mr-1.5" />
-                <span class="min-w-0 flex-1 text-content-strong">{{ option.label }}</span>
-                <span v-if="option.description" class="shrink-0 text-footnote text-content-muted">{{ option.description }}</span>
+                <slot name="option" :option="withMeta(option)" :active="isFocused(option)" :selected="chosen(option)">
+                  <ToneDot v-if="option.dot" :tone="option.dot" class="-mr-1.5" />
+                  <span class="min-w-0 flex-1 text-content-strong">{{ option.label }}</span>
+                  <span v-if="option.description" class="shrink-0 text-footnote text-content-muted">{{ option.description }}</span>
+                </slot>
                 <Icon v-if="!props.multiple && chosen(option)" name="checkCustom" :size="18" class="shrink-0 text-content-link" />
               </span>
             </button>

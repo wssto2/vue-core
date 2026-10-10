@@ -7,10 +7,10 @@ import { useLatestLoad, type SuggestionStatus } from "./suggestions";
  * landed (kept while the next is loading, so the chosen option keeps its label). Pass it where a list goes:
  * `<SelectField :options="models" />`, `<MultiSelectField :options="models" />`.
  */
-export interface AsyncOptions<Value extends string | number = string | number> {
+export interface AsyncOptions<Value extends string | number = string | number, Meta = undefined> {
   /** `idle`: nothing to ask yet (the input this depends on is empty). */
   readonly status: SuggestionStatus;
-  readonly options: readonly SelectOption<Value>[];
+  readonly options: readonly SelectOption<Value, Meta>[];
   /**
    * Counts how often the input these options depend on moved away from a value (the user picked another make). A field clears
    * a value the options lack only when options land for a newer generation: never on the first load (a saved value the list no
@@ -22,7 +22,7 @@ export interface AsyncOptions<Value extends string | number = string | number> {
 }
 
 /** What a select takes as its options: a list, or one that loads. */
-export type OptionsSource<Value extends string | number> = readonly SelectOption<Value>[] | AsyncOptions<Value>;
+export type OptionsSource<Value extends string | number, Meta = undefined> = readonly SelectOption<Value, Meta>[] | AsyncOptions<Value, Meta>;
 
 export interface OptionsContext {
   /** Aborted when a newer ask replaced this one or the scope ended: pass it on to the request. */
@@ -42,18 +42,18 @@ export interface OptionsContext {
  * `for` is a getter of the input the options depend on (reactive); `null` or `undefined` asks nothing (the list is empty, `idle`), anything
  * else asks, again whenever it changes. Without `for` the options load once.
  */
-export function useOptions<Input, Value extends string | number>(options: {
+export function useOptions<Input, Value extends string | number, Meta = undefined>(options: {
   readonly for: () => Input | null | undefined;
-  readonly load: (input: Input, context: OptionsContext) => Promise<readonly SelectOption<Value>[]>;
-}): AsyncOptions<Value>;
-export function useOptions<Value extends string | number>(options: {
-  readonly load: (context: OptionsContext) => Promise<readonly SelectOption<Value>[]>;
-}): AsyncOptions<Value>;
-export function useOptions<Input, Value extends string | number>(options: {
+  readonly load: (input: Input, context: OptionsContext) => Promise<readonly SelectOption<Value, Meta>[]>;
+}): AsyncOptions<Value, Meta>;
+export function useOptions<Value extends string | number, Meta = undefined>(options: {
+  readonly load: (context: OptionsContext) => Promise<readonly SelectOption<Value, Meta>[]>;
+}): AsyncOptions<Value, Meta>;
+export function useOptions<Input, Value extends string | number, Meta = undefined>(options: {
   readonly for?: () => Input | null | undefined;
-  readonly load: ((context: OptionsContext) => Promise<readonly SelectOption<Value>[]>) | ((input: Input, context: OptionsContext) => Promise<readonly SelectOption<Value>[]>);
-}): AsyncOptions<Value> {
-  const latest = useLatestLoad<SelectOption<Value>>();
+  readonly load: ((context: OptionsContext) => Promise<readonly SelectOption<Value, Meta>[]>) | ((input: Input, context: OptionsContext) => Promise<readonly SelectOption<Value, Meta>[]>);
+}): AsyncOptions<Value, Meta> {
+  const latest = useLatestLoad<SelectOption<Value, Meta>>();
   const dependent = options.for !== undefined;
   let generation = 0;
 
@@ -66,7 +66,7 @@ export function useOptions<Input, Value extends string | number>(options: {
       return;
     }
     void latest.run((signal) =>
-      dependent ? (options.load as (input: Input, context: OptionsContext) => Promise<readonly SelectOption<Value>[]>)(input as Input, { signal }) : (options.load as (context: OptionsContext) => Promise<readonly SelectOption<Value>[]>)({ signal }),
+      dependent ? (options.load as (input: Input, context: OptionsContext) => Promise<readonly SelectOption<Value, Meta>[]>)(input as Input, { signal }) : (options.load as (context: OptionsContext) => Promise<readonly SelectOption<Value, Meta>[]>)({ signal }),
     );
   }
 
@@ -95,9 +95,9 @@ export function useOptions<Input, Value extends string | number>(options: {
   };
 }
 
-const isList = <Value extends string | number>(source: OptionsSource<Value>): source is readonly SelectOption<Value>[] => Array.isArray(source);
+const isList = <Value extends string | number, Meta = undefined>(source: OptionsSource<Value, Meta>): source is readonly SelectOption<Value, Meta>[] => Array.isArray(source);
 
-const WITHOUT_OPTIONS: readonly SelectOption<never>[] = [];
+const WITHOUT_OPTIONS: readonly SelectOption<never, never>[] = [];
 
 /**
  * What a select makes of its `options` prop, a list or a loader: the options known (also the stale ones while loading, so the
@@ -106,8 +106,8 @@ const WITHOUT_OPTIONS: readonly SelectOption<never>[] = [];
  * another make, or emptied it), so the field can drop a value they do not contain. The first load and a reload of the same
  * input never call it.
  */
-export function useOptionSource<Value extends string | number>(source: () => OptionsSource<Value>, arrived: (options: readonly SelectOption<Value>[]) => void) {
-  const known = computed<readonly SelectOption<Value>[]>(() => {
+export function useOptionSource<Value extends string | number, Meta = undefined>(source: () => OptionsSource<Value, Meta>, arrived: (options: readonly SelectOption<Value, Meta>[]) => void) {
+  const known = computed<readonly SelectOption<Value, Meta>[]>(() => {
     const current = source();
     return isList(current) ? current : current.options;
   });

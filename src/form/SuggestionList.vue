@@ -1,9 +1,9 @@
-<script setup lang="ts" generic="Value extends string | number">
+<script setup lang="ts" generic="Value extends string | number, Meta = undefined">
 import { computed, nextTick, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
 import { useAnchoredPosition } from "../overlay/anchored";
-import type { SelectOption } from "./options";
+import type { OptionSlotScope, OptionWithMeta, SelectOption } from "./options";
 import { listShows, matchParts, type SuggestionStatus } from "./suggestions";
 
 /**
@@ -11,12 +11,12 @@ import { listShows, matchParts, type SuggestionStatus } from "./suggestions";
  * row in bold, a second line for the detail, the recent choices under their heading before anything is typed, the
  * loading, failed and empty states, a line naming the keys. The field owns the input and the keys; this is the panel.
  */
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   /** The input's id: the list and its rows are named from it (`aria-controls`, `aria-activedescendant`). */
   id: string;
   anchor: HTMLElement | null;
   open: boolean;
-  items: readonly SelectOption<Value>[];
+  items: readonly SelectOption<Value, Meta>[];
   highlighted: number;
   query: string;
   status: SuggestionStatus;
@@ -26,16 +26,23 @@ const props = defineProps<{
   emptyMessage: boolean;
   /** The line of keys under the list (hidden on touch screens). */
   hint?: string;
+  /** The chosen value, for the `#option` slot's `selected`. */
+  selected?: Value | null;
+}>(), { hint: undefined, selected: null });
+defineSlots<{
+  /** Replaces what a row says (label with the match marked, and detail). The row, its keys and roles stay. */
+  option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
 }>();
 
-const emit = defineEmits<{ pick: [option: SelectOption<Value>]; hover: [index: number] }>();
+const emit = defineEmits<{ pick: [option: SelectOption<Value, Meta>]; hover: [index: number] }>();
 
 const { t } = useI18n();
 const panel = useTemplateRef<HTMLElement>("panel");
 
 const visible = computed(() => listShows(props.open, props.items.length, props.status, props.emptyMessage));
 const busy = computed(() => props.status === "loading");
-const marked = (option: SelectOption<Value>) => matchParts(option.label, props.query);
+const withMeta = (option: SelectOption<Value, Meta>) => option as OptionWithMeta<Value, Meta>; // the app promised a `meta` on every option it reads in the slot
+const marked = (option: SelectOption<Value, Meta>) => matchParts(option.label, props.query);
 
 const { style } = useAnchoredPosition(panel, {
   reference: () => props.anchor,
@@ -63,13 +70,15 @@ watch(() => props.highlighted, () => void nextTick(() => panel.value?.querySelec
           :class="[index === props.highlighted ? 'bg-tint-soft' : 'hover:bg-fill', option.disabled ? 'cursor-not-allowed opacity-45' : '', busy ? 'opacity-60' : '']"
           @mouseenter="emit('hover', index)" @click="!option.disabled && emit('pick', option)">
           <Icon v-if="props.recent" name="history" :size="16" class="shrink-0 text-content-disabled" />
-          <span class="min-w-0 flex-1">
-            <span class="block truncate text-body text-content-strong">
-              <template v-if="props.recent">{{ option.label }}</template>
-              <template v-else>{{ marked(option).before }}<strong v-if="marked(option).match" class="font-semibold">{{ marked(option).match }}</strong>{{ marked(option).after }}</template>
+          <slot name="option" :option="withMeta(option)" :active="index === props.highlighted" :selected="props.selected === option.value">
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-body text-content-strong">
+                <template v-if="props.recent">{{ option.label }}</template>
+                <template v-else>{{ marked(option).before }}<strong v-if="marked(option).match" class="font-semibold">{{ marked(option).match }}</strong>{{ marked(option).after }}</template>
+              </span>
+              <span v-if="option.description" class="block truncate text-footnote text-content-muted">{{ option.description }}</span>
             </span>
-            <span v-if="option.description" class="block truncate text-footnote text-content-muted">{{ option.description }}</span>
-          </span>
+          </slot>
         </div>
       </template>
       <p v-else-if="props.status === 'loading'" class="px-3 py-2 text-footnote text-content-muted" role="status">{{ t("core.form.select.loading") }}</p>

@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Value extends string | number">
+<script setup lang="ts" generic="Value extends string | number, Meta = undefined">
 import { computed, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
@@ -6,7 +6,7 @@ import { controlWidth, type ControlWidth } from "../controls";
 import { useControlSurface } from "./control";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
-import type { SelectOption } from "./options";
+import type { OptionSlotScope, SelectOption } from "./options";
 import SuggestionList from "./SuggestionList.vue";
 import { listShows, useSuggestions } from "./suggestions";
 
@@ -26,11 +26,11 @@ import { listShows, useSuggestions } from "./suggestions";
 const props = withDefaults(
   defineProps<FieldProps & {
     /** A fixed list, filtered locally. */
-    options?: readonly SelectOption<Value>[];
+    options?: readonly SelectOption<Value, Meta>[];
     /** Searches the server; the answer for the text typed. */
-    search?: (query: string, context: { signal: AbortSignal }) => Promise<readonly SelectOption<Value>[]>;
+    search?: (query: string, context: { signal: AbortSignal }) => Promise<readonly SelectOption<Value, Meta>[]>;
     /** The option of the current value when the caller already has it (a saved record's customer). */
-    selected?: SelectOption<Value> | null;
+    selected?: SelectOption<Value, Meta> | null;
     placeholder?: string;
     /** The fewest characters before `search` is asked. */
     minLength?: number;
@@ -46,7 +46,7 @@ const props = withDefaults(
 );
 
 const model = defineModel<Value | null>({ default: null });
-const emit = defineEmits<{ picked: [option: SelectOption<Value>] }>();
+const emit = defineEmits<{ picked: [option: SelectOption<Value, Meta>] }>();
 
 const { t } = useI18n();
 const inRow = !!useFormGroup();
@@ -55,9 +55,9 @@ const fieldWidth = computed(() => (inRow ? controlWidth(props.width) : "w-full")
 const input = useTemplateRef<HTMLInputElement>("input");
 const anchor = useTemplateRef<HTMLElement>("anchor");
 
-const picked = shallowRef<SelectOption<Value> | null>(null);
+const picked = shallowRef<SelectOption<Value, Meta> | null>(null);
 const text = shallowRef("");
-const suggestions = useSuggestions<Value>({
+const suggestions = useSuggestions<Value, Meta>({
   source: () => props.search ?? props.options,
   minLength: () => props.minLength,
   debounce: () => props.debounce,
@@ -89,7 +89,7 @@ function onFocus() {
   if (!props.disabled) suggestions.show("");
 }
 
-function choose(option: SelectOption<Value>) {
+function choose(option: SelectOption<Value, Meta>) {
   suggestions.close();
   suggestions.remember(option);
   picked.value = option;
@@ -106,7 +106,10 @@ function onBlur() {
 
 const expanded = computed(() => listShows(open.value, items.value.length, status.value, true));
 defineExpose({ focus: () => input.value?.focus() });
-defineSlots<FieldSlots>();
+defineSlots<FieldSlots & {
+  /** Replaces what an option row says (an icon, a badge); the row, its keys and roles stay. */
+  option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
+}>();
 </script>
 
 <template>
@@ -121,8 +124,10 @@ defineSlots<FieldSlots>();
         <Icon name="search" :size="14" class="shrink-0 text-content-muted" />
       </div>
 
-      <SuggestionList :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="text" :status="status" :recent="showingRecent" :empty-message="true"
-        :hint="t('core.form.suggestions.keys_pick')" @pick="choose" @hover="suggestions.highlight($event)" />
+      <SuggestionList :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="text" :status="status" :recent="showingRecent" :empty-message="true" :selected="model"
+        :hint="t('core.form.suggestions.keys_pick')" @pick="choose" @hover="suggestions.highlight($event)">
+        <template v-if="$slots.option" #option="scope"><slot name="option" v-bind="scope" /></template>
+      </SuggestionList>
     </template>
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
     <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
