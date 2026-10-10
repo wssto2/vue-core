@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.19 — 2026-10-10
+
+Pickers with rich rows in narrow columns, a date-time that stays inside its row on a phone, and a flag before a translation. Found moving ARV's vehicle and customer pickers onto the `#option` slot.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`row-layout?: "setting" | "stacked"` on `ComboField` and `SelectField`**, typed as on `SegmentedField`: `stacked` puts the control under its label at the row's full width (a picker in a ~230 px column), `setting` at the end of the row; without it the row is a label column and the control, as before. `MultiSelectField` is always stacked and has no option.
+- **`#prefix` slot on `TextField`**: an icon or image before the value, inside the control while editing and in front of the value while reading (not before "not entered"); `Field` has the same `prefix` slot for a control of your own. For a country's flag before its translation (ARV katalog › Verzija). The text `prefix` prop is unchanged. A decorative image takes `alt=""`; one that carries meaning brings its own `alt`.
+- **`OptionSlotScope` and `OptionWithMeta` are exported from `@wssto2/vue-core/form`**, the types an `#option` slot receives.
+
+### Fixed
+- **`DateTimeField` on a phone no longer runs past its row**: the capsule kept "12.10.2026. 10:00" on one line inside a button narrower than its text (about 33 px past the card at 390 with a long label). The date and the time are now two unbreakable words and the capsule wraps between them, right-aligned.
+
+### Changes to existing behaviour
+- **The list under a `ComboField` (and a `TextField` with `suggestions`) is at least 20rem wide** and never wider than the screen: the field's width when that is more, aligned to the field's start. On a phone (viewport under 640 px) it spans the screen minus an 8 px gutter, so `#option` rows keep their photo and badge; it stays a list under the input (a sheet would hide the text being typed). Before it was exactly as wide as the field. ARV call sites it touches (no code change; lists only get wider where the field was under 20rem): the 11 files with a `ComboField` (`lead/views/Vehicle.vue`, `offer/components/OfferVehicleSection.vue` and `OfferCustomerSection.vue`, `contract/components/ContractTradeInGroup.vue`, `lead/components/LeadModalImproved.vue`, `customer/components/CustomerCreateModal.vue`, `transportlist/components/DraftForm.vue`, `evaluations/components/EvaluationCustomerField.vue`, `vehicles/components/phase/DeliverSheet.vue` and `RecordSaleSheet.vue`, `used/takeover/views/PurchaseContract.vue`) and the `TextField :suggestions` of `lead/views/Customer.vue` and `customer/views/General.vue`.
+- **The `SelectField` and `MultiSelectField` popover is at least 20rem wide** (was 18rem; every ARV select, no code change). Phones keep the sheet.
+- **A stacked `ComboField` aligns its text left on a phone** (a field in a label column still aligns it right).
+- **`DateButton` text is right-aligned** (visible only when it wraps). ARV's `DateTimeField` call sites (`lead/views/General.vue`, `offer/components/OfferDetailsSection.vue` and the others) need no change.
+
 ## 0.4.18 — 2026-10-10
 
 One record in a dialog, and selects whose options load that say they can come back empty. Found moving ARV's admin dialogs and vehicle forms.
