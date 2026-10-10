@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.20 — 2026-10-10
+
+The notes from ARV's wave 2: what each ARV screen had to build by hand around the fields. Six items, one commit each.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`blur` and `focus` events** (the `FocusEvent`) on `TextField`, `NumberField`, `MoneyField`, `TextareaField`, `ComboField`, `DateField`, `DateTimeField` and `TimeField`: `<TextField @blur="check" />`. A typed date or time is committed first and a combo has put its chosen label back, so the listener reads what the field now holds. (`DateTimeField` emits for its date text; its clock input is part of the same control and does not.) `SelectField`, `MultiSelectField` and the other fields have none. ARV: `VehicleBasicSection.vue` (`vinEvents`), `VehicleEntrySection.vue` (`entryVinEvents`) and `arvvehicledefinition/components/VersionForm.vue` (`codeBlur`) bind `onFocusout` through `v-bind`; each becomes `@blur`.
+- **`blank-zero` on `NumberField` and `MoneyField`** (default off): a value of 0 reads as an empty field, editing and reading; the value stays 0 and what is emitted is unchanged. A 0 the user types stays visible while the field has focus and reads blank once it is left. ARV: the `blank()` / `asBlank()` helpers of `arvvehicledefinition/components/PriceRuleTab.vue` (costs and the calculator's four samples) and the offers of `used_vehicles/evaluations/views/Offers.vue` become `blank-zero` and are deleted.
+- **`#value` slot on `SelectField` and `ComboField`**: the chosen option's own content, `{ option }` typed like `#option`'s (with the `meta` the options carry; type `ValueSlotScope` exported from `@wssto2/vue-core/form`). A select replaces the chosen text with it, in the control (desktop and phone) and in read mode; a combo shows it before the text it keeps editable, and in read mode instead of the text. Only while an option is chosen; the placeholder is not the slot's. Default rendering unchanged. ARV: `VehicleBasicSection.vue` passes `VehicleColorSwatch` in `#option` only; the chosen colour gets the same in `#value`.
+- **`data-group` on `FormGroup`** (the group's name, on the section only; its Edit button is inside it): a spec finds a group's Edit with `[data-group=contact] [data-test=group-edit]`. ARV: `groupMark()` in `features/vehicles/utils.ts` and its `v-bind="groupMark('…')"` on the `FormGroup`s of `VehicleBasicSection.vue`, `VehicleCharacteristicsSection.vue`, `VehicleEntrySection.vue`, `VehicleRsPanel.vue`, `VehicleSiPanel.vue` and `VehicleStatusSection.vue` are deleted.
+- **Tests for colour contrast and touch size** (`src/tokens.test.ts`): the `--app-*` colour pairs (text, muted, destructive and brand on the four surfaces, on-tint, inverse, status tones on their surfaces, the nine category tones, control borders) meet WCAG AA in light and dark, computed from `theme.css` with no browser; the hit area and row are 44 px on touch and narrow screens, and Button (all sizes), SwitchField, PopupButton and DateButton carry `hit-target`.
+
+### Fixed
+- **Clearing a `NumberField` or `MoneyField` always emits `null`.** Two causes. On focus the formatted text (`120.00`) became the typed text (`120`) only on Vue's next render; Playwright's `fill("")` selects, focuses, and presses Delete, and the render collapsed the selection, so Delete cleared nothing and no update was sent (select-all + Backspace by hand worked). The text is now swapped in the focus handler, and the `select` event that follows a swap with the caret collapsed selects the text again (until the first key or pointer press). And `defineModel` drops an update equal to the value the parent passed, so a parent that shows a 0 as empty (`null`) never heard the clear; `NumberField` emits every change itself. A paste of nothing, a cut and Backspace were already emitting and are tested.
+
+### Changes to existing behaviour
+- **`NumberField` emits `update:modelValue` on every change of its text, including one equal to the value it was given** (it used `defineModel`, which dropped those). A parent that counts updates sees more of them; no ARV call site does (every `NumberField` / `MoneyField` is `v-model` or `form.bind`). `MoneyField` passes them on the same way.
+- **Declaring `focus` and `blur` means a listener bound with `v-bind` or `@blur` on these fields is now the component's event**; before, `blur` (which does not bubble) never reached it. ARV's `onFocusout` listeners are unaffected until moved to `@blur`.
+- **Pinned by tests that were updated:** none; no test pinned an old default.
+
 ## 0.4.19 — 2026-10-10
 
 Pickers with rich rows in narrow columns, a date-time that stays inside its row on a phone, and a flag before a translation. Found moving ARV's vehicle and customer pickers onto the `#option` slot.
