@@ -140,6 +140,19 @@ describe("a record of groups, read where it reads", () => {
     expect(editButton("Contact")).toBeTruthy();
   });
 
+  it("names the group on the group alone, so a spec finds the group's Edit by group", async () => {
+    const { container } = await openRecord();
+    expect(container.querySelectorAll("[data-test=form-group]")).toHaveLength(2);
+    expect(container.querySelectorAll("[data-group=contact]")).toHaveLength(1); // the section only, not its Edit
+    expect(container.querySelector("[data-group=contact]")!.matches("[data-test=form-group]")).toBe(true);
+    const edit = container.querySelector("[data-group=contact] [data-test=group-edit]")!;
+    expect(edit.hasAttribute("data-group")).toBe(false);
+    expect(container.querySelector("[data-group=general] [data-test=group-edit]")).not.toBe(edit);
+    await fireEvent.click(edit);
+    await settle();
+    expect(inSheet().getByLabelText("Email")).toBeTruthy(); // the Edit found by group opens that group's sheet
+  });
+
   it("offers no Edit for a group the viewer may not change", async () => {
     await openRecord({ canEdit: false });
     expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();

@@ -98,7 +98,7 @@ if (props.section) useSectionAnchor(id, () => props.header ?? "", root);
 </script>
 
 <template>
-  <section v-if="visible" ref="root" :id="props.section ? id : undefined" data-test="form-group" class="form-group flex min-w-0 flex-col has-[>.form-group-cell:empty]:hidden"
+  <section v-if="visible" ref="root" :id="props.section ? id : undefined" data-test="form-group" :data-group="props.group" class="form-group flex min-w-0 flex-col has-[>.form-group-cell:empty]:hidden"
     :class="{ 'scroll-mt-4': props.section }" :style="{ '--form-label-width': props.labelWidth }">
     <header v-if="!inOwnSheet && (props.header || slots.header || slots['header-trailing'] || onEdit)" class="flex min-w-0 items-end gap-2 px-row-inset pb-2">
       <h3 class="min-w-0 flex-1 text-subheadline font-semibold text-content-strong compact:text-footnote compact:font-normal compact:uppercase compact:tracking-wide compact:text-content-muted">
