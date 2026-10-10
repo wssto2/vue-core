@@ -29,6 +29,8 @@ const props = withDefaults(defineProps<{
   subtitle?: string;
   /** What the primary action says: exactly what it does ("Assign"). */
   confirmLabel: string;
+  /** Disables the primary action while true (a proposal still loading). The inputs, Cancel and the leave guard work as before, and `run()` does nothing. */
+  confirmDisabled?: boolean;
   /** What it says once done; by default "Saved". */
   doneLabel?: string;
   /** What it says while working; by default "Saving…". */
@@ -38,7 +40,7 @@ const props = withDefaults(defineProps<{
   size?: "sm" | "md" | "lg";
   /** The name of a field for people, for errors that have no field on screen. */
   fieldLabel?: (field: string) => string;
-}>(), { subtitle: undefined, doneLabel: undefined, busyLabel: undefined, message: undefined, size: "sm", fieldLabel: undefined });
+}>(), { subtitle: undefined, confirmDisabled: false, doneLabel: undefined, busyLabel: undefined, message: undefined, size: "sm", fieldLabel: undefined });
 
 const emit = defineEmits<{ done: [] }>();
 defineSlots<{
@@ -63,6 +65,7 @@ watch(() => props.command.open.value, (open) => {
 });
 
 async function run(options: { addAnother?: boolean } = {}) {
+  if (props.confirmDisabled) return;
   const result = await props.command.run();
   if (result.status === "failed") {
     if (result.failure.kind === "invalid") await nextTick().then(() => focusFirstError(body.value ?? document));
@@ -87,7 +90,7 @@ const status = computed(() => (props.command.form.submitting.value ? "processing
 </script>
 
 <template>
-  <Modal ref="modal" :size="props.size" grouped :title="props.title" :subtitle="props.subtitle" :before-dismiss="confirmDiscard" :primary-label="props.confirmLabel" :status="status"
+  <Modal ref="modal" :size="props.size" grouped :title="props.title" :subtitle="props.subtitle" :before-dismiss="confirmDiscard" :primary-label="props.confirmLabel" :primary-disabled="props.confirmDisabled" :status="status"
     :processing-label="props.busyLabel ?? t('core.actions.saving')" :done-label="props.doneLabel ?? t('core.actions.saved')" @primary="run()" @dismissed="props.command.dismiss()">
     <template v-if="$slots.actions" #actions>
       <slot name="actions" :run="run" :busy="props.command.form.submitting.value" />

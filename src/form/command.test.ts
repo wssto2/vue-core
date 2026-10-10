@@ -294,3 +294,47 @@ describe("a command with nothing to enter", () => {
     expect(screen.getByRole("alertdialog")).toBeTruthy();
   });
 });
+
+describe("a command dialog with its primary action disabled", () => {
+  function mountWaiting() {
+    const waiting = ref(true);
+    const run = vi.fn(async () => ({ ok: true }));
+    let command!: ReturnType<typeof makeCommand>;
+    const makeCommand = () => useCommand({ defaults: () => ({ note: "" }), run });
+    const Host = defineComponent({
+      setup() {
+        command = makeCommand();
+        return () =>
+          h("div", [
+            h("button", { onClick: () => command.present() }, "Open"),
+            h(CommandDialog, { command, title: "Distribute", confirmLabel: "Apply", confirmDisabled: waiting.value, doneLabel: "Applied" }, () => h(TextField, { ...command.form.bind("note"), label: "Note" })),
+            h(LeaveGuardRoot),
+          ]);
+      },
+    });
+    render(Host, { global: { plugins: [i18n, testFormatting(i18n), { install: (app: App) => app.provide(leaveGuardKey, createLeaveGuard()) }], stubs: { transition: false } } });
+    return { waiting, run, command: () => command };
+  }
+
+  it("cannot be confirmed while true, keeps the input, and works again once it clears", async () => {
+    const { waiting, run, command } = mountWaiting();
+    await fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    await settle();
+    await fireEvent.update(dialog().getByLabelText("Note"), "kept");
+    const primary = dialog().getByRole("button", { name: "Apply" }) as HTMLButtonElement;
+    expect(primary.disabled).toBe(true);
+    await fireEvent.click(primary);
+    await settle();
+    expect(run).not.toHaveBeenCalled();
+    expect((dialog().getByLabelText("Note") as HTMLInputElement).value).toBe("kept");
+    expect((dialog().getByRole("button", { name: "Cancel" }) as HTMLButtonElement).disabled).toBe(false);
+
+    waiting.value = false;
+    await settle();
+    expect((dialog().getByRole("button", { name: "Apply" }) as HTMLButtonElement).disabled).toBe(false);
+    await fireEvent.click(dialog().getByRole("button", { name: "Apply" }));
+    await settle();
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(command().open.value).toBe(true);
+  });
+});
