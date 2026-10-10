@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.17 — 2026-10-10
+
+Bosnian numbers and dates in every browser, and a command dialog whose primary action can wait. Found in ARV's Bosnian market on screens already moved to the library.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Changes to existing behaviour
+- **`bs` is formatted with `sr-Latn-BA` data.** Chromium (Chrome, Edge, Playwright) ships no Bosnian `Intl` data: it formatted `bs` as English (`400,000.50`, `BAM 1,234.50`, `2026 M10 10, Sat`, "Germany") while still reporting `bs`. Every `Intl` call in the library now goes through one internal function that gives `Intl` `sr-Latn-BA` for `bs` (`400.000,50`, `1.234,50 KM`, `oktobar 2026.`, "Njemačka") and every other locale unchanged: the default formatters (`date`, `dateTime`, `time`, `number`, `money`, `relative`), the calendar and date sheet (month and weekday names, first weekday), the `ResourceHeader` count, phone country names and search, and the language names on `I18nField` tabs (named in the UI language). A language's own name (`languageName`) still asks for `bs`. Nothing to configure; a custom `formatters` entry still receives the app's locale (`bs`). An application with its own `Intl` calls for `bs` can drop its workaround.
+
+### Added
+- `CommandDialog` **`confirmDisabled`**: while true the primary action is disabled and `run()` does nothing; the fields, Cancel and the leave guard work as before, and the primary works again when it clears.
+
 ## 0.4.16 — 2026-10-09
 
 Bosnian and Serbian in the library's own words, a trailing slot on every field, and numbers as written. Found when ARV's dealer, location and follow-up forms moved onto the library.
