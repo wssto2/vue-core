@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Value extends string | number, Clearable extends boolean = false">
+<script setup lang="ts" generic="Value extends string | number, Clearable extends boolean = false, Source extends OptionsSource<Value> = OptionsSource<Value>">
 import { computed, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "../button/Button.vue";
@@ -12,7 +12,7 @@ import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
 import OptionList from "./OptionList.vue";
 import type { SelectOption } from "./options";
-import { useOptionSource, type OptionsSource } from "./useOptions";
+import { useOptionSource, type AsyncOptions, type OptionsSource } from "./useOptions";
 
 /**
  * One choice from a list. The value is the chosen option's `value`, or `null` for none: a value of `0` or `""`
@@ -26,8 +26,8 @@ import { useOptionSource, type OptionsSource } from "./useOptions";
  *
  * The type says what the select hands back: without `clearable` the user can only pick, so it emits a `Value` and binds a field
  * that is never null; with `clearable` it emits `Value | null`. It still accepts `null` as the value (a select that starts empty
- * shows its placeholder). Exception: options that load (`useOptions`) drop a value the new options lack, so a field bound to a
- * select with changing options should be able to hold `null`.
+ * shows its placeholder). Options that load (`useOptions`) drop a value the new options lack, so such a select emits
+ * `Value | null` whatever `clearable` says.
  *
  * Options from the server (`useOptions`, say the models of the chosen make) work the same way: the field keeps its label and
  * value and shows a spinner while they load, the opened list says "Loading…" or offers "Try again", and a value the new options
@@ -38,7 +38,7 @@ import { useOptionSource, type OptionsSource } from "./useOptions";
  */
 const props = withDefaults(
   defineProps<FieldProps & {
-    options: OptionsSource<Value>;
+    options: Source & OptionsSource<Value>;
     /** The option of the current value when the caller already has it (a saved record's model): its label shows before the options arrive, or when they do not contain it. */
     selected?: SelectOption<Value> | null;
     placeholder?: string;
@@ -50,7 +50,9 @@ const props = withDefaults(
   { ...fieldDefaults, selected: null, placeholder: undefined, clearable: undefined, modelValue: undefined, searchFrom: 9 },
 );
 
-const emit = defineEmits<{ "update:modelValue": [value: Clearable extends true ? Value | null : Value] }>();
+// What the select hands back: `null` when the user can clear it, or when options that load can (they drop a value the new options lack).
+type Emitted = Clearable extends true ? Value | null : Source extends AsyncOptions<Value> ? Value | null : Value;
+const emit = defineEmits<{ "update:modelValue": [value: Emitted] }>();
 // Uncontrolled use (no v-model) keeps its own value; the emitted type is narrower than what the internals pass.
 const local = ref<Value | null>(props.modelValue ?? null);
 watch(() => props.modelValue, (next) => (local.value = next ?? null));
@@ -58,7 +60,7 @@ const model = computed<Value | null>({
   get: () => local.value,
   set: (next) => {
     local.value = next;
-    emit("update:modelValue", next as Clearable extends true ? Value | null : Value);
+    emit("update:modelValue", next as Emitted);
   },
 });
 const { t } = useI18n();
@@ -67,7 +69,7 @@ const inRow = !!useFormGroup();
 const sheet = useTemplateRef<{ present: () => void; dismiss: () => void }>("sheet");
 const sheetOpen = ref(false);
 
-const choices = useOptionSource(() => props.options, (arrived) => {
+const choices = useOptionSource(() => props.options as OptionsSource<Value>, (arrived) => {
   if (model.value !== null && !arrived.some((option) => option.value === model.value)) model.value = null;
 });
 const selected = computed(() => choices.known.value.find((option) => option.value === model.value) ?? (props.selected?.value === model.value ? props.selected : null));

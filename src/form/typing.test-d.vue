@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Type fixture (checked by `npm run typecheck`, never built): a field is bound to a form's field by name and by value type.
 import { useForm } from "./useForm";
+import { useOptions } from "./useOptions";
 import type { SelectOption } from "./options";
 import CheckboxField from "./CheckboxField.vue";
 import Calendar from "./date/Calendar.vue";
@@ -40,6 +41,15 @@ const statuses = [
   { value: "closed", label: "Closed" },
 ] as const satisfies readonly SelectOption[];
 const tagOptions: readonly SelectOption<string>[] = [{ value: "a", label: "A" }];
+// options that load: a value the new options lack is cleared, so the select hands back null whatever `clearable` says
+// What a select emits, asserted from its `@update:model-value` handler (a `@vue-expect-error` is not reported when unused, these are): `null` allowed or not.
+declare function emitsNull<T>(value: null extends T ? T : never): void;
+declare function emitsNoNull<T>(value: null extends T ? never : T): void;
+// 0.4.17 inferred Value from the options too: a literal-typed v-model with string options, and a literal model value, still compile
+const stringOptions = [{ value: "x", label: "X" }] as { value: string; label: string }[];
+const modes: Record<string, "user" | "off" | "on"> = {};
+const loadedStatuses = useOptions({ load: async () => statuses });
+const loadedTags = useOptions({ load: async () => tagOptions });
 </script>
 
 <template>
@@ -59,6 +69,21 @@ const tagOptions: readonly SelectOption<string>[] = [{ value: "a", label: "A" }]
   <!-- a select that cannot be emptied never emits null, so a field that is never null binds to it; a clearable one binds a nullable field -->
   <SelectField v-bind="form.bind('title3')" :options="[{ value: 1, label: 'Mr' }, { value: 2, label: 'Ms' }, { value: 3, label: 'Mx' }]" />
   <SelectField v-bind="form.bind('status')" clearable :options="statuses" />
+  <!-- options that load: the field they edit can be null, clearable or not -->
+  <SelectField v-bind="form.bind('status')" :options="loadedStatuses" />
+  <SelectField v-bind="form.bind('status')" clearable :options="loadedStatuses" />
+  <SelectField v-model="modes.a" :options="stringOptions" />
+  <SelectField :model-value="''" :options="stringOptions" @update:model-value="(value: string) => value" />
+  <!-- emitted type: static and not clearable -> Value; clearable -> Value | null; loaded -> Value | null, clearable or not -->
+  <SelectField :options="statuses" @update:model-value="emitsNoNull" />
+  <SelectField :options="statuses" clearable @update:model-value="emitsNull" />
+  <SelectField :options="loadedStatuses" @update:model-value="emitsNull" />
+  <SelectField :options="loadedStatuses" :clearable="false" @update:model-value="emitsNull" />
+  <SelectField :options="loadedStatuses" clearable @update:model-value="emitsNull" />
+  <!-- a combo always emits Value | null; a multi-select emits a list, which loaded options shrink but never make null -->
+  <ComboField :options="tagOptions" @update:model-value="emitsNull" />
+  <ComboField :search="async () => tagOptions" @update:model-value="emitsNull" />
+  <MultiSelectField :options="loadedTags" @update:model-value="emitsNoNull" />
   <I18nField v-bind="form.bind('title')" :required-locales="['hr']" />
   <PhoneField v-bind="form.bind('mobile')" default-country="BA" :common-countries="['DE', 'AT']" />
   <!-- free text stays a string whatever it suggests; a record pick keeps its id type -->
