@@ -17,7 +17,8 @@ import { completionOf, listShows, useSuggestions, type SuggestionSource, type Te
  *   <TextField v-bind="form.bind('vin')" mono suffix="VIN" :label="t('vin')" />
  *
  * `mono` is for codes read character by character (0 and O, 1 and l); `prefix` and `suffix` are plain text
- * (a unit, an @) inside the control; `width` is the filled control's width in a row on wide screens.
+ * (a unit, an @) inside the control; `width` is the filled control's width in a row on wide screens. The `#prefix` slot
+ * puts an icon or image before the value, editing and reading (a flag before a translation).
  *
  * `suggestions` offers texts while typing, from a list or from the server (`api.ts` does the request); the value stays a
  * string whatever is picked. The best match shows grey after the typed text and Tab accepts it; the list marks the matched
@@ -113,13 +114,17 @@ const onKeydown = (event: KeyboardEvent) => {
 };
 
 defineExpose({ focus: () => input.value?.focus() });
-defineSlots<FieldSlots>();
+defineSlots<FieldSlots & {
+  /** An icon or image before the value, in the control and in the read-mode row (a country's flag before its translation). Give an image `alt=""` when the label already says what it shows. */
+  prefix?: () => unknown;
+}>();
 </script>
 
 <template>
   <Field v-bind="fieldProps(props)" :value="model" :prefix="props.prefix" :suffix="props.suffix" :value-style="props.mono ? 'mono' : undefined">
     <template #default="{ id, describedby, invalid }">
       <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
+        <span v-if="$slots.prefix" class="flex shrink-0 items-center" data-test="field-prefix"><slot name="prefix" /></span>
         <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
         <div class="relative min-w-0 flex-1">
           <input :id="id" ref="input" v-model="model" :type="props.type" :name="props.name" :placeholder="props.placeholder" :maxlength="props.maxLength" :autocomplete="suggesting ? 'off' : props.autocomplete"
@@ -139,6 +144,7 @@ defineSlots<FieldSlots>();
       <SuggestionList v-if="suggesting" :id="id" :anchor="anchor" :open="open" :items="items" :highlighted="highlighted" :query="model" :status="status" :recent="showingRecent" :empty-message="false"
         :hint="completion ? t('core.form.suggestions.keys_complete') : t('core.form.suggestions.keys_pick')" @pick="pick" @hover="engine.highlight($event)" />
     </template>
+    <template v-if="$slots.prefix" #prefix><slot name="prefix" /></template>
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
     <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
     <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>

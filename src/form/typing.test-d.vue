@@ -61,6 +61,7 @@ const loadedTags = useOptions({ load: async () => tagOptions });
 
 <template>
   <TextField v-bind="form.bind('name')" label="Name" />
+  <TextField v-bind="form.bind('name')" label="Name"><template #prefix><span aria-hidden="true">*</span></template></TextField>
   <NumberField v-bind="form.bind('age')" />
   <SelectField v-bind="form.bind('status')" :options="statuses" />
   <MultiSelectField v-bind="form.bind('tags')" :options="tagOptions" />

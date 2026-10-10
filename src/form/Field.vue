@@ -46,6 +46,8 @@ defineSlots<{
   trailing?: () => unknown;
   /** At the end of the label's line while editing (the language tabs of `I18nField`). */
   labelTrailing?: () => unknown;
+  /** An icon or image before the read-mode value (a flag); a field that has the slot draws the same one before its control. Not shown while the value is empty. */
+  prefix?: () => unknown;
 }>();
 
 const { t } = useI18n();
@@ -95,7 +97,7 @@ const progress = computed(() =>
         <slot v-if="editable" :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" />
         <slot v-else-if="slots.readonly" name="readonly" />
         <span v-else-if="hasValue" class="block break-words text-body text-content-strong" :class="props.valueStyle === 'mono' ? 'font-mono' : props.valueStyle === 'numeric' ? 'tabular-nums' : ''">
-          <span v-if="props.prefix" class="mr-1">{{ props.prefix }}</span>{{ shown }}<span v-if="props.suffix" class="ml-1 text-content-muted">{{ props.suffix }}</span>
+          <span v-if="slots.prefix" class="mr-1.5 inline-flex shrink-0 items-center align-middle" data-test="field-prefix"><slot name="prefix" /></span><span v-if="props.prefix" class="mr-1">{{ props.prefix }}</span>{{ shown }}<span v-if="props.suffix" class="ml-1 text-content-muted">{{ props.suffix }}</span>
         </span>
         <span v-else class="block text-body text-content-disabled">{{ t("core.state.no_value") }}</span>
       </div>
@@ -118,7 +120,8 @@ const progress = computed(() =>
     </div>
     <slot v-else-if="editable" :id="controlId" :describedby="describedby" :invalid="!!props.error" :required="props.required" :disabled="props.disabled" />
     <slot v-else-if="slots.readonly" name="readonly" />
-    <span v-else class="text-body" :class="hasValue ? 'text-content-strong' : 'text-content-disabled'">{{ hasValue ? `${props.prefix ?? ""}${shown}${props.suffix ?? ""}` : t("core.state.no_value") }}</span>
+    <span v-else class="text-body" :class="hasValue ? 'text-content-strong' : 'text-content-disabled'">
+      <span v-if="hasValue && slots.prefix" class="mr-1.5 inline-flex shrink-0 items-center align-middle" data-test="field-prefix"><slot name="prefix" /></span>{{ hasValue ? `${props.prefix ?? ""}${shown}${props.suffix ?? ""}` : t("core.state.no_value") }}</span>
     <p v-if="props.hint && editable" :id="hintId" class="text-footnote text-content-muted">{{ props.hint }}</p>
     <p v-if="props.error" :id="errorId" role="alert" class="flex items-start gap-1.5 text-footnote text-content-destructive">
       <Icon name="alertTriangle" :size="14" class="mt-px shrink-0" /> {{ props.error }}
