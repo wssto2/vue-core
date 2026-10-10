@@ -299,6 +299,15 @@ describe("DateTimeField on a phone", () => {
     expect(value.value).toBe("2026-10-20T14:36");
   });
 
+  it("shows the date and the time as two words that cannot break, so a narrow row wraps between them and never runs past its edge", () => {
+    mountField(DateTimeField, { label: "Visit" }, { initial: "2026-10-15T14:35" });
+    const capsule = screen.getByRole("button", { name: "Visit" });
+    expect([...capsule.querySelectorAll(".whitespace-nowrap")].map((word) => word.textContent)).toEqual([expect.stringContaining("2026"), "14:35"]);
+    expect(capsule.querySelector(".whitespace-normal")).not.toBeNull(); // the capsule's own nowrap yields to the break between them
+    expect(capsule.classList.contains("text-right")).toBe(true);
+    expect(capsule.textContent).toMatch(/2026\.? 14:35$/);
+  });
+
   it("a quick pick sets the day and keeps the time; Done without touching the time takes the time now for a new value", async () => {
     const { value } = mountField(DateTimeField, { label: "Visit" });
     await fireEvent.click(screen.getByRole("button", { name: "Visit" }));

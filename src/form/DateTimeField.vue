@@ -143,7 +143,8 @@ defineSlots<FieldSlots>();
     <template #default="{ id, describedby, invalid }">
       <template v-if="compact">
         <DateButton v-bind="{ id, 'aria-describedby': describedby }" :disabled="props.disabled" :invalid="invalid" :placeholder="t('core.form.select.choose')" @click="sheet?.present()">
-          <template v-if="model">{{ entry.text.value }}</template>
+          <!-- The date and the time are two words that cannot break inside: on a phone the capsule wraps between them instead of running past its row. -->
+          <span v-if="model" class="whitespace-normal"><span class="whitespace-nowrap">{{ format.date(current.day) }}</span>{{ " " }}<span class="whitespace-nowrap">{{ current.time }}</span></span>
         </DateButton>
         <DatePickerSheet ref="sheet" :title="props.label ?? t('core.form.date.calendar')" mode="datetime" :model-value="model" :min="rules.min" :max="rules.max" :disabled-dates="props.disabledDates"
           :open-on="props.openOn" :shortcuts="shortcuts" :step="props.minuteStep" :clearable="!props.required" @update:model-value="entry.set" />

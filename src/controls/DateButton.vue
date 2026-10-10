@@ -40,7 +40,7 @@ function hasContent(): boolean {
 <template>
   <button type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="props.expanded"
     :aria-invalid="props.invalid || undefined"
-    class="hit-target inline-flex max-w-full items-center whitespace-nowrap rounded-control px-2.5 py-1 text-body tabular-nums disabled:cursor-not-allowed disabled:opacity-45"
+    class="hit-target inline-flex max-w-full items-center whitespace-nowrap rounded-control text-right px-2.5 py-1 text-body tabular-nums disabled:cursor-not-allowed disabled:opacity-45"
     :class="props.expanded
       ? 'bg-tint-soft font-semibold text-content-link ring-[1.5px] ring-inset ring-border-focus transition-colors duration-motion-fast ease-motion-standard'
       : ['text-content-strong', surface]"
