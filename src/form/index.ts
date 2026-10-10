@@ -68,6 +68,8 @@ export type { SaveChromeOptions } from "./useSaveChrome";
 export { default as CommandDialog } from "./CommandDialog.vue";
 export { useCommand } from "./useCommand";
 export type { Command, CommandOptions } from "./useCommand";
+export { useRecordDialog } from "./useRecordDialog";
+export type { RecordDialog, RecordDialogOptions } from "./useRecordDialog";
 export { default as NumberCell } from "./NumberCell.vue";
 export { useStepForm } from "./steps";
 export type { StepDefinition, StepDialogBinding, StepDraftOptions, StepFlow, StepFormOptions, StepState } from "./steps";

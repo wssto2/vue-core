@@ -191,45 +191,43 @@ Field errors land on the fields, a conflict or no permission is said in the bann
 
 ### One record in a dialog (create and edit)
 
-An admin list where each row is a small record is a command whose dialog is used twice: **new** (empty, with "Save and add another") and **edit** (filled with the row). It is a recipe, not a component: about thirty lines on `useCommand` and `CommandDialog`, which already bring the discard guard ("Discard changes?" when closing with typed input, however it is dismissed), the "Saving…" then "Saved" beat before the dialog closes, field errors on the fields with focus on the first, and the failure banner. What the feature adds is which endpoint (`editing`), the success toast and the extra action.
+An admin list where each row is a small record is one dialog used twice: **new** (defaults, with "Save and add another") and **edit** (filled with the row). `useRecordDialog` is a `useCommand` whose call is `create` for a new record and `update` for an edited one, and `CommandDialog` brings the discard guard ("Discard changes?" when closing with typed input, however it is dismissed), the "Saving…" then "Saved" beat, field errors on the fields with focus on the first, and the failure banner. The feature says what it saves, how it creates, how it updates and what shows when it is done.
 
-<!-- example: docs/examples/forms/components/CategoryDialog.vue:13-29 -->
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:13-26 -->
 ```ts
-const editing = ref<Category | null>(null); // null: a new one
-
-// One command for both: create or edit. The dialog brings the discard guard, the "saved" beat, the field errors and the focus.
-const save = useCommand({
+// One dialog for both: `create` for a new category, `update` for an edited one. The dialog brings the discard guard, the "saved" beat, the field errors and the focus.
+const category = useRecordDialog({
   defaults: () => ({ name: "", active: true }),
   validator: { safeParse: (input) => ((input as { name: string }).name.trim() === "" ? { success: false, error: { issues: [{ path: ["name"], message: "Enter a name." }] } } : { success: true, data: input as { name: string; active: boolean } }) },
-  run: (input, { idempotencyKey }) => (editing.value ? api.updateCategory(editing.value.id, input, idempotencyKey) : api.createCategory(input, idempotencyKey)),
+  toValues: (row: Category) => ({ name: row.name, active: row.active }),
+  create: (input, { idempotencyKey }) => api.createCategory(input, idempotencyKey),
+  update: (row, input, { idempotencyKey }) => api.updateCategory(row.id, input, idempotencyKey),
   done: () => {
     toast.success(t("forms.categorySaved"));
     emit("saved");
   },
 });
 
-defineExpose({
-  create: () => ((editing.value = null), save.present()),
-  edit: (category: Category) => ((editing.value = category), save.present({ name: category.name, active: category.active })),
-});
+defineExpose({ create: category.create, edit: category.edit });
 ```
 
-<!-- example: docs/examples/forms/components/CategoryDialog.vue:33-41 -->
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:30-38 -->
 ```vue
-  <CommandDialog :command="save" :title="editing ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')">
+  <CommandDialog :command="category.command" :title="category.editing.value ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')">
     <FormGroup>
-      <TextField v-bind="save.form.bind('name')" :label="t('forms.name')" required />
-      <SwitchField v-bind="save.form.bind('active')" :label="t('forms.active')" />
+      <TextField v-bind="category.form.bind('name')" :label="t('forms.name')" required />
+      <SwitchField v-bind="category.form.bind('active')" :label="t('forms.active')" />
     </FormGroup>
-    <template v-if="!editing" #actions="{ run, busy }">
+    <template v-if="!category.editing.value" #actions="{ run, busy }">
       <Button :disabled="busy" @click="run({ addAnother: true })">{{ t("forms.saveAndAddAnother") }}</Button>
     </template>
   </CommandDialog>
 ```
 
-- `create()` and `edit(row)` are what the page calls (`dialog.value?.create()`); `present(initial)` starts from the defaults with what is known laid over them, so an edit never shows what the last dialog left. A record that must be read first (`api.get(id)`) is read by the page, which then calls `edit(record)`.
+- `create()` and `edit(row)` are what the page calls (`dialog.value?.create()`). `create()` shows the defaults; `edit(row)` shows `toValues(row)` over them, so a field the row lacks shows its default and an edit never shows what the last dialog left. A dialog that only adds leaves out `update` and `toValues`.
+- `editing` is the row being edited, `null` for a new record: the title, a field only a new record has (`:disabled="!!editing"` locks one when editing), and the delete button of an edit (a `FormGroupButton` that opens an `AlertDialog`, which is the page's own). A record that must be read first (`api.get(id)`) is read by the page, which then calls `edit(record)`.
 - `done` runs after the call went through: the toast and telling the page to reload.
-- The `#actions` slot gets `run` and `busy`. `run({ addAnother: true })` saves exactly like the primary action, calls `done` (so the toast shows), then opens the dialog again with the defaults and focus on the first field, instead of closing. Render the button only for a new record (`v-if="!editing"`); it takes no part in the discard guard because the fresh form is not dirty. A refused save (a field error) behaves as with the primary action: nothing is cleared.
+- The `#actions` slot gets `run` and `busy`. `run({ addAnother: true })` saves exactly like the primary action, calls `done` (so the toast shows), then opens the dialog again with the defaults and focus on the first field, instead of closing. Render the button only for a new record (`v-if="!editing.value"`); it takes no part in the discard guard because the fresh form is not dirty. A refused save (a field error) behaves as with the primary action: nothing is cleared.
 - Read-only users do not get the button that calls `create()`/`edit()` (`access.can`), not a disabled dialog.
 
 Used from a list, which is the page's own:
