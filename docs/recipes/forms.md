@@ -354,6 +354,14 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
 - **Read mode is the form's or the group's** (`FormView :editable`, `FormGroup :editable`): rows become value rows and empty ones disappear. **Locked is the field's** `disabled`: dimmed on wide screens, a value row on phones; the group's `locked-footer` says why once.
 - **A select hands back `null` when anything can empty it.** Without `clearable` and with a list, `SelectField` emits its option's value, so a draft field typed `1 | 2 | 3` binds to it; with `clearable`, or with options that load (`useOptions`, which drop a value the new options lack), it emits `Value | null`. Either takes `null` as the value it is given (a select that starts empty shows its placeholder).
 - **A field passes `Field`'s slots through.** `#trailing` puts an action after the control (a per-row Save beside a select; in a group's row, or beside a field on its own), `#labelTrailing` ends the label's line, `#readonly` replaces the read value. Editing only, as on `Field`; the control stays the label's target and the action is reached by Tab after it. See the select in [Options that load](#options-that-load).
+- **`#prefix` on `TextField`** puts an icon or image before the value, in the control and in front of the read-mode value (an empty value reads "not entered" without it): a country's flag before its translation. It is decorative unless it carries meaning: an image the label already names takes `alt=""`; one that says something the label does not (a currency) takes its own `alt`.
+
+<!-- example: docs/examples/forms/components/PickerFields.vue:21-23 -->
+```vue
+    <TextField v-bind="form.bind('translation')" :label="t('forms.translation')">
+      <template #prefix><img src="/flags/ba.png" alt="" class="h-3.5 w-5" /></template>
+    </TextField>
+```
 - **`label-hidden`** (any field): the label is still the control's accessible name (and the read row's) but is not drawn. For a field whose group header already says it.
 - Dates, times and months are [their own fields](#dates-and-times): typed first, a calendar when you would rather pick. None of them has a `Date` value.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
@@ -387,7 +395,21 @@ const queues = useOptions({ for: () => form.values.category, load: (category, { 
 - A row that says more than a label and a description (a photo, a VIN, a "New" badge) fills the **`#option` slot** of `SelectField`, `MultiSelectField` or `ComboField`: `<template #option="{ option, active, selected }">`. It replaces what the row says; the row, its check, its keys and its roles stay. Put the row's own data in the option's `meta` (`SelectOption<number, Vehicle>`), and the slot reads `option.meta.vin` typed, without a cast; give every option a `meta` when the slot reads it.
 - Searching a long list is `ComboField :search`, not a select.
 
-The desktop list is a popover that is never clipped by a dialog or a scrolling panel, and is at least as wide as the field (never narrower than its own minimum). Phones get the bottom sheet.
+### A picker in a narrow column
+
+A picker whose row sits in a narrow column (a half-width card, a phone) takes `row-layout` like `SegmentedField`: `stacked` puts the control under the label at the row's full width, `setting` at the end of the row; without it the row is a label column and the control. The list of rows is never narrower than its field or than **20rem** (never wider than the screen), aligned to the field's start; on a phone the `ComboField` list spans the screen, so a photo and a badge keep their room. `SelectField` and `MultiSelectField` follow the same minimum, and a phone opens them in the sheet as before. The slot's types are public: `OptionWithMeta` and `OptionSlotScope` come from `@wssto2/vue-core/form`.
+
+<!-- example: docs/examples/forms/components/PickerFields.vue:15-20 -->
+```vue
+    <ComboField v-bind="form.bind('vehicle')" row-layout="stacked" :label="t('forms.vehicle')" :search="find">
+      <template #option="{ option }">
+        <img :src="option.meta.photo" alt="" class="h-12 w-16 shrink-0 rounded object-cover" />
+        <span class="min-w-0 flex-1"><span class="block truncate">{{ option.label }}</span><span class="block truncate font-mono text-footnote">{{ vin(option) }}</span></span>
+      </template>
+    </ComboField>
+```
+
+The desktop list is a popover that is never clipped by a dialog or a scrolling panel, and is at least as wide as the field and at least 20rem (never past the screen). Phones get the bottom sheet.
 
 ### Numbers without a thousands separator
 
@@ -455,6 +477,8 @@ useSaveChrome({ form, save });
 | `MonthYearField` | two numbers, `month` 1 to 12 and `year` | `3`, `2019` |
 
 An empty field is `null`, never `""`. Turning a wall-clock date-time into an instant (and back) is the record mapping's job, as for every field.
+
+A date field never draws outside its row: on a phone `DateTimeField` shows the date and the time as two words and wraps between them when the row's column is too narrow for one line (right-aligned), so a long label no longer pushes the value past the card.
 
 <!-- example: docs/examples/forms/components/DeliveryFields.vue:8-16 -->
 ```ts

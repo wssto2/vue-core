@@ -106,9 +106,24 @@
     "shiftStart": "Početak smjene",
     "firstRegistration": "Prva registracija",
     "narrow": "U uskom stupcu",
+    "longLabel": "Datum i vrijeme probne vožnje i preuzimanja vozila",
     "values": "Vrijednosti",
     "editing": "Uređivanje",
     "link": "Datumi i vremena"
+  },
+  "pickers": {
+    "title": "Odabiri i prijevodi",
+    "link": "Odabiri i prijevodi",
+    "intro": "Odabiri s fotografijom u uskom stupcu i redak prijevoda sa zastavom ispred svakog jezika.",
+    "narrow": "U uskom stupcu",
+    "narrowHint": "Popis je širok najmanje 20rem i otvara se ispod polja; na telefonu zauzima cijeli zaslon.",
+    "wide": "Kratko polje u širokom retku",
+    "vehicle": "Vozilo (pretraga)",
+    "stock": "Vozilo na stanju",
+    "new": "Novo",
+    "translations": "Prijevodi",
+    "translationsHint": "Zastava ispred svakog jezika: u polju dok se uređuje, ispred vrijednosti dok se čita.",
+    "translationsRows": "Isto, u redcima"
   },
   "options": {
     "title": "Opcije koje se učitavaju",

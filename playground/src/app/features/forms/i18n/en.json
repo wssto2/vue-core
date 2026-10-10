@@ -106,9 +106,24 @@
     "shiftStart": "Shift start",
     "firstRegistration": "First registration",
     "narrow": "In a narrow column",
+    "longLabel": "Date and time of the test drive and the handover",
     "values": "Values",
     "editing": "Editing",
     "link": "Dates and times"
+  },
+  "pickers": {
+    "title": "Pickers and translations",
+    "link": "Pickers and translations",
+    "intro": "Pickers with photo rows in a narrow column, and a translations row with a flag before each language.",
+    "narrow": "In a narrow column",
+    "narrowHint": "The list is at least 20rem wide and opens under the field; on a phone it spans the screen.",
+    "wide": "A short field in a wide row",
+    "vehicle": "Vehicle (search)",
+    "stock": "Vehicle in stock",
+    "new": "New",
+    "translations": "Translations",
+    "translationsHint": "A flag before each language: in the control while editing, before the value while reading.",
+    "translationsRows": "The same, in rows"
   },
   "options": {
     "title": "Options that load",

@@ -44,6 +44,7 @@ const nextDelivery = (today: string) => {
         <FormGroup :header="t('forms.dates.narrow')">
           <DateField v-model="values.deliveryOn" :label="t('forms.dates.deliveryOn')" />
           <DateTimeField v-model="values.visitAt" :label="t('forms.dates.visitAt')" />
+          <DateTimeField v-model="values.visitAt" :label="t('forms.dates.longLabel')" required />
           <TimeField v-model="values.shiftStart" :label="t('forms.dates.shiftStart')" />
           <MonthYearField v-model:month="values.month" v-model:year="values.year" :label="t('forms.dates.firstRegistration')" />
         </FormGroup>

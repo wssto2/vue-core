@@ -37,6 +37,8 @@
   "category": "Category",
   "queue": "Queue",
   "latitude": "Latitude",
+  "vehicle": "Vehicle",
+  "translation": "Bosnia and Herzegovina",
   "longitude": "Longitude",
   "vehicles": "Vehicles",
   "postalCode": "Postal code",
