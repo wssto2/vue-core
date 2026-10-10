@@ -96,6 +96,8 @@ const loadedTags = useOptions({ load: async () => tagOptions });
   <SelectField :options="loadedVehicles"><template #option="{ option }">{{ isString(option.meta.vin) }}</template></SelectField>
   <MultiSelectField :options="vehicles"><template #option="{ option }">{{ isNumber(option.meta.kw) }}</template></MultiSelectField>
   <ComboField :options="vehicles"><template #option="{ option }">{{ isString(option.meta.vin) }}</template></ComboField>
+  <SelectField :options="vehicles"><template #value="{ option }">{{ isString(option.meta.vin) }}{{ isNumber(option.meta.kw) }}</template></SelectField>
+  <ComboField :options="vehicles"><template #value="{ option }">{{ isString(option.meta.vin) }}</template></ComboField>
   <ComboField :search="async () => vehicles"><template #option="{ option }">{{ isNumber(option.meta.kw) }}</template></ComboField>
   <!-- options without meta: the slot's meta is undefined, not any -->
   <SelectField :options="statuses"><template #option="{ option }">{{ isUndefined(option.meta) }}</template></SelectField>

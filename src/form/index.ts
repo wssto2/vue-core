@@ -41,7 +41,7 @@ export { default as OptionList } from "./OptionList.vue";
 export { groupOptions, matchOptions } from "./options";
 export { recentChoicesKey } from "./suggestions";
 export type { RecentChoices, SuggestionSource, TextSuggestion } from "./suggestions";
-export type { OptionGroup, OptionSlotScope, OptionWithMeta, SelectOption } from "./options";
+export type { OptionGroup, OptionSlotScope, OptionWithMeta, SelectOption, ValueSlotScope } from "./options";
 export { useOptions } from "./useOptions";
 export type { AsyncOptions, OptionsContext, OptionsSource } from "./useOptions";
 export { default as OtpInput } from "./OtpInput.vue";

@@ -18,6 +18,11 @@ export interface SelectOption<Value extends string | number = string | number, M
 /** An option whose `meta` is there: what the `#option` slot reads. */
 export type OptionWithMeta<Value extends string | number, Meta> = SelectOption<Value, Meta> & { readonly meta: Meta };
 
+/** What a `#value` slot receives: the chosen option, with the `meta` the app gave it. Only rendered while an option is chosen. */
+export interface ValueSlotScope<Value extends string | number, Meta = undefined> {
+  readonly option: OptionWithMeta<Value, Meta>;
+}
+
 /** What an `#option` slot receives for one row: the option, whether it is the highlighted (or focused) row, and whether it is the chosen one. */
 export interface OptionSlotScope<Value extends string | number, Meta = undefined> {
   /** The row's option, with the `meta` the app gave it (give every option one when the slot reads it). */

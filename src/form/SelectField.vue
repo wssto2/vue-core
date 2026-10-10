@@ -11,7 +11,7 @@ import { useControlSurface } from "./control";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
 import OptionList from "./OptionList.vue";
-import type { OptionSlotScope, SelectOption } from "./options";
+import type { OptionSlotScope, OptionWithMeta, SelectOption, ValueSlotScope } from "./options";
 import { useOptionSource, type AsyncOptions, type OptionsSource } from "./useOptions";
 
 /**
@@ -93,6 +93,8 @@ const triggerClass = computed(() => [
 defineSlots<FieldSlots & {
   /** Replaces what an option row says (an icon, a badge); the row, its check, keys and roles stay. */
   option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
+  /** Replaces the chosen value's text, in the control and in read mode (a swatch before the colour's name). Only rendered while an option is chosen; the placeholder is not this slot's. */
+  value?: (scope: ValueSlotScope<Value, Meta>) => unknown;
 }>();
 </script>
 
@@ -103,7 +105,7 @@ defineSlots<FieldSlots & {
         <button v-if="compact" :id="id" type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="sheetOpen" :aria-required="props.required || undefined"
           :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="sheet?.present()">
           <ToneDot v-if="selected?.dot" :tone="selected.dot" />
-          <span class="min-w-0 truncate" :class="[stacked ? 'flex-1 text-left' : '', selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled']">{{ selected?.label ?? placeholder }}</span>
+          <span class="min-w-0 truncate" :class="[stacked ? 'flex-1 text-left' : '', selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled']"><slot v-if="$slots.value && selected" name="value" :option="selected as OptionWithMeta<Value, Meta>" /><template v-else>{{ selected?.label ?? placeholder }}</template></span>
           <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
         </button>
         <Popover v-else :label="props.label ?? placeholder" width="lg" match-trigger-width placement="bottom-start" :arrow="false" :block="stacked">
@@ -111,7 +113,7 @@ defineSlots<FieldSlots & {
             <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined"
               :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="toggle">
               <ToneDot v-if="selected?.dot" :tone="selected.dot" />
-              <span class="min-w-0 truncate" :class="[stacked ? 'flex-1 text-left' : '', selected ? 'text-content-strong' : 'text-content-disabled']">{{ selected?.label ?? placeholder }}</span>
+              <span class="min-w-0 truncate" :class="[stacked ? 'flex-1 text-left' : '', selected ? 'text-content-strong' : 'text-content-disabled']"><slot v-if="$slots.value && selected" name="value" :option="selected as OptionWithMeta<Value, Meta>" /><template v-else>{{ selected?.label ?? placeholder }}</template></span>
               <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
             </button>
           </template>
@@ -138,5 +140,6 @@ defineSlots<FieldSlots & {
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
     <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
     <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
+    <template v-else-if="$slots.value && selected" #readonly><span class="block break-words text-body text-content-strong"><slot name="value" :option="selected as OptionWithMeta<Value, Meta>" /></span></template>
   </Field>
 </template>

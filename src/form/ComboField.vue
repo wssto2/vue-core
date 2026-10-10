@@ -6,7 +6,7 @@ import { controlWidth, type ControlWidth } from "../controls";
 import { useControlSurface } from "./control";
 import Field from "./Field.vue";
 import { fieldDefaults, fieldProps, useFormGroup, type FieldProps, type FieldSlots } from "./field";
-import type { OptionSlotScope, SelectOption } from "./options";
+import type { OptionSlotScope, OptionWithMeta, SelectOption, ValueSlotScope } from "./options";
 import SuggestionList from "./SuggestionList.vue";
 import { listShows, useSuggestions } from "./suggestions";
 
@@ -114,6 +114,8 @@ defineExpose({ focus: () => input.value?.focus() });
 defineSlots<FieldSlots & {
   /** Replaces what an option row says (an icon, a badge); the row, its keys and roles stay. */
   option?: (scope: OptionSlotScope<Value, Meta>) => unknown;
+  /** The chosen value's content: in the control it stands before the text (a swatch before the name), in read mode it replaces the text. Only rendered while an option is chosen. */
+  value?: (scope: ValueSlotScope<Value, Meta>) => unknown;
 }>();
 </script>
 
@@ -121,6 +123,7 @@ defineSlots<FieldSlots & {
   <Field v-bind="fieldProps(props)" :value="current?.label ?? null" :row-layout="props.rowLayout">
     <template #default="{ id, describedby, invalid }">
       <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
+        <span v-if="$slots.value && current" class="flex shrink-0 items-center" data-test="field-value"><slot name="value" :option="current as OptionWithMeta<Value, Meta>" /></span>
         <input :id="id" ref="input" role="combobox" type="text" autocomplete="off" :value="text" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
           aria-autocomplete="list" :aria-expanded="expanded" :aria-controls="`${id}-list`" :aria-activedescendant="expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined" :aria-required="props.required || undefined"
           :aria-invalid="invalid || undefined" :aria-describedby="describedby"
@@ -137,5 +140,6 @@ defineSlots<FieldSlots & {
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
     <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
     <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>
+    <template v-else-if="$slots.value && current" #readonly><span class="block break-words text-body text-content-strong"><slot name="value" :option="current as OptionWithMeta<Value, Meta>" /></span></template>
   </Field>
 </template>
