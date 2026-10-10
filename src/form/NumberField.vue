@@ -24,6 +24,7 @@ import { numberMarks, parseNumber } from "./number";
  * Typing "1,5" mid-edit is never rewritten under the cursor: the text is the user's until the field loses focus.
  * `:max-digits="5"` takes at most five digits (a postal code): typing a sixth does nothing, pasting a longer number keeps its first five.
  * However the field is emptied (typing, a paste of nothing, a cut, a test's `fill("")`) it emits `null`, also when the value it was given was already `null`.
+ * `blankZero` shows a 0 as an empty field (a cost row where nothing entered and 0 mean the same); the value stays 0.
  * Limits (`min`, `max`) are the validator's job; the field only keeps what cannot be a number out.
  */
 const props = withDefaults(
@@ -38,6 +39,8 @@ const props = withDefaults(
     grouping?: boolean;
     /** The most digits the field takes, fraction digits included (the sign, separators and decimal mark are not counted): a postal code is `:max-digits="5"`. Further digits are not accepted, as `maxlength` does for text; a pasted longer number keeps its first digits. */
     maxDigits?: number;
+    /** A value of 0 reads as an empty field, editing and reading (a cost that is "not set" until filled in). The value stays 0 and what is emitted is unchanged; a 0 the user types stays visible while the field has focus. */
+    blankZero?: boolean;
     /** The monospaced face of `TextField mono` (coordinates, codes). */
     mono?: boolean;
     modelValue?: number | null;
@@ -47,7 +50,7 @@ const props = withDefaults(
     /** sm 10rem (the default for numbers) · md · lg · full. */
     width?: Exclude<ControlWidth, "content">;
   }>(),
-  { ...fieldDefaults, modelValue: undefined, decimals: 0, minDecimals: undefined, negative: false, grouping: true, maxDigits: undefined, mono: false, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
+  { ...fieldDefaults, modelValue: undefined, decimals: 0, minDecimals: undefined, negative: false, blankZero: false, grouping: true, maxDigits: undefined, mono: false, placeholder: undefined, prefix: undefined, suffix: undefined, width: "sm" },
 );
 
 const emit = defineEmits<{ "update:modelValue": [value: number | null]; focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
@@ -66,8 +69,9 @@ const fieldWidth = computed(() => (inRow ? controlWidth(props.width) : "w-full")
 
 const marks = computed(() => numberMarks(format));
 const fixed = computed(() => Math.min(props.minDecimals ?? props.decimals, props.decimals));
-const shown = (value: number | null) => (value === null ? "" : format.number(value, { minimumFractionDigits: fixed.value, maximumFractionDigits: props.decimals, useGrouping: props.grouping }));
-const editing = (value: number | null) => (value === null ? "" : String(value).replace(".", marks.value.decimal));
+const blank = (value: number | null) => value === null || (props.blankZero && value === 0);
+const shown = (value: number | null) => (blank(value) ? "" : format.number(value, { minimumFractionDigits: fixed.value, maximumFractionDigits: props.decimals, useGrouping: props.grouping }));
+const editing = (value: number | null) => (blank(value) ? "" : String(value).replace(".", marks.value.decimal));
 const read = (text: string) => parseNumber(text, { decimals: props.decimals, group: props.grouping ? marks.value.group : "" });
 
 const focused = ref(false);
@@ -77,7 +81,7 @@ watch(model, (value) => {
   if (!focused.value) text.value = shown(value);
   else if (read(text.value) !== value) text.value = editing(value);
 });
-watch(() => [props.decimals, fixed.value, props.grouping, marks.value.decimal], () => {
+watch(() => [props.decimals, props.blankZero, fixed.value, props.grouping, marks.value.decimal], () => {
   if (!focused.value) text.value = shown(model.value);
 });
 
@@ -134,7 +138,7 @@ defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <Field v-bind="fieldProps(props)" :value="model === null ? null : shown(model)" :prefix="props.prefix" :suffix="props.suffix" :value-style="props.mono ? 'mono' : 'numeric'">
+  <Field v-bind="fieldProps(props)" :value="blank(model) ? null : shown(model!)" :prefix="props.prefix" :suffix="props.suffix" :value-style="props.mono ? 'mono' : 'numeric'">
     <template #default="{ id, describedby, invalid }">
       <div class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
         <span v-if="props.prefix" class="shrink-0 text-footnote text-content-muted">{{ props.prefix }}</span>
