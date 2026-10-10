@@ -111,6 +111,19 @@
     "editing": "Uređivanje",
     "link": "Datumi i vremena"
   },
+  "events": {
+    "title": "Blur, nula kao prazno i odabrana vrijednost",
+    "link": "Blur, nula kao prazno i odabrana vrijednost",
+    "intro": "VIN koji se provjerava pri izlasku iz polja, red troška u kojem 0 znači nije uneseno, i odabir boje s uzorkom na odabranoj vrijednosti.",
+    "vin": "VIN",
+    "vinHint": "Izađite iz polja za provjeru.",
+    "checked": "Provjereno {vin}",
+    "unchecked": "Još nije provjereno",
+    "transport": "Prijevoz",
+    "customs": "Carina",
+    "sent": "Pohranjeno: prijevoz {transport}, carina {customs}",
+    "colour": "Boja"
+  },
   "pickers": {
     "title": "Odabiri i prijevodi",
     "link": "Odabiri i prijevodi",

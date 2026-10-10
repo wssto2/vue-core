@@ -111,6 +111,19 @@
     "editing": "Editing",
     "link": "Dates and times"
   },
+  "events": {
+    "title": "Blur, blank zero and the chosen value",
+    "link": "Blur, blank zero and the chosen value",
+    "intro": "A VIN checked when the field is left, a cost row where 0 reads as not set, and a colour select with its swatch on the chosen value.",
+    "vin": "VIN",
+    "vinHint": "Leave the field to check it.",
+    "checked": "Checked {vin}",
+    "unchecked": "Not checked yet",
+    "transport": "Transport",
+    "customs": "Customs",
+    "sent": "Value held: transport {transport}, customs {customs}",
+    "colour": "Colour"
+  },
   "pickers": {
     "title": "Pickers and translations",
     "link": "Pickers and translations",

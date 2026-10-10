@@ -362,6 +362,20 @@ One `Field` (label, hint, error, required, locked) around each control. `TextFie
       <template #prefix><img src="/flags/ba.png" alt="" class="h-3.5 w-5" /></template>
     </TextField>
 ```
+- **`@blur` and `@focus`** on `TextField`, `NumberField`, `MoneyField`, `TextareaField`, `ComboField`, `DateField`, `DateTimeField` and `TimeField` are the control's own events (with the `FocusEvent`), not a `focusout` listener bound through `v-bind`. A typed date or time is committed first and a combo has put its chosen label back, so the listener reads the value the field now holds: a VIN check or a lookup on leaving the field.
+
+<!-- example: docs/examples/forms/components/FieldEvents.vue:14-14 -->
+```vue
+    <TextField v-bind="form.bind('vin')" :label="t('forms.vin')" mono @blur="lookUp(form.values.vin)" />
+```
+- **`#value` on `SelectField` and `ComboField`** is the chosen option's own content, typed like `#option`'s `{ option }` (the `meta` the options carry): a colour's swatch beside its name on the chosen value as well as on the rows. A select replaces the chosen text with it, in the control and in read mode; a combo shows it before the text it keeps editable (and in read mode instead of the text). Only while an option is chosen, so the placeholder stays the field's.
+
+<!-- example: docs/examples/forms/components/FieldEvents.vue:16-18 -->
+```vue
+    <SelectField v-bind="form.bind('colour')" :label="t('forms.colour')" :options="colours">
+      <template #value="{ option }"><span class="inline-block size-3 rounded-full align-middle" :style="{ background: option.meta.hex }" /> {{ option.label }}</template>
+    </SelectField>
+```
 - **`label-hidden`** (any field): the label is still the control's accessible name (and the read row's) but is not drawn. For a field whose group header already says it.
 - Dates, times and months are [their own fields](#dates-and-times): typed first, a calendar when you would rather pick. None of them has a `Date` value.
 - The upload is the app's: `FileField` and `PhotoField` hold a `File` and check type and size; the form's `send` puts it in a multipart body.
@@ -421,6 +435,15 @@ A year, a code or a coordinate is a number that must not read "2.024". `:groupin
 ```vue
     <NumberField v-bind="form.bind('latitude')" :label="t('forms.latitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
     <NumberField v-bind="form.bind('longitude')" :label="t('forms.longitude')" :decimals="7" :min-decimals="0" negative mono :grouping="false" />
+```
+
+### A zero that reads as not set
+
+A cost row where nothing entered and 0 mean the same takes **`blank-zero`** (`NumberField`, `MoneyField`): a value of 0 reads as an empty field, editing and reading, while the value stays 0 and what is sent is unchanged. A 0 the user types stays visible while the field has focus and reads blank once it is left. Clearing a number field, however it is done (typing, a paste of nothing, a cut), always emits `null`.
+
+<!-- example: docs/examples/forms/components/FieldEvents.vue:15-15 -->
+```vue
+    <MoneyField v-bind="form.bind('transport')" :label="t('forms.transport')" currency="EUR" blank-zero />
 ```
 
 ### Codes of a fixed length
@@ -648,3 +671,5 @@ A free-text field with suggestions is left-aligned on phones, where other fields
 ## Testing
 
 `useForm`, `useResourceForm`, `useGroupSheet` and `useCommand` need a component to live in and the library's i18n; the playground-free pattern used by this repo's own tests is a `createApp` with `createI18n`, the formatting plugin and an app-provided leave guard (see `src/form/testing.ts`).
+
+A group is found by its name: `FormGroup :group="…"` carries `data-group` (the section only; its Edit is inside it), so a spec reaches one group's Edit with `[data-group=contact] [data-test=group-edit]`.
