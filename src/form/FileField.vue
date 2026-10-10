@@ -92,7 +92,7 @@ defineSlots<FieldSlots>();
           @click="!props.disabled && chooser?.click()" @keydown.enter.prevent="!props.disabled && chooser?.click()" @keydown.space.prevent="!props.disabled && chooser?.click()"
           @dragover.prevent="dragging = true" @dragleave.prevent="dragging = false" @drop.prevent="dragging = false; if (!props.disabled) take($event.dataTransfer?.files?.[0])">
           <span class="font-semibold text-content-link">{{ t("core.form.file.choose") }}</span>
-          <span class="text-content-muted"> {{ t("core.form.file.drop") }}</span>
+          <span class="text-content-muted">{{ " " + t("core.form.file.drop") }}</span>
         </div>
 
         <Button v-else :disabled="props.disabled" @click="chooser?.click()">{{ t("core.form.file.choose") }}</Button>

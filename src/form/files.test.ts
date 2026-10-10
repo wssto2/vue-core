@@ -21,6 +21,20 @@ const choose = async (input: HTMLInputElement, chosen: File) => {
   await fireEvent.change(input);
 };
 
+describe("the dropzone's text", () => {
+  it.each([
+    ["en", "Choose file or drop a file here"],
+    ["bs", "Izaberi datoteku ili prevucite datoteku ovdje"],
+    ["hr", "Odaberi datoteku ili povucite datoteku ovdje"],
+    ["sl", "Izberi datoteko ali povlecite datoteko sem"],
+    ["sr-Latn", "Izaberi datoteku ili prevucite datoteku ovde"],
+  ])("reads as one sentence in %s: a space between the two messages", (locale, text) => {
+    const i18n = createTestI18n({ locale });
+    render(FileField, { props: { modelValue: null, label: "Sheet", variant: "dropzone" }, global: { plugins: [i18n, testFormatting(i18n)] } });
+    expect(screen.getByRole("button", { name: /./ }).textContent?.trim()).toBe(text);
+  });
+});
+
 describe("checkFile", () => {
   it.each([
     ["a.pdf", "application/pdf", [".pdf"], null],
