@@ -49,6 +49,7 @@ const props = withDefaults(
 );
 
 const model = defineModel<number | null>({ default: null });
+const emit = defineEmits<{ focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 const format = useFormat();
 const input = useTemplateRef<HTMLInputElement>("input");
 const inRow = !!useFormGroup();
@@ -97,14 +98,16 @@ function onInput(event: Event) {
   else model.value = null;
 }
 
-function onFocus() {
+function onFocus(event: FocusEvent) {
   focused.value = true;
   text.value = editing(model.value);
+  emit("focus", event);
 }
 
-function onBlur() {
+function onBlur(event: FocusEvent) {
   focused.value = false;
   text.value = shown(model.value);
+  emit("blur", event);
 }
 
 defineExpose({ focus: () => input.value?.focus() });

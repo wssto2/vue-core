@@ -16,13 +16,14 @@ const props = withDefaults(
 );
 
 const model = defineModel<number | null>({ default: null });
+const emit = defineEmits<{ focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 const field = useTemplateRef<InstanceType<typeof NumberField>>("field");
 defineExpose({ focus: () => field.value?.focus() });
 defineSlots<FieldSlots>();
 </script>
 
 <template>
-  <NumberField ref="field" v-model="model" v-bind="fieldProps(props)" :decimals="props.decimals" :negative="props.negative" :suffix="props.currency" :width="props.width">
+  <NumberField ref="field" v-model="model" v-bind="fieldProps(props)" :decimals="props.decimals" :negative="props.negative" :suffix="props.currency" :width="props.width" @focus="emit('focus', $event)" @blur="emit('blur', $event)">
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
     <template v-if="$slots.labelTrailing" #labelTrailing><slot name="labelTrailing" /></template>
     <template v-if="$slots.readonly" #readonly><slot name="readonly" /></template>

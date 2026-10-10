@@ -48,7 +48,7 @@ const props = withDefaults(
 );
 
 const model = defineModel<Value | null>({ default: null });
-const emit = defineEmits<{ picked: [option: SelectOption<Value, Meta>] }>();
+const emit = defineEmits<{ picked: [option: SelectOption<Value, Meta>]; focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 
 const { t } = useI18n();
 const inRow = !!useFormGroup();
@@ -88,7 +88,8 @@ function onInput(event: Event) {
   }
 }
 
-function onFocus() {
+function onFocus(event: FocusEvent) {
+  emit("focus", event);
   if (!props.disabled) suggestions.show("");
 }
 
@@ -101,10 +102,11 @@ function choose(option: SelectOption<Value, Meta>) {
   emit("picked", option);
 }
 
-function onBlur() {
-  // What was typed but not picked is not a choice: the chosen label comes back.
+function onBlur(event: FocusEvent) {
+  // What was typed but not picked is not a choice: the chosen label comes back, and then the field has blurred.
   suggestions.close();
   text.value = current.value?.label ?? "";
+  emit("blur", event);
 }
 
 const expanded = computed(() => listShows(open.value, items.value.length, status.value, true));

@@ -25,6 +25,7 @@ const props = withDefaults(
 );
 
 const model = defineModel<string>({ default: "" });
+const emit = defineEmits<{ focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 const area = useTemplateRef<HTMLTextAreaElement>("area");
 const inRow = !!useFormGroup();
 const compact = useCompactPresentation();
@@ -46,7 +47,7 @@ defineSlots<FieldSlots>();
         <textarea :id="id" ref="area" v-model="model" :name="props.name" :rows="props.rows" :placeholder="props.placeholder" :maxlength="props.maxLength" :autocomplete="props.autocomplete"
           :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
           class="block w-full border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
-          :class="props.disabled ? 'resize-none' : 'resize-y'"></textarea>
+          :class="props.disabled ? 'resize-none' : 'resize-y'" @focus="emit('focus', $event)" @blur="emit('blur', $event)"></textarea>
       </div>
       <p v-if="!asEntry && counter" class="mt-1 self-end text-footnote tabular-nums text-content-muted">{{ counter }}</p>
     </template>

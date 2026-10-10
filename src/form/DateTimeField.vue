@@ -50,6 +50,7 @@ const props = withDefaults(
 );
 
 const model = defineModel<string | null>({ default: null });
+const emit = defineEmits<{ focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 const { t } = useI18n();
 const format = useFormat();
 const compact = useCompactPresentation();
@@ -156,7 +157,7 @@ defineSlots<FieldSlots>();
             <input :id="id" ref="input" v-bind="attrs" type="text" role="combobox" autocomplete="off" size="20" :name="props.name" :value="entry.text.value" :placeholder="dates.placeholder.value"
               :disabled="props.disabled" :required="props.required" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined" :aria-describedby="describedby"
               class="block min-h-7 min-w-0 border-0 bg-transparent py-1 pl-2.5 text-body tabular-nums text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
-              @input="entry.input(($event.target as HTMLInputElement).value)" @blur="entry.commit()" @keydown="onKeydown" @click="open(false)" />
+              @input="entry.input(($event.target as HTMLInputElement).value)" @focus="emit('focus', $event)" @blur="entry.commit(); emit('blur', $event)" @keydown="onKeydown" @click="open(false)" />
             <button v-if="!props.disabled" type="button" tabindex="-1" :aria-label="t('core.form.date.open')" class="mr-2 flex shrink-0 cursor-pointer items-center text-content-link" @click="presented ? popover?.dismiss() : open(true)">
               <Icon name="calendarLine" :size="18" />
             </button>

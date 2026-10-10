@@ -55,7 +55,7 @@ const props = withDefaults(
 );
 
 const model = defineModel<string>({ default: "" });
-const emit = defineEmits<{ picked: [suggestion: { text: string; detail?: string }] }>();
+const emit = defineEmits<{ picked: [suggestion: { text: string; detail?: string }]; focus: [event: FocusEvent]; blur: [event: FocusEvent] }>();
 const input = useTemplateRef<HTMLInputElement>("input");
 const anchor = useTemplateRef<HTMLElement>("anchor");
 const inRow = !!useFormGroup();
@@ -100,8 +100,13 @@ function pick(option: SelectOption<string>) {
   emit("picked", { text: option.value, ...(option.description !== undefined ? { detail: option.description } : {}) });
 }
 /** Focusing a field that has text suggests nothing (that would search for what is already there); an empty one shows the recent picks. */
-function onFocus() {
+function onFocus(event: FocusEvent) {
+  emit("focus", event);
   if (suggesting.value && model.value === "") engine.show("");
+}
+function onBlur(event: FocusEvent) {
+  engine.close();
+  emit("blur", event);
 }
 function acceptCompletion(): boolean {
   const option = engine.current.value;
@@ -133,7 +138,7 @@ defineSlots<FieldSlots & {
             :aria-activedescendant="suggesting && expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined"
             class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
             :class="[props.mono ? 'font-mono' : '', inRow && !suggesting ? 'compact:text-right' : '']"
-            @input="onInput" @keyup="noteCaret" @click="noteCaret" @keydown="onKeydown" @focus="onFocus" @blur="engine.close()" />
+            @input="onInput" @keyup="noteCaret" @click="noteCaret" @keydown="onKeydown" @focus="onFocus" @blur="onBlur" />
           <!-- The grey completion: the typed text takes its room invisibly, the rest shows after it. -->
           <span v-if="completion" aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-pre py-1 text-body" :class="props.mono ? 'font-mono' : ''" data-test="completion">
             <span class="invisible">{{ model }}</span><span class="text-content-disabled">{{ completion }}</span>
