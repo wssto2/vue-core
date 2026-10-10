@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.21 — 2026-10-10
+
+A step opens at its top, and a command can ask before it runs. From ARV wave 3 (vehicle entry at 390, Isporuka). Two items, one commit each.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`ask` on `useCommand`**: `ask: (input) => ({ title, message?, confirmLabel?, tone? }) | null`. After the inputs check out and before anything is sent, `CommandDialog` puts the question in an `AlertDialog` over the filled form. Yes calls with the usual idempotency key; Cancel returns to the form untouched and sends nothing; a refusal after Yes (422, conflict) lands on the form like any other. `null` asks nothing this time. The question may depend on the input and on what the caller holds. An invalid form is not asked about: its errors go on the fields as before. New on the command: `question` (a ref, set instead of calling) and `answer(yes)`; `confirm()` skips the question (it is the answer). The type of `CommandDialog`'s `command` takes `question` and `answer` as optional, so a hand-made adapter still type-checks. ARV: `features/vehicles/components/phase/DeliverSheet.vue` (the `ask()` wrapper, the `sheet` adapter, `runDeliver` and its own `AlertDialog`) becomes `ask: () => ({ title, message: payments.confirmBody(...), confirmLabel, tone: "neutral" })` on `deliver` and `:command="deliver"`. It is the only form-then-question flow in ARV; the other `AlertDialog`s ask without inputs.
+
+### Fixed
+- **`StepForm` opens a step at its top.** It focused the step body on every step change without `preventScroll`, so a sheet on a phone scrolled the body into view and the progress went out of view (vehicle entry › Podaci o vozilu at 390). Focus now goes to the step with `preventScroll`, and when the form's top is scrolled out above its container (a sheet's body, else the page) it is brought back to the top; a page that shows its top does not jump. Next and Back alike. A refused Next still scrolls to and focuses the first field in error. ARV: none; the vehicle entry step at 390 is re-shot after adopting.
+
+### Changes to existing behaviour
+- **`StepForm` scrolls on a step change** when the form's top is out of view (see above), and focuses the step without scrolling.
+- **Pinned by tests that were updated:** none; no test pinned an old default.
+
 ## 0.4.20 — 2026-10-10
 
 The notes from ARV's wave 2: what each ARV screen had to build by hand around the fields. Six items, one commit each.
