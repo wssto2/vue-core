@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { intlLocale } from "../internal/intlLocale";
 import { computed, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon, type IconName } from "../icon";
@@ -42,7 +43,7 @@ defineSlots<{ leading?: () => unknown; description?: () => unknown }>();
 const { locale } = useI18n();
 // The nav bar exists below md, so that is where actions move.
 const phone = useMediaQuery("(max-width: 47.999rem)");
-const count = computed(() => (props.count == null ? null : new Intl.NumberFormat(locale.value).format(props.count)));
+const count = computed(() => (props.count == null ? null : new Intl.NumberFormat(intlLocale(locale.value)).format(props.count)));
 
 const titleElement = useTemplateRef<HTMLElement>("titleElement");
 useLargeTitle(titleElement, () => props.title);

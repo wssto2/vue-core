@@ -1,5 +1,6 @@
 import type { App } from "vue";
 import { defineFeatureContext } from "../platform/context";
+import { intlLocale } from "../internal/intlLocale";
 
 /** What the formatting functions accept for a point in time. Anything that is not a real date reads as "nothing to show". */
 export type DateInput = Date | string | number | null | undefined;
@@ -83,19 +84,19 @@ export function intlFormatters(): Formatters {
     return found;
   };
   const dateFormat = (locale: string, options: Intl.DateTimeFormatOptions) =>
-    cached(`d|${locale}|${JSON.stringify(options)}`, () => new Intl.DateTimeFormat(locale, options));
+    cached(`d|${locale}|${JSON.stringify(options)}`, () => new Intl.DateTimeFormat(intlLocale(locale), options));
 
   return {
     date: (value, locale) => dateFormat(locale, DATE).format(value),
     dateTime: (value, locale) => dateFormat(locale, { ...DATE, ...TIME }).format(value),
     time: (value, locale) => dateFormat(locale, TIME).format(value),
-    number: (value, locale, options) => cached(`n|${locale}|${JSON.stringify(options ?? {})}`, () => new Intl.NumberFormat(locale, options)).format(value),
+    number: (value, locale, options) => cached(`n|${locale}|${JSON.stringify(options ?? {})}`, () => new Intl.NumberFormat(intlLocale(locale), options)).format(value),
     money: (amount, currency, locale) =>
-      cached(`m|${locale}|${currency}`, () => new Intl.NumberFormat(locale, { style: "currency", currency })).format(amount),
+      cached(`m|${locale}|${currency}`, () => new Intl.NumberFormat(intlLocale(locale), { style: "currency", currency })).format(amount),
     relative(value, locale, now) {
       const seconds = Math.trunc((value.getTime() - now.getTime()) / 1000);
       const [unit, size] = RELATIVE_UNITS.find(([, length]) => Math.abs(seconds) >= length) ?? RELATIVE_UNITS[RELATIVE_UNITS.length - 1]!;
-      return cached(`r|${locale}`, () => new Intl.RelativeTimeFormat(locale, { numeric: "auto" })).format(Math.trunc(seconds / size), unit);
+      return cached(`r|${locale}`, () => new Intl.RelativeTimeFormat(intlLocale(locale), { numeric: "auto" })).format(Math.trunc(seconds / size), unit);
     },
   };
 }

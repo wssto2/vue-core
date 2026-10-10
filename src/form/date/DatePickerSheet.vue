@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { intlLocale } from "../../internal/intlLocale";
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useFormat } from "../../format";
@@ -80,8 +81,8 @@ function turnWheel(next: Time | null) {
 const summary = computed(() => {
   const long = (value: Day) => {
     const civil = parseDay(value)!;
-    const text = new Intl.DateTimeFormat(format.locale, { dateStyle: "full", timeZone: "UTC" }).format(new Date(Date.UTC(civil.year, civil.month - 1, civil.day)));
-    return text.charAt(0).toLocaleUpperCase(format.locale) + text.slice(1);
+    const text = new Intl.DateTimeFormat(intlLocale(format.locale), { dateStyle: "full", timeZone: "UTC" }).format(new Date(Date.UTC(civil.year, civil.month - 1, civil.day)));
+    return text.charAt(0).toLocaleUpperCase(intlLocale(format.locale)) + text.slice(1);
   };
   if (props.mode === "time") return time.value ?? "";
   if (!day.value) return "";

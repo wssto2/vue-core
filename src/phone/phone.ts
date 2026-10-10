@@ -1,3 +1,4 @@
+import { intlLocale } from "../internal/intlLocale";
 import { AsYouType, getCountries, getCountryCallingCode, parsePhoneNumberFromString, validatePhoneNumberLength, type CountryCode } from "libphonenumber-js/max";
 import metadata from "libphonenumber-js/max/metadata";
 import { foldText } from "../form/options";
@@ -117,7 +118,7 @@ export const isValidPhone = (value: string): boolean => phoneProblem(value) === 
 /** The country's name in a language ("Bosna i Hercegovina"); the code itself when the browser does not know it. */
 export function countryName(country: PhoneCountry, locale: string): string {
   try {
-    return new Intl.DisplayNames([locale], { type: "region" }).of(country) ?? country;
+    return new Intl.DisplayNames([intlLocale(locale)], { type: "region" }).of(country) ?? country;
   } catch {
     return country;
   }
@@ -128,7 +129,7 @@ export function searchCountries(query: string, locale: string, countries: readon
   const needle = foldText(query.trim());
   if (needle === "") return countries;
   const digits = needle.replace(/\D/g, "");
-  const names = new Intl.DisplayNames([locale], { type: "region" });
+  const names = new Intl.DisplayNames([intlLocale(locale)], { type: "region" });
   const name = (country: PhoneCountry) => foldText(names.of(country) ?? country);
   const dial = needle.startsWith("+") || /^\d+$/.test(needle);
   return countries.filter((country) => (dial ? dialCodeOf(country).startsWith(digits) : name(country).includes(needle) || country.toLowerCase() === needle));

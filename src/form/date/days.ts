@@ -5,6 +5,8 @@
  * component, the parsers and the quick picks all stand on this file.
  */
 
+import { intlLocale } from "../../internal/intlLocale";
+
 /** A calendar day, `"YYYY-MM-DD"` (years 0001 to 9999). Sorts and compares as text. */
 export type Day = string;
 
@@ -147,7 +149,7 @@ interface WeekInfo {
 
 function weekInfo(locale: string): WeekInfo | null {
   try {
-    const intl = new Intl.Locale(locale) as Intl.Locale & { getWeekInfo?: () => WeekInfo; weekInfo?: WeekInfo };
+    const intl = new Intl.Locale(intlLocale(locale)) as Intl.Locale & { getWeekInfo?: () => WeekInfo; weekInfo?: WeekInfo };
     return intl.getWeekInfo?.() ?? intl.weekInfo ?? null;
   } catch {
     return null;

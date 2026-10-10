@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { intlLocale } from "../internal/intlLocale";
 import { computed, inject, nextTick, ref, useId, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { applicationKey } from "../app/environment";
@@ -55,7 +56,7 @@ const written = (locale: string): boolean => textOf(locale).trim() !== "";
 const code = (locale: string): string => locale.toUpperCase();
 function nameOf(locale: string): string {
   try {
-    return new Intl.DisplayNames([uiLocale.value], { type: "language" }).of(locale) ?? code(locale);
+    return new Intl.DisplayNames([intlLocale(uiLocale.value)], { type: "language" }).of(locale) ?? code(locale);
   } catch {
     return code(locale);
   }
