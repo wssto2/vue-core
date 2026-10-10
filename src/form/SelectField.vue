@@ -46,8 +46,10 @@ const props = withDefaults(
     modelValue?: Value | null;
     /** Shows the search box from this many options. */
     searchFrom?: number;
+    /** `setting` puts the control at the end of the row; `stacked` stretches it under the label (a select in a narrow column). Without it the row is label column and control. */
+    rowLayout?: "setting" | "stacked";
   }>(),
-  { ...fieldDefaults, selected: null, placeholder: undefined, clearable: undefined, modelValue: undefined, searchFrom: 9 },
+  { ...fieldDefaults, selected: null, placeholder: undefined, clearable: undefined, modelValue: undefined, searchFrom: 9, rowLayout: undefined },
 );
 
 // What the select hands back: `null` when the user can clear it, or when options that load can (they drop a value the new options lack).
@@ -81,8 +83,10 @@ function pick(value: Value | null) {
   sheet.value?.dismiss();
 }
 
+const stacked = computed(() => props.rowLayout === "stacked");
 const triggerClass = computed(() => [
   "flex max-w-full min-w-0 items-center gap-1.5 py-1 pl-2.5 pr-2 text-body focus-visible:outline-none",
+  stacked.value ? "w-full" : "",
   inRow ? "compact:pl-0 compact:pr-0" : "",
   props.disabled ? "cursor-not-allowed" : "cursor-pointer",
 ]);
@@ -93,21 +97,21 @@ defineSlots<FieldSlots & {
 </script>
 
 <template>
-  <Field v-bind="fieldProps(props)" :value="selected?.label ?? null">
+  <Field v-bind="fieldProps(props)" :value="selected?.label ?? null" :row-layout="props.rowLayout">
     <template #default="{ id, describedby, invalid }">
-      <div class="inline-flex max-w-full min-w-0" :class="surface">
+      <div class="max-w-full min-w-0" :class="[stacked ? 'flex w-full' : 'inline-flex', surface]">
         <button v-if="compact" :id="id" type="button" :disabled="props.disabled" aria-haspopup="dialog" :aria-expanded="sheetOpen" :aria-required="props.required || undefined"
           :aria-invalid="invalid || undefined" :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="sheet?.present()">
           <ToneDot v-if="selected?.dot" :tone="selected.dot" />
-          <span class="min-w-0 truncate" :class="selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
+          <span class="min-w-0 truncate" :class="[stacked ? 'flex-1 text-left' : '', selected ? (inRow ? 'text-content-strong compact:text-content-muted' : 'text-content-strong') : 'text-content-disabled']">{{ selected?.label ?? placeholder }}</span>
           <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
         </button>
-        <Popover v-else :label="props.label ?? placeholder" width="md" match-trigger-width placement="bottom-start" :arrow="false">
+        <Popover v-else :label="props.label ?? placeholder" width="lg" match-trigger-width placement="bottom-start" :arrow="false" :block="stacked">
           <template #trigger="{ toggle, attrs }">
             <button :id="id" type="button" v-bind="attrs" aria-haspopup="listbox" :disabled="props.disabled" :aria-required="props.required || undefined" :aria-invalid="invalid || undefined"
               :aria-describedby="describedby" :aria-busy="choices.loading.value || undefined" :class="triggerClass" @click="toggle">
               <ToneDot v-if="selected?.dot" :tone="selected.dot" />
-              <span class="min-w-0 truncate" :class="selected ? 'text-content-strong' : 'text-content-disabled'">{{ selected?.label ?? placeholder }}</span>
+              <span class="min-w-0 truncate" :class="[stacked ? 'flex-1 text-left' : '', selected ? 'text-content-strong' : 'text-content-disabled']">{{ selected?.label ?? placeholder }}</span>
               <Icon :name="choices.loading.value ? 'loader4Line' : 'expandUpDownLine'" :size="14" class="shrink-0 text-content-muted" :class="choices.loading.value ? 'animate-spin' : ''" />
             </button>
           </template>

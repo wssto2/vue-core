@@ -2,7 +2,7 @@
 import { computed, nextTick, onUnmounted, ref, useId, watch } from "vue";
 import type { Placement } from "@floating-ui/dom";
 import { focusableWithin } from "../internal/focusable";
-import { arrowSide, useAnchoredPosition } from "./anchored";
+import { NARROW_VIEWPORT, arrowSide, useAnchoredPosition } from "./anchored";
 import { CLOSE_OVERLAYS_EVENT } from "./closeOverlays";
 
 /**
@@ -60,7 +60,6 @@ defineSlots<{
 
 /** Viewport edge gutter; also the width breakpoint for spanning the screen. */
 const GUTTER = 12;
-const NARROW_VIEWPORT = 640;
 const WIDTH = { sm: "w-56", md: "w-72", lg: "w-80", auto: "w-max" } as const;
 
 const panelId = `popover-${useId()}`;

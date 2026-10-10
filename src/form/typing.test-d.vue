@@ -98,6 +98,11 @@ const loadedTags = useOptions({ load: async () => tagOptions });
   <ComboField :search="async () => vehicles"><template #option="{ option }">{{ isNumber(option.meta.kw) }}</template></ComboField>
   <!-- options without meta: the slot's meta is undefined, not any -->
   <SelectField :options="statuses"><template #option="{ option }">{{ isUndefined(option.meta) }}</template></SelectField>
+  <!-- a picker in a narrow column lays out like a segmented control: setting or stacked -->
+  <ComboField :options="tagOptions" row-layout="stacked" />
+  <SelectField :options="statuses" row-layout="setting" />
+  <!-- @vue-expect-error a row layout of a picker is setting or stacked -->
+  <SelectField :options="statuses" row-layout="grid" />
   <I18nField v-bind="form.bind('title')" :required-locales="['hr']" />
   <PhoneField v-bind="form.bind('mobile')" default-country="BA" :common-countries="['DE', 'AT']" />
   <!-- free text stays a string whatever it suggests; a record pick keeps its id type -->

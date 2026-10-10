@@ -2,7 +2,7 @@
 import { computed, nextTick, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
-import { useAnchoredPosition } from "../overlay/anchored";
+import { NARROW_VIEWPORT, useAnchoredPosition } from "../overlay/anchored";
 import type { OptionSlotScope, OptionWithMeta, SelectOption } from "./options";
 import { listShows, matchParts, type SuggestionStatus } from "./suggestions";
 
@@ -50,7 +50,10 @@ const { style } = useAnchoredPosition(panel, {
   offset: 4,
   padding: 8,
   fit: (floating, available) => {
-    floating.style.width = `${props.anchor?.offsetWidth ?? 0}px`;
+    // Rich rows need room wherever the field sits: at least 20rem (never past the screen), the field's width if wider; on a phone the screen.
+    const narrow = window.innerWidth < NARROW_VIEWPORT;
+    floating.style.width = `${narrow ? window.innerWidth - 16 : (props.anchor?.offsetWidth ?? 0)}px`;
+    floating.style.minWidth = narrow ? "" : "min(20rem, calc(100vw - 16px))";
     floating.style.maxHeight = `${Math.max(120, Math.min(320, available.height))}px`;
   },
 });

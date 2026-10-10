@@ -11,6 +11,9 @@ import {
   type ReferenceElement,
 } from "@floating-ui/dom";
 
+/** Below this viewport width a floating panel spans the screen (minus its gutter). */
+export const NARROW_VIEWPORT = 640;
+
 export interface AnchoredOptions {
   /** What the panel is anchored to: an element, or a point (a context menu). Null: not yet known. */
   reference: () => ReferenceElement | null;

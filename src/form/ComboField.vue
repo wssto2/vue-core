@@ -41,8 +41,10 @@ const props = withDefaults(
     /** The id the last picks are kept under; setting it turns "Recent" on. */
     recents?: string;
     width?: Exclude<ControlWidth, "content">;
+    /** `setting` puts the control at the end of the row; `stacked` stretches it under the label (a picker in a narrow column). Without it the row is label column and control. */
+    rowLayout?: "setting" | "stacked";
   }>(),
-  { ...fieldDefaults, options: undefined, search: undefined, selected: null, placeholder: undefined, minLength: 1, debounce: 300, limit: 30, recents: undefined, width: "md" },
+  { ...fieldDefaults, options: undefined, search: undefined, selected: null, placeholder: undefined, minLength: 1, debounce: 300, limit: 30, recents: undefined, width: "md", rowLayout: undefined },
 );
 
 const model = defineModel<Value | null>({ default: null });
@@ -51,7 +53,8 @@ const emit = defineEmits<{ picked: [option: SelectOption<Value, Meta>] }>();
 const { t } = useI18n();
 const inRow = !!useFormGroup();
 const surface = useControlSurface("text", () => (props.error ? "error" : props.disabled ? "locked" : "rest"));
-const fieldWidth = computed(() => (inRow ? controlWidth(props.width) : "w-full"));
+const stacked = computed(() => props.rowLayout === "stacked");
+const fieldWidth = computed(() => (inRow && !stacked.value ? controlWidth(props.width) : "w-full"));
 const input = useTemplateRef<HTMLInputElement>("input");
 const anchor = useTemplateRef<HTMLElement>("anchor");
 
@@ -113,13 +116,13 @@ defineSlots<FieldSlots & {
 </script>
 
 <template>
-  <Field v-bind="fieldProps(props)" :value="current?.label ?? null">
+  <Field v-bind="fieldProps(props)" :value="current?.label ?? null" :row-layout="props.rowLayout">
     <template #default="{ id, describedby, invalid }">
       <div ref="anchor" class="flex items-center gap-1.5" :class="[surface, fieldWidth]">
         <input :id="id" ref="input" role="combobox" type="text" autocomplete="off" :value="text" :name="props.name" :placeholder="props.placeholder" :disabled="props.disabled" :required="props.required"
           aria-autocomplete="list" :aria-expanded="expanded" :aria-controls="`${id}-list`" :aria-activedescendant="expanded && items.length > 0 ? `${id}-option-${highlighted}` : undefined" :aria-required="props.required || undefined"
           :aria-invalid="invalid || undefined" :aria-describedby="describedby"
-          class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed" :class="inRow ? 'compact:text-right' : ''"
+          class="block w-full min-w-0 border-0 bg-transparent px-0 py-1 text-body text-content-strong placeholder:text-content-disabled focus:outline-none focus:ring-0 disabled:cursor-not-allowed" :class="inRow && !stacked ? 'compact:text-right' : ''"
           @input="onInput" @focus="onFocus" @blur="onBlur" @keydown="suggestions.keydown($event, { pick: choose, enterNeedsMove: false })" />
         <Icon name="search" :size="14" class="shrink-0 text-content-muted" />
       </div>
