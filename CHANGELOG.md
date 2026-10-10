@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.18 — 2026-10-10
+
+One record in a dialog, and selects whose options load that say they can come back empty. Found moving ARV's admin dialogs and vehicle forms.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`useRecordDialog({ defaults, validator, toValues?, create, update?, done? })`** (`@wssto2/vue-core/form`): the dialog that adds and edits one small record, on `useCommand` and `CommandDialog`. Returns `{ command, form, editing, create(), edit(row) }`. `create()` presents the defaults; `edit(row)` presents `toValues(row)` over them; `editing` is the row or `null` (the title, a field only a new record has, "Save and add another" via `#actions`, a delete button of an edit); a save calls `create(input, { idempotencyKey })` or `update(row, input, { idempotencyKey })` by it; `done(result, { editing })` is told which row was saved (`null` for a new one). The recipe "One record in a dialog" is rewritten on it (the wiring drops from about 30 lines to about 14).
+
+- **An `#option` slot on `SelectField`, `MultiSelectField` and `ComboField`**, `{ option, active, selected }`: it replaces what a row says (an icon, a photo, a badge, a VIN); the row, its check, keys and roles stay, and without the slot nothing changes. `TextField` suggestions are unchanged.
+- **`SelectOption<Value, Meta = undefined>` with `meta?: Meta`**: the row's own data, typed through `useOptions`, the three fields and the slot, so `#option="{ option }"` reads `option.meta.vin` without a cast. `Meta` is a new last type parameter of `SelectOption`, `AsyncOptions`, `OptionsSource` and `useOptions`; options without `meta` are `SelectOption<Value>` as before. Give every option a `meta` when the slot reads it (the slot's type says it is there). Recent choices of a `ComboField` keep their `meta` in the recents store.
+
+### Fixed
+- **A `DateField`, `DateTimeField` or `TimeField` in a narrow grouped row no longer runs past the card** (a date-time control in a half-width column overflowed by about 116 px): the popover's inline trigger wrappers now shrink (`max-w-full min-w-0`). `MonthYearField` shares the popover and fits too.
+- **The `FileField` dropzone reads "Izaberi datoteku ili prevucite datoteku ovdje"**, in every locale: the space between the two messages was lost by the template (it read "datotekuili prevucite").
+
+### Changes to existing behaviour
+- **`SelectField` with options from `useOptions` emits `Value | null`**, whatever `clearable` says (it clears a value the new options lack). Before it was typed `Value` unless `clearable`. A draft field bound to such a select must now be able to hold `null` (`make: null as string | null`); a field typed without `null` no longer compiles. A list of options and `clearable` keep the 0.4.15 rule. `SelectField` gained a third type parameter (`Source`, inferred from `options`). `ComboField` (always `Value | null`) and `MultiSelectField` (a list) already told the truth. No ARV call site passes `useOptions` today.
+
 ## 0.4.17 — 2026-10-10
 
 Bosnian numbers and dates in every browser, and a command dialog whose primary action can wait. Found in ARV's Bosnian market on screens already moved to the library.
