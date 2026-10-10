@@ -189,4 +189,10 @@ describe("Popover", () => {
     await settle();
     expect(screen.getByRole("dialog").style.minWidth).toBe("");
   });
+
+  it("its trigger wrappers can shrink: a date field in a narrow row does not run past the card", () => {
+    mountPopover();
+    const trigger = document.querySelector("#trigger")!;
+    for (const wrapper of [trigger.parentElement!, trigger.parentElement!.parentElement!]) expect(wrapper.className).toMatch(/min-w-0/);
+  });
 });

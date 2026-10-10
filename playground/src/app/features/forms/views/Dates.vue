@@ -38,6 +38,18 @@ const nextDelivery = (today: string) => {
       </FormGroup>
     </FormView>
 
+    <!-- A half-width column: the date-time control shrinks inside its row instead of running past the card. -->
+    <div id="narrow-dates" class="mt-group-gap w-[22rem] max-w-full">
+      <FormView :editable="true">
+        <FormGroup :header="t('forms.dates.narrow')">
+          <DateField v-model="values.deliveryOn" :label="t('forms.dates.deliveryOn')" />
+          <DateTimeField v-model="values.visitAt" :label="t('forms.dates.visitAt')" />
+          <TimeField v-model="values.shiftStart" :label="t('forms.dates.shiftStart')" />
+          <MonthYearField v-model:month="values.month" v-model:year="values.year" :label="t('forms.dates.firstRegistration')" />
+        </FormGroup>
+      </FormView>
+    </div>
+
     <FormGroup :header="t('forms.dates.values')" class="mt-group-gap">
       <SwitchField v-model="editing" :label="t('forms.dates.editing')" />
       <pre class="px-1 py-2 text-footnote tabular-nums text-content-muted">{{ JSON.stringify(values, null, 2) }}</pre>

@@ -157,8 +157,8 @@ defineExpose({ present, dismiss: () => dismiss(), toggle });
 </script>
 
 <template>
-  <span :class="props.block ? 'flex w-full' : 'inline-flex'" @focusout="onFocusOut">
-    <span ref="anchor" :class="props.block ? 'flex w-full' : 'inline-flex'">
+  <span :class="props.block ? 'flex w-full' : 'inline-flex max-w-full min-w-0'" @focusout="onFocusOut">
+    <span ref="anchor" :class="props.block ? 'flex w-full' : 'inline-flex max-w-full min-w-0'">
       <slot name="trigger" :presented="isOpen" :toggle="toggle" :attrs="triggerAttrs" />
     </span>
 
