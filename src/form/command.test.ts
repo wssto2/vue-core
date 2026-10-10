@@ -27,7 +27,7 @@ const people = [
   { value: 2, label: "Bob" },
 ] as const;
 
-function mountAssign(run: (input: { assignee: number; note: string }) => Promise<unknown> = async () => ({ ok: true }), done?: () => unknown) {
+function mountAssign(run: (input: { assignee: number; note: string }) => Promise<unknown> = async () => ({ ok: true }), done?: () => unknown, ask?: (input: { assignee: number; note: string }) => { title: string; message?: string; confirmLabel?: string } | null) {
   const guard = createLeaveGuard();
   let command!: ReturnType<typeof makeCommand>;
   const makeCommand = () =>
@@ -38,6 +38,7 @@ function mountAssign(run: (input: { assignee: number; note: string }) => Promise
       },
       run: (input) => run(input),
       done,
+      ask,
     });
   const Host = defineComponent({
     setup() {
@@ -336,5 +337,69 @@ describe("a command dialog with its primary action disabled", () => {
     await settle();
     expect(run).toHaveBeenCalledTimes(1);
     expect(command().open.value).toBe(true);
+  });
+});
+
+describe("a command that asks first", () => {
+  const ask = (input: { note: string }) => (input.note === "quiet" ? null : { title: "Assign for good?", message: `Note: ${input.note}`, confirmLabel: "Yes, assign" });
+  const prepare = async (run: (input: { assignee: number; note: string }) => Promise<unknown>, note = "Urgent") => {
+    const view = mountAssign(run, undefined, ask);
+    await open();
+    await pickAssignee("Bob");
+    await fireEvent.update(dialog().getByLabelText("Note"), note);
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    return view;
+  };
+  const question = () => within(document.querySelector("[role=alertdialog]") as HTMLElement);
+
+  it("sends nothing until yes, then sends once; the question names the consequence from the input", async () => {
+    const run = vi.fn(async (_input: { assignee: number; note: string }) => ({ ok: true }));
+    await prepare(run);
+    expect(run).not.toHaveBeenCalled();
+    expect(question().getByText("Assign for good?")).toBeTruthy();
+    expect(question().getByText("Note: Urgent")).toBeTruthy();
+    await fireEvent.click(question().getByRole("button", { name: "Yes, assign" }));
+    await settle();
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(run.mock.calls[0]?.[0]).toEqual({ assignee: 2, note: "Urgent" });
+    expect(dialog().getByRole("button", { name: "Saved" })).toBeTruthy();
+  });
+
+  it("No returns to the filled form untouched and sends nothing", async () => {
+    const run = vi.fn(async () => ({}));
+    const { command } = await prepare(run);
+    await fireEvent.click(question().getByRole("button", { name: "Cancel" }));
+    await settle();
+    expect(run).not.toHaveBeenCalled();
+    expect(command().question.value).toBeNull();
+    expect(command().open.value).toBe(true);
+    expect((dialog().getByLabelText("Note") as HTMLInputElement).value).toBe("Urgent");
+  });
+
+  it("a refused form is not asked about; its errors are on the fields", async () => {
+    mountAssign(async () => ({}), undefined, ask);
+    await open();
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    expect(document.querySelector("[role=alertdialog]")).toBeNull();
+    expect(dialog().getByText("Choose an assignee")).toBeTruthy();
+  });
+
+  it("a 422 after yes lands on the field of the form, which keeps its input", async () => {
+    await prepare(async () => {
+      throw new ApiError({ kind: "validation", message: "no", status: 422, fields: { note: ["too long for a note"] } });
+    });
+    await fireEvent.click(question().getByRole("button", { name: "Yes, assign" }));
+    await settle();
+    expect(dialog().getByText("too long for a note")).toBeTruthy();
+    expect((dialog().getByLabelText("Note") as HTMLInputElement).value).toBe("Urgent");
+  });
+
+  it("null from ask runs straight away", async () => {
+    const run = vi.fn(async () => ({}));
+    await prepare(run, "quiet");
+    expect(document.querySelector("[role=alertdialog]")).toBeNull();
+    expect(run).toHaveBeenCalledTimes(1);
   });
 });
