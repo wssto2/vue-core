@@ -386,6 +386,20 @@ describe("a command that asks first", () => {
     expect(dialog().getByText("Choose an assignee")).toBeTruthy();
   });
 
+  it("the failure of a refused attempt is gone once the inputs check out and the question appears", async () => {
+    const { command } = mountAssign(async () => ({}), undefined, ask);
+    await open();
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    expect(dialog().getByText("Check the marked fields and try again.")).toBeTruthy();
+    await pickAssignee("Bob");
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    expect(question().getByText("Assign for good?")).toBeTruthy();
+    expect(command().form.failure.value).toBeNull();
+    expect(dialog().queryByText("Check the marked fields and try again.")).toBeNull();
+  });
+
   it("a 422 after yes lands on the field of the form, which keeps its input", async () => {
     await prepare(async () => {
       throw new ApiError({ kind: "validation", message: "no", status: 422, fields: { note: ["too long for a note"] } });
@@ -400,6 +414,22 @@ describe("a command that asks first", () => {
     const run = vi.fn(async () => ({}));
     await prepare(run, "quiet");
     expect(document.querySelector("[role=alertdialog]")).toBeNull();
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("a command that does not ask", () => {
+  it("clears the failure of a refused attempt when the corrected form is sent", async () => {
+    const run = vi.fn(async () => ({}));
+    const { command } = mountAssign(run);
+    await open();
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    expect(command().form.failure.value?.kind).toBe("invalid");
+    await pickAssignee("Bob");
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    expect(command().form.failure.value).toBeNull();
     expect(run).toHaveBeenCalledTimes(1);
   });
 });

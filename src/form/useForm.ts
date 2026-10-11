@@ -112,7 +112,7 @@ export interface Form<Values extends object, Output = Values> {
   reset(): void;
   /** Takes the draft as the baseline (defaults applied right after loading are not the user's edits). */
   markClean(): void;
-  /** Runs the validator on a copy of the draft: the errors are set and null returned, or the parsed output. */
+  /** Runs the validator on a copy of the draft: the errors are set and null returned, or the parsed output and the failure of an earlier attempt is cleared (it complained about inputs that have since been fixed). */
   validate(): Output | null;
   /** Like `validate` for the given fields only: the validator's issues elsewhere are ignored (a group saving to its own endpoint). True when they are fine. */
   check(fields: Fields<Values>): boolean;
@@ -190,10 +190,17 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
 
   function validate(): Output | null {
     errors.clear();
-    if (!options.validator) return cloneValue(values) as unknown as Output;
+    // Inputs that check out are no longer what a refusal complained about: its banner goes, as the errors did.
+    if (!options.validator) {
+      failure.value = null;
+      return cloneValue(values) as unknown as Output;
+    }
     // The validator works on a copy: its transforms never rewrite what the user typed.
     const result = options.validator.safeParse(cloneValue(values));
-    if (result.success) return result.data;
+    if (result.success) {
+      failure.value = null;
+      return result.data;
+    }
     place(issuesToMessages(result.error.issues));
     return null;
   }
