@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/vue";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createApplication, type Application } from "../app";
 import { options } from "../app/testing";
 import { baseFeature } from "../shell/testing";
@@ -12,6 +12,8 @@ const running: { application: Application; target: HTMLElement }[] = [];
 let connections: Connection[] = [];
 let media: ReturnType<typeof mockMedia>;
 
+// The settings page is a lazy route: its first import is a cold transform that can outlast waitFor's 1s on a loaded machine.
+beforeAll(() => import("./settings/SettingsPage.vue"), 60_000);
 beforeEach(() => {
   connections = [];
   answers = baseAnswers();
