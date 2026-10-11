@@ -189,6 +189,22 @@ const assign = useCommand({
 
 Field errors land on the fields, a conflict or no permission is said in the banner, the inputs stay on a failure, closing with typed input asks first, and `present({ assignee: 3 })` starts from what is already known. While the page still waits for something the call needs (a proposal loading), `:confirm-disabled="loading"` disables the primary action: the fields keep what was typed, Cancel and the discard guard work, and `run()` does nothing until it clears. A command with nothing to enter is `<AlertDialog :action="command.confirm" …>`: it stays open and emits `failed` when the call does not go through.
 
+### A refused save says why
+
+A refused submit says the reason, in the user's language, the same in every form and command: the translation of a reason code the app or the library has a text for, otherwise the server's own sentence when it refused a rule (a 4xx the client cannot know), the library's plain sentence for no permission, a conflict, a lost connection or a fault, "Check the marked fields" when the refusal names fields, and "saved, but could not be read back" for `refresh`. The app's `createApplication({ describeError })` is asked first; a form's `failureMessage` still overrides all of it.
+
+### A dialog for someone who may only look
+
+`:editable="false"` on `CommandDialog` shows the record: the fields read like `FormGroup :editable="false"`, there is no primary action, the dismiss says "Close" and closing never asks. Use the same dialog and body as the editing one.
+
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:10-11 -->
+```ts
+// Someone who may only look gets the same dialog, read-only: no Save, "Close", no discard question.
+const props = withDefaults(defineProps<{ editable?: boolean }>(), { editable: true });
+```
+
+The dialog passes it on (`:editable="props.editable"` on the `CommandDialog` in the next block); the page sets it from its permission (`:editable="access.can('categories:manage')"`).
+
 ### A command that asks first
 
 An irreversible command puts its question after the inputs check out and before anything is sent. `ask` reads the validated input (and whatever the page holds, such as what is still unpaid) and returns the question, or `null` for none this time; `CommandDialog` presents it over the filled form. Cancel returns to the form untouched and sends nothing; Yes calls with the usual idempotency key, and a refusal from the server lands on the form like any other. Name the consequence in the title and say exactly what Yes does in `confirmLabel`; `icon` takes the same names as `AlertDialog`'s (the default follows the tone). Pressing the primary again after a refusal clears the old failure banner as soon as the inputs check out, so the question never sits over a stale error.
@@ -207,7 +223,7 @@ const close = useCommand({
 
 An admin list where each row is a small record is one dialog used twice: **new** (defaults, with "Save and add another") and **edit** (filled with the row). `useRecordDialog` is a `useCommand` whose call is `create` for a new record and `update` for an edited one, and `CommandDialog` brings the discard guard ("Discard changes?" when closing with typed input, however it is dismissed), the "Saving…" then "Saved" beat, field errors on the fields with focus on the first, and the failure banner. The feature says what it saves, how it creates, how it updates and what shows when it is done.
 
-<!-- example: docs/examples/forms/components/CategoryDialog.vue:13-26 -->
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:15-28 -->
 ```ts
 // One dialog for both: `create` for a new category, `update` for an edited one. The dialog brings the discard guard, the "saved" beat, the field errors and the focus.
 const category = useRecordDialog({
@@ -225,9 +241,9 @@ const category = useRecordDialog({
 defineExpose({ create: category.create, edit: category.edit });
 ```
 
-<!-- example: docs/examples/forms/components/CategoryDialog.vue:30-38 -->
+<!-- example: docs/examples/forms/components/CategoryDialog.vue:32-40 -->
 ```vue
-  <CommandDialog :command="category.command" :title="category.editing.value ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')">
+  <CommandDialog :command="category.command" :title="category.editing.value ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')" :editable="props.editable">
     <FormGroup>
       <TextField v-bind="category.form.bind('name')" :label="t('forms.name')" required />
       <SwitchField v-bind="category.form.bind('active')" :label="t('forms.active')" />
@@ -238,7 +254,7 @@ defineExpose({ create: category.create, edit: category.edit });
   </CommandDialog>
 ```
 
-- `create()` and `edit(row)` are what the page calls (`dialog.value?.create()`). `create()` shows the defaults; `edit(row)` shows `toValues(row)` over them, so a field the row lacks shows its default and an edit never shows what the last dialog left. A dialog that only adds leaves out `update` and `toValues`.
+- `create()` and `edit(row)` are what the page calls (`dialog.value?.create()`). `create()` shows the defaults; `create({ name: "Suggested" })` starts from those values over them, as the baseline (the untouched dialog closes without asking); `edit(row)` shows `toValues(row)` over them, so a field the row lacks shows its default and an edit never shows what the last dialog left. A dialog that only adds leaves out `update` and `toValues`.
 - `editing` is the row being edited, `null` for a new record: the title, a field only a new record has (`:disabled="!!editing"` locks one when editing), and the delete button of an edit (a `FormGroupButton` that opens an `AlertDialog`, which is the page's own). A record that must be read first (`api.get(id)`) is read by the page, which then calls `edit(record)`.
 - `done` runs after the call went through: the toast and telling the page to reload.
 - The `#actions` slot gets `run` and `busy`. `run({ addAnother: true })` saves exactly like the primary action, calls `done` (so the toast shows), then opens the dialog again with the defaults and focus on the first field, instead of closing. Render the button only for a new record (`v-if="!editing.value"`); it takes no part in the discard guard because the fresh form is not dirty. A refused save (a field error) behaves as with the primary action: nothing is cleared.

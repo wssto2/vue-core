@@ -19,6 +19,7 @@ import {
 } from "@wssto2/vue-core/state";
 import { ref, useTemplateRef } from "vue";
 import LocalePanel from "./LocalePanel.vue";
+import RecordDialogPanel from "./RecordDialogPanel.vue";
 
 const modal = useTemplateRef<InstanceType<typeof Modal>>("modal");
 const sheet = useTemplateRef<InstanceType<typeof Sheet>>("sheet");
@@ -162,6 +163,8 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
     </Panel>
 
     <LocalePanel />
+
+    <RecordDialogPanel />
 
     <Panel title="Content" collapsible>
       <div class="flex flex-col gap-4">

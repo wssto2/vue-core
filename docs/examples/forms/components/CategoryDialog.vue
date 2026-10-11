@@ -7,6 +7,8 @@ import type { Category } from "../api";
 import { useTicketFormsApi } from "../context";
 
 const emit = defineEmits<{ saved: [] }>();
+// Someone who may only look gets the same dialog, read-only: no Save, "Close", no discard question.
+const props = withDefaults(defineProps<{ editable?: boolean }>(), { editable: true });
 const { t } = useI18n();
 const api = useTicketFormsApi();
 
@@ -27,7 +29,7 @@ defineExpose({ create: category.create, edit: category.edit });
 </script>
 
 <template>
-  <CommandDialog :command="category.command" :title="category.editing.value ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')">
+  <CommandDialog :command="category.command" :title="category.editing.value ? t('forms.editCategory') : t('forms.newCategory')" :confirm-label="t('forms.save')" :editable="props.editable">
     <FormGroup>
       <TextField v-bind="category.form.bind('name')" :label="t('forms.name')" required />
       <SwitchField v-bind="category.form.bind('active')" :label="t('forms.active')" />
