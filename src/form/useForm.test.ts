@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../client";
 import { deferred } from "../platform/testing";
-import { appFieldErrorDescriberKey } from "../i18n/describeError";
+import { appErrorDescriberKey, appFieldErrorDescriberKey } from "../i18n/describeError";
 import { createTestApp, withSetup } from "../testing";
 import { useForm } from "./useForm";
 import type { FormValidator } from "./validation";
@@ -349,5 +349,52 @@ describe("the application's describeFieldError", () => {
     const form = withSetup(() => useForm({ defaults: empty })).result;
     await refuse(form);
     expect(form.errors.first("subject")).toBe("required");
+  });
+});
+
+describe("the sentence of a refused submit", () => {
+  const library = {
+    invalid: "Check the marked fields and try again.",
+    conflict: "The record changed while you were editing it.",
+    forbidden: "You do not have permission to do this.",
+    failed: "The changes could not be saved. Try again.",
+    refresh: "Your changes were saved, but the updated record could not be loaded. Reload the page.",
+  };
+  const say = async (error: unknown, options: { failureMessage?: (kind: never, error: unknown) => string | undefined; app?: (error: unknown) => string | undefined } = {}) => {
+    const plugins = [...createTestApp().plugins, { install: (app: import("vue").App) => options.app && app.provide(appErrorDescriberKey, options.app) }];
+    const form = withSetup(() => useForm({ defaults: empty, failureMessage: options.failureMessage as never }), { plugins }).result;
+    await form.submit(async () => {
+      throw error;
+    });
+    return form.failure.value?.message;
+  };
+
+  it("is the server's sentence for a refusal that names no field (a business rule)", async () => {
+    expect(await say(api("validation", { status: 422, message: "The VIN is already on another order." }))).toBe("The VIN is already on another order.");
+  });
+  it("is the client's translation of a reason code it has one for", async () => {
+    expect(await say(api("validation", { status: 422, code: "identity.email.taken", message: "server words" }))).toBe("This e-mail address is already used by another account.");
+  });
+  it("is the server's translated sentence for a reason code it has no text for", async () => {
+    expect(await say(api("conflict", { status: 409, code: "order.locked", message: "The order is locked by finance." }))).toBe("The order is locked by finance.");
+  });
+  it("keeps the library's sentence for a permission, a conflict and a fault", async () => {
+    expect(await say(api("forbidden", { status: 403, message: "raw" }))).toBe(library.forbidden);
+    expect(await say(api("conflict", { status: 409, message: "raw" }))).toBe(library.conflict);
+    expect(await say(api("server", { status: 500, message: "boom" }))).toBe(library.failed);
+    expect(await say(new Error("boom"))).toBe(library.failed);
+  });
+  it("is check-the-fields for a refusal that names fields, whatever the server wrote", async () => {
+    expect(await say(api("validation", { status: 422, message: "raw", fields: { subject: ["required"] } }))).toBe(library.invalid);
+  });
+  it("says what could not be read back for a refresh", async () => {
+    const form = make();
+    filled(form);
+    await form.submit(async () => "ok", { refresh: () => { throw api("validation", { status: 422, message: "raw" }); } });
+    expect(form.failure.value?.message).toBe(library.refresh);
+  });
+  it("is the form's own failureMessage when it gives one, and the app's describeError ahead of the library's", async () => {
+    expect(await say(api("validation", { status: 422, message: "raw" }), { failureMessage: () => "mine" })).toBe("mine");
+    expect(await say(api("validation", { status: 422, message: "raw" }), { app: () => "the app says" })).toBe("the app says");
   });
 });

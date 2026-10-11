@@ -1,7 +1,7 @@
 import { computed, reactive, ref, shallowRef, type ComputedRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { isAborted, isApiError } from "../client";
-import { useAppFieldErrorDescriber } from "../i18n/describeError";
+import { useAppFieldErrorDescriber, useDescribeError } from "../i18n/describeError";
 import { ErrorBag } from "./errors";
 import { cloneValue, sameValue } from "./snapshot";
 import { fieldOfPath, issuesToMessages, type FieldMessages, type FormValidator } from "./validation";
@@ -87,7 +87,11 @@ export interface FormOptions<Values extends object, Output = Values> {
   readonly describeFieldError?: (message: string, field: string) => string;
   /** The draft's name for a field the server names, given the whole dotted path (`tax_id` is `taxId`, `lines.0.unit_price` is `lines.0.unitPrice`). Default: the same name. */
   readonly serverField?: (field: string) => string;
-  /** The sentence for a failure; return undefined for the library's default of that kind. */
+  /**
+   * The sentence for a failure; return undefined for the default: the reason a request was refused as `useDescribeError` words it (the app's own
+   * describer first, a reason code the client translates, the server's sentence for a business rule, the library's words for forbidden, conflict,
+   * offline), the library's per-kind sentence for a server fault, a validator refusal, a refusal that names fields ("check the marked fields") and `refresh`.
+   */
   readonly failureMessage?: (kind: FormFailureKind, error: unknown) => string | undefined;
 }
 
@@ -152,6 +156,7 @@ const newKey = (): string =>
 export function useForm<Values extends object, Output = Values>(options: FormOptions<Values, Output>): Form<Values, Output> {
   const { t } = useI18n();
   const describeFieldError = options.describeFieldError ?? useAppFieldErrorDescriber();
+  const describeError = useDescribeError();
   const initial = (): Values => cloneValue(typeof options.defaults === "function" ? (options.defaults as () => Values)() : options.defaults);
 
   const values = reactive(initial() as object) as Values;
@@ -175,9 +180,21 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
     failure.value = null;
   }
 
+  // The reason the request was refused, in the user's words; the per-kind sentence where there is none (a permission, a conflict, a lost
+  // connection, a server fault, a refusal that names fields, a validator, `refresh`).
+  function defaultMessage(kind: FormFailureKind, error: unknown): string {
+    const sentence = t(`core.form.failure.${kind}`);
+    if (kind === "refresh" || !isApiError(error)) return sentence;
+    if (kind === "invalid" && Object.keys(error.fields).length > 0) return sentence;
+    const rule = kind === "invalid" || (kind === "failed" && error.status !== null && error.status < 500);
+    // No `fallback`: it would hide the server's text for a rule; a refusal with no text of its own keeps the per-kind sentence.
+    if (error.code) return describeError(error, { fallback: sentence });
+    return rule && error.message ? describeError(error) : sentence;
+  }
+
   function fail(kind: FormFailureKind, error: unknown): FormFailure {
     const requestId = isApiError(error) ? error.requestId : null;
-    const message = options.failureMessage?.(kind, error) ?? t(`core.form.failure.${kind}`);
+    const message = options.failureMessage?.(kind, error) ?? defaultMessage(kind, error);
     return (failure.value = { kind, message, requestId, error });
   }
 
