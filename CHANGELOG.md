@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.23 — 2026-10-11
+
+Test and tooling only; no change to the library's code or behaviour. Two items, one commit each.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Fixed
+- **The notifications gear test no longer fails on a loaded machine.** `notificationsFeature > has a gear in the inbox…` waited for the lazy settings page inside `waitFor`'s 1s default, and the first import of `SettingsPage.vue` is a cold transform (about 800ms idle, several seconds under load), so it ended on `home`. The page is now imported in a `beforeAll`. It was never tied to the clock: it passes at 00:30, 06:00, 12:00 and 23:50 UTC under `TZ=UTC` and `TZ=Europe/Zagreb`.
+- **`npm run lint` ignores `.claude/`.** An agent worktree inside the checkout was linted as part of the project and failed `npm run check` (and so `prepublishOnly`).
+
+### Changes to existing behaviour
+- None.
+
 ## 0.4.22 — 2026-10-11
 
 An empty month/year says so, and a question is the only thing on the form. From the ARV cleanup run on 0.4.21. Three items, one commit each. `CHANGELOG.md` now ships in the package.
