@@ -1,7 +1,7 @@
 import { computed, reactive, ref, shallowRef, type ComputedRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { isAborted, isApiError } from "../client";
-import { useAppFieldErrorDescriber, useDescribeError } from "../i18n/describeError";
+import { useAppErrorDescriber, useAppFieldErrorDescriber, useDescribeError } from "../i18n/describeError";
 import { ErrorBag } from "./errors";
 import { cloneValue, sameValue } from "./snapshot";
 import { fieldOfPath, issuesToMessages, type FieldMessages, type FormValidator } from "./validation";
@@ -157,6 +157,7 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
   const { t } = useI18n();
   const describeFieldError = options.describeFieldError ?? useAppFieldErrorDescriber();
   const describeError = useDescribeError();
+  const appDescriber = useAppErrorDescriber();
   const initial = (): Values => cloneValue(typeof options.defaults === "function" ? (options.defaults as () => Values)() : options.defaults);
 
   const values = reactive(initial() as object) as Values;
@@ -184,7 +185,11 @@ export function useForm<Values extends object, Output = Values>(options: FormOpt
   // connection, a server fault, a refusal that names fields, a validator, `refresh`).
   function defaultMessage(kind: FormFailureKind, error: unknown): string {
     const sentence = t(`core.form.failure.${kind}`);
-    if (kind === "refresh" || !isApiError(error)) return sentence;
+    if (kind === "refresh") return sentence;
+    // The app's own words come first, for any error (its older HTTP client's too).
+    const own = appDescriber?.(error);
+    if (own !== undefined) return own;
+    if (!isApiError(error)) return sentence;
     if (kind === "invalid" && Object.keys(error.fields).length > 0) return sentence;
     const rule = kind === "invalid" || (kind === "failed" && error.status !== null && error.status < 500);
     // No `fallback`: it would hide the server's text for a rule; a refusal with no text of its own keeps the per-kind sentence.

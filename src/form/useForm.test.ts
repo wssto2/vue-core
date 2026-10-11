@@ -396,5 +396,7 @@ describe("the sentence of a refused submit", () => {
   it("is the form's own failureMessage when it gives one, and the app's describeError ahead of the library's", async () => {
     expect(await say(api("validation", { status: 422, message: "raw" }), { failureMessage: () => "mine" })).toBe("mine");
     expect(await say(api("validation", { status: 422, message: "raw" }), { app: () => "the app says" })).toBe("the app says");
+    expect(await say(api("forbidden", { status: 403 }), { app: () => "the app says" })).toBe("the app says");
+    expect(await say(new Error("legacy"), { app: (error) => (error instanceof Error ? `app:${error.message}` : undefined) })).toBe("app:legacy");
   });
 });
