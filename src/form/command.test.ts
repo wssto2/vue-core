@@ -447,3 +447,45 @@ describe("a command that does not ask", () => {
     expect(run).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("a command dialog that is not editable", () => {
+  function mountLook() {
+    let command!: ReturnType<typeof useCommand<{ note: string }>>;
+    const Host = defineComponent({
+      setup() {
+        command = useCommand({ defaults: () => ({ note: "" }), run: async () => ({}) });
+        return () =>
+          h("div", [
+            h(CommandDialog, { command, title: "Order", confirmLabel: "Save", editable: false }, { default: () => h(FormGroup, null, () => h(TextField, { ...command.form.bind("note"), label: "Note" })), actions: () => h("button", "Save and add another") }),
+            h(LeaveGuardRoot),
+          ]);
+      },
+    });
+    const guard = createLeaveGuard();
+    render(Host, { global: { plugins: [i18n, testFormatting(i18n), { install: (app: App) => app.provide(leaveGuardKey, guard) }], stubs: { transition: false } } });
+    return () => command;
+  }
+
+  it("shows the record read-only with no primary action, and the dismiss says Close", async () => {
+    const command = mountLook();
+    command().present({ note: "Paid in full" });
+    await settle();
+    expect(dialog().getByText("Paid in full")).toBeTruthy();
+    expect(dialog().queryByRole("textbox")).toBeNull();
+    expect(dialog().queryByRole("button", { name: "Save" })).toBeNull();
+    expect(dialog().queryByRole("button", { name: "Save and add another" })).toBeNull();
+    expect(dialog().queryByRole("button", { name: "Cancel" })).toBeNull();
+    expect(dialog().getAllByRole("button", { name: "Close" }).length).toBeGreaterThan(0);
+  });
+
+  it("closes without asking, even with a draft that differs", async () => {
+    const command = mountLook();
+    command().present({ note: "Paid in full" });
+    await settle();
+    command().form.values.note = "changed behind its back";
+    await fireEvent.click(dialog().getAllByRole("button", { name: "Close" })[0]!);
+    await settle();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+});

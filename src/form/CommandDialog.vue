@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { focusableWithin } from "../internal/focusable";
 import Modal from "../modal/Modal.vue";
 import AlertDialog from "../overlay/AlertDialog.vue";
 import { DONE_BEAT_MS } from "../state/useWaitStatus";
+import { formEditableKey } from "./field";
 import { focusFirstError } from "./focus";
 import FormErrors from "./FormErrors.vue";
 import { useLeaveGuard } from "./leaveGuard";
@@ -24,6 +25,9 @@ import type { Form } from "./useForm";
  * instead of closing, opens the dialog again with fresh inputs (the command's defaults), so the next record can be entered
  * (the add-a-record recipe, `docs/recipes/forms.md`).
  *
+ * `:editable="false"` is the same dialog for someone who may only look: the fields read (like `FormGroup :editable="false"`), there is no
+ * primary action (nor `#actions`), the dismiss button says "Close", and closing never asks. Give the same body to both; do not write a second dialog.
+ *
  * A command with `ask` puts its question here, in an `AlertDialog` over the filled form, once the inputs check out: Cancel
  * returns to the form untouched and nothing is sent; the action runs the command, and a refusal then lands on the form like any other.
  */
@@ -33,6 +37,8 @@ const props = withDefaults(defineProps<{
   subtitle?: string;
   /** What the primary action says: exactly what it does ("Assign"). */
   confirmLabel: string;
+  /** `false`: the record is shown, not edited: fields read, no primary action, "Close" instead of Cancel, no discard question. */
+  editable?: boolean;
   /** Disables the primary action while true (a proposal still loading). The inputs, Cancel and the leave guard work as before, and `run()` does nothing. */
   confirmDisabled?: boolean;
   /** What it says once done; by default "Saved". */
@@ -44,7 +50,7 @@ const props = withDefaults(defineProps<{
   size?: "sm" | "md" | "lg";
   /** The name of a field for people, for errors that have no field on screen. */
   fieldLabel?: (field: string) => string;
-}>(), { subtitle: undefined, confirmDisabled: false, doneLabel: undefined, busyLabel: undefined, message: undefined, size: "sm", fieldLabel: undefined });
+}>(), { subtitle: undefined, editable: true, confirmDisabled: false, doneLabel: undefined, busyLabel: undefined, message: undefined, size: "sm", fieldLabel: undefined });
 
 const emit = defineEmits<{ done: [] }>();
 defineSlots<{
@@ -59,7 +65,9 @@ const body = useTemplateRef<HTMLElement>("body");
 const done = ref(false);
 let closing: ReturnType<typeof setTimeout> | null = null;
 
-const { confirmDiscard } = useLeaveGuard(() => props.command.open.value && props.command.form.dirty.value);
+provide(formEditableKey, computed(() => props.editable));
+
+const { confirmDiscard } = useLeaveGuard(() => props.editable && props.command.open.value && props.command.form.dirty.value);
 
 watch(() => props.command.open.value, (open) => {
   if (open) {
@@ -109,9 +117,9 @@ const status = computed(() => (props.command.form.submitting.value ? "processing
 </script>
 
 <template>
-  <Modal ref="modal" :size="props.size" grouped :title="props.title" :subtitle="props.subtitle" :before-dismiss="confirmDiscard" :primary-label="props.confirmLabel" :primary-disabled="props.confirmDisabled" :status="status"
+  <Modal ref="modal" :size="props.size" grouped :title="props.title" :subtitle="props.subtitle" :before-dismiss="confirmDiscard" :primary-label="props.editable ? props.confirmLabel : undefined" :primary-disabled="props.confirmDisabled" :status="status"
     :processing-label="props.busyLabel ?? t('core.actions.saving')" :done-label="props.doneLabel ?? t('core.actions.saved')" @primary="run()" @dismissed="props.command.dismiss()">
-    <template v-if="$slots.actions" #actions>
+    <template v-if="props.editable && $slots.actions" #actions>
       <slot name="actions" :run="run" :busy="props.command.form.submitting.value" />
     </template>
     <div ref="body" class="flex min-w-0 flex-col gap-group-gap" data-test="command-dialog">
