@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.24 — 2026-10-11
+
+A refusal in the server's words, a dialog that only shows, a new record with a start. From ARV cutover e8a (both lanes). Three items, one commit each.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`CommandDialog` `editable` (default `true`).** `:editable="false"` is the same dialog for someone who may only look: the fields read as `FormGroup :editable="false"` shows them (the dialog provides the form's read mode, so every `FormGroup` and field inside inherits it), there is no primary action and no `#actions`, the dismiss button says "Close" (Zatvori) instead of "Cancel", and closing never asks about a discard. One component, one body. ARV: lane B `OrderModal.vue` / `RepairCostModal.vue` drop the second `Modal` and `OrderFormBody.vue` / `RepairCostFormBody.vue` copy; lane A `LocaleModal.vue` (Jezik aplikacije) uses `:editable="false"` instead of `confirm-disabled`.
+- **`useRecordDialog().create(initial?: Partial<Values>)`.** The values are laid over the defaults and become the baseline, as `edit(row)` does with `toValues(row)`: the untouched dialog is not dirty and closes without asking. ARV: lane B Narudžba `create({ category })` instead of setting it after `create()`.
+
+### Changes to existing behaviour
+- **A refused submit says the reason.** The default sentence of `form.failure.message` (every `useForm`, `useCommand`, `useRecordDialog`, `EditorPage`, step form) is no longer one generic sentence per kind. For a request failure (an `ApiError`) it is, in order:
+  - **the error has a reason code** (any kind): the client's text for the code (`errors.<code>`, `core.errors.<code>` with the error's params), then the server's already translated sentence; with neither, the per-kind sentence below;
+  - **`invalid`, the refusal names no field** (a business rule in a 422): the server's sentence, else the per-kind one; **`invalid` that names fields**: "Check the marked fields and try again." (as before); a validator refusal: the same (as before);
+  - **`failed` with a 4xx other than 401/403/409/422** (404, 429, 400…): the library's "not found" / "too many requests", else the server's sentence;
+  - **`forbidden`, `conflict`, `unauthorized`, `offline` without a reason code**, **a server fault (5xx, unreadable) and anything thrown that is not an `ApiError`**: the library's per-kind sentence, as before ("You do not have permission…", "The record changed while you were editing it.", "The changes could not be saved. Try again."…);
+  - **`refresh`**: "Your changes were saved, but the updated record could not be loaded…", as before.
+  The app's `describeError` (`createApplication({ describeError })`) is asked first, for any error (its older HTTP client's included), and wins when it has a sentence; `failureMessage` still overrides all of it, returning `undefined` for the default. ARV: `features/vehicles/composables/useFailureSentence.ts` and its nine callers can go: its `refresh` / `invalid`-with-fields / `invalid`-without-fields cases are the default now, and for `forbidden`, `conflict`, `offline` it said `describeError`'s sentence ("You are not authorized to perform this action.", "The record changed or already exists…") where the default says the form wording; a caller that must keep `describeError`'s words for those keeps an override. Lane A needs no workaround, and its refusal pins can be exact again.
+- **Pinned by tests that were updated:** none; no test pinned an old default (existing tests that read "changed while you were editing" and "could not be saved" still hold).
+
 ## 0.4.23 — 2026-10-11
 
 Test and tooling only; no change to the library's code or behaviour. Two items, one commit each.
