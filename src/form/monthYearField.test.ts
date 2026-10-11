@@ -37,6 +37,22 @@ afterEach(() => {
 });
 
 describe("MonthYearField", () => {
+  it("says what it wants while both are empty: the library's wording, or the caller's", async () => {
+    mountField();
+    expect(pill("First registration").textContent).toContain("Choose…");
+    document.body.innerHTML = "";
+    mountField({ placeholder: "Month and year" });
+    expect(pill("First registration").textContent).toContain("Month and year");
+  });
+
+  it("shows the placeholder in the app's language, and not once a value is there", () => {
+    mountField({}, { month: null, year: null }, "hr");
+    expect(pill("First registration").textContent).toContain("Odaberite…");
+    document.body.innerHTML = "";
+    mountField({}, { month: 3, year: 2026 });
+    expect(pill("First registration").textContent).not.toContain("Choose");
+  });
+
   it("picks a month in the year shown and writes both numbers", async () => {
     const { month, year } = mountField();
     await open();

@@ -18,8 +18,8 @@ import { fieldDefaults, fieldProps, type FieldProps, type FieldSlots } from "./f
  * Month names come from the library's texts, so every market gets its own language whatever the browser's data lacks.
  */
 const props = withDefaults(
-  defineProps<FieldProps & { minYear?: number; maxYear?: number }>(),
-  { ...fieldDefaults, minYear: 1970, maxYear: () => new Date().getFullYear() + 1 },
+  defineProps<FieldProps & { minYear?: number; maxYear?: number; /** Shown while both are empty; by default the library's "Choose…". */ placeholder?: string }>(),
+  { ...fieldDefaults, placeholder: undefined, minYear: 1970, maxYear: () => new Date().getFullYear() + 1 },
 );
 
 const month = defineModel<number | null>("month", { default: null });
@@ -52,7 +52,7 @@ defineSlots<FieldSlots>();
     <template #default="{ id, describedby, invalid }">
       <Popover :label="props.label ?? shown" width="sm" placement="bottom-start" :arrow="false">
         <template #trigger="{ toggle, presented }">
-          <DateButton v-bind="{ id, 'aria-describedby': describedby }" :expanded="presented" :disabled="props.disabled" :invalid="invalid" @click="toggle">
+          <DateButton v-bind="{ id, 'aria-describedby': describedby }" :expanded="presented" :disabled="props.disabled" :invalid="invalid" :placeholder="props.placeholder ?? t('core.form.select.choose')" @click="toggle">
             <template v-if="shown">{{ shown }}<Icon name="calendarLine" :size="16" class="ml-2 shrink-0 text-content-muted" /></template>
           </DateButton>
         </template>
