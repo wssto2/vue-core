@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.22 — 2026-10-11
+
+An empty month/year says so, and a question is the only thing on the form. From the ARV cleanup run on 0.4.21. Three items, one commit each. `CHANGELOG.md` now ships in the package.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`placeholder` on `MonthYearField`**, shown while both month and year are empty, in the muted placeholder style at every width. By default it is the library's "Choose…" (`core.form.select.choose`, the wording `DateField` and `SelectField` use: en "Choose…", hr "Odaberite…", bs and sr-Latn "Izaberite…", sl "Izberite…"). Read mode is unchanged. ARV: `components/vehicle-entry/EntryVinStep.vue` (Prva registracija, step 1), `features/vehicles/components/VehicleEntrySection.vue` and `VehicleBasicSection.vue` now show "Odaberite…" in an empty field; none passes a placeholder, none needs to.
+- **`icon?: IconName` on `CommandQuestion`**, passed to the question's `AlertDialog` (its default still follows the tone). ARV: `features/vehicles/components/phase/DeliverSheet.vue` gives Isporuka's question `icon: "archive2Fill"` when it moves to 0.4.22.
+
+### Fixed
+- **A question no longer sits over a stale failure.** `form.validate()` clears `form.failure` when the inputs check out, as it already cleared the errors. A command with `ask` that was refused once ("Check the marked fields and try again."), then fixed and pressed again, showed the question over the old banner. A command without `ask` already cleared it (its call does); a test pins both. Chosen in `useForm`, not `useCommand.run()`: `run()` only sees a read-only `failure`, and every caller of `validate()` gets the right behaviour (a successful check means the earlier refusal no longer holds). ARV: the only `ask` is Isporuka; ARV's own `form.validate()` calls are its form core's, not this one.
+
+### Changes to existing behaviour
+- **An empty `MonthYearField` shows "Choose…"** where it showed an empty pill.
+- **`useForm().validate()` clears the failure on success.**
+- **Pinned by tests that were updated:** none; no test pinned an old default.
+
 ## 0.4.21 — 2026-10-10
 
 A step opens at its top, and a command can ask before it runs. From ARV wave 3 (vehicle entry at 390, Isporuka). Two items, one commit each.
