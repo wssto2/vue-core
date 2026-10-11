@@ -71,6 +71,19 @@ describe("useRecordDialog", () => {
     expect(update).not.toHaveBeenCalled();
   });
 
+  it("create({ … }) starts from the given values over the defaults, as a clean baseline: closing untouched asks nothing", async () => {
+    const { dialog } = mountList();
+    dialog().create({ name: "Suggested" });
+    await settle();
+    expect((panel().getByLabelText("Name") as HTMLInputElement).value).toBe("Suggested");
+    expect((panel().getByLabelText("Note") as HTMLInputElement).value).toBe("default note");
+    expect(dialog().form.dirty.value).toBe(false);
+    await fireEvent.click(panel().getByRole("button", { name: "Cancel" }));
+    await settle();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("edit(row) shows the row over the defaults, editing is the row, and a save calls update with the row", async () => {
     const { dialog, create, update } = mountList();
     await fireEvent.click(screen.getByRole("button", { name: "Edit" }));

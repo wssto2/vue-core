@@ -20,8 +20,8 @@ export interface RecordDialog<Values extends object, Output = Values, Done = unk
   readonly form: Command<Values, Output, Done>["form"];
   /** The row being edited, `null` for a new record: the title, the fields that only a new one has, "Save and add another". */
   readonly editing: Readonly<Ref<Row | null>>;
-  /** Opens the dialog for a new record, with the defaults. */
-  create(): void;
+  /** Opens the dialog for a new record, with the defaults; `initial` is laid over them as the starting point (a suggested category), and is not an edit: the untouched dialog closes without asking. */
+  create(initial?: Partial<Values>): void;
   /** Opens it for `row`: `toValues(row)` over the defaults. */
   edit(row: Row): void;
 }
@@ -62,9 +62,9 @@ export function useRecordDialog<Values extends object, Output = Values, Done = u
     command,
     form: command.form,
     editing,
-    create() {
+    create(initial) {
       editing.value = null;
-      command.present();
+      command.present(initial);
     },
     edit(row) {
       editing.value = row;
