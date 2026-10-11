@@ -24,8 +24,10 @@ const flow = useStepForm(form, {
 const sent = ref(0);
 const deliver = useCommand({
   defaults: () => ({ deliveredOn: null as string | null }),
+  // A day is required: pressing the primary with none shows the banner; fixing it and pressing again puts the question, and the banner is gone.
+  validator: { safeParse: (input) => ((input as { deliveredOn: string | null }).deliveredOn === null ? { success: false, error: { issues: [{ path: ["deliveredOn"], message: t("forms.required") }] } } : { success: true, data: input as { deliveredOn: string } }) },
   run: async () => { sent.value += 1; return {}; },
-  ask: (input) => (input.deliveredOn === null ? null : { title: t("forms.steps.askTitle"), message: t("forms.steps.askBody", { date: input.deliveredOn }), confirmLabel: t("forms.steps.askConfirm"), tone: "warning" }),
+  ask: (input) => ({ title: t("forms.steps.askTitle"), message: t("forms.steps.askBody", { date: input.deliveredOn }), confirmLabel: t("forms.steps.askConfirm"), icon: "box2Line", tone: "warning" }),
 });
 </script>
 

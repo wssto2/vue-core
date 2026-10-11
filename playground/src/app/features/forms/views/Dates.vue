@@ -14,6 +14,8 @@ const values = reactive({
   slotAt: null as string | null,
   month: 3 as number | null,
   year: 2019 as number | null,
+  serviceMonth: null as number | null,
+  serviceYear: null as number | null,
 });
 // The app's own shortcut: a delivery day is a working day (an app with holidays would look them up here).
 const nextDelivery = (today: string) => {
@@ -35,6 +37,7 @@ const nextDelivery = (today: string) => {
       <FormGroup :header="t('forms.dates.timeAndMonth')">
         <TimeField v-model="values.shiftStart" :label="t('forms.dates.shiftStart')" />
         <MonthYearField v-model:month="values.month" v-model:year="values.year" :label="t('forms.dates.firstRegistration')" />
+        <MonthYearField v-model:month="values.serviceMonth" v-model:year="values.serviceYear" :label="t('forms.dates.lastService')" />
       </FormGroup>
     </FormView>
 

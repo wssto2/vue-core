@@ -14,7 +14,7 @@ const close = useCommand({
   defaults: () => ({ closedOn: null as string | null }),
   run: (input, { idempotencyKey }) => api.assign(ticket.id.value ?? 0, { assignee_id: 0, note: input.closedOn ?? "" }, idempotencyKey),
   done: (saved) => ticket.update(saved),
-  ask: (input) => (input.closedOn === null ? null : { title: t("forms.closeTitle"), message: t("forms.closeBody", { date: input.closedOn }), confirmLabel: t("forms.close"), tone: "warning" }),
+  ask: (input) => (input.closedOn === null ? null : { title: t("forms.closeTitle"), message: t("forms.closeBody", { date: input.closedOn }), confirmLabel: t("forms.close"), icon: "box2Line", tone: "warning" }),
 });
 </script>
 

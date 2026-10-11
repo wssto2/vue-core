@@ -191,7 +191,7 @@ Field errors land on the fields, a conflict or no permission is said in the bann
 
 ### A command that asks first
 
-An irreversible command puts its question after the inputs check out and before anything is sent. `ask` reads the validated input (and whatever the page holds, such as what is still unpaid) and returns the question, or `null` for none this time; `CommandDialog` presents it over the filled form. Cancel returns to the form untouched and sends nothing; Yes calls with the usual idempotency key, and a refusal from the server lands on the form like any other. Name the consequence in the title and say exactly what Yes does in `confirmLabel`.
+An irreversible command puts its question after the inputs check out and before anything is sent. `ask` reads the validated input (and whatever the page holds, such as what is still unpaid) and returns the question, or `null` for none this time; `CommandDialog` presents it over the filled form. Cancel returns to the form untouched and sends nothing; Yes calls with the usual idempotency key, and a refusal from the server lands on the form like any other. Name the consequence in the title and say exactly what Yes does in `confirmLabel`; `icon` takes the same names as `AlertDialog`'s (the default follows the tone). Pressing the primary again after a refusal clears the old failure banner as soon as the inputs check out, so the question never sits over a stale error.
 
 <!-- example: docs/examples/forms/components/ArchiveDialog.vue:13-18 -->
 ```ts
@@ -199,7 +199,7 @@ const close = useCommand({
   defaults: () => ({ closedOn: null as string | null }),
   run: (input, { idempotencyKey }) => api.assign(ticket.id.value ?? 0, { assignee_id: 0, note: input.closedOn ?? "" }, idempotencyKey),
   done: (saved) => ticket.update(saved),
-  ask: (input) => (input.closedOn === null ? null : { title: t("forms.closeTitle"), message: t("forms.closeBody", { date: input.closedOn }), confirmLabel: t("forms.close"), tone: "warning" }),
+  ask: (input) => (input.closedOn === null ? null : { title: t("forms.closeTitle"), message: t("forms.closeBody", { date: input.closedOn }), confirmLabel: t("forms.close"), icon: "box2Line", tone: "warning" }),
 });
 ```
 
@@ -513,7 +513,7 @@ useSaveChrome({ form, save });
 | `TimeField` | a time of day | `"14:35"` |
 | `MonthYearField` | two numbers, `month` 1 to 12 and `year` | `3`, `2019` |
 
-An empty field is `null`, never `""`. Turning a wall-clock date-time into an instant (and back) is the record mapping's job, as for every field.
+An empty field is `null`, never `""`, and shows "Choose…" (in the app's language; `placeholder` replaces it) in the muted placeholder style; `MonthYearField`'s two numbers are both `null`. Turning a wall-clock date-time into an instant (and back) is the record mapping's job, as for every field.
 
 A date field never draws outside its row: on a phone `DateTimeField` shows the date and the time as two words and wraps between them when the row's column is too narrow for one line (right-aligned), so a long label no longer pushes the value past the card.
 
