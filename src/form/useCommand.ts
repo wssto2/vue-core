@@ -1,4 +1,5 @@
 import { ref, type Ref } from "vue";
+import type { IconName } from "../icon";
 import { useForm, type Form, type FormOptions, type SubmitContext, type SubmitResult } from "./useForm";
 
 /** The question a command asks before it runs: it names the consequence ("Archive the vehicle?"), and `confirmLabel` says exactly what yes does. */
@@ -6,6 +7,8 @@ export interface CommandQuestion {
   readonly title: string;
   readonly message?: string;
   readonly confirmLabel?: string;
+  /** The alert's icon, as on `AlertDialog` (an app-registered or core icon name); by default the tone's. */
+  readonly icon?: IconName;
   readonly tone?: "neutral" | "warning" | "critical";
 }
 
@@ -53,7 +56,7 @@ export interface Command<Values extends object, Output = Values, Done = unknown>
  *   <CommandDialog :command="assign" :title="t('assign')" :confirm-label="t('assign')"><SelectField v-bind="assign.form.bind('assignee')" … /></CommandDialog>
  *   <Button @click="assign.present()">Assign</Button>
  *
- * `ask: (input) => ({ title, message, confirmLabel, tone }) | null` puts a question before the call (a delivery that archives the vehicle).
+ * `ask: (input) => ({ title, message, confirmLabel, icon, tone }) | null` puts a question before the call (a delivery that archives the vehicle).
  * A command with nothing to enter is an `AlertDialog` with `:action="command.confirm"`.
  */
 export function useCommand<Values extends object, Output = Values, Done = unknown>(options: CommandOptions<Values, Output, Done>): Command<Values, Output, Done> {

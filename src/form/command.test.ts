@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, ref, type App, type Component } from "vue";
 import { ApiError } from "../client";
+import { Icon } from "../icon";
 import AlertDialog from "../overlay/AlertDialog.vue";
 import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
@@ -12,7 +13,7 @@ import LeaveGuardRoot from "./LeaveGuardRoot.vue";
 import SelectField from "./SelectField.vue";
 import { settle } from "../testing";
 import TextField from "./TextField.vue";
-import { useCommand } from "./useCommand";
+import { useCommand, type CommandQuestion } from "./useCommand";
 
 const i18n = createTestI18n();
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -27,7 +28,7 @@ const people = [
   { value: 2, label: "Bob" },
 ] as const;
 
-function mountAssign(run: (input: { assignee: number; note: string }) => Promise<unknown> = async () => ({ ok: true }), done?: () => unknown, ask?: (input: { assignee: number; note: string }) => { title: string; message?: string; confirmLabel?: string } | null) {
+function mountAssign(run: (input: { assignee: number; note: string }) => Promise<unknown> = async () => ({ ok: true }), done?: () => unknown, ask?: (input: { assignee: number; note: string }) => CommandQuestion | null) {
   const guard = createLeaveGuard();
   let command!: ReturnType<typeof makeCommand>;
   const makeCommand = () =>
@@ -398,6 +399,19 @@ describe("a command that asks first", () => {
     expect(question().getByText("Assign for good?")).toBeTruthy();
     expect(command().form.failure.value).toBeNull();
     expect(dialog().queryByText("Check the marked fields and try again.")).toBeNull();
+  });
+
+  it("the question's icon is the alert's icon", async () => {
+    const withIcon = (input: { note: string }) => ({ ...ask(input)!, icon: "deleteBin2Line" as const });
+    mountAssign(async () => ({}), undefined, withIcon);
+    await open();
+    await pickAssignee("Bob");
+    await fireEvent.click(dialog().getByRole("button", { name: "Assign" }));
+    await settle();
+    const glyph = (root: Element) => root.querySelector("path")?.getAttribute("d");
+    const shown = glyph(document.querySelector("[role=alertdialog]")!.querySelector(".size-11")!);
+    const { container } = render(Icon, { props: { name: "deleteBin2Line" } });
+    expect(shown).toBe(glyph(container));
   });
 
   it("a 422 after yes lands on the field of the form, which keeps its input", async () => {

@@ -120,6 +120,6 @@ const status = computed(() => (props.command.form.submitting.value ? "processing
       <slot />
     </div>
   </Modal>
-  <AlertDialog v-if="asked" ref="ask" :title="asked.title" :message="asked.message" :confirm-label="asked.confirmLabel" :tone="asked.tone" :action="answerYes"
+  <AlertDialog v-if="asked" ref="ask" :title="asked.title" :message="asked.message" :confirm-label="asked.confirmLabel" :tone="asked.tone" :icon="asked.icon" :action="answerYes"
     @dismissed="void props.command.answer?.(false)" />
 </template>
