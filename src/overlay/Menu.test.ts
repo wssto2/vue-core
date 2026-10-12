@@ -4,6 +4,7 @@ import { defineComponent, nextTick, ref } from "vue";
 import Modal from "../modal/Modal.vue";
 import { createTestI18n } from "../testing/i18n";
 import Menu, { type MenuItem } from "./Menu.vue";
+import MenuButton from "./MenuButton.vue";
 import { closeOverlays } from "./closeOverlays";
 
 const global = { plugins: [createTestI18n()], stubs: { transition: false } };
@@ -233,5 +234,62 @@ describe("Menu", () => {
     press("Escape");
     await vi.waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
     expect(screen.getByRole("dialog")).toBeTruthy();
+  });
+});
+
+describe("MenuButton", () => {
+  function mountButton() {
+    const Owner = defineComponent({
+      components: { ActionMenu: Menu, MenuButton },
+      setup: () => ({ menuItems: items() }),
+      template: `
+        <ActionMenu :items="menuItems" label="Actions">
+          <template #trigger="trigger"><MenuButton v-bind="trigger" label="Row actions" /></template>
+        </ActionMenu>`,
+    });
+    return render(Owner, { global });
+  }
+
+  it("is an icon-only button named by its label that carries the trigger attrs", () => {
+    mountButton();
+    const button = screen.getByRole("button", { name: "Row actions" });
+
+    expect(button.textContent?.trim()).toBe("");
+    expect(button.querySelector("svg")).not.toBeNull();
+    expect(button.getAttribute("aria-haspopup")).toBe("menu");
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(button.hasAttribute("data-menu-trigger")).toBe(true);
+    expect(button.getAttribute("aria-controls")).toMatch(/^menu-/);
+  });
+
+  it("shows its pressed state while the menu is open", async () => {
+    mountButton();
+    const button = screen.getByRole("button", { name: "Row actions" });
+    expect(button.hasAttribute("data-pressed")).toBe(false);
+
+    await fireEvent.click(button);
+    await settle();
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    expect(button.hasAttribute("data-pressed")).toBe(true);
+    expect(screen.getByRole("menu", { name: "Actions" }).id).toBe(button.getAttribute("aria-controls"));
+
+    press("Escape");
+    await settle();
+    expect(button.hasAttribute("data-pressed")).toBe(false);
+  });
+
+  it("opens from the keyboard (Enter on the focused button) and Escape returns focus to it", async () => {
+    mountButton();
+    const button = screen.getByRole("button", { name: "Row actions" });
+    button.focus();
+    // A focused button turns Enter and Space into a click.
+    await fireEvent.click(button);
+    await settle();
+    expect(screen.getByRole("menu")).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Rename" }));
+
+    press("Escape");
+    await settle();
+    expect(document.activeElement).toBe(button);
   });
 });

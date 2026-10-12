@@ -1,5 +1,6 @@
 export { default as AlertDialog } from "./AlertDialog.vue";
 export { default as Menu, type MenuItem } from "./Menu.vue";
+export { default as MenuButton } from "./MenuButton.vue";
 export { default as Popover } from "./Popover.vue";
 export { default as Toaster } from "./Toaster.vue";
 export { default as Tooltip } from "./Tooltip.vue";
