@@ -176,13 +176,16 @@ describe("Timestamp with an author", () => {
   const value = "2026-09-30T14:05:00Z";
   const author = { name: "Josip Žlimen" };
 
-  it("shows the avatar and the name before the date, with no calendar icon", () => {
+  it("stacks the name over the date beside a two-row avatar, with no calendar icon", () => {
     const { container } = render(Timestamp, { props: { value, author }, global });
     const root = container.querySelector("[data-timestamp-author]")!;
     const parts = [...root.children];
 
     expect(parts[0]!.textContent).toBe("JŽ");
     expect(parts[0]!.className).toContain("size-5"); // the smallest avatar
+    expect(parts[0]!.className).toContain("row-span-2"); // centred over both lines
+    expect(root.className).toMatch(/\binline-grid\b/);
+    expect(root.className).toContain("grid-cols-[auto_minmax(0,1fr)]"); // avatar column, then the text column: name above date
     expect(parts[1]!.textContent).toBe("Josip Žlimen");
     expect(parts[2]!.tagName).toBe("TIME");
     expect(parts[2]!.getAttribute("datetime")).toBe("2026-09-30T14:05:00.000Z");
@@ -196,7 +199,8 @@ describe("Timestamp with an author", () => {
     const [, name, time] = [...container.querySelector("[data-timestamp-author]")!.children];
 
     expect(name!.className).toMatch(/\bmin-w-0\b.*\btruncate\b/);
-    expect(time!.className).toContain("shrink-0");
+    expect(time!.className).toContain("whitespace-nowrap");
+    expect(time!.className).not.toContain("truncate");
   });
 
   it("hands the author's avatarUrl to the avatar", () => {

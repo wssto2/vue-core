@@ -14,8 +14,9 @@ const CIVIL_DATE = /^\d{4}-\d{2}-\d{2}$/;
  * zero time, the epoch) reads "No data".
  *
  * With an `author` (who changed the record) the calendar icon gives way to the person: a small
- * avatar and the name, then the date in muted text, as a mail list shows sender and date. A long
- * name truncates; the date never does.
+ * avatar, centred on two lines, the name on the first (a long one truncates) and the date on the
+ * second in muted text (never truncated, never wrapped). The cell is as wide as the wider of the
+ * two, so a list column stays narrow. One layout; there is no option for the inline one.
  *
  *   <Timestamp :value="lead.created_at" />
  *   <Timestamp :value="invoice.due" precision="date" />
@@ -42,10 +43,10 @@ const text = computed(() => (props.precision === "date" ? format.date(date.value
 </script>
 
 <template>
-  <span v-if="date && props.author" class="inline-flex max-w-full min-w-0 items-center gap-2 text-xs" data-timestamp-author>
-    <Avatar :name="props.author.name" :src="props.author.avatarUrl" size="xs" />
+  <span v-if="date && props.author" class="inline-grid max-w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 text-xs" data-timestamp-author>
+    <Avatar :name="props.author.name" :src="props.author.avatarUrl" size="xs" class="row-span-2" />
     <span class="min-w-0 truncate text-content">{{ props.author.name }}</span>
-    <time :datetime="isoValue" class="shrink-0 text-content-muted">{{ text }}</time>
+    <time :datetime="isoValue" class="whitespace-nowrap text-content-muted">{{ text }}</time>
   </span>
   <time v-else-if="date" :datetime="isoValue" class="inline-flex items-center gap-2 text-xs text-content">
     <Icon name="calendarEventFill" class="text-content-muted" />{{ text }}
