@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.25 — 2026-10-12
+
+The photo viewer's actions on a phone. From ARV cutover g (wave 1, the vehicle gallery). Two items, one commit each.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`PhotoViewerAction`** (`@wssto2/vue-core/overlay`): the content of `PhotoViewer`'s `#actions` slot. `label`, `tone?: "critical"` (the destructive one, in the danger colour), `disabled?` (stays focusable, `aria-disabled`, emits nothing); emits `select`. A 44 px text button made for the viewer's dark surface, contrast-tested. ARV: `VehiclePhotoGallery.vue` replaces its hand-styled `<button>`s ("Postavi kao naslovnu", "Obriši") and their `text-xs` with two `PhotoViewerAction`s, `data-test` kept.
+
+### Changes to existing behaviour
+- **On a phone the `#actions` move to a bottom toolbar.** Where `useCompactPresentation()` is true the slot renders once, in a centred toolbar (`data-test="photo-toolbar"`, safe-area aware) between the photo and the thumbnail strip; the header keeps the counter, rotate, download and close. On a wide screen nothing changes (the actions stay in the header). No `#actions`, no toolbar. ARV: the vehicle gallery's viewer (390 px: the counter is no longer cut to "2." and the actions no longer shrink).
+- **The counter is never cut.** In the header only the title truncates; the counter stays whole.
+- **Pinned by tests that were updated:** none.
+
 ## 0.4.24 — 2026-10-11
 
 A refusal in the server's words, a dialog that only shows, a new record with a start. From ARV cutover e8a (both lanes). Three items, one commit each.
