@@ -50,6 +50,9 @@ export function heldSession<U extends SessionUser>(state: SessionState<U>): Sess
   return state.status === "anonymous" && state.reason === "expired" ? state.previous ?? null : null;
 }
 
+/** The parts of a signed-in session `Session.update` may replace. */
+export type SessionPatch<U extends SessionUser = SessionUser> = Partial<Pick<SessionSnapshot<U>, "user" | "access" | "navigation">>;
+
 /** The seam to a backend: how to ask who is signed in and how to end the session. */
 export interface SessionAdapter<U extends SessionUser = SessionUser> {
   /** The current session, or null when there is none (not signed in). Reject for failures; honour `signal`. */
@@ -79,6 +82,14 @@ export interface Session<U extends SessionUser = SessionUser> {
   refresh(): Promise<SessionState<U>>;
   /** A sign-in succeeded: the application's login call produced this snapshot. */
   establish(snapshot: SessionSnapshot<U>): void;
+  /**
+   * The same person, changed in place: a profile or language saved, a menu or access re-read by the application. Replaces
+   * only the parts in the patch; the status, `expiresAt` and the impersonator stay, and nothing in flight is cancelled
+   * (this is not "a change of who is signed in", which is `establish`). A no-op unless authenticated. A `user.id` other than
+   * the signed-in one is a programming error and throws: a different person is `establish`. A refresh already asked
+   * still lands when it is answered, with the server's version.
+   */
+  update(patch: SessionPatch<U>): void;
   /** The server rejected the session (401): signed in becomes anonymous with reason `expired`. No-op when nobody is signed in. */
   expire(): void;
   /**
@@ -186,6 +197,19 @@ export function createSession<U extends SessionUser = SessionUser>(
     establish(snapshot) {
       supersede();
       state.value = { status: "authenticated", ...snapshot };
+    },
+    update(patch) {
+      const current = state.value;
+      if (current.status !== "authenticated") return;
+      if (patch.user && patch.user.id !== current.user.id) {
+        throw new Error(`session.update cannot change who is signed in (user ${String(current.user.id)} to ${String(patch.user.id)}); use session.establish for a different person.`);
+      }
+      state.value = {
+        ...current,
+        user: patch.user ?? current.user,
+        access: patch.access ?? current.access,
+        ...((patch.navigation ?? current.navigation) && { navigation: patch.navigation ?? current.navigation }),
+      };
     },
     expire() {
       if (state.value.status !== "authenticated") return;

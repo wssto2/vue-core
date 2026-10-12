@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { beforeSignOutTimeout, createSession, heldSession, type SessionAdapter, type SessionSnapshot } from "./session";
-import { deferred, snapshotOf } from "./testing";
+import { createTestPlatform } from "../testing/platform";
+import { deferred, held, snapshotOf } from "./testing";
 
 function adapterOf(load: SessionAdapter["load"], signOut: SessionAdapter["signOut"] = async () => {}): SessionAdapter {
   return { load, signOut };
@@ -311,5 +312,61 @@ describe("an expired session that is held", () => {
     session.establish(snapshotOf(7));
     session.expire();
     expect(session.state.value).toEqual({ status: "anonymous", reason: "expired" });
+  });
+});
+
+describe("update", () => {
+  const named = (id: number, name: string): SessionSnapshot<{ id: number; name: string }> => ({ ...snapshotOf(id), user: { id, name } });
+
+  it("replaces the user in place: status, expiry, impersonator, access and menu stay, and nothing in flight is cancelled", async () => {
+    const answer = deferred<SessionSnapshot | null>();
+    let signal: AbortSignal | undefined;
+    const session = createSession<{ id: number; name: string }>({
+      load: (given) => {
+        signal = given;
+        return answer.promise as Promise<SessionSnapshot<{ id: number; name: string }> | null>;
+      },
+      signOut: async () => {},
+    });
+    const expiresAt = new Date("2030-01-01");
+    const impersonator = { id: 1, name: "Admin" };
+    session.establish({ ...named(7, "Ana"), expiresAt, impersonator, navigation: [] });
+    const refreshing = session.refresh(); // in flight while the profile is saved
+    await Promise.resolve();
+    const before = session.state.value;
+
+    session.update({ user: { id: 7, name: "Ana Maria" } });
+
+    expect(session.state.value).not.toBe(before); // reactive readers see a new state
+    expect(session.state.value).toMatchObject({ status: "authenticated", user: { id: 7, name: "Ana Maria" }, expiresAt, impersonator, navigation: [] });
+    expect(signal?.aborted).toBe(false);
+    answer.resolve(named(7, "From server"));
+    expect(await refreshing).toMatchObject({ status: "authenticated", user: { name: "From server" } }); // the answer was not dropped
+  });
+
+  it("replaces access (the access client follows) and the menu, and keeps the user", () => {
+    const platform = createTestPlatform({ user: { id: 5 }, permissions: ["tickets:view"] });
+    expect(platform.access.can("tickets:update")).toBe(false);
+    platform.session.update({ access: { root: false, permissions: { "tickets:update": held("organization") }, unavailable: [] }, navigation: [{ destination: "x", children: [] }] as never });
+    expect(platform.access.can("tickets:update")).toBe(true);
+    expect(platform.access.can("tickets:view")).toBe(false);
+    expect(platform.session.state.value).toMatchObject({ user: { id: 5 }, navigation: [{ destination: "x" }] });
+  });
+
+  it("is a no-op unless somebody is signed in", async () => {
+    const session = createSession(adapterOf(async () => null));
+    session.update({ user: { id: 1 } });
+    expect(session.state.value).toEqual({ status: "unknown" });
+    await session.restore();
+    session.update({ user: { id: 1 } });
+    expect(session.state.value).toEqual({ status: "anonymous", reason: "none" });
+  });
+
+  it("throws for a different person, and leaves the session as it was", () => {
+    const session = createSession(adapterOf(async () => null));
+    session.establish(snapshotOf(7));
+    const before = session.state.value;
+    expect(() => session.update({ user: { id: 8 } })).toThrow(/establish/);
+    expect(session.state.value).toBe(before);
   });
 });
