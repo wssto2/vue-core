@@ -111,7 +111,7 @@ The page chrome marks its parts with `data-page-*` attributes, so end-to-end and
 | `data-page-action="<id>"` | one action, by its id |
 | `data-page-overflow` | the "More" button of the overflow menu |
 
-```ts
+```js
 await page.locator("[data-page-toolbar] [data-page-action=create]").click();
 await page.locator("[data-page-overflow]").click();
 ```

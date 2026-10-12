@@ -199,6 +199,45 @@ What to know:
 - **`recordRoute`** makes a row open its record on click and an `identity` column link to it (without the `?from=` state a list adds). `row-class` marks a row (a total, the newest), `density="condensed"` tightens the cells.
 - `RowActions` and the `#actions` slot work on `CollectionTable` too, where they replace the default open-record link and More button.
 
+## Who changed it, and when
+
+`Timestamp` (from `@wssto2/vue-core/content`) is the "Created / Changed" cell. With an `author` it shows a small avatar and the name, then the date in muted text; a long name truncates and the date stays whole. `precision="date"` drops the time.
+
+<!-- example: docs/examples/tickets/components/ChangedBy.vue -->
+```vue
+<script setup lang="ts">
+import { Timestamp } from "@wssto2/vue-core/content";
+
+defineProps<{ row: { updated_at: string; updated_by: string } }>();
+</script>
+
+<template>
+  <Timestamp :value="row.updated_at" :author="{ name: row.updated_by }" />
+</template>
+```
+
+## A row's menu
+
+`MenuButton` (from `@wssto2/vue-core/overlay`) is the round "⋯" button for a `Menu`'s `#trigger` slot: spread the slot scope on it and give it the accessible name. `icon` replaces the dots.
+
+<!-- example: docs/examples/tickets/components/RowMenu.vue -->
+```vue
+<script setup lang="ts">
+import { Menu, MenuButton, type MenuItem } from "@wssto2/vue-core/overlay";
+import { useI18n } from "vue-i18n";
+
+defineProps<{ items: readonly MenuItem[] }>();
+
+const { t } = useI18n();
+</script>
+
+<template>
+  <Menu :items="items" :label="t('tickets.rowActions')">
+    <template #trigger="trigger"><MenuButton v-bind="trigger" :label="t('tickets.rowActions')" /></template>
+  </Menu>
+</template>
+```
+
 ## Two things it will not do
 
 It does not hide a failed load behind an empty table: the failure is a banner with a retry, and the rows already shown stay. And it does not load more than one request at a time: a newer query drops the older answer.

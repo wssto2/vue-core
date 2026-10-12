@@ -227,6 +227,27 @@ const plans = useLoad(({ signal }) => http.get<Plan[]>("/plans", { signal }).the
 
 `useLoad(load, { watch })` starts over from nothing when a source changes (a route parameter, a selected tab); `{ immediate: false }` waits for `reload()`. A failure is worded by `describeError` (see [app setup](app-setup.md)) unless you pass `errorMessage`.
 
+A region driven by plain flags (a store's `loading` and `error`, a ref that is `undefined` until the answer comes) builds its one `state` with `asyncState`; `AsyncSection` has no second props surface:
+
+<!-- example: docs/examples/accounts/components/Documents.vue -->
+```vue
+<script setup lang="ts">
+import { AsyncSection, asyncState } from "@wssto2/vue-core/state";
+
+// A store's flags: `documents` is undefined until the answer comes.
+defineProps<{ loading: boolean; error: string | null; documents?: readonly string[] }>();
+defineEmits<{ retry: [] }>();
+</script>
+
+<template>
+  <AsyncSection :state="asyncState({ loading, error, value: documents })" @retry="$emit('retry')">
+    <template #default="{ value }"><ul><li v-for="name in value" :key="name">{{ name }}</li></ul></template>
+  </AsyncSection>
+</template>
+```
+
+`value` stays `undefined` until there is an answer (`null` is an answer: empty). Loading over a value is `refreshing`, an error over a value is `stale`, loading wins over an error.
+
 ## 4. A layout of your own
 
 When the record is not "header, then content" (a lead with a phase track, a contact panel, comments beside sections), compose the same parts: `AdaptivePageShell` for the chrome, `RecordHeader`, `SectionNavigator` anywhere in your grid, and the same resource. The playground's lead page does this and is the reference: `playground/src/app/features/records/views/LeadRecord.vue`. Its pager is `RecordPager` (from `@wssto2/vue-core/resource`) in the shell's `#pager` slot, fed by `neighbors.context.neighbors`.
