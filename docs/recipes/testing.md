@@ -95,6 +95,29 @@ describe("the ticket list", () => {
 - A feature's context is one line: `plugins: [{ install: (instance) => instance.provide(KEY, value) }]`.
 - `messages` are merged over the library's texts per locale, yours winning, so a button reads in the test what it reads in production (`getByRole("button", { name: "New ticket" })`).
 
+## Stable spec hooks
+
+The page chrome marks its parts with `data-page-*` attributes, so end-to-end and component specs select them instead of classes or text. They are part of the library's API and change only with a major release. Each part appears once on a page.
+
+| Hook | The part |
+|---|---|
+| `data-page-shell` | the page shell root |
+| `data-page-toolbar` | the desktop toolbar |
+| `data-page-path` | the breadcrumb `nav` (a path of two or more levels) |
+| `data-page-path-item` | one ancestor link of the path |
+| `data-page-back` | the back link (toolbar) or button (phone bar) |
+| `data-page-status` | the quiet status ("Unsaved changes") |
+| `data-page-actions` | the actions group |
+| `data-page-action="<id>"` | one action, by its id |
+| `data-page-overflow` | the "More" button of the overflow menu |
+
+```ts
+await page.locator("[data-page-toolbar] [data-page-action=create]").click();
+await page.locator("[data-page-overflow]").click();
+```
+
+Dialog parts are `[data-part=…]`.
+
 ## A component, and who may do what
 
 A component that asks `access.can(...)` is tested by the platform it gets: build one per case. The phone layout is `mockMedia`:

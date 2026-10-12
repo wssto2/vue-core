@@ -41,7 +41,7 @@ function prominence(action: PageAction) {
 </script>
 
 <template>
-  <div v-if="inline.length || overflow.length" class="flex min-w-0 flex-wrap items-center justify-end gap-2">
+  <div v-if="inline.length || overflow.length" data-page-actions class="flex min-w-0 flex-wrap items-center justify-end gap-2">
     <Button v-for="action in inline" :key="action.id" :prominence="prominence(action)" :icon="action.icon" :disabled="action.disabled"
       :processing="action.processing" :keyboard-shortcut="action.keyboardShortcut" :data-page-action="action.id" @click="action.onClick()">
       {{ action.label }}

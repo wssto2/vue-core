@@ -347,6 +347,7 @@ describe("BackofficeShell on a phone", () => {
     expect(bar.getByRole("button", { name: "Leads" })).toBeTruthy();
     expect(topBar()!.querySelector("[data-shell-bar-back] svg")!.getAttribute("width")).toBe("28"); // ARV's chevron size
     expect(topBar()!.querySelector("[data-shell-bar-title]")!.textContent).toBe("Lead 7");
+    expect(topBar()!.querySelectorAll("[data-page-back]")).toHaveLength(1); // the phone bar carries the page hooks too
     await fireEvent.click(bar.getByRole("button", { name: "Save changes" }));
     expect(save).toHaveBeenCalledTimes(1);
     expect(bar.getByRole("button", { name: "More actions" })).toBeTruthy();

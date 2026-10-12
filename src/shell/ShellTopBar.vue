@@ -82,7 +82,7 @@ function goBack() {
           @click="leading.onClick()">
           <span class="truncate">{{ leading.label }}</span>
         </button>
-        <button v-else-if="back" type="button" data-shell-bar-back
+        <button v-else-if="back" type="button" data-shell-bar-back data-page-back
           class="hit-target inline-flex min-w-0 cursor-pointer items-center rounded-control pr-2 text-body text-content-link active:opacity-60"
           @click="goBack">
           <Icon name="arrowLeftSLine" :size="28" class="-mr-0.5 shrink-0" />
@@ -124,7 +124,7 @@ function goBack() {
           </template>
           <Menu v-if="menuItems.length" :items="menuItems" :label="t('core.page.more_actions')">
             <template #trigger="{ toggle, attrs }">
-              <button type="button" v-bind="attrs" :aria-label="t('core.page.more_actions')" data-shell-bar-more
+              <button type="button" v-bind="attrs" :aria-label="t('core.page.more_actions')" data-shell-bar-more data-page-overflow
                 class="hit-target flex size-9 cursor-pointer items-center justify-center rounded-full text-content-link" @click="toggle">
                 <Icon name="moreLine" :size="22" />
               </button>

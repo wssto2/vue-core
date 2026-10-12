@@ -32,8 +32,8 @@ const parent = computed(() => (props.path && ancestors.value.length ? props.path
 </script>
 
 <template>
-  <div class="sticky top-[var(--shell-banner-h,0px)] z-20 flex min-h-bar-height min-w-0 flex-wrap items-center gap-2.5 border-b border-border-separator bg-surface-page/85 py-2 pr-6 pl-4 backdrop-blur-xl">
-    <nav v-if="ancestors.length && parent" :aria-label="t('core.page.breadcrumbs')" class="-ml-1 flex min-w-0 items-center">
+  <div data-page-toolbar class="sticky top-[var(--shell-banner-h,0px)] z-20 flex min-h-bar-height min-w-0 flex-wrap items-center gap-2.5 border-b border-border-separator bg-surface-page/85 py-2 pr-6 pl-4 backdrop-blur-xl">
+    <nav v-if="ancestors.length && parent" data-page-path :aria-label="t('core.page.breadcrumbs')" class="-ml-1 flex min-w-0 items-center">
       <span class="flex shrink-0 text-content-link" aria-hidden="true"><Icon name="arrowLeftSLine" :size="20" /></span>
       <ol class="flex min-w-0 items-center">
         <!-- Below lg (a tablet) the ancestors give way to the back link: the path and the actions

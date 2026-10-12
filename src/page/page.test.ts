@@ -299,6 +299,29 @@ describe("AdaptivePageShell", () => {
     expect(chrome.back.value).toEqual({ label: "Renault", to: { name: "models" } });
   });
 
+  // The stable spec hooks (documented in the testing recipe): each part is marked once.
+  it("marks every part of the page chrome with its own data-page hook, once", async () => {
+    const chrome = createPageChrome();
+    chrome.claim().setRegistration({ actions: [], leading: null, status: "Unsaved changes", navTitle: null });
+    const path = [{ label: "Catalogue", to: { name: "catalogue" } }, { label: "Renault", to: { name: "brands" } }];
+    await mountShell({
+      title: "Clio",
+      path,
+      actions: [
+        { id: "create", label: "Create", placement: "primary", onClick: () => {} },
+        { id: "archive", label: "Archive", placement: "overflow", onClick: () => {} },
+      ],
+    }, {}, chrome, "/c");
+
+    for (const hook of ["shell", "toolbar", "path", "actions", "back", "status", "overflow"]) {
+      expect(document.querySelectorAll(`[data-page-${hook}]`), hook).toHaveLength(1);
+    }
+    expect(document.querySelectorAll("[data-page-path-item]")).toHaveLength(1);
+    expect(document.querySelectorAll('[data-page-action="create"]')).toHaveLength(1);
+    expect(document.querySelector("[data-page-toolbar] [data-page-path] [data-page-back]")).not.toBeNull();
+    expect(document.querySelector("[data-page-toolbar] [data-page-actions] [data-page-overflow]")).not.toBeNull();
+  });
+
   it("keeps the plain back for a path of one level", async () => {
     await mountShell({ path: [{ label: "Customers", to: { name: "list" } }] });
 
