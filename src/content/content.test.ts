@@ -134,6 +134,49 @@ describe("Timestamp", () => {
   });
 });
 
+describe("Timestamp with an author", () => {
+  const value = "2026-09-30T14:05:00Z";
+  const author = { name: "Josip Žlimen" };
+
+  it("shows the avatar and the name before the date, with no calendar icon", () => {
+    const { container } = render(Timestamp, { props: { value, author }, global });
+    const root = container.querySelector("[data-timestamp-author]")!;
+    const parts = [...root.children];
+
+    expect(parts[0]!.textContent).toBe("JŽ");
+    expect(parts[0]!.className).toContain("size-5"); // the smallest avatar
+    expect(parts[1]!.textContent).toBe("Josip Žlimen");
+    expect(parts[2]!.tagName).toBe("TIME");
+    expect(parts[2]!.getAttribute("datetime")).toBe("2026-09-30T14:05:00.000Z");
+    expect(parts[2]!.textContent).toMatch(/2026/);
+    expect(parts[2]!.className).toContain("text-content-muted");
+    expect(root.querySelector("svg")).toBeNull();
+  });
+
+  it("truncates a long name and keeps the date whole", () => {
+    const { container } = render(Timestamp, { props: { value, author: { name: "Alexandrina-Maria Konstantinopoulou-Papadimitriou" } }, global });
+    const [, name, time] = [...container.querySelector("[data-timestamp-author]")!.children];
+
+    expect(name!.className).toMatch(/\bmin-w-0\b.*\btruncate\b/);
+    expect(time!.className).toContain("shrink-0");
+  });
+
+  it("keeps precision", () => {
+    const { container } = render(Timestamp, { props: { value, author, precision: "date" }, global });
+    expect(container.querySelector("time")!.textContent).not.toMatch(/:\d\d/);
+  });
+
+  it("no author is the date alone, and nothing to show stays empty whoever the author is", () => {
+    const alone = render(Timestamp, { props: { value, author: null }, global });
+    expect(alone.container.querySelector("[data-timestamp-author]")).toBeNull();
+    expect(alone.container.querySelector("time svg")).not.toBeNull();
+    alone.unmount();
+
+    const { container } = render(Timestamp, { props: { value: null, author }, global });
+    expect(container.textContent).toBe("No data");
+  });
+});
+
 describe("Panel", () => {
   const mount = (props: Record<string, unknown> = {}, slots: Record<string, string> = { default: "<p>Body</p>" }) =>
     render(Panel, { props: { title: "Vehicle data", ...props }, slots });
