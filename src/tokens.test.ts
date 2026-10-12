@@ -52,6 +52,21 @@ const PAIRS: [string, string, number][] = [
   ["tile-brand-foreground", "tile-brand", 3], // an icon on its tile, not text
 ];
 
+// The viewer is dark in both modes, so its colours are fixed hexes in the component, not tokens: read them from the source.
+describe("PhotoViewerAction on the viewer's surface", () => {
+  const viewer = readFileSync("src/overlay/PhotoViewer.vue", "utf8");
+  const action = readFileSync("src/overlay/PhotoViewerAction.vue", "utf8");
+  const surface = /bg-\[(#[0-9a-f]{6})\] text-\[#f1f5f3\]/i.exec(viewer)?.[1];
+  const colours = { text: /: 'text-\[(#[0-9a-f]{6})\]'/i.exec(action)?.[1], critical: /'critical' \? 'text-\[(#[0-9a-f]{6})\]'/i.exec(action)?.[1] };
+
+  it.each(["text", "critical"] as const)("%s is at least 4.5:1 on the surface, also under the hover wash", (name) => {
+    expect(surface, "the viewer's surface").toBeDefined();
+    expect(colours[name], `${name} colour`).toBeDefined();
+    expect(contrast(colours[name]!, surface!)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(colours[name]!, "#323836")).toBeGreaterThanOrEqual(4.5); // white at 16 % over the surface, 
+  });
+});
+
 describe("colour contrast (WCAG AA)", () => {
   for (const [mode, set] of [["light", light], ["dark", dark]] as const) {
     it.each(PAIRS)(`${mode}: %s on %s is at least %s:1`, (foreground, background, minimum) => {
