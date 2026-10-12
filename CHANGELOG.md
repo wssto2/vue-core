@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.27 — 2026-10-12
+
+The gaps ARV lane W found when it moved its twin components onto the library. Four items (plus `Avatar` `src`, which `Timestamp` author needs); no existing default changes.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **Page chrome spec hooks.** The toolbar root is `data-page-toolbar`, the breadcrumb `nav` `data-page-path` and the actions group `data-page-actions`, beside the existing `data-page-shell`, `-back`, `-action="<id>"`, `-overflow`, `-path-item` and `-status`. The phone nav bar now carries `data-page-back` and `data-page-overflow` on its back and "More" buttons. All are documented as stable spec hooks (testing recipe); each appears once per page. ARV: the 39 specs that select `[data-test="page-toolbar"]`, `page-back`, `page-action-overflow`, `page-shell`, `page-status`, `page-path` and `page-actions` move to `[data-page-*]` when the catalogue screens adopt the library shell.
+- **`Timestamp` `author`** (`@wssto2/vue-core/content`): `{ name: string; avatarUrl?: string | null } | null`. With an author the calendar icon gives way to the smallest `Avatar` and the name (truncated), then the date in muted text, which never shrinks; `precision` still applies, no author is the date alone, and an empty value still reads "No data". `avatarUrl` is the photo's full URL, **built by the app** (no auth or fetching in the library); ARV joins its legacy URL and the photo path. ARV: the 22 non-deferred `Timestamp` users (`:date` becomes `:value`, `with-time` becomes `precision`).
+- **`Avatar` `src`** (`@wssto2/vue-core/content`): `src?: string | null`, a full URL. Draws the photo (round, `object-cover`, `alt` = the name, not draggable); the initials show when `src` is empty, while it loads and if it fails to load (never a broken-image icon), and a changed `src` retries.
+- **`asyncState({ loading, error, value })`** (`@wssto2/vue-core/state`): the `AsyncState` of a region driven by plain flags, for `AsyncSection`'s one `state` prop (no second props surface). `value` is `undefined` until there is an answer (`null` is an answer, shown as empty); loading over a value is `refreshing`, an error over a value is `stale`, loading wins over an error, an empty error is none, and nothing yet is `loading`. ARV: the offer and contract document sections.
+- **`MenuButton`** (`@wssto2/vue-core/overlay`): the round "⋯" button for a `Menu`'s `#trigger` slot. `<MenuButton v-bind="trigger" label="…" />` (props `label` required, `icon` default `moreLine`, plus the slot scope `presented`, `toggle`, `attrs`). It carries the trigger attrs and shows a pressed look (`data-pressed`) while the menu is open. ARV: `FollowUpRow`.
+
+### Changes to existing behaviour
+- None. **Pinned by tests that were updated:** none.
+
 ## 0.4.26 — 2026-10-12
 
 A typed platform declared once, and the signed-in user changed in place. From ARV cutover g (the step f map, wave 2 step 0). Three items, one commit each.
