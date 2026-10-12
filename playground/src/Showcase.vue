@@ -186,7 +186,10 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         <ul class="divide-y divide-border-separator rounded-group bg-surface-cell">
           <li v-for="row in changed" :key="row.vehicle" class="flex items-center gap-3 px-3 py-2">
             <span class="min-w-0 flex-1 truncate text-subheadline text-content-strong">{{ row.vehicle }}</span>
-            <span class="flex w-60 max-w-[72%] shrink-0 justify-end"><Timestamp :value="row.at" :author="row.author" /></span>
+            <span class="flex w-44 max-w-[60%] shrink-0 justify-end"><Timestamp :value="row.at" :author="row.author" /></span>
+            <Menu :items="menu" label="Row actions">
+              <template #trigger="trigger"><MenuButton v-bind="trigger" label="Row actions" /></template>
+            </Menu>
           </li>
         </ul>
         <Divider label="or enter it manually" />

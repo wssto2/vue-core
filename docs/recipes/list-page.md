@@ -201,7 +201,7 @@ What to know:
 
 ## Who changed it, and when
 
-`Timestamp` (from `@wssto2/vue-core/content`) is the "Created / Changed" cell. With an `author` it shows a small avatar and the name, then the date in muted text; a long name truncates and the date stays whole. `precision="date"` drops the time.
+`Timestamp` (from `@wssto2/vue-core/content`) is the "Created / Changed" cell. With an `author` it stacks the person over the date: a small avatar centred on two lines, the name on the first (a long one truncates), the date on the second in muted text (never truncated or wrapped). The cell is as wide as the wider of the two, so the column stays narrow. `precision="date"` drops the time.
 
 <!-- example: docs/examples/tickets/components/ChangedBy.vue -->
 ```vue
@@ -218,7 +218,7 @@ defineProps<{ row: { updated_at: string; updated_by: string } }>();
 
 ## A row's menu
 
-`MenuButton` (from `@wssto2/vue-core/overlay`) is the round "⋯" button for a `Menu`'s `#trigger` slot: spread the slot scope on it and give it the accessible name. `icon` replaces the dots.
+`MenuButton` (from `@wssto2/vue-core/overlay`) is the round "⋯" button for a `Menu`'s `#trigger` slot: spread the slot scope on it and give it the accessible name. It is plain at rest (no fill, muted icon) so a row does not grow or fill with grey circles; the fill shows on hover, keyboard focus and while its menu is open, and the 44px touch target on compact is an invisible hit area. `icon` replaces the dots.
 
 <!-- example: docs/examples/tickets/components/RowMenu.vue -->
 ```vue
