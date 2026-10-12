@@ -3,6 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick, ref } from "vue";
 import Modal from "../modal/Modal.vue";
 import { createTestI18n } from "../testing/i18n";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import Menu, { type MenuItem } from "./Menu.vue";
 import MenuButton from "./MenuButton.vue";
 import { closeOverlays } from "./closeOverlays";
@@ -260,6 +262,23 @@ describe("MenuButton", () => {
     expect(button.getAttribute("aria-expanded")).toBe("false");
     expect(button.hasAttribute("data-menu-trigger")).toBe(true);
     expect(button.getAttribute("aria-controls")).toMatch(/^menu-/);
+  });
+
+  it("is plain at rest, filled while the menu is open, and keeps a 44px hit area", async () => {
+    mountButton();
+    const button = screen.getByRole("button", { name: "Row actions" });
+    const css = readFileSync(resolve(process.cwd(), "src/styles/theme.css"), "utf8");
+    const classes = () => button.className.split(/\s+/);
+
+    expect(classes()).not.toContain("bg-fill");
+    expect(classes()).toContain("text-content-muted");
+    expect(classes()).toContain("data-pressed:bg-fill-strong");
+    expect(classes()).toContain("hover:bg-fill");
+    expect(classes()).toContain("focus-visible:bg-fill");
+    // The invisible hit area grows to --app-target-size, 2.75rem (44px) on compact, without growing the box.
+    expect(classes()).toContain("hit-target");
+    expect(classes()).toContain("size-9");
+    expect(css).toMatch(/@media[^{]*\{\s*:root \{ --app-target-size: 2\.75rem; \}/);
   });
 
   it("shows its pressed state while the menu is open", async () => {
