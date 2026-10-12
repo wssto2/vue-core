@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.28 — 2026-10-12
+
+From the owner's review of ARV W2's screenshots of 0.4.27: the changed-by cell and the row menu are quieter. Two items, one commit each; no new API.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Changes to existing behaviour
+- **`Timestamp` with an `author` stacks.** The smallest `Avatar` is centred on two lines, the name on the first (a long one truncates) and the date on the second in muted text (never truncated, never wrapped). The cell is as wide as the wider of the name and the date, no wider, so a list column stays narrow instead of growing and cutting the row's own text. There is no `layout` option: one way. Without an author it is unchanged (date with the calendar icon); "No data" is unchanged. ARV: the "Uneseno/Uređeno" columns; nothing to change in the call sites.
+- **`MenuButton` is plain at rest.** No fill and a `content-muted` icon, like an iOS row's "⋯"; the fill (and `content-strong` icon) shows on hover, `focus-visible` and while its menu is open (`data-pressed`, the stronger fill). The 44px touch target on compact stays an invisible hit area (`hit-target`), so a row of 36px content does not grow. `aria-expanded` and `data-pressed` are as before. ARV: `FollowUpRow`.
+- **Pinned by tests that were updated:** `content.test.ts` "Timestamp with an author" (the inline layout: `shrink-0` date, three siblings in a row) now pins the grid, the two-row avatar and `whitespace-nowrap`; `Menu.test.ts` "MenuButton" gains the rest-state and hit-area test (the pressed-state test is unchanged).
+
 ## 0.4.27 — 2026-10-12
 
 The gaps ARV lane W found when it moved its twin components onto the library. Four items (plus `Avatar` `src`, which `Timestamp` author needs); no existing default changes.
