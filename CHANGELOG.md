@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.26 — 2026-10-12
+
+A typed platform declared once, and the signed-in user changed in place. From ARV cutover g (the step f map, wave 2 step 0). Three items, one commit each.
+
+### Requires
+- go-core unchanged: **`v1.7.0`**; **`vue` 3.5.19 or later**.
+
+### Added
+- **`PlatformRegistry`** (`@wssto2/vue-core/platform`): the app says once what its session user and bootstrap config are, as it does for permissions: `declare module "@wssto2/vue-core/platform" { interface PlatformRegistry { user: ArvUser; config: ArvConfig } }`. Bare `Platform` (what `usePlatform()`, `createApplication({ platform })`, `createTestPlatform()` and `createTestSession()` use) is then `Platform<ArvUser, ArvConfig>`; a key left out falls back to `SessionUser` / `BootstrapConfig` (`RegisteredUser` and `RegisteredConfig` are exported). `createPlatform<U, C>` stays generic. **Moving from explicit generics:** declare the registry once, then drop the casts at every `usePlatform()` read and `Platform<User, Config>` annotations (they still compile: the same type). Checked by `typing.test-d.ts` (not augmented) and `test-data/registry` (augmented; `npm run typecheck:registry`, part of `check`).
+- **`useSessionUser()`**: the signed-in user as a readonly computed ref, typed from the registry, `null` unless authenticated (a held, expired session is not a signed-in user). The impersonator stays on `session.state`. No `useSession()` reader: `usePlatform().session` is enough. ARV: the 39 files reading `useAuthStore().user` can read it.
+- **`session.update(patch)`**: `patch` is `Partial<Pick<SessionSnapshot, "user" | "access" | "navigation">>` (`SessionPatch`). It replaces those parts of a signed-in session and keeps the status, `expiresAt`, impersonator and the rest. It is not a change of who is signed in: nothing in flight is cancelled and no late answer is dropped (a `refresh()` already asked still lands with the server's version). Reactive readers (`useSessionUser`, the access client, the application's locale-from-user) see the new value. A no-op unless authenticated; a `user.id` other than the signed-in one **throws** (a programming error: a different person is `session.establish`). ARV: `useAuthStore.write()` becomes `session.update(...)`, so a language or profile save no longer re-establishes the session.
+
+### Changes to existing behaviour
+- **Bare `Platform` follows the registry.** Without an augmentation nothing changes. With one, a platform built with another user type no longer fits bare `Platform`. `createTestPlatform({ config })` must then give the registered config's own fields (the test has no other source for them). ARV: `frontend/tests/app/features.test.ts` and `frontend/tests/support/arvApp.ts` (`createTestPlatform`) once the registry declares `config`.
+- **Pinned by tests that were updated:** none.
+
 ## 0.4.25 — 2026-10-12
 
 The photo viewer's actions on a phone. From ARV cutover g (wave 1, the vehicle gallery). Two items, one commit each.
