@@ -1,13 +1,17 @@
-import type { App } from "vue";
+import type { App, InjectionKey } from "vue";
 import { createHttpClient, type HttpClient, type HttpClientOptions, type Transport } from "../client";
 import { createAccessClient, type AccessClient, type AccessClientOptions } from "./access";
 import type { BootstrapConfig } from "./bootstrap";
+import type { RegisteredConfig, RegisteredUser } from "./index";
 import { defineFeatureContext } from "./context";
 import { httpSessionAdapter } from "./httpSession";
 import { createSession, heldSession, type BeforeSignOutHook, type Session, type SessionAdapter, type SessionUser } from "./session";
 
-/** One application's shared services. Everything in it belongs to this instance alone. */
-export interface Platform<U extends SessionUser = SessionUser, C extends BootstrapConfig = BootstrapConfig> {
+/**
+ * One application's shared services. Everything in it belongs to this instance alone. Bare `Platform` is the
+ * application's own: its user and config as declared in `PlatformRegistry`.
+ */
+export interface Platform<U extends SessionUser = RegisteredUser, C extends BootstrapConfig = RegisteredConfig> {
   readonly config: C;
   readonly http: HttpClient;
   readonly session: Session<U>;
@@ -97,7 +101,10 @@ export function createPlatform<U extends SessionUser, C extends BootstrapConfig>
 }
 
 /** The platform as a context: `installPlatform(app, platform)` once, `usePlatform()` in components. */
-export const [platformKey, usePlatform] = defineFeatureContext<Platform>("platform");
+const context = defineFeatureContext<Platform>("platform");
+// Annotated so the declaration build keeps `Platform` (the registered one) instead of expanding it to the defaults.
+export const platformKey: InjectionKey<Platform> = context[0];
+export const usePlatform: () => Platform = context[1];
 
 export function installPlatform(app: App, platform: Platform): void {
   app.provide(platformKey, platform);

@@ -2,7 +2,7 @@
 // `@ts-expect-error` line must fail to. Nothing here runs.
 import { createApp } from "vue";
 import { createHttpClient, type ApiErrorKind, type HttpClient, type Transport } from "../client";
-import { createPlatform, defineFeatureContext, type AccessGateProps, httpSessionAdapter, parseBootstrap, type AccessClient, type SessionAdapter } from "./index";
+import { createPlatform, defineFeatureContext, type AccessGateProps, httpSessionAdapter, parseBootstrap, type AccessClient, type Platform, type SessionAdapter } from "./index";
 
 const config = parseBootstrap({ locale: "hr", country: "HR" }, (fields) => ({ country: fields.string("country") }));
 
@@ -108,3 +108,10 @@ export const anyGate: AccessGateProps = { any: ["a", "b"] };
 export const twoGates: AccessGateProps = { permission: "a", all: ["b"] };
 // @ts-expect-error no requirement is rejected
 export const noGate: AccessGateProps = {};
+
+// --- not augmented (this project declares no PlatformRegistry): the platform is the minimal one
+// The augmented case is `test-data/registry/registered.test-d.ts`.
+export const unregistered: Platform = createPlatform({ config });
+export const unregisteredId: number | string | undefined = unregistered.session.state.value.status === "authenticated" ? unregistered.session.state.value.user.id : undefined;
+// @ts-expect-error nothing is registered, so the user is the minimal one
+void (unregistered.session.state.value.status === "authenticated" && unregistered.session.state.value.user.name);

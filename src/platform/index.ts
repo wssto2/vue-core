@@ -1,3 +1,5 @@
+import type { BootstrapConfig } from "./bootstrap";
+import type { SessionUser } from "./session";
 export { createAccessClient } from "./access";
 export type { AccessClient, AccessClientOptions, AccessClause, AccessQualifier, AccessScope, AccessSnapshot, HeldAccess } from "./access";
 export { BootstrapError, BootstrapFields, parseBootstrap, readBootstrap } from "./bootstrap";
@@ -28,3 +30,23 @@ export interface PermissionRegistry {}
 export type Permission = keyof PermissionRegistry extends never ? string : Extract<keyof PermissionRegistry, string>;
 export { default as AccessGate } from "./AccessGate.vue";
 export type { AccessGateProps } from "./AccessGate.vue";
+
+/**
+ * The application's own session user and bootstrap config. The library declares neither: an app says
+ * once what they are by augmenting this interface (declaration merging, like `PermissionRegistry`), and
+ * `usePlatform()`, `useSessionUser()`, `createApplication` and `createTestPlatform` are typed from it, with no cast.
+ *
+ *   declare module "@wssto2/vue-core/platform" {
+ *     interface PlatformRegistry { user: AppUser; config: AppConfig }
+ *   }
+ *
+ * Both keys are optional: a missing one leaves `SessionUser` / `BootstrapConfig`.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- an empty interface is the point: apps augment it
+export interface PlatformRegistry {}
+
+/** The registered session user (`PlatformRegistry["user"]`); `SessionUser` until the app declares one. */
+export type RegisteredUser = PlatformRegistry extends { user: infer U extends SessionUser } ? U : SessionUser;
+
+/** The registered bootstrap config (`PlatformRegistry["config"]`); `BootstrapConfig` until the app declares one. */
+export type RegisteredConfig = PlatformRegistry extends { config: infer C extends BootstrapConfig } ? C : BootstrapConfig;

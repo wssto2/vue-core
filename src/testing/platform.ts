@@ -1,4 +1,4 @@
-import { createPlatform, type AccessClause, type AccessQualifier, type AccessSnapshot, type BootstrapConfig, type HeldAccess, type NavigationNode, type Platform, type PlatformOptions, type SessionAdapter, type SessionSnapshot, type SessionUser } from "../platform";
+import { createPlatform, type AccessClause, type AccessQualifier, type AccessSnapshot, type BootstrapConfig, type HeldAccess, type NavigationNode, type Platform, type PlatformOptions, type RegisteredConfig, type RegisteredUser, type SessionAdapter, type SessionSnapshot, type SessionUser } from "../platform";
 import type { Transport } from "../client";
 
 /**
@@ -11,7 +11,7 @@ export function heldAccess(level: string, id?: number, qualifier: AccessQualifie
   return { scope, qualifier, clauses: clauses ?? [{ scope, qualifier }] };
 }
 
-export interface TestSessionOptions<U extends SessionUser = SessionUser> {
+export interface TestSessionOptions<U extends SessionUser = RegisteredUser> {
   /** Default `{ id: 1 }`. */
   user?: U;
   /** Permissions held at the organization for every record (names), or exactly how each is held (`heldAccess`). */
@@ -25,7 +25,7 @@ export interface TestSessionOptions<U extends SessionUser = SessionUser> {
 }
 
 /** What `/auth/me` would say for a user: for `session.establish(...)` mid-test, or an adapter that answers it. */
-export function createTestSession<U extends SessionUser = SessionUser>(options: TestSessionOptions<U> = {}): SessionSnapshot<U> {
+export function createTestSession<U extends SessionUser = RegisteredUser>(options: TestSessionOptions<U> = {}): SessionSnapshot<U> {
   const { permissions = [] } = options;
   const held: Record<string, HeldAccess> = Array.isArray(permissions)
     ? Object.fromEntries(permissions.map((name: string) => [name, heldAccess("organization")]))
@@ -39,13 +39,16 @@ export function createTestSession<U extends SessionUser = SessionUser>(options: 
   };
 }
 
-export interface TestPlatformOptions<U extends SessionUser = SessionUser> extends Omit<TestSessionOptions<U>, "user">, Omit<PlatformOptions<U, BootstrapConfig>, "config" | "transport" | "session"> {
+export interface TestPlatformOptions<U extends SessionUser = RegisteredUser> extends Omit<TestSessionOptions<U>, "user">, Omit<PlatformOptions<U, BootstrapConfig>, "config" | "transport" | "session"> {
   /** `null`: nobody is signed in (the session answers "none" when asked). Default: the user of `createTestSession`. */
   user?: U | null;
   /** Answers the requests the code under test makes: `scriptedTransport` or `routedTransport`. Default: any request fails the test. */
   transport?: Transport;
-  /** Fields of the bootstrap config over the test's (`apiBase: ""`, `locale: "en"`, `appName: "Test app"`). */
-  config?: Partial<BootstrapConfig>;
+  /**
+   * Fields of the bootstrap config over the test's (`apiBase: ""`, `locale: "en"`, `appName: "Test app"`). The
+   * fields a registered config adds (`PlatformRegistry`) are required here: the test has no other source for them.
+   */
+  config?: Partial<BootstrapConfig> & Omit<RegisteredConfig, keyof BootstrapConfig>;
   /** A session adapter of your own; then `user`, `permissions` and the like are not used and the session starts unasked. */
   session?: SessionAdapter<U>;
 }
@@ -61,13 +64,13 @@ const noRequests: Transport = async (url, init) => {
  *   const platform = createTestPlatform({ user: { id: 7 }, permissions: ["tickets:view"], transport });
  *   platform.access.can("tickets:view"); // true, at once
  */
-export function createTestPlatform<U extends SessionUser = SessionUser>(options: TestPlatformOptions<U> = {}): Platform<U> {
+export function createTestPlatform<U extends SessionUser = RegisteredUser>(options: TestPlatformOptions<U> = {}): Platform<U> {
   const { user, permissions, unavailable, root, navigation, expiresAt, transport, config, session, ...rest } = options;
   const snapshot = user === null ? null : createTestSession<U>({ user, permissions, unavailable, root, navigation, expiresAt });
   const adapter: SessionAdapter<U> = session ?? { load: async () => snapshot, signOut: async () => undefined };
-  const platform = createPlatform<U, BootstrapConfig>({
+  const platform = createPlatform<U, RegisteredConfig>({
     ...rest,
-    config: { apiBase: "", locale: "en", appName: "Test app", capabilities: [], ...config },
+    config: { apiBase: "", locale: "en", appName: "Test app", capabilities: [], ...config } as RegisteredConfig,
     transport: transport ?? noRequests,
     session: adapter,
   });
