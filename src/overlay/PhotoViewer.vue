@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Icon } from "../icon";
+import { useCompactPresentation } from "../internal/mediaQuery";
 import { clampPan, drawnSize, MAX_ZOOM, miniMap, panToFraction, stepZoom, turned, zoomAt, type Point, type Size } from "./photoGeometry";
 import { useDialog } from "./useDialog";
 
@@ -23,8 +24,9 @@ export interface PhotoViewerItem {
  * and a strip of thumbnails. It is a dialog like `Modal`: the page behind is inert, Tab stays inside, Escape closes and focus goes back
  * to what opened it. Under reduced motion nothing animates.
  *
- * Keys: ← → photos, + − zoom, 0 fits the screen again, R rotates, Esc closes. `#actions` (given the photo on show) adds your own buttons to the header:
- * "Make cover", "Delete".
+ * Keys: ← → photos, + − zoom, 0 fits the screen again, R rotates, Esc closes. `#actions` (given the photo on show) adds your own buttons:
+ * "Make cover", "Delete". They sit in the header on a wide screen and in a toolbar under the photo on a phone (the header keeps the counter, rotate,
+ * download and close); the slot renders in one place at a time.
  *
  *   <PhotoViewer ref="viewer" :items="photos" title="VW Golf 8" />
  *   <button @click="viewer?.present(index)">…</button>        viewer.value?.dismiss()
@@ -40,11 +42,12 @@ const index = defineModel<number>("index", { default: 0 });
 const emit = defineEmits<{ presented: []; dismissed: [] }>();
 
 defineSlots<{
-  /** Next to the zoom buttons: what the app does with the photo on show (make it the cover, delete it). */
+  /** What the app does with the photo on show (make it the cover, delete it): in the header next to the zoom buttons, in a bottom toolbar on a phone. */
   actions?: (scope: { item: PhotoViewerItem; index: number }) => unknown;
 }>();
 
 const { t } = useI18n();
+const compact = useCompactPresentation();
 const panel = ref<HTMLElement | null>(null);
 const stageElement = useTemplateRef<HTMLElement>("stage");
 const imageElement = useTemplateRef<HTMLImageElement>("image");
@@ -301,12 +304,12 @@ const label = computed(() => props.title ?? t("core.viewer.label"));
         leave-active-class="pointer-events-none transition-opacity duration-motion-normal ease-motion-standard" leave-to-class="opacity-0" @after-leave="unmountIfClosed">
         <div v-if="isOpen" ref="panel" role="dialog" aria-modal="true" :aria-label="label" tabindex="-1" data-part="panel" data-test="photo-viewer"
           class="fixed inset-0 flex flex-col bg-[#0b1210] text-[#f1f5f3] outline-none" @keydown="onKeydown">
-          <div class="flex items-center gap-2 px-4 pt-[max(0.875rem,var(--app-safe-top))] pb-3.5 md:px-4.5">
-            <h2 class="min-w-0 truncate text-headline font-semibold">
-              <span v-if="props.title">{{ props.title }} · </span><span aria-live="polite" data-test="photo-counter">{{ t("core.viewer.counter", { current: index + 1, total: props.items.length }) }}</span>
+          <div data-test="photo-header" class="flex items-center gap-2 px-4 pt-[max(0.875rem,var(--app-safe-top))] pb-3.5 md:px-4.5">
+            <h2 class="flex min-w-0 text-headline font-semibold">
+              <span v-if="props.title" class="truncate">{{ props.title }}</span><span v-if="props.title" class="shrink-0 whitespace-pre"> · </span><span class="shrink-0 whitespace-nowrap" aria-live="polite" data-test="photo-counter">{{ t("core.viewer.counter", { current: index + 1, total: props.items.length }) }}</span>
             </h2>
             <div class="grow"></div>
-            <slot v-if="item" name="actions" :item="item" :index="index"></slot>
+            <slot v-if="item && !compact" name="actions" :item="item" :index="index"></slot>
             <button type="button" :class="[BUTTON, 'compact:hidden']" :aria-label="t('core.viewer.zoom_out')" :aria-disabled="!zoomed" data-test="zoom-out" @click="zoomBy(-1)"><Icon name="zoomOut" :size="18" /></button>
             <p class="w-13 text-center text-subheadline tabular-nums compact:hidden" data-test="zoom-percent">{{ t("core.viewer.zoom_percent", { percent }) }}</p>
             <button type="button" :class="[BUTTON, 'compact:hidden']" :aria-label="t('core.viewer.zoom_in')" :aria-disabled="zoom >= MAX_ZOOM" data-test="zoom-in" @click="zoomBy(1)"><Icon name="zoomIn" :size="18" /></button>
@@ -332,6 +335,10 @@ const label = computed(() => props.title ?? t("core.viewer.label"));
               </div>
             </div>
             <button v-if="props.items.length > 1" type="button" :class="[BUTTON, 'size-12 compact:hidden']" :aria-label="t('core.viewer.next')" :aria-disabled="!hasNext" data-test="next" @click="go(1)"><Icon name="arrowRightSLine" :size="22" /></button>
+          </div>
+
+          <div v-if="compact && item && $slots.actions" data-test="photo-toolbar" class="flex shrink-0 items-center justify-center gap-2 px-4 pt-3 pb-1">
+            <slot name="actions" :item="item" :index="index"></slot>
           </div>
 
           <ul v-if="props.items.length > 1" ref="strip" data-test="photo-strip" class="flex shrink-0 justify-start gap-2 overflow-x-auto px-4 pt-4 pb-[max(1.25rem,var(--app-safe-bottom))] scrollbar-hide md:justify-center md:px-4.5">

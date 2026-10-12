@@ -2,6 +2,7 @@ import { fireEvent, render } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick, ref, type Component } from "vue";
 import { createTestI18n } from "../testing/i18n";
+import { mockMedia } from "../testing/media";
 import PhotoViewer, { type PhotoViewerItem } from "./PhotoViewer.vue";
 
 const global = { plugins: [createTestI18n()], stubs: { transition: false as boolean | Component } };
@@ -275,5 +276,56 @@ describe("dragging and swiping", () => {
     expect(q("photo-counter")!.textContent).toBe("2 / 3");
     expect(imageStyle().transform).toContain("translate(400px, 0px)");
     expect(parseFloat(q("mini-map-view")!.style.left)).toBeCloseTo(0);
+  });
+});
+
+describe("#actions", () => {
+  let media: ReturnType<typeof mockMedia>;
+  afterEach(() => media.restore());
+
+  async function openWith(compact: boolean, withSlot = true) {
+    media = mockMedia({ compact });
+    const viewer = ref<InstanceType<typeof PhotoViewer> | null>(null);
+    const Owner = defineComponent({
+      components: { PhotoViewer },
+      setup: () => ({ viewer, list: items }),
+      template: withSlot
+        ? `<PhotoViewer ref="viewer" :items="list" title="VW Golf 8"><template #actions="{ index }"><button type="button" data-test="make-cover">Cover {{ index }}</button></template></PhotoViewer>`
+        : `<PhotoViewer ref="viewer" :items="list" title="VW Golf 8" />`,
+    });
+    render(Owner, { global });
+    viewer.value!.present(1);
+    await settle();
+  }
+
+  it("on a wide screen they sit in the header, with no toolbar", async () => {
+    await openWith(false);
+    const found = document.querySelectorAll('[data-test="make-cover"]');
+    expect(found).toHaveLength(1);
+    expect(found[0]!.closest('[data-test="photo-header"]')).not.toBeNull();
+    expect(q("photo-toolbar")).toBeNull();
+    expect(found[0]!.textContent).toBe("Cover 1");
+  });
+
+  it("on a phone they move once to a toolbar under the stage; the header keeps the counter, rotate, download and close", async () => {
+    await openWith(true);
+    const found = document.querySelectorAll('[data-test="make-cover"]');
+    expect(found).toHaveLength(1);
+    expect(found[0]!.closest('[data-test="photo-toolbar"]')).not.toBeNull();
+    expect(q("photo-header")!.querySelector('[data-test="make-cover"]')).toBeNull();
+    for (const kept of ["photo-counter", "rotate", "download", "close"]) expect(q("photo-header")!.querySelector(`[data-test="${kept}"]`)).not.toBeNull();
+    const order = [q("photo-header")!, q("photo-stage")!, q("photo-toolbar")!, q("photo-strip")!];
+    for (let at = 1; at < order.length; at++) expect(order[at - 1]!.compareDocumentPosition(order[at]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("the counter is never cut: only the title truncates", async () => {
+    await openWith(true);
+    expect(q("photo-counter")!.className).toContain("shrink-0");
+    expect(q("photo-counter")!.className).not.toContain("truncate");
+  });
+
+  it("without the slot there is no toolbar, on either width", async () => {
+    await openWith(true, false);
+    expect(q("photo-toolbar")).toBeNull();
   });
 });
