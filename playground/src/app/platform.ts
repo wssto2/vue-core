@@ -5,6 +5,10 @@ import { createPlatform, httpSessionAdapter, parseBootstrap, type SessionUser } 
 import { serveLists } from "./features/crmdata/serve";
 
 declare module "@wssto2/vue-core/platform" {
+  // The application's session user, declared once: usePlatform(), useSessionUser() and createApplication are typed from it.
+  interface PlatformRegistry {
+    user: Employee;
+  }
   // The permission catalogue: route meta and `access` narrow to it.
   interface PermissionRegistry {
     "tickets:view": true;

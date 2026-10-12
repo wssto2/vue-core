@@ -7,5 +7,5 @@
       "@wssto2/vue-core/*": ["../../src/*/index.ts"]
     }
   },
-  "include": ["./**/*", "../../src/internal/*.d.ts"]
+  "include": ["./**/*", "../../docs/examples/registry/*", "../../src/internal/*.d.ts"]
 }

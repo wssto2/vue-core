@@ -69,6 +69,65 @@ export const application = createApplication({
 - **Expiry.** A 401 while signed in calls `renewSession` once, however many requests failed at once; `true` sends the failed requests again, otherwise the session expires and the user is sent to the login page, remembering where they were (`returnTo(route)` on the login page). A feature that asks for the password again on the page itself (`identityFeature`, see [sign-in](sign-in.md)) keeps the person where they are instead.
 - **Signing out** clears the state first, so nothing else can read the old session, then tells the server. `beforeSignOut` (or `session.onBeforeSignOut(hook)` from an effect) runs first, **while the session still exists**, for at most 3 seconds: remove this device's push subscription, flush a draft. A failing or late hook is reported to `onSessionError` and never blocks the sign-out.
 
+### Your user and config, declared once
+
+The platform is typed from `PlatformRegistry`, the way permissions are typed from `PermissionRegistry`: say once what your session user and your bootstrap config are, and `usePlatform()`, `useSessionUser()`, `createApplication` and `createTestPlatform` all resolve to them, with no cast and no explicit `Platform<User, Config>`. Both keys are optional; without them the user is `SessionUser` (`{ id }`) and the config `BootstrapConfig`. `createPlatform<User, Config>` stays generic and builds a platform of the same type.
+
+<!-- example: docs/examples/registry/declarations.ts -->
+```ts
+// What the application says once about its session user and its config: every reader (`usePlatform()`,
+// `useSessionUser()`, `createApplication`, `createTestPlatform`) is typed from it, with no cast and no generics.
+import type { BootstrapConfig } from "@wssto2/vue-core/platform";
+
+export interface AppUser {
+  readonly id: number;
+  readonly name: string;
+  readonly locale: string;
+}
+
+export interface AppConfig extends BootstrapConfig {
+  readonly market: string;
+}
+
+declare module "@wssto2/vue-core/platform" {
+  interface PlatformRegistry {
+    user: AppUser;
+    config: AppConfig;
+  }
+}
+```
+
+`useSessionUser()` is the signed-in user as a readonly ref (`null` while nobody is signed in); `usePlatform().session` remains the way to reach the impersonator and the rest of the state. After a save the app knows the new user: `session.update({ user })` replaces it in place (also `access` and `navigation`). That is not a sign-in: the status, expiry and impersonator stay, requests in flight are not cancelled and readers just see the new value. It does nothing unless somebody is signed in, and throws for a different `user.id` (a different person is `session.establish`).
+
+<!-- example: docs/examples/registry/ProfileName.vue -->
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { useSessionUser, usePlatform } from "@wssto2/vue-core/platform";
+
+// `user` is the registered AppUser or null; `config.market` is typed too.
+const user = useSessionUser();
+const { http, session, config } = usePlatform();
+const name = ref(user.value?.name ?? "");
+
+async function save(): Promise<void> {
+  if (!user.value) return;
+  const { data } = await http.put<{ name: string }>("/profile", { name: name.value });
+  // The same person, changed in place: nothing in flight is cancelled and nothing flickers (a different
+  // person is `session.establish`, which throws here by design). `useSessionUser()` shows the new name.
+  session.update({ user: { ...user.value, name: data.name } });
+}
+</script>
+
+<template>
+  <form @submit.prevent="save">
+    <p>{{ user?.name }} ({{ config.market }})</p>
+    <input v-model="name" />
+    <button type="submit">Save</button>
+  </form>
+</template>
+```
+
 ## Effects
 
 Background behavior is never a component with a timer. It is an **effect** a feature lists: `scope: "app"` starts once per mounted application, `scope: "session"` starts when someone signs in, restarts when the user changes (`sessionKey` decides what "changes" means) and stops on sign-out or expiry. It receives an `AbortSignal` that aborts when it must end, reports failures to the application's `onError`, and returns a function that cleans up. `keepSessionAlive()` is one, the session feature in the examples uses it.

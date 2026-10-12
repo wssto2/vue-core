@@ -1,5 +1,6 @@
 // What an application's composition root does with @wssto2/vue-core/client and /platform: a validated bootstrap
 // config with the app's own section, a platform over a custom transport and session adapter, typed permissions.
+import type { Employee } from "./app/platform"; // also declares the platform registry
 import { ApiError, isAborted, type Transport } from "@wssto2/vue-core/client";
 import {
   createPlatform,
@@ -11,11 +12,6 @@ import {
 
 export type AppPermission = "tickets:view" | "tickets:update";
 
-interface AppUser {
-  readonly id: number;
-  readonly name: string;
-}
-
 // The server embeds this in the page; readBootstrap() reads it from <script id="app-state">.
 const config = parseBootstrap({ locale: "en", api_base: "/api/v1", app_name: "Playground", currency: "EUR" }, (fields) => ({
   currency: fields.string("currency"),
@@ -26,7 +22,7 @@ const transport: Transport = async (url) => {
   if (url.endsWith("/auth/me")) {
     return new Response(
       JSON.stringify({
-        user: { id: 1, name: "Ana" },
+        user: { id: 1, name: "Ana", email: "ana@example.com" },
         access: { root: false, permissions: { "tickets:view": { scope: { level: "organization" }, qualifier: "all", clauses: [] } } },
       }),
     );
@@ -39,9 +35,9 @@ export const platform = createPlatform({
   transport,
   session: (http) =>
     httpSessionAdapter(http, {
-      parseUser: (raw): AppUser => {
-        const { id, name } = raw as AppUser;
-        return { id, name };
+      parseUser: (raw): Employee => {
+        const { id, name, email } = raw as Employee;
+        return { id, name, email };
       },
     }),
 });
