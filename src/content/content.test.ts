@@ -100,6 +100,44 @@ describe("KeyValue and KeyValueList", () => {
   });
 });
 
+describe("Avatar photo", () => {
+  const mount = (src?: string | null) => render(Avatar, { props: { name: "Josip Žlimen", src }, global });
+
+  it("shows initials until the image loads, then the image", async () => {
+    const { container } = mount("/p.jpg");
+    const img = container.querySelector("img")!;
+
+    expect(container.firstElementChild!.textContent).toBe("JŽ");
+    expect(img.hasAttribute("data-loaded")).toBe(false);
+    expect(img.className).toContain("opacity-0");
+    await fireEvent.load(img);
+    expect(img.hasAttribute("data-loaded")).toBe(true);
+    expect(img.className).not.toContain("opacity-0");
+    expect(img.getAttribute("alt")).toBe("Josip Žlimen");
+    expect(img.getAttribute("draggable")).toBe("false");
+    expect(img.className).toMatch(/object-cover/);
+  });
+
+  it("falls back to the initials, with no image, when it fails; a changed src retries", async () => {
+    const { container, rerender } = mount("/gone.jpg");
+    await fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.firstElementChild!.textContent).toBe("JŽ");
+
+    await rerender({ name: "Josip Žlimen", src: "/back.jpg" });
+    expect(container.querySelector("img")!.getAttribute("src")).toBe("/back.jpg");
+  });
+
+  it("an empty src is the initials", () => {
+    for (const src of [undefined, null, ""]) {
+      const { container, unmount } = mount(src);
+      expect(container.querySelector("img")).toBeNull();
+      expect(container.firstElementChild!.textContent).toBe("JŽ");
+      unmount();
+    }
+  });
+});
+
 describe("Timestamp", () => {
   it("formats a date and time for the active locale inside a <time>", () => {
     const { container } = render(Timestamp, { props: { value: "2026-09-30T14:05:00Z" }, global });
@@ -159,6 +197,11 @@ describe("Timestamp with an author", () => {
 
     expect(name!.className).toMatch(/\bmin-w-0\b.*\btruncate\b/);
     expect(time!.className).toContain("shrink-0");
+  });
+
+  it("hands the author's avatarUrl to the avatar", () => {
+    const { container } = render(Timestamp, { props: { value, author: { name: "Ana Horvat", avatarUrl: "/ana.jpg" } }, global });
+    expect(container.querySelector("[data-timestamp-author] img")!.getAttribute("src")).toBe("/ana.jpg");
   });
 
   it("keeps precision", () => {

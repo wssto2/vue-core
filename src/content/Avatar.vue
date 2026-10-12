@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { initialsFor } from "./initials";
 
 /**
@@ -8,13 +8,19 @@ import { initialsFor } from "./initials";
  *
  *   <Avatar name="Josip Žlimen" size="md" />
  *   <Avatar name="Josip Žlimen" size="xl" tone="anchor" />     the monogram of a record header
+ *   <Avatar name="Josip Žlimen" :src="user.photoUrl" />        the photo, initials until it loads
+ *
+ * `src` is a full URL the app has already built (no fetching or auth here). The initials show when
+ * it is empty, while it loads and if it fails to load: never a broken-image icon. A changed `src` retries.
  */
 const props = withDefaults(defineProps<{
   name?: string | null;
+  src?: string | null;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   tone?: "neutral" | "anchor";
 }>(), {
   name: "",
+  src: null,
   size: "sm",
   tone: "neutral",
 });
@@ -35,9 +41,18 @@ const TONES = {
 } as const;
 
 const initials = computed(() => initialsFor(props.name));
+
+const loaded = ref(false);
+const failed = ref(false);
+watch(() => props.src, () => {
+  loaded.value = false;
+  failed.value = false;
+});
 </script>
 
 <template>
-  <span aria-hidden="true" class="inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold"
-    :class="[SIZES[props.size], TONES[props.tone]]">{{ initials }}</span>
+  <span aria-hidden="true" class="relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full font-semibold"
+    :class="[SIZES[props.size], TONES[props.tone]]">{{ initials }}<img v-if="props.src && !failed" :key="props.src" :src="props.src" :alt="props.name ?? ''" draggable="false"
+      :data-loaded="loaded || undefined" class="absolute inset-0 size-full rounded-full object-cover" :class="loaded ? '' : 'opacity-0'"
+      @load="loaded = true" @error="failed = true" /></span>
 </template>

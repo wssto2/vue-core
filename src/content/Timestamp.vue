@@ -24,11 +24,8 @@ const CIVIL_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const props = withDefaults(defineProps<{
   value?: string | Date | null;
   precision?: "date" | "dateTime";
-  /**
-   * Who changed it. `avatar` (a photo reference) is accepted for the record's author as the API
-   * returns it, but the avatar shows initials only until `Avatar` can show photos.
-   */
-  author?: { name: string; avatar?: string | null } | null;
+  /** Who changed it. `avatarUrl` is the photo's full URL, built by the app; initials show until it loads or without it. */
+  author?: { name: string; avatarUrl?: string | null } | null;
 }>(), { value: undefined, precision: "dateTime", author: null });
 
 const { t } = useI18n();
@@ -46,7 +43,7 @@ const text = computed(() => (props.precision === "date" ? format.date(date.value
 
 <template>
   <span v-if="date && props.author" class="inline-flex max-w-full min-w-0 items-center gap-2 text-xs" data-timestamp-author>
-    <Avatar :name="props.author.name" size="xs" />
+    <Avatar :name="props.author.name" :src="props.author.avatarUrl" size="xs" />
     <span class="min-w-0 truncate text-content">{{ props.author.name }}</span>
     <time :datetime="isoValue" class="shrink-0 text-content-muted">{{ text }}</time>
   </span>

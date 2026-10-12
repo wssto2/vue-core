@@ -51,11 +51,14 @@ const tabs: TabItem<string>[] = [
 ];
 const tab = ref("overview");
 
+// A data URL stands in for the photo URL an app builds.
+const PHOTO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZTBhNDU4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYjU1MjdhIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSJ1cmwoI2cpIi8+PGNpcmNsZSBjeD0iMzIiIGN5PSIyNSIgcj0iMTEiIGZpbGw9IiNmNGQ5YzAiLz48cGF0aCBkPSJNMTAgNjRjMi0xOCAxMi0yNCAyMi0yNHMyMCA2IDIyIDI0eiIgZmlsbD0iIzJjM2U1MCIvPjwvc3ZnPg==";
 const changed = [
   { vehicle: "Clio 1.5 dCi", at: "2026-09-30T14:05:00Z", author: { name: "Josip Žlimen" } },
   { vehicle: "Megane E-Tech", at: "2026-09-29T09:41:00Z", author: { name: "Alexandrina-Maria Konstantinopoulou-Papadimitriou" } },
   { vehicle: "Captur", at: "2026-09-28T16:20:00Z", author: null },
   { vehicle: "Austral", at: null, author: { name: "Ana Horvat" } },
+  { vehicle: "Arkana", at: "2026-09-27T11:10:00Z", author: { name: "Ana Horvat", avatarUrl: PHOTO } },
 ];
 
 const menu: MenuItem[] = [
@@ -183,7 +186,7 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         <ul class="divide-y divide-border-separator rounded-group bg-surface-cell">
           <li v-for="row in changed" :key="row.vehicle" class="flex items-center gap-3 px-3 py-2">
             <span class="min-w-0 flex-1 truncate text-subheadline text-content-strong">{{ row.vehicle }}</span>
-            <span class="flex w-60 max-w-[55%] shrink-0 justify-end"><Timestamp :value="row.at" :author="row.author" /></span>
+            <span class="flex w-60 max-w-[72%] shrink-0 justify-end"><Timestamp :value="row.at" :author="row.author" /></span>
           </li>
         </ul>
         <Divider label="or enter it manually" />
