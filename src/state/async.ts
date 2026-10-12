@@ -25,3 +25,22 @@ export function valueOf<Value>(state: AsyncState<Value>): Value | undefined {
 export function isEmptyValue(value: unknown): boolean {
   return value == null || value === "" || (Array.isArray(value) && value.length === 0);
 }
+
+/**
+ * The `AsyncState` of a region that tracks its load with plain flags (a store's `loading` and
+ * `error`, a `ref` that is `undefined` until the answer comes), for `AsyncSection`'s one `state`.
+ *
+ *   <AsyncSection :state="asyncState({ loading, error, value: documents })" @retry="reload">
+ *
+ * `value` is `undefined` while there is nothing yet; `null` is an answer (nothing there), which
+ * `AsyncSection` shows as empty. A loading flag over a value is `refreshing`, an error over a value
+ * is `stale`; loading wins over an error, since a retry is running. An empty `error` is no error.
+ * Not yet loaded, not loading, no error: `loading`, never a blank region.
+ */
+export function asyncState<Value>(flags: { loading?: boolean; error?: string | null; value?: Value }): AsyncState<Value> {
+  const { loading, error, value } = flags;
+  const has = value !== undefined;
+  if (loading) return has ? { status: "refreshing", value } : { status: "loading" };
+  if (error) return has ? { status: "stale", value, error } : { status: "failed", error };
+  return has ? { status: "loaded", value } : { status: "loading" };
+}

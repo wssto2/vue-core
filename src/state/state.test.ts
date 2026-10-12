@@ -11,7 +11,7 @@ import FieldNote from "./FieldNote.vue";
 import ProgressTrack from "./ProgressTrack.vue";
 import Skeleton from "./Skeleton.vue";
 import StatusLine from "./StatusLine.vue";
-import type { AsyncState } from "./async";
+import { asyncState, type AsyncState } from "./async";
 
 const global = { plugins: [createTestI18n()] };
 
@@ -255,5 +255,44 @@ describe("AsyncSection", () => {
       expect(container.querySelector("input")).toBe(input);
       expect(input.value).toBe("edited");
     }
+  });
+});
+
+describe("asyncState", () => {
+  const rows = ["a"];
+
+  it("builds each state from plain flags", () => {
+    expect(asyncState({ loading: true })).toEqual({ status: "loading" });
+    expect(asyncState({})).toEqual({ status: "loading" }); // nothing yet is never a blank region
+    expect(asyncState({ error: "Down" })).toEqual({ status: "failed", error: "Down" });
+    expect(asyncState({ value: rows })).toEqual({ status: "loaded", value: rows });
+    expect(asyncState({ loading: true, value: rows })).toEqual({ status: "refreshing", value: rows });
+    expect(asyncState({ error: "Down", value: rows })).toEqual({ status: "stale", value: rows, error: "Down" });
+  });
+
+  it("loading wins over an error, an empty error is none, and null is an answer", () => {
+    expect(asyncState({ loading: true, error: "Down" })).toEqual({ status: "loading" });
+    expect(asyncState({ error: "", value: rows })).toEqual({ status: "loaded", value: rows });
+    expect(asyncState<string[]>({ value: null as never })).toEqual({ status: "loaded", value: null });
+  });
+
+  it("drives AsyncSection to loading, failed, empty and loaded", () => {
+    const states = [
+      asyncState<string[]>({ loading: true }),
+      asyncState<string[]>({ error: "Down" }),
+      asyncState<string[]>({ value: [] }),
+      asyncState({ value: rows }),
+    ];
+    const seen = states.map((state) => {
+      const { container, unmount } = render(AsyncSection<string[]>, {
+        props: { state },
+        slots: { default: "<p>content</p>" },
+        global: { plugins: [createTestI18n()] },
+      });
+      const found = container.querySelector("[data-async]")?.getAttribute("data-async") ?? (container.textContent?.includes("content") ? "loaded" : "?");
+      unmount();
+      return found;
+    });
+    expect(seen).toEqual(["loading", "failed", "empty", "loaded"]);
   });
 });
