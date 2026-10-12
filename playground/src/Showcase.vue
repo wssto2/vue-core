@@ -4,7 +4,7 @@ import { Avatar, KeyValueList, MicroLabel, Panel, Timestamp, Divider } from "@ws
 import { DateButton, IconTile, PopupButton, SearchInput, SwipeActions, Tabs, type TabItem } from "@wssto2/vue-core/controls";
 import { Icon } from "@wssto2/vue-core/icon";
 import { DiscardChangesModal, Modal, Sheet } from "@wssto2/vue-core/modal";
-import { AlertDialog, Menu, Popover, Toaster, Tooltip, toast, type MenuItem } from "@wssto2/vue-core/overlay";
+import { AlertDialog, Menu, MenuButton, Popover, Toaster, Tooltip, toast, type MenuItem } from "@wssto2/vue-core/overlay";
 import { AdaptivePageShell, BottomDock, RecordHeader, ResourceHeader, type PageAction } from "@wssto2/vue-core/page";
 import {
   AsyncSection,
@@ -50,6 +50,13 @@ const tabs: TabItem<string>[] = [
   { value: "files", label: "Files", warning: "Documents are missing" },
 ];
 const tab = ref("overview");
+
+const changed = [
+  { vehicle: "Clio 1.5 dCi", at: "2026-09-30T14:05:00Z", author: { name: "Josip Žlimen" } },
+  { vehicle: "Megane E-Tech", at: "2026-09-29T09:41:00Z", author: { name: "Alexandrina-Maria Konstantinopoulou-Papadimitriou" } },
+  { vehicle: "Captur", at: "2026-09-28T16:20:00Z", author: null },
+  { vehicle: "Austral", at: null, author: { name: "Ana Horvat" } },
+];
 
 const menu: MenuItem[] = [
   { id: "copy", label: "Copy link", icon: "fileTextLine", shortcut: "⌘C", onSelect: () => toast.success("Copied") },
@@ -173,6 +180,12 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         <div class="flex items-center gap-3"><Avatar name="Josip Žlimen" size="md" /><Avatar name="Ana Horvat" size="lg" tone="anchor" /><MicroLabel>Status</MicroLabel></div>
         <KeyValueList :columns="3" :items="[{ key: 'make', label: 'Make', value: 'Renault' }, { key: 'vin', label: 'VIN', value: null }, { key: 'km', label: 'Km', value: 0 }]" />
         <Timestamp value="2026-09-30T14:05:00Z" />
+        <ul class="divide-y divide-border-separator rounded-group bg-surface-cell">
+          <li v-for="row in changed" :key="row.vehicle" class="flex items-center gap-3 px-3 py-2">
+            <span class="min-w-0 flex-1 truncate text-subheadline text-content-strong">{{ row.vehicle }}</span>
+            <span class="flex w-60 max-w-[55%] shrink-0 justify-end"><Timestamp :value="row.at" :author="row.author" /></span>
+          </li>
+        </ul>
         <Divider label="or enter it manually" />
       </div>
     </Panel>
@@ -185,6 +198,9 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         <Button @click="discard?.present()">Discard changes</Button>
         <Menu :items="menu" label="Actions">
           <template #trigger="{ toggle, attrs }"><Button v-bind="attrs" trailing-icon="arrowDownSLine" @click="toggle">Menu</Button></template>
+        </Menu>
+        <Menu :items="menu" label="Row actions">
+          <template #trigger="trigger"><MenuButton v-bind="trigger" label="Row actions" /></template>
         </Menu>
         <Popover label="Quick note" placement="bottom-start">
           <template #trigger="{ toggle, attrs }"><Button v-bind="attrs" @click="toggle">Popover</Button></template>
