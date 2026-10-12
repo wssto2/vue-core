@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FormGroup, PhotoField } from "@wssto2/vue-core/form";
-import { PhotoViewer, type PhotoViewerItem } from "@wssto2/vue-core/overlay";
+import { PhotoViewer, PhotoViewerAction, type PhotoViewerItem } from "@wssto2/vue-core/overlay";
 import { AdaptivePageShell } from "@wssto2/vue-core/page";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -10,13 +10,15 @@ import { workflowRoutes } from "../routes";
 // A gallery of twelve pictures and one PhotoField, both opening the same viewer. The pictures are drawn here; a real app gives URLs.
 const { t } = useI18n();
 const viewer = useTemplateRef<InstanceType<typeof PhotoViewer>>("viewer");
-const photos: PhotoViewerItem[] = Array.from({ length: 12 }, (_unused, at) => ({
+const photos = ref<PhotoViewerItem[]>(Array.from({ length: 12 }, (_unused, at) => ({
   src: placeholderPhoto(at + 1),
   thumb: placeholderPhoto(at + 1, { width: 320, height: 200 }),
   alt: t("workflows.photos.alt", { n: at + 1 }),
   downloadName: `golf-${at + 1}.svg`,
-}));
+})));
 const cover = ref<string | File | null>(placeholderPhoto(1));
+const makeCover = (at: number) => (cover.value = photos.value[at]!.src);
+const remove = (at: number) => photos.value.splice(at, 1);
 </script>
 
 <template>
@@ -33,6 +35,11 @@ const cover = ref<string | File | null>(placeholderPhoto(1));
       <PhotoField v-model="cover" :label="t('workflows.photos.cover')" />
     </FormGroup>
 
-    <PhotoViewer ref="viewer" :items="photos" title="VW Golf 8" />
+    <PhotoViewer ref="viewer" :items="photos" title="VW Golf 8">
+      <template #actions="{ index }">
+        <PhotoViewerAction :label="t('workflows.photos.makeCover')" @select="makeCover(index)" />
+        <PhotoViewerAction :label="t('workflows.photos.delete')" tone="critical" @select="remove(index)" />
+      </template>
+    </PhotoViewer>
   </AdaptivePageShell>
 </template>

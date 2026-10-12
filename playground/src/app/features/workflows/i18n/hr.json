@@ -76,6 +76,8 @@
     "alt": "Fotografija {n}",
     "field": "Polje za sliku",
     "fieldHint": "Dodirnite sliku u obrascu da je pogledate izbliza.",
-    "cover": "Naslovna fotografija"
+    "cover": "Naslovna fotografija",
+    "makeCover": "Postavi kao naslovnu",
+    "delete": "Obriši"
   }
 }

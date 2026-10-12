@@ -21,5 +21,6 @@
     "documentsCount": "{count} documents"
   },
   "photos": "Photographs",
-  "makeCover": "Make cover"
+  "makeCover": "Make cover",
+  "deletePhoto": "Delete"
 }

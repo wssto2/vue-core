@@ -76,6 +76,8 @@
     "alt": "Photograph {n}",
     "field": "Picture field",
     "fieldHint": "Tap the picture in the form to look at it closer.",
-    "cover": "Cover photo"
+    "cover": "Cover photo",
+    "makeCover": "Make cover",
+    "delete": "Delete"
   }
 }

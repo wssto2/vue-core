@@ -262,13 +262,13 @@ The routes are the same child routes with `meta.section` as in section 2; `steps
 
 `PhotoViewer` (in `@wssto2/vue-core/overlay`) is a full-screen dark viewer for a set of pictures: zoom (buttons, wheel, pinch, double tap or double click, 100 to 500 %), drag a zoomed picture with a mini-map showing where you are, rotate, download, previous and next (buttons, swipe, arrow keys) and a strip of thumbnails. It is a dialog like `Modal`: the page behind is inert, Tab stays inside, Escape closes and focus goes back to what opened it; under reduced motion nothing animates. Keys: ← → pictures, + − zoom, 0 fits the screen again, R rotates, Esc closes. `PhotoField` opens it when its picture is tapped; for a gallery you give it typed items and call `present(index)`:
 
-<!-- example: docs/examples/accounts/components/Gallery.vue:11-12 -->
+<!-- example: docs/examples/accounts/components/Gallery.vue:10-11 -->
 ```ts
 // Typed items: the picture, an optional small one for the strip, what it shows, the file name Download suggests.
 const items = (): PhotoViewerItem[] => props.photos.map((photo) => ({ src: photo.url, thumb: photo.small, alt: photo.caption, downloadName: `${photo.caption}.jpg` }));
 ```
 
-<!-- example: docs/examples/accounts/components/Gallery.vue:16-27 -->
+<!-- example: docs/examples/accounts/components/Gallery.vue:15-29 -->
 ```vue
 <template>
   <ul class="grid grid-cols-4 gap-2">
@@ -278,11 +278,14 @@ const items = (): PhotoViewerItem[] => props.photos.map((photo) => ({ src: photo
   </ul>
 
   <PhotoViewer ref="viewer" :items="items()" :title="t('accounts.photos')">
-    <!-- Your own buttons next to zoom, rotate and download, given the photo on show. -->
-    <template #actions="{ index }"><Button prominence="plain" @click="emit('makeCover', props.photos[index]!.id)">{{ t("accounts.makeCover") }}</Button></template>
+    <!-- The app's own actions on the photo on show: next to zoom in the header, in a toolbar under the photo on a phone. -->
+    <template #actions="{ index }">
+      <PhotoViewerAction :label="t('accounts.makeCover')" @select="emit('makeCover', props.photos[index]!.id)" />
+      <PhotoViewerAction :label="t('accounts.deletePhoto')" tone="critical" @select="emit('remove', props.photos[index]!.id)" />
+    </template>
   </PhotoViewer>
 </template>
 ```
 
-`#actions` puts your own buttons (make it the cover, delete it) next to zoom, rotate and download, given the picture on show. The pictures are the app's: the viewer loads `src` as an image, never as markup, and Download only keeps `downloadName` for a picture served from this origin.
+`#actions` is where your own actions on the picture on show go (make it the cover, delete it); the slot is given the `item` and its `index`. Fill it with `PhotoViewerAction`s: a text button made for the viewer's dark surface, with a `label`, `disabled?` and `tone="critical"` for the destructive one (it reads in the danger colour), emitting `select`. Every app's actions then look the same; do not style your own buttons for the slot. On a wide screen they sit in the header next to zoom; on a phone they move to a toolbar under the picture, within reach of the thumb, and the header keeps the counter, rotate, download and close. The slot renders in one place at a time, so a `data-test` on an action stays unique, and with no `#actions` there is no toolbar. The pictures are the app's: the viewer loads `src` as an image, never as markup, and Download only keeps `downloadName` for a picture served from this origin.
 

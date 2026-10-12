@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { Button } from "@wssto2/vue-core/button";
-import { PhotoViewer, type PhotoViewerItem } from "@wssto2/vue-core/overlay";
+import { PhotoViewer, PhotoViewerAction, type PhotoViewerItem } from "@wssto2/vue-core/overlay";
 import { useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const props = defineProps<{ photos: readonly { id: number; url: string; small: string; caption: string }[] }>();
-const emit = defineEmits<{ makeCover: [id: number] }>();
+const emit = defineEmits<{ makeCover: [id: number]; remove: [id: number] }>();
 
 // Typed items: the picture, an optional small one for the strip, what it shows, the file name Download suggests.
 const items = (): PhotoViewerItem[] => props.photos.map((photo) => ({ src: photo.url, thumb: photo.small, alt: photo.caption, downloadName: `${photo.caption}.jpg` }));
@@ -21,7 +20,10 @@ const viewer = useTemplateRef<InstanceType<typeof PhotoViewer>>("viewer");
   </ul>
 
   <PhotoViewer ref="viewer" :items="items()" :title="t('accounts.photos')">
-    <!-- Your own buttons next to zoom, rotate and download, given the photo on show. -->
-    <template #actions="{ index }"><Button prominence="plain" @click="emit('makeCover', props.photos[index]!.id)">{{ t("accounts.makeCover") }}</Button></template>
+    <!-- The app's own actions on the photo on show: next to zoom in the header, in a toolbar under the photo on a phone. -->
+    <template #actions="{ index }">
+      <PhotoViewerAction :label="t('accounts.makeCover')" @select="emit('makeCover', props.photos[index]!.id)" />
+      <PhotoViewerAction :label="t('accounts.deletePhoto')" tone="critical" @select="emit('remove', props.photos[index]!.id)" />
+    </template>
   </PhotoViewer>
 </template>
