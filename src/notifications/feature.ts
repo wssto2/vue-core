@@ -2,7 +2,9 @@ import { defineFeature, provideContext, type Feature, type SessionEffect } from 
 import { notificationRoutes } from "../modules/notification/routes";
 import { shallowRef, type ShallowRef } from "vue";
 import type { Destination } from "../router";
-import { notificationsContextKey, type NotificationCategoryLook } from "./context";
+import { notificationsContextKey, type NotificationCategoryLook, type NotificationSettingsSection } from "./context";
+import { browserPush } from "./push/browser";
+import { syncThisBrowser, unsubscribeThisBrowser } from "./push/thisDevice";
 import { deadLettersRoutes } from "./deadletters/routes";
 import SettingsMenuItem from "./settings/SettingsMenuItem.vue";
 import { notificationSettingsRoutes } from "./settings/routes";
@@ -26,6 +28,45 @@ export interface NotificationsFeatureOptions {
    * split at its dots; a category without a text is shown by its code. `false` leaves the page, the menu entry and the gear out. Default true.
    */
   settings?: boolean;
+  /** Sections of the application's own on the settings page (`NotificationSettingsSection`: a title, groups of rows), placed by `order` among the built-in ones. */
+  settingsSections?: readonly NotificationSettingsSection[];
+  /**
+   * Web push: on the settings page the "This device" section (turn push on for this browser) and the list of devices, both shown only
+   * when the server has push (`push_available`), the push switch next to e-mail for each category, and, for a signed-in person whose
+   * browser already holds a subscription, registering it again once per session (and removing it when they sign out). The
+   * service worker is the application's own: it imports `@wssto2/vue-core/push-worker`. `false` leaves all of it out. Default true.
+   */
+  push?: boolean;
+}
+
+const BUILT_IN_SECTIONS = ["channels", "quiet", "device", "devices"];
+
+function checkedSections(sections: readonly NotificationSettingsSection[]): readonly NotificationSettingsSection[] {
+  const seen = new Set(BUILT_IN_SECTIONS);
+  for (const section of sections) {
+    if (seen.has(section.id)) throw new Error(`notificationsFeature: the settings section "${section.id}" is a built-in id or is given twice.`);
+    seen.add(section.id);
+  }
+  return sections;
+}
+
+/**
+ * This browser's push subscription, kept for the person signed in: registered again when the session starts (once per
+ * session: it is what refreshes the device's last use and moves a shared computer's endpoint to this person), and removed,
+ * at the account and in the browser, right before they sign out.
+ */
+function pushOfSession(): SessionEffect {
+  return {
+    id: "notifications.push",
+    scope: "session",
+    start({ signal, platform, report }) {
+      const browser = browserPush();
+      void syncThisBrowser(platform.http, browser, signal).catch((error: unknown) => {
+        if (!signal.aborted) report(error);
+      });
+      return platform.session.onBeforeSignOut((_user, hookSignal) => unsubscribeThisBrowser(platform.http, browser, hookSignal));
+    },
+  };
 }
 
 /** The inbox of one session: made when the person signs in, and ended, with its stream, when the session ends or changes (signing in as somebody else included). */
@@ -54,15 +95,17 @@ export function notificationsFeature(options: NotificationsFeatureOptions = {}):
   const inbox = shallowRef<Inbox | null>(null);
   const deadLetters = options.deadLetters ?? {};
   const settings = options.settings ?? true;
+  const push = options.push ?? true;
+  const sections = checkedSections(options.settingsSections ?? []);
   return defineFeature({
     id: "notifications",
     routes: [...(deadLetters === false ? [] : deadLettersRoutes.records), ...(settings ? notificationSettingsRoutes.records : [])],
     navigation: deadLetters !== false && deadLetters.destination ? [{ destination: deadLetters.destination, to: deadLettersRoutes.index }] : [],
-    context: provideContext(notificationsContextKey, { inbox, categories: options.categories ?? {}, settings }),
+    context: provideContext(notificationsContextKey, { inbox, categories: options.categories ?? {}, settings, push, sections }),
     contributions: [
       { id: "notifications.bell", slot: "headerActions", component: NotificationBell, scope: "authenticated" },
       ...(settings ? [{ id: "notifications.settings", slot: "accountMenu", component: SettingsMenuItem, scope: "authenticated", optional: true, order: -9 } as const] : []),
     ],
-    effects: [inboxOfSession(inbox)],
+    effects: [inboxOfSession(inbox), ...(push ? [pushOfSession()] : [])],
   });
 }

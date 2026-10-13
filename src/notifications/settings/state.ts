@@ -6,10 +6,13 @@ export function withCategory(preferences: Preferences, settings: CategorySetting
   return { ...preferences, categories: preferences.categories.map((known) => (known.category === settings.category ? settings : known)) };
 }
 
-/** One category's e-mail switched here, before the server answers: it is the person's own choice now. */
-export function withEmail(preferences: Preferences, category: string, enabled: boolean): Preferences {
+/** The channels a category can be switched on: e-mail and web push. In-app is always on. */
+export type Channel = "email" | "push";
+
+/** One category's channel switched here, before the server answers: it is the person's own choice now. */
+export function withChannel(preferences: Preferences, category: string, channel: Channel, enabled: boolean): Preferences {
   const known = preferences.categories.find((one) => one.category === category);
-  return known ? withCategory(preferences, { ...known, email: { enabled, source: "person" } }) : preferences;
+  return known ? withCategory(preferences, { ...known, [channel]: { enabled, source: "person" } }) : preferences;
 }
 
 /** Minutes after midnight as the `"HH:mm"` a time field edits. */

@@ -29,6 +29,7 @@ const entries: Record<string, string> = {
   "identity/index": "src/identity/index.ts",
   "access/index": "src/access/index.ts",
   "notifications/index": "src/notifications/index.ts",
+  "push-worker/index": "src/push-worker/index.ts",
   "testing/index": "src/testing/index.ts",
 };
 

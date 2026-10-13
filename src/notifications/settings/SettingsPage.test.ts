@@ -1,5 +1,7 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { defineComponent, h, type PropType } from "vue";
+import type { Preferences } from "../../modules/notification/entities";
 import { callsTo, dataOf, refusal, startScreen, stopApplications } from "../../identity/testing";
 import { toast } from "../../overlay";
 import { settle } from "../../testing";
@@ -30,7 +32,7 @@ const preferences = (extra: object = {}) =>
     ...extra,
   });
 
-const messages = { en: { notifications: { categories: { tickets: { assigned: { label: "Ticket assigned to me", description: "When someone gives you a ticket" } } } } } };
+const messages = { en: { dealer: { title: "Dealer policies", line: "Which dealer notices reach you" }, notifications: { categories: { tickets: { assigned: { label: "Ticket assigned to me", description: "When someone gives you a ticket" } } } } } };
 
 async function open(answers: Record<string, Parameters<typeof startScreen>[0]["answers"][string]> = {}, feature?: NotificationsFeatureOptions, location = "/profile/notifications") {
   return startScreen({ permissions: [], location, features: [notificationsFeature(feature)], messages, answers: { "GET /v1/notifications/preferences": preferences(), ...answers } });
@@ -39,6 +41,15 @@ const row = (code: string) => document.querySelector<HTMLElement>(`[data-categor
 const switchOf = (code: string) => within(row(code)).getByRole("switch");
 
 describe("the notification settings page", () => {
+  it("is grouped sections with a title each and no card around them: a group per category, rows inside", async () => {
+    await open();
+    const titles = [...document.querySelectorAll("main h2, [data-notification-channels] h2, [data-notification-quiet-hours] h2")].map((node) => node.textContent);
+    expect(titles).toEqual(["Notify me about", "Quiet hours"]);
+    expect(document.querySelectorAll("[data-notification-channels] [data-category]")).toHaveLength(3);
+    expect(document.querySelector("[data-category=\"tickets.assigned\"]")?.textContent).toContain("Ticket assigned to me");
+    expect(document.querySelector("[data-notification-channels]")?.parentElement?.className).not.toMatch(/rounded|border|shadow/); // no card chrome around a section
+  });
+
   it("lists the categories by the application's texts, falling back to the code", async () => {
     await open();
     expect(row("tickets.assigned").textContent).toContain("Ticket assigned to me");
@@ -88,40 +99,55 @@ describe("the notification settings page", () => {
     const summary = document.querySelector("[data-quiet-summary]")?.textContent ?? "";
     expect(summary).toContain("Europe/Zagreb");
     expect(summary).toContain("Between 21:00 and 07:00 (Europe/Zagreb)");
-    expect(summary).toContain("e-mail waits until the quiet hours end");
+    expect(summary).toContain("e-mail and push wait until the quiet hours end");
   });
 
   it("leaves out a zone the server cannot name (Go's \"Local\")", async () => {
     await open({ "GET /v1/notifications/preferences": preferences({ time_zone: "Local" }) });
     const summary = document.querySelector("[data-quiet-summary]")?.textContent ?? "";
-    expect(summary).toContain("Between 21:00 and 07:00 e-mail waits until the quiet hours end");
+    expect(summary).toContain("Between 21:00 and 07:00 e-mail and push wait until the quiet hours end");
     expect(summary).not.toContain("Local");
   });
 
-  it("saves quiet hours in minutes after midnight", async () => {
-    const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: true, start: 1320, end: 360 }) });
-    const panel = within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);
-    const from = panel.getByLabelText("From");
+  const quiet = () => within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);
+  const quietPuts = (calls: Parameters<typeof callsTo>[0]) => callsTo(calls, "PUT", "/v1/notifications/quiet-hours").map((call) => JSON.parse(String(call.init.body)));
+
+  it("has no Save button: a time is saved, in minutes after midnight, when it is committed", async () => {
+    const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: true, start: 1320, end: 420 }) });
+    expect(quiet().queryByRole("button", { name: /Save/ })).toBeNull();
+    const from = quiet().getByLabelText("From");
     await fireEvent.update(from, "22:00");
     await fireEvent.blur(from);
-    const to = panel.getByLabelText("To");
-    await fireEvent.update(to, "06:00");
-    await fireEvent.blur(to);
-    await fireEvent.click(panel.getByRole("button", { name: "Save quiet hours" }));
-    await waitFor(() => expect(callsTo(calls, "PUT", "/v1/notifications/quiet-hours")).toHaveLength(1));
-    expect(JSON.parse(String(callsTo(calls, "PUT", "/v1/notifications/quiet-hours")[0]?.init.body))).toEqual({ enabled: true, start: 1320, end: 360 });
+    await waitFor(() => expect(quietPuts(calls)).toEqual([{ enabled: true, start: 1320, end: 420 }]));
+    await settle();
+    expect(document.querySelector("[data-quiet-summary]")?.textContent).toContain("Between 22:00 and 07:00");
+  });
+
+  it("saves the switch at once", async () => {
+    const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: false, start: 1260, end: 420 }) });
+    await fireEvent.click(quiet().getByRole("switch"));
+    await waitFor(() => expect(quietPuts(calls)).toEqual([{ enabled: false, start: 1260, end: 420 }]));
+    expect(document.querySelector("[data-quiet-summary]")?.textContent).toContain("Quiet hours are off");
+  });
+
+  it("puts the last saved values back and says why when the save fails", async () => {
+    await open({ "PUT /v1/notifications/quiet-hours": refusal(422, "notification.quiet.invalid") });
+    const from = quiet().getByLabelText("From");
+    await fireEvent.update(from, "22:00");
+    await fireEvent.blur(from);
+    await waitFor(() => expect(document.querySelector("[data-quiet-failure]")).not.toBeNull());
+    expect((quiet().getByLabelText("From") as HTMLInputElement).value).toBe("21:00");
+    expect(document.querySelector("[data-quiet-summary]")?.textContent).toContain("Between 21:00 and 07:00");
   });
 
   it("refuses the same time twice on the field, without asking the server", async () => {
     const { calls } = await open();
-    const panel = within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);
-    const to = panel.getByLabelText("To");
+    const to = quiet().getByLabelText("To");
     await fireEvent.update(to, "21:00");
     await fireEvent.blur(to);
-    await fireEvent.click(panel.getByRole("button", { name: "Save quiet hours" }));
     await settle();
-    expect(panel.getByText("From and to must be different times.")).toBeTruthy();
-    expect(callsTo(calls, "PUT", "/v1/notifications/quiet-hours")).toHaveLength(0);
+    expect(quiet().getByText("From and to must be different times.")).toBeTruthy();
+    expect(quietPuts(calls)).toHaveLength(0);
   });
 
   it("has an entry in the account menu that opens it", async () => {
@@ -134,5 +160,34 @@ describe("the notification settings page", () => {
   it("is left out with settings: false", async () => {
     const { application } = await open({}, { settings: false }, "/");
     expect(application.router.hasRoute("notifications.settings")).toBe(false);
+  });
+});
+
+describe("the application's own sections", () => {
+  const dealer = { render: () => h("section", "Dealer policies") };
+  const seen = () => [...document.querySelectorAll("[data-notification-channels], [data-notification-quiet-hours], [data-settings-section]")].map((node) => node.getAttribute("data-settings-section") ?? node.getAttributeNames().find((name) => name.startsWith("data-notification-")));
+
+  it("adds a section after the built-in ones, given the preferences", async () => {
+    const component = defineComponent({ props: { preferences: { type: Object as PropType<Preferences>, required: true } }, setup: (props) => () => h("section", `Categories: ${props.preferences.categories.length}`) });
+    await open({}, { settingsSections: [{ id: "dealer", titleKey: "dealer.title", component }] });
+    expect(seen()).toEqual(["data-notification-channels", "data-notification-quiet-hours", "dealer"]);
+    expect(document.querySelector("[data-settings-section=dealer]")?.textContent).toContain("Categories: 3");
+  });
+
+  it("gives it a title and a line in the page's own style, from the application's keys", async () => {
+    await open({}, { settingsSections: [{ id: "dealer", titleKey: "dealer.title", descriptionKey: "dealer.line", component: dealer }] });
+    const section = document.querySelector<HTMLElement>("[data-settings-section=dealer]")!;
+    expect(section.querySelector("h2")?.textContent).toBe("Dealer policies");
+    expect(section.textContent).toContain("Which dealer notices reach you");
+  });
+
+  it("places a section by its order among the built-in sections and leaves out one that is not visible", async () => {
+    await open({}, { settingsSections: [{ id: "first", titleKey: "dealer.title", component: dealer, order: -1 }, { id: "between", titleKey: "dealer.title", component: dealer, order: 5 }, { id: "hidden", titleKey: "dealer.title", component: dealer, visible: () => false }] });
+    expect(seen()).toEqual(["first", "data-notification-channels", "between", "data-notification-quiet-hours"]);
+  });
+
+  it("refuses a built-in id and an id given twice", () => {
+    expect(() => notificationsFeature({ settingsSections: [{ id: "quiet", titleKey: "x", component: dealer }] })).toThrow(/"quiet"/);
+    expect(() => notificationsFeature({ settingsSections: [{ id: "a", titleKey: "x", component: dealer }, { id: "a", titleKey: "x", component: dealer }] })).toThrow(/"a"/);
   });
 });

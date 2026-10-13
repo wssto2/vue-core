@@ -9,7 +9,7 @@ export type * as DeadLetterInputs from "../modules/events/schemas";
 export { eventsRoutes } from "../modules/events/routes";
 export { notificationsFeature } from "./feature";
 export type { NotificationsFeatureOptions } from "./feature";
-export type { NotificationCategoryLook } from "./context";
+export type { NotificationCategoryLook, NotificationSettingsSection } from "./context";
 export { notificationSettingsRoutes } from "./settings/routes";
 export type { NotificationSettingsRoutes } from "./settings/routes";
 export { deadLettersRoutes } from "./deadletters/routes";

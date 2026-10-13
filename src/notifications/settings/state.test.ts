@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Preferences } from "../../modules/notification/entities";
-import { draftOf, minutesOfTime, timeOfMinutes, withCategory, withEmail } from "./state";
+import { draftOf, minutesOfTime, timeOfMinutes, withCategory, withChannel } from "./state";
 
 const preferences: Preferences = {
   email_available: true,
@@ -15,10 +15,15 @@ const preferences: Preferences = {
 
 describe("the settings state", () => {
   it("switches one category as the person's own choice and leaves the rest", () => {
-    const next = withEmail(preferences, "tickets.assigned", false);
+    const next = withChannel(preferences, "tickets.assigned", "email", false);
     expect(next.categories[0]).toEqual({ category: "tickets.assigned", email: { enabled: false, source: "person" }, push: { enabled: true, source: "default" } });
     expect(next.categories[1]).toBe(preferences.categories[1]);
     expect(preferences.categories[0]!.email.source).toBe("default");
+  });
+
+  it("switches the push channel without touching e-mail", () => {
+    const next = withChannel(preferences, "tickets.assigned", "push", false);
+    expect(next.categories[0]).toEqual({ category: "tickets.assigned", email: { enabled: true, source: "default" }, push: { enabled: false, source: "person" } });
   });
 
   it("takes what the server answered for a category", () => {
