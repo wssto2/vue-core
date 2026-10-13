@@ -412,6 +412,33 @@ describe("message namespaces", () => {
   });
 });
 
+describe("the session's language", () => {
+  const tickets = localeMessages("tickets", {
+    en: async () => ({ default: { title: "Tickets" } }),
+    hr: async () => ({ default: { title: "Tiketi" } }),
+  });
+  // Captures its label once, at setup, as a form's step titles do: it cannot follow a later locale change.
+  const captured = defineComponent({ setup() { const label = useI18n().t("tickets.title"); return () => h("p", label); } });
+  const feature = defineFeature({ id: "tickets", routes: [{ name: "tickets.index", path: "/tickets", component: captured }], messages: tickets });
+
+  it("is applied before the first page, so a label captured at setup is in it", async () => {
+    const { platform } = fakeBackend(signedIn(1, [], { user: { id: 1, locale: "hr" } as never })); // the page's server locale is en
+    const application = createApplication(options(platform, [loginFeature, feature], "/tickets"));
+    const target = await start(application);
+
+    expect(application.locale.value).toBe("hr");
+    expect(target.textContent).toBe("Tiketi");
+  });
+
+  it("leaves the locale alone when the user's is not one the application offers", async () => {
+    const { platform } = fakeBackend(signedIn(1, [], { user: { id: 1, locale: "de" } as never }));
+    const application = createApplication(options(platform, [loginFeature, feature], "/tickets"));
+    const target = await start(application);
+
+    expect(target.textContent).toBe("Tickets");
+  });
+});
+
 describe("start failures", () => {
   it("a server that cannot be reached shows the session failure (not a login page) and can be retried", async () => {
     const { platform, backend } = fakeBackend(signedIn(1));

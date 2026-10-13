@@ -437,6 +437,12 @@ export function createApplication(options: ApplicationOptions): Application {
     if (disposed) return;
     if (session.status === "failed") return fail("session", session.error);
 
+    // The person's saved language is the language of the first page: a label captured at setup would stay in the old one.
+    // (Mapping the server's code to a supported locale is the user parser's job.)
+    const saved = session.status === "authenticated" ? (session.user as { locale?: unknown }).locale : undefined;
+    if (typeof saved === "string" && saved !== composer.locale.value && supportedLocales.includes(saved)) await environment.setLocale(saved);
+    if (disposed) return;
+
     const failures = await messages.loadEssential();
     if (disposed) return;
     if (failures.length > 0) return fail("messages", failures[0]!.error);

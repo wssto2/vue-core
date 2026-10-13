@@ -56,7 +56,7 @@ export const platform = createPlatform({ config: readBootstrap(), ...identityPla
 
 - **The sign-in page** at `/login` (route name `login`, public, the default of `router.login`): a username and a password, a required-field check before the server is asked, and the server's refusals said under the password in the app's language. After signing in the person goes where they were heading (`?redirect=`), else to `home`.
 - **Session upkeep**: `keepSessionAlive`, renewing shortly before the access token expires and when the app comes back to the foreground. It goes through `platform.session.renew()`, the same single renewal a 401 uses, so a timer and a failed request never refresh twice.
-- **The language**: the language saved on the person is applied when their session begins (also after a reload), and a language chosen in the account menu is saved with `change-locale`. A save that fails is a toast; the page stays in the chosen language. Do not also pass `locale.onChange` for this.
+- **The language**: the language saved on the person is applied when their session begins, before the first page renders (also after a reload), so labels a page captures at setup are already in it, and a language chosen in the account menu is saved with `change-locale`. A save that fails is a toast; the page stays in the chosen language. Do not also pass `locale.onChange` for this.
 
 ## Refusals
 
