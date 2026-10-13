@@ -1,5 +1,72 @@
 # Changelog
 
+## 0.5.0 — 2026-10-13
+
+The screens for go-core v1.8.0. Web push comes into the library (owner 2026-10-12: push belongs in go-core and vue-core). My profile and the notification settings move to the current grouped-rows look. Apps get their own sections on both pages and their own role settings.
+
+### Requires
+- **go-core `v1.8.0`**: the push and device routes, the push settings channel, `authz.invalid` problems as objects, and compare of any two roles. `src/modules` is regenerated. **`vue` 3.5.19 or later**, unchanged.
+
+### New
+- **Web push.** It is on by default; `notificationsFeature({ push: false })` turns it off.
+  - **This device:** turn push on or off on this browser. One state shows at a time: unsupported, iPhone or iPad in a Safari tab (the home-screen steps), blocked, off, or on. The permission is asked only from the button.
+  - **Your devices:** a list with "This device", "Disabled", last use and last push. Rename, Send test and Remove are in the row's ⋯ menu; Remove asks first.
+  - **Per category:** each category is a group with an E-mail row and a Push row. A setting the organisation enforces is locked and says so.
+  - **Session sync:** once per session, an existing subscription is registered again. That refreshes the device's last use, re-enables a disabled device, and moves a shared computer's endpoint to whoever is signed in. A subscription made with an old key is replaced. Signing out removes the subscription at the account and in the browser.
+- **`@wssto2/vue-core/push-worker`.** The app's own service worker calls `installPushHandlers({ icon?, badge?, fallbackTitle? })` once.
+  - It shows each push from go-core's payload (`notification_id, category, title, body, link, tag, unread_count`) and sets the app badge.
+  - A tap focuses a window of the app and navigates it to the link. A link to another origin opens "/".
+  - Also exported: `readPayload`, `sameOriginLink`, and the types `PushPayload`, `PushHandlersOptions`, `PushWorkerScope`.
+- **`usersFeature({ profileSections })`.** App-owned sections on My profile: `{ id, component, after?|before?, visible?(profile) }`. The component renders its own `FormGroup`s, gets `profile`, and may emit `updated`. `ActionRow` is exported from `/identity`, and the types are `ProfileSection` and `ProfilePanel`.
+- **`notificationsFeature({ settingsSections })`.** App-owned sections on the notification settings page: `{ id, titleKey, descriptionKey?, component, order?, visible?(preferences) }`. The page draws the title, and the component renders `FormGroup`s and gets `preferences`. Built-in positions: channels 0, quiet hours 10, this device 20, devices 30.
+- **`accessFeature({ roleConstraints })`.** An app's choice stored in a role's `attrs`: `[{ attribute, labelKey, options: [{ value, labelKey }], anyLabelKey? }]`.
+  - The attribute is one lowercase word, as go-core requires.
+  - It is a select row in the role editor and a read row on a predefined role. "All" leaves the key out.
+  - Types: `RoleConstraint`, `RoleConstraintOption`.
+- **`accessFeature({ problems })`.** The app's texts for its own `authz.invalid` problem codes. A refused role names every problem, one sentence each, with `{permission}` as the permission's label and `{detail}`.
+  - The library has texts for its own 12 codes, plus a fallback sentence.
+  - Exported: `useDescribeRefusal`, `roleProblems`, type `RoleProblem`.
+- **"Return to my account" in the account menu** while signed in as someone else, next to the banner. Both use `useReturnToOwnAccount()`.
+
+### Changes to existing behaviour
+- **My profile is grouped rows** in one readable column, with no page Save.
+  - **Details:** read rows. Edit opens a sheet with one Save; the username is read-only and keeps its note.
+  - **E-mail:** the current address, then "Change e-mail address". A pending change shows the new address and how long the code is valid, with "Enter code" and "Cancel the change".
+  - **Password:** a row that opens a dialog. Every other device is signed out.
+  - **Sessions:** grouped rows. "Sign out" is the trailing action from `md` up and sits under the facts on a phone, with no separator ever starting or ending a line.
+  - **Sign-in history:** grouped rows labelled by device ("Chrome · Linux"), with the raw User-Agent as a tooltip. The users record page's sign-in table uses the same label.
+- **Notification settings are grouped sections** in one readable column, with no cards.
+  - Quiet hours save as they change: the switch at once, a time when it is committed and valid. A failure restores the last saved values and says so under the group.
+- **Compare any two roles.** Compare offers every role the actor may view, and every role page has it, predefined and computed ones included. Replace is still for predefined roles only.
+- **A person outside the admin's reach** (404) shows the not-found state, not an error.
+- **Refusals:**
+  - A refused login-as names the reason, or "You cannot sign in as {name}." when the server gives none.
+  - A language the server refuses (`identity.locale.unsupported`) says so, and the app goes back to the language the server kept.
+  - Resend with no code pending shows its sentence.
+- **`FormGroup`'s header action** (Edit) sits on the title's baseline.
+- **Pinned and unchanged:**
+  - the code entry sends once on the sixth digit, typed or pasted;
+  - the code's expiry time uses the app's time format.
+
+### Removed
+- `DetailsPanel`, `EmailPanel`, `PasswordPanel`, `SessionsPanel`, `SignInsPanel` and `PanelActions` (My profile).
+- `EmailPanel` of the notification settings, now `ChannelsSection`. The panels are now `QuietHoursSection`, `ThisDeviceSection` and `DevicesSection`.
+- Message keys `core.profile.details.submit`, `quiet.saved`, `quiet.submit`, `push.on_description`, `push.off_description` and `email.note`.
+
+### For ARV (H4, H6, H8)
+- **`usersFeature`:** `profileSections` for mobile phone, dealer and location, roles and preferences. ARV's profile panels and `VerifyCodePanel` go.
+- **`accessFeature`:**
+  - `roleConstraints` with `vehiclekind` (all, new only, used only);
+  - `problems` with `vehicle_kind_conflict`. ARV's `errors.authz.invalid` override stays as the fallback.
+- **`notificationsFeature`:** `settingsSections` with the dealer policies.
+  - These go: `ThisDevicePanel`, `PushPrompt`, `DevicesPanel`, `ChannelPreferencesPanel`, `QuietHoursPanel`, `usePushSubscription`, `utils/push.ts`, `pushApi` and `onBeforeLogout("notification.push")`.
+- **`static/app/sw.js`:**
+  - It keeps its caching and calls `installPushHandlers({ icon: "/static/app/icon-192.png", fallbackTitle: "ARV" })`.
+  - Its own Web Push block and `pushsubscriptionchange` handler go, as does the SPA's `notification-open` listener.
+
+### Not yet
+- Tapping a notification reloads the app (`client.navigate`). Routing it inside the app, and marking it read, are a follow-up.
+
 ## 0.4.28 — 2026-10-12
 
 From the owner's review of ARV W2's screenshots of 0.4.27: the changed-by cell and the row menu are quieter. Two items, one commit each; no new API.
