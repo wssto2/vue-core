@@ -10,6 +10,7 @@ export { accessPermissions } from "./context";
 export { dependantsClosure, permissionTree, requiredClosure } from "./catalogue";
 export type { Grants, PermissionCatalogue, PermissionEntry, PermissionGroup, PermissionMeta, PermissionScreen } from "./catalogue";
 export { useAccessLabels } from "./labels";
-export { useRefusalMessage } from "./refusals";
+export { roleProblems, useDescribeRefusal, useRefusalMessage } from "./refusals";
+export type { RoleProblem } from "./refusals";
 export { default as PersonAccess } from "./PersonAccess.vue";
 export { default as BindingRow } from "./BindingRow.vue";

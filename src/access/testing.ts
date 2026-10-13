@@ -53,7 +53,7 @@ export async function startAccess(answers: Record<string, Answer>, permissions: 
     features: [defineFeature({ id: "sign-in", routes: [{ name: "login", path: "/login", component: page("sign in"), meta: { public: true } }, { name: "home", path: "/", component: page("home") }] }), accessFeature({ catalogue, ...options }), ...more],
     router: { history },
     // The application's own texts: what a catalogue's keys, a custom role's kind and a level mean.
-    i18n: { missingWarn: false, messages: { en: { perm: { customer: { view: "View customers", update: "Edit customers" }, lead: { view: "View leads" }, role: { manage: "Manage roles" } }, access: { modules: { crm: "CRM", iam: "Administration" }, resources: { crm_customer: "Customers", crm_lead: "Leads" }, levels: { dealer: "Dealer", location: "Location" } } } } },
+    i18n: { missingWarn: false, messages: { en: { roles: { vehicle_kind_conflict: "{permission}: this role mixes vehicle kinds." }, perm: { customer: { view: "View customers", update: "Edit customers" }, lead: { view: "View leads" }, role: { manage: "Manage roles" } }, access: { modules: { crm: "CRM", iam: "Administration" }, resources: { crm_customer: "Customers", crm_lead: "Leads" }, levels: { dealer: "Dealer", location: "Location" } } } } },
   });
   const target = document.createElement("div");
   document.body.append(target);

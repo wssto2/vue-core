@@ -139,6 +139,21 @@
         "hide_why": "Sakrij",
         "all_modules": "Svih {count} modula",
         "fewer_modules": "Manje modula"
+      },
+      "problems": {
+        "unknown_permission": "{permission} nije poznata dozvola.",
+        "unknown_attribute": "Ograničenje „{detail}“ ova aplikacija ne poznaje.",
+        "empty_attribute": "Ograničenje bez vrednosti ne odgovara ničemu. Izostavite ga ako želite da dozvolite sve.",
+        "invalid_qualifier": "{permission} ima neispravan domet.",
+        "qualifier_not_allowed": "{permission} se ne može ograničiti na sopstvene zapise.",
+        "missing_required": "{permission} traži drugu dozvolu koja je isključena.",
+        "required_too_narrow": "{permission} traži dozvolu većeg dometa nego što je uloga daje.",
+        "duplicate_grant": "{permission} je dodeljena dvaput.",
+        "computed_with_grants": "Izračunata uloga nema sopstvenih dozvola.",
+        "invalid_role": "Uloga nije ispravna.",
+        "unknown_requirement": "{permission} traži dozvolu koja ne postoji.",
+        "organization_only": "{permission} se može dati samo za celu organizaciju.",
+        "unknown": "Uloga nije ispravna ({code})."
       }
     },
     "actions": {

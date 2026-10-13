@@ -139,6 +139,21 @@
         "hide_why": "Hide",
         "all_modules": "All {count} modules",
         "fewer_modules": "Fewer modules"
+      },
+      "problems": {
+        "unknown_permission": "{permission} is not a known permission.",
+        "unknown_attribute": "The constraint “{detail}” is not known to this application.",
+        "empty_attribute": "A constraint without a value matches nothing. Leave it out to allow everything.",
+        "invalid_qualifier": "{permission} has an invalid reach.",
+        "qualifier_not_allowed": "{permission} cannot be limited to own records.",
+        "missing_required": "{permission} needs another permission that is switched off.",
+        "required_too_narrow": "{permission} needs a permission with a wider reach than the role gives it.",
+        "duplicate_grant": "{permission} is given twice.",
+        "computed_with_grants": "A computed role has no permissions of its own.",
+        "invalid_role": "The role is not valid.",
+        "unknown_requirement": "{permission} requires a permission that does not exist.",
+        "organization_only": "{permission} can only be given for the whole organization.",
+        "unknown": "The role is not valid ({code})."
       }
     },
     "actions": {

@@ -16,6 +16,14 @@ export interface AccessFeatureOptions {
   subjectRoute?: (subject: SubjectRef) => RouteLocationRaw | null;
   /** The places a person may be given roles at. Default: what the server says (`GET /v1/iam/users/:id/scopes`). */
   scopes?: (subject: SubjectRef, signal: AbortSignal) => Promise<ScopeOptions>;
+  /**
+   * The sentence for each problem code the application's own role check reports (`access.WithRoleCheck`), as an i18n key; a text may use
+   * `{permission}` (the permission's label, when the problem has one) and `{detail}`. Built-in codes have library texts (`core.access.problems.<code>`);
+   * a key here rewords one. A refused role (`authz.invalid`) shows one sentence per problem.
+   *
+   *   accessFeature({ catalogue, problems: { vehicle_kind_conflict: "roles.problems.vehicle_kind_conflict" } })
+   */
+  problems?: Readonly<Record<string, string>>;
   /** The backend's navigation destination that opens the roles list. Without it the application links to `accessPages.roles` itself. */
   destination?: Destination;
 }
@@ -35,6 +43,7 @@ export function accessFeature(options: AccessFeatureOptions): Feature {
     context: provideContext(accessContextKey, {
       catalogue: options.catalogue,
       subjectRoute: options.subjectRoute ?? (() => null),
+      problems: options.problems ?? {},
       scopes: options.scopes ?? null,
     }),
     navigation: options.destination ? [{ destination: options.destination, to: accessPages.roles, within: ["access.role", "access.roles.new"] }] : [],

@@ -3,7 +3,6 @@ import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { Button } from "../button";
 import { FormGroup, FormRow } from "../form";
-import { useDescribeError } from "../i18n";
 import type { Binding, SubjectRef } from "../modules/access/entities";
 import { AlertDialog, toast } from "../overlay";
 import { AccessGate } from "../platform";
@@ -15,6 +14,7 @@ import BindingRow from "./BindingRow.vue";
 import { accessPermissions } from "./context";
 import EffectiveAccess from "./EffectiveAccess.vue";
 import { useAccessLabels } from "./labels";
+import { useDescribeRefusal } from "./refusals";
 
 /**
  * A person's access: their roles, each with where it applies, *Add role* and removal (both offered only when the server says the actor may
@@ -32,7 +32,7 @@ const emit = defineEmits<{ loaded: [bindings: number] }>();
 
 const { t } = useI18n();
 const labels = useAccessLabels();
-const describeError = useDescribeError();
+const describeError = useDescribeRefusal();
 const api = useAccessApi();
 
 // A person outside the actor's reach answers 404, the same as one that does not exist: one not-found state, not an error banner.

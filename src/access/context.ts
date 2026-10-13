@@ -9,6 +9,8 @@ export interface AccessContext {
   /** Where a holder's name leads (their record), or null for a name that is not a link. */
   readonly subjectRoute: (subject: SubjectRef) => RouteLocationRaw | null;
   /** The places `subject` may be given roles at; by default what the server says (`GET /v1/iam/users/:id/scopes`). */
+  /** The i18n key of the sentence for each of the application's own role-problem codes (`authz.invalid`). */
+  readonly problems: Readonly<Record<string, string>>;
   readonly scopes: ((subject: SubjectRef, signal: AbortSignal) => Promise<ScopeOptions>) | null;
 }
 

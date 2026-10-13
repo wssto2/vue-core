@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
-import { settle } from "../testing";
+import { jsonResponse, settle } from "../testing";
 import { accessPermissions } from "./context";
 import { choose, data, findTest, queryAllTest, queryTest, refusal, role, seller, startAccess, summary, support, type Started } from "./testing";
 
@@ -82,6 +82,15 @@ describe("a role's page", () => {
     await fireEvent.click(screen.getByRole("switch", { name: "View leads" }));
     await fireEvent.click(screen.getByRole("button", { name: "Save role" }));
     expect(await screen.findByText("That role has permissions you do not hold yourself, so you cannot give it.")).toBeTruthy();
+  });
+
+  it("says every problem of a role the server refused as invalid, in the go-core v1.8.0 shape", async () => {
+    const invalid = jsonResponse(400, { success: false, error: "invalid", code: "authz.invalid", params: { problems: [{ code: "organization_only", permission: "crm.lead:view" }, { code: "vehicle_kind_conflict", permission: "crm.customer:update" }] } });
+    running = await startAccess(server({ "PUT /v1/iam/roles/7": invalid } as never), all, "/iam/roles/7", { problems: { vehicle_kind_conflict: "roles.vehicle_kind_conflict" } });
+    await screen.findByDisplayValue("Support");
+    await fireEvent.click(screen.getByRole("switch", { name: "View leads" }));
+    await fireEvent.click(screen.getByRole("button", { name: "Save role" }));
+    expect(await screen.findByText("View leads can only be given for the whole organization. Edit customers: this role mixes vehicle kinds.")).toBeTruthy();
   });
 
   it("only reads a predefined role, and offers Copy", async () => {

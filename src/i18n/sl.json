@@ -139,6 +139,21 @@
         "hide_why": "Skrij",
         "all_modules": "Vseh {count} modulov",
         "fewer_modules": "Manj modulov"
+      },
+      "problems": {
+        "unknown_permission": "{permission} ni znano dovoljenje.",
+        "unknown_attribute": "Omejitve »{detail}« ta aplikacija ne pozna.",
+        "empty_attribute": "Omejitev brez vrednosti se ne ujema z ničemer. Izpustite jo, če želite dovoliti vse.",
+        "invalid_qualifier": "{permission} ima neveljaven doseg.",
+        "qualifier_not_allowed": "{permission} ni mogoče omejiti na lastne zapise.",
+        "missing_required": "{permission} zahteva drugo dovoljenje, ki je izklopljeno.",
+        "required_too_narrow": "{permission} zahteva dovoljenje z večjim dosegom, kot ga daje vloga.",
+        "duplicate_grant": "{permission} je dodeljeno dvakrat.",
+        "computed_with_grants": "Izračunana vloga nima lastnih dovoljenj.",
+        "invalid_role": "Vloga ni veljavna.",
+        "unknown_requirement": "{permission} zahteva dovoljenje, ki ne obstaja.",
+        "organization_only": "{permission} je mogoče dodeliti samo za celotno organizacijo.",
+        "unknown": "Vloga ni veljavna ({code})."
       }
     },
     "actions": {
