@@ -37,8 +37,9 @@ const allOn = computed(() => current.value !== undefined && totals(current.value
 
 function toggleAll() {
   if (!current.value) return;
+  const turnOff = allOn.value; // once: granting a permission grants what it needs, which may complete the module halfway through
   for (const id of entriesOf(current.value.key)) {
-    if (allOn.value) revoke(catalogue, props.grants, id);
+    if (turnOff) revoke(catalogue, props.grants, id);
     else grant(catalogue, props.grants, id);
   }
 }
