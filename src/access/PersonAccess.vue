@@ -7,7 +7,8 @@ import { useDescribeError } from "../i18n";
 import type { Binding, SubjectRef } from "../modules/access/entities";
 import { AlertDialog, toast } from "../overlay";
 import { AccessGate } from "../platform";
-import { AsyncSection, useLoad } from "../state";
+import { isApiError } from "../client";
+import { AsyncSection, EmptyState, useLoad } from "../state";
 import AddRoleDialog from "./AddRoleDialog.vue";
 import { useAccessApi } from "./api";
 import BindingRow from "./BindingRow.vue";
@@ -34,10 +35,19 @@ const labels = useAccessLabels();
 const describeError = useDescribeError();
 const api = useAccessApi();
 
-const access = useLoad(async ({ signal }) => {
-  const result = await api.access(props.subject, { signal });
-  emit("loaded", result.bindings.length);
-  return result;
+// A person outside the actor's reach answers 404, the same as one that does not exist: one not-found state, not an error banner.
+const missing = ref(false);
+const access = useLoad(async ({ signal, abandon }) => {
+  missing.value = false;
+  try {
+    const result = await api.access(props.subject, { signal });
+    emit("loaded", result.bindings.length);
+    return result;
+  } catch (error) {
+    if (!isApiError(error) || error.kind !== "notFound") throw error;
+    missing.value = true;
+    return abandon();
+  }
 }, { watch: () => props.subject.id });
 
 const addDialog = useTemplateRef<{ present: () => Promise<void> }>("addDialog");
@@ -57,7 +67,8 @@ defineExpose({ reload: access.reload });
 
 <template>
   <div class="flex min-w-0 flex-col gap-group-gap" data-test="access-panel">
-    <AsyncSection :state="access.state.value" :skeleton-rows="6" :is-empty="() => false" @retry="access.reload()">
+    <EmptyState v-if="missing" :title="t('core.resource.not_found.title')" :description="t('core.resource.not_found.body')" icon="errorWarningLine" data-test="access-not-found" />
+    <AsyncSection v-else :state="access.state.value" :skeleton-rows="6" :is-empty="() => false" @retry="access.reload()">
       <template #default="{ value }">
         <FormGroup :header="t('core.access.person_roles')" :footer="t('core.access.roles_footer')">
           <FormRow v-if="value.bindings.length === 0" layout="setting" :label="t('core.access.no_roles_title')" :sub="t('core.access.no_roles_description')" />

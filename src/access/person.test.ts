@@ -93,6 +93,17 @@ describe("a person's roles", () => {
   });
 });
 
+describe("a person out of reach", () => {
+  it("answers 404 like a person that does not exist: the not-found state, no error banner, no toast", async () => {
+    const error = vi.spyOn(toast, "error");
+    await mount({ "GET /v1/iam/users/4/access": refusal(404, "") });
+    expect(await findTest("access-not-found")).toBeTruthy();
+    expect(screen.getByText("Not found")).toBeTruthy();
+    expect(document.querySelector('[data-async="failed"]')).toBeNull();
+    expect(error).not.toHaveBeenCalled();
+  });
+});
+
 describe("adding a role", () => {
   const bindable = (roles: Role[]) => data({ roles });
 
