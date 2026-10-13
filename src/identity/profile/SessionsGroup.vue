@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
-import { Panel } from "../../content";
 import type { SessionItem } from "../../modules/identity/entities";
 import { identityRoutes } from "../../modules/identity/routes";
 import { AlertDialog, toast } from "../../overlay";
@@ -36,13 +35,11 @@ async function end(session: SessionItem) {
 </script>
 
 <template>
-  <Panel :title="t('core.profile.sessions.title')" icon="deviceLine" flush data-profile-sessions>
+  <div data-profile-sessions>
     <AsyncSection :state="sessions.state.value" :skeleton-rows="3" :is-empty="() => false" @retry="sessions.reload()">
-      <div class="p-3">
-        <SessionList :sessions="list" can-end :footer="t('core.profile.sessions.footer')" @end="(session) => { pending = session; dialog?.present(session); }" />
-      </div>
+      <SessionList :sessions="list" can-end :header="t('core.profile.sessions.title')" :footer="t('core.profile.sessions.footer')" @end="(session) => { pending = session; dialog?.present(session); }" />
     </AsyncSection>
     <AlertDialog ref="dialog" tone="critical" icon="logoutBoxRLine" :title="t('core.account.sessions.end_title')"
       :message="t('core.account.sessions.end_body', { device: pending?.device || t('core.account.sessions.unknown_device') })" :confirm-label="t('core.account.sessions.end')" :action="end" />
-  </Panel>
+  </div>
 </template>

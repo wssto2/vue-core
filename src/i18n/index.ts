@@ -216,9 +216,9 @@ export type CoreMessages = {
       title: string;
       description: string;
       menu: string;
-      details: Texts<"title" | "login_hint" | "submit" | "saved">;
+      details: Texts<"title" | "login_hint" | "saved">;
       email: Texts<"title" | "current" | "change" | "pending" | "valid_until" | "enter_code" | "cancel_change" | "change_title" | "new_email" | "current_password" | "request_hint" | "send_code" | "verify_title" | "verify_description" | "verify" | "resend" | "resend_in" | "request_new" | "changed" | "cancelled" | "code_sent" | "verify_failed" | "resend_failed" | "cancel_failed">;
-      password: Texts<"title" | "current" | "new" | "repeat" | "show" | "hide" | "submit" | "changed">;
+      password: Texts<"title" | "current" | "new" | "repeat" | "show" | "hide" | "submit" | "row_sub" | "changed">;
       sessions: Texts<"title" | "footer">;
       signins: Texts<"title" | "footer">;
     };

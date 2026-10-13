@@ -36,7 +36,7 @@ async function signInAsThem() {
     await signInAs(platform, props.userId);
     await router.push(home);
   } catch (error) {
-    if (!isSessionEnded(error)) toast.error(describeError(error));
+    if (!isSessionEnded(error)) toast.error(describeError(error, { fallback: t("core.identity.impersonation.sign_in_as_failed", { name: props.name }) }));
   } finally {
     busy.value = false;
   }

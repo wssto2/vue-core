@@ -112,6 +112,7 @@ async function resend() {
       pending.value = null;
       emit("pending", null);
       step.value = "request";
+      toast.error(messages.sentence(error, t("core.profile.email.resend_failed"))); // nothing is pending any more: say so before the address step
       return;
     }
     codeError.value = messages.sentence(error, t("core.profile.email.resend_failed"));

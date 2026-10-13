@@ -1,24 +1,34 @@
 <script setup lang="ts">
+import type { Component } from "vue";
 import { useI18n } from "vue-i18n";
 import { AdaptivePageShell } from "../../page";
 import { usePlatform } from "../../platform";
 import { AsyncSection, useLoad } from "../../state";
 import { identityRoutes } from "../../modules/identity/routes";
 import type { ProfileResponse } from "../../modules/identity/entities";
-import DetailsPanel from "./DetailsPanel.vue";
-import EmailPanel from "./EmailPanel.vue";
-import PasswordPanel from "./PasswordPanel.vue";
-import SessionsPanel from "./SessionsPanel.vue";
-import SignInsPanel from "./SignInsPanel.vue";
+import { useUsersContext } from "../users/context";
+import DetailsGroup from "./DetailsGroup.vue";
+import EmailGroup from "./EmailGroup.vue";
+import PasswordGroup from "./PasswordGroup.vue";
+import { layoutProfile, type ProfileEntry, type ProfilePanel } from "./profileSections";
+import SessionsGroup from "./SessionsGroup.vue";
+import SignInsGroup from "./SignInsGroup.vue";
 
 /**
- * "My profile": the signed-in person's own account: name and phone, the e-mail address (changed with a code mailed to the
- * new one), the password, the devices they are signed in on and their sign-in history. It needs no permission, only a session.
+ * "My profile": the signed-in person's own account as grouped rows: name and phone (changed in a sheet), the e-mail address
+ * (changed with a code mailed to the new one), the password (a dialog), the devices they are signed in on and their sign-in
+ * history, then the application's own groups. It needs no permission, only a session.
  */
 const { t } = useI18n();
 const { http, session } = usePlatform();
+const { profileSections } = useUsersContext();
 
 const profile = useLoad(async ({ signal }) => (await http.request(identityRoutes.profileShow, undefined, { signal })).data);
+
+const groups: Record<ProfilePanel, Component> = { details: DetailsGroup, email: EmailGroup, password: PasswordGroup, sessions: SessionsGroup, signins: SignInsGroup };
+const keyOf = (entry: ProfileEntry) => (entry.kind === "panel" ? entry.id : `section:${entry.section.id}`);
+// Only the account groups take the profile; the sessions and sign-ins load their own.
+const takesProfile = (entry: ProfileEntry) => entry.kind === "section" || ["details", "email"].includes(entry.id);
 
 // The shell's account menu shows the name and e-mail the session knows: read them again.
 function updated(next: ProfileResponse) {
@@ -28,17 +38,16 @@ function updated(next: ProfileResponse) {
 </script>
 
 <template>
-  <AdaptivePageShell :title="t('core.profile.title')" :description="t('core.profile.description')" width="content">
+  <AdaptivePageShell :title="t('core.profile.title')" :description="t('core.profile.description')" width="readable">
     <AsyncSection :state="profile.state.value" :skeleton-rows="6" :is-empty="() => false" @retry="profile.reload()">
       <template #default="{ value }">
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-          <div class="flex flex-col gap-4">
-            <DetailsPanel :profile="value" @updated="updated" />
-            <EmailPanel :profile="value" @updated="updated" />
-          </div>
-          <PasswordPanel />
-          <SessionsPanel class="lg:col-span-2" />
-          <SignInsPanel class="lg:col-span-2" />
+        <div class="flex min-w-0 flex-col gap-group-gap">
+          <template v-for="entry in layoutProfile(profileSections, value)" :key="keyOf(entry)">
+            <div v-if="entry.kind === 'section'" class="flex min-w-0 flex-col gap-group-gap" :data-profile-section="entry.section.id">
+              <component :is="entry.section.component" :profile="value" @updated="updated" />
+            </div>
+            <component :is="groups[entry.id]" v-else v-bind="takesProfile(entry) ? { profile: value } : {}" @updated="updated" />
+          </template>
         </div>
       </template>
     </AsyncSection>

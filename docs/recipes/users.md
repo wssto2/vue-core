@@ -42,7 +42,11 @@ Install it for everyone: the server's permission catalogue decides who sees what
 
 **Deactivate** says what it does (signed out on every device, cannot sign in, roles and history stay) and asks once. When the application's deactivation hook refuses (`WithDeactivationHook` returns an error with a reason), the dialog stays open and says that reason: your text for it (`errors.<reason>` in the application's messages, with the error's params) or, without one, the sentence the server sent. Nobody can deactivate themselves (go-core refuses it, and the action is not offered).
 
-**My profile** (`/profile`, route `profile`, no permission) and its entry in the account menu: name and phone; the e-mail address, changed in two steps (the new address and the current password, then the six-digit code mailed to the new address; **Resend** waits for the cooldown the server names, a change that waits for its code can be resumed or cancelled from the page, and an address taken in the meantime sends the person back to the address with the reason on the field); the password (current, new, repeated; every other session ends); the devices (this one marked, the others can be signed out); and the sign-in history (**All / Failed**). Rows carry who did it as `{ id, name }` (go-core `PersonRef`), so no screen looks people up; a person who is gone has an empty name and reads as "somebody else".
+**My profile** (`/profile`, route `profile`, no permission) and its entry in the account menu: name and phone, read on the page and changed in a sheet (the username is shown with its note, never edited; the page has no Save); the e-mail address, changed in two steps (the new address and the current password, then the six-digit code mailed to the new address; **Resend** waits for the cooldown the server names, a change that waits for its code can be resumed or cancelled from the page, and an address taken in the meantime sends the person back to the address with the reason on the field); the password (a row that opens a dialog: current, new, repeated; every other session ends); the devices (this one marked, the others can be signed out); and the sign-in history (**All / Failed**; each device named like a session, "Chrome · Linux", with the raw User-Agent as its tooltip). Rows carry who did it as `{ id, name }` (go-core `PersonRef`), so no screen looks people up; a person who is gone has an empty name and reads as "somebody else".
+
+**Your own groups on "my profile"** (`profileSections`): an application adds groups (its own phone number with its own endpoint, dealer and location, preferences) among the built-in ones. Each has an `id` (one lowercase word), a `component` that renders its own `FormGroup`s (rows, a header, a footer; `ActionRow`, exported from the same entry, is the row that opens something) so it reads like the built-in groups, gets the loaded `profile` as a prop and may emit `updated` with a changed profile, an optional `visible(profile)`, and a place: `after` or `before` one of `details`, `email`, `password`, `sessions`, `signins`. Without a place it goes to the end; sections with the same place keep the order given (see the example below).
+
+While somebody is signed in as another person, the account menu has a **Return to my account** row (the same way out as the banner's button; a shell without an account menu shows only the banner).
 
 Names of the people who did things (who signed in as the person, who changed their account) are not in go-core's rows, only ids: the screens ask for them one by one, and only for someone who may see people. Without a name a row says "Somebody else".
 
@@ -53,6 +57,7 @@ Names of the people who did things (who signed in as the person, who changed the
 // What an application can leave out, link to, or add.
 import type { PersonSection } from "@wssto2/vue-core/identity";
 import { usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import { FormGroup, FormRow } from "@wssto2/vue-core/form";
 import { h } from "vue";
 
 // Only "my profile": no users list, no record.
@@ -78,6 +83,15 @@ export const withRoles = usersFeature({ sections: [roles] });
 
 // The Activity section names the application's areas (the keys the audit records) by its own texts.
 export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm", billing: "areas.billing" } });
+
+// A group of the application's own on "my profile", after the personal details: it renders its own FormGroup and gets the loaded profile.
+const Phone = {
+  props: ["profile"],
+  render(this: { profile: { name: string } }) {
+    return h(FormGroup, { header: "Mobile phone" }, () => h(FormRow, { layout: "setting", label: "Mobile phone", sub: this.profile.name }));
+  },
+};
+export const withPhoneGroup = usersFeature({ profileSections: [{ id: "phone", component: Phone, after: "details", visible: (profile) => profile.id !== 0 }] });
 ```
 
 - The paths are fixed (`/users`, `/profile`) and so are the route names; link by `usersRoutes` and `profileRoutes`.

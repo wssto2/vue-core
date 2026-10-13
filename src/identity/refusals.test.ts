@@ -50,7 +50,9 @@ describe("field errors from the server land on the fields", () => {
 
   it("of the password, under the field the server names", async () => {
     await mine({ "PUT /v1/iam/profile/password": fields({ current_password: "identity.password.wrong" }) });
-    const panel = within(document.querySelector("[data-profile-password]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-change-password] button") as HTMLElement);
+    await settle();
+    const panel = within(screen.getByRole("dialog"));
     await fireEvent.update(panel.getByLabelText(/^Current password/), "wrong");
     await fireEvent.update(panel.getByLabelText(/^New password/), "a new long password");
     await fireEvent.update(panel.getByLabelText(/^Repeat new password/), "a new long password");
@@ -61,7 +63,7 @@ describe("field errors from the server land on the fields", () => {
 
   it("of the e-mail change: a wrong password, and an address that is taken", async () => {
     await mine({ "POST /v1/iam/profile/email": fields({ current_password: "identity.password.wrong", email: "identity.email.taken" }) });
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     const dialog = within(screen.getByRole("dialog"));
     await fireEvent.update(dialog.getByLabelText(/^New e-mail address/), "ivan@example.test");
@@ -75,7 +77,9 @@ describe("field errors from the server land on the fields", () => {
 describe("a refusal of the whole action says its reason", () => {
   it("when too many wrong passwords lock re-confirmation, with the time of day", async () => {
     await mine({ "PUT /v1/iam/profile/password": refusal(400, "identity.reauth.locked", { params: { retry_after: 900, locked_until: "2026-10-03T14:35:00Z" } }) });
-    const panel = within(document.querySelector("[data-profile-password]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-change-password] button") as HTMLElement);
+    await settle();
+    const panel = within(screen.getByRole("dialog"));
     await fireEvent.update(panel.getByLabelText(/^Current password/), "wrong");
     await fireEvent.update(panel.getByLabelText(/^New password/), "a new long password");
     await fireEvent.update(panel.getByLabelText(/^Repeat new password/), "a new long password");
@@ -119,7 +123,7 @@ describe("a refusal of the whole action says its reason", () => {
       "POST /v1/iam/profile/email": dataOf(pending()),
       "POST /v1/iam/profile/email/confirm": jsonResponse(422, { success: false, error: "x", code: "identity.code.mismatch", params: { attempts_left: 4 } }),
     });
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^New e-mail address/), "new@example.test");
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^Current password/), "my password");
@@ -135,7 +139,7 @@ describe("a refusal of the whole action says its reason", () => {
       "POST /v1/iam/profile/email": dataOf(pending()),
       "POST /v1/iam/profile/email/confirm": fields({ email: "identity.email.taken" }),
     });
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^New e-mail address/), "new@example.test");
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^Current password/), "my password");
@@ -167,7 +171,10 @@ describe("unsaved work is not lost by accident", () => {
 
   it("on the profile's details, and leaving goes through once they are discarded", async () => {
     const { application } = await mine();
-    await fireEvent.update(screen.getByLabelText(/Full name/), "Someone else");
+    // The details are edited in a sheet: the unsaved edits are the sheet's, and leaving the page asks about them.
+    await fireEvent.click(document.querySelector("[data-profile-details] [data-test='group-edit']") as HTMLElement);
+    await settle();
+    await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/Full name/), "Someone else");
     const going = leave(application);
     expect(await screen.findByText("Unsaved changes")).toBeTruthy();
     await settle();

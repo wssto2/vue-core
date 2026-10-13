@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { Panel } from "../../content";
 import type { SignInView } from "../../modules/identity/entities";
 import { identityRoutes } from "../../modules/identity/routes";
 import { usePlatform } from "../../platform";
 import { AsyncSection, useLoad } from "../../state";
 import PageBar from "../shared/PageBar.vue";
-import SignInTable from "../shared/SignInTable.vue";
+import SignInList from "../shared/SignInList.vue";
 import ViewTabs from "../shared/ViewTabs.vue";
 
 /**
@@ -21,7 +20,7 @@ const view = ref<SignInView>("all");
 const page = ref(1);
 
 const history = useLoad(async ({ signal }) => (await http.request(identityRoutes.profileSignins, { view: view.value, page: page.value, per_page: 20 }, { signal })).data);
-// A new view starts at its first page; a new page or view replaces the rows when it arrives: the table and the pager stay on screen meanwhile.
+// A new view starts at its first page; a new page or view replaces the rows when it arrives: the tabs and the pager stay on screen meanwhile.
 watch(view, () => {
   page.value = 1;
   void history.reload();
@@ -30,14 +29,16 @@ watch(page, () => void history.reload());
 </script>
 
 <template>
-  <Panel :title="t('core.profile.signins.title')" icon="timeFill" flush data-profile-signins>
-    <div class="px-3 pt-3"><ViewTabs v-model="view" :views="SIGNIN_VIEWS" :counts="history.data.value?.meta?.views" :label-of="(key) => t(`core.account.signins.views.${key}`)" :label="t('core.profile.signins.title')" /></div>
+  <div class="flex min-w-0 flex-col gap-group-gap" data-profile-signins>
     <AsyncSection :state="history.state.value" :skeleton-rows="4" :is-empty="() => false" @retry="history.reload()">
       <template #default="{ value }">
-        <div class="px-3 pt-3"><SignInTable :rows="value.data" /></div>
-        <div class="py-3"><PageBar v-model:page="page" :last-page="value.last_page" :total="value.total" /></div>
-        <p class="px-4 pb-3 text-footnote text-content-muted">{{ t("core.profile.signins.footer") }}</p>
+        <SignInList :rows="value.data" :header="t('core.profile.signins.title')" :footer="t('core.profile.signins.footer')">
+          <template #header-trailing>
+            <ViewTabs v-model="view" :views="SIGNIN_VIEWS" :counts="history.data.value?.meta?.views" :label-of="(key) => t(`core.account.signins.views.${key}`)" :label="t('core.profile.signins.title')" />
+          </template>
+        </SignInList>
+        <PageBar v-model:page="page" :last-page="value.last_page" :total="value.total" />
       </template>
     </AsyncSection>
-  </Panel>
+  </div>
 </template>

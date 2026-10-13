@@ -33,11 +33,11 @@ const format = useFormat();
     <FormRow v-for="session in props.sessions" :key="session.id" layout="setting" :label="session.device || t('core.account.sessions.unknown_device')" :data-session="session.id">
       <template #leading><IconTile tone="anchor" icon="deviceLine" /></template>
       <template #sub>
-        <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+        <span class="flex flex-col gap-y-0.5 md:flex-row md:flex-wrap md:items-center md:gap-x-1.5" data-session-facts>
           <span v-if="session.ip" class="font-mono">{{ session.ip }}</span>
-          <span v-if="session.ip" aria-hidden="true">·</span>
+          <span v-if="session.ip" aria-hidden="true" class="hidden md:inline">·</span>
           <span>{{ t("core.account.sessions.last_active", { when: format.dateTime(session.last_used_at) }) }}</span>
-          <span aria-hidden="true">·</span>
+          <span aria-hidden="true" class="hidden md:inline">·</span>
           <span>{{ t("core.account.sessions.expires", { when: format.dateTime(session.expires_at) }) }}</span>
         </span>
         <span v-if="session.current || session.opened_by" class="mt-1 flex flex-wrap gap-1">
@@ -46,9 +46,11 @@ const format = useFormat();
             {{ session.opened_by.name ? t("core.account.sessions.opened_by", { name: session.opened_by.name }) : t("core.account.sessions.opened_by_other") }}
           </Badge>
         </span>
+        <!-- Under the facts on compact; the row's trailing action from md up (below). -->
+        <Button v-if="props.canEnd && !session.current" prominence="plain" tone="critical" size="sm" class="mt-1 -ml-2 md:hidden" :data-end-session-inline="session.id" @click="emit('end', session)">{{ t("core.account.sessions.end") }}</Button>
       </template>
       <template v-if="props.canEnd && !session.current" #trailing>
-        <Button prominence="plain" tone="critical" size="sm" :data-end-session="session.id" @click="emit('end', session)">{{ t("core.account.sessions.end") }}</Button>
+        <Button prominence="plain" tone="critical" size="sm" class="hidden md:inline-flex" :data-end-session="session.id" @click="emit('end', session)">{{ t("core.account.sessions.end") }}</Button>
       </template>
     </FormRow>
   </FormGroup>

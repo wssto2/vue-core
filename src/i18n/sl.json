@@ -522,7 +522,8 @@
           "not_found": "Ta naprava ni več prijavljena."
         },
         "locale": {
-          "invalid": "Ta jezik ni podprt."
+          "invalid": "Ta jezik ni podprt.",
+          "unsupported": "Ta jezik ni na voljo za vaš račun."
         },
         "impersonation": {
           "disabled": "Prijava kot druga oseba ni omogočena.",
@@ -626,7 +627,8 @@
         "banner": "Prijavljeni ste kot {name}. Vse, kar tukaj storite, se stori v njihovem imenu.",
         "banner_short": "Prijavljeni ste kot {name}",
         "return": "Nazaj na moj račun",
-        "sign_in_as": "Prijavi se kot {name}"
+        "sign_in_as": "Prijavi se kot {name}",
+        "sign_in_as_failed": "Ne morete se prijaviti kot {name}."
       }
     },
     "users": {
@@ -865,7 +867,6 @@
       "details": {
         "title": "Osebni podatki",
         "login_hint": "Uporabniško ime lahko spremeni samo skrbnik.",
-        "submit": "Shrani podatke",
         "saved": "Osebni podatki so shranjeni"
       },
       "email": {
@@ -902,7 +903,8 @@
         "show": "Pokaži gesla",
         "hide": "Skrij gesla",
         "submit": "Spremeni geslo",
-        "changed": "Geslo je spremenjeno. Odjavljeni ste na drugih napravah."
+        "changed": "Geslo je spremenjeno. Odjavljeni ste na drugih napravah.",
+        "row_sub": "Vse vaše druge naprave bodo odjavljene."
       },
       "sessions": {
         "title": "Seje",

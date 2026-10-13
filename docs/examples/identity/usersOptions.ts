@@ -1,6 +1,7 @@
 // What an application can leave out, link to, or add.
 import type { PersonSection } from "@wssto2/vue-core/identity";
 import { usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import { FormGroup, FormRow } from "@wssto2/vue-core/form";
 import { h } from "vue";
 
 // Only "my profile": no users list, no record.
@@ -26,3 +27,12 @@ export const withRoles = usersFeature({ sections: [roles] });
 
 // The Activity section names the application's areas (the keys the audit records) by its own texts.
 export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm", billing: "areas.billing" } });
+
+// A group of the application's own on "my profile", after the personal details: it renders its own FormGroup and gets the loaded profile.
+const Phone = {
+  props: ["profile"],
+  render(this: { profile: { name: string } }) {
+    return h(FormGroup, { header: "Mobile phone" }, () => h(FormRow, { layout: "setting", label: "Mobile phone", sub: this.profile.name }));
+  },
+};
+export const withPhoneGroup = usersFeature({ profileSections: [{ id: "phone", component: Phone, after: "details", visible: (profile) => profile.id !== 0 }] });

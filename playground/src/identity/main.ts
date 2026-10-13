@@ -23,11 +23,13 @@ import { createPlatform, parseBootstrap } from "@wssto2/vue-core/platform";
 import { backofficeShell } from "@wssto2/vue-core/shell";
 import { createWebHashHistory } from "vue-router";
 import "../app.css";
+import { themeFeature } from "../app/features/theme/feature";
 import { shellIcons } from "../app/icons";
 import { appIcons } from "../icons";
 import { accessFeatures } from "./access";
 import { permissionMessages } from "./permissions";
 import { homeFeature } from "./home";
+import PhonePanel from "./PhonePanel.vue";
 import { rolesSection } from "./rolesSection";
 
 const platform = createPlatform({
@@ -40,10 +42,11 @@ void createApplication({
   shell: backofficeShell(),
   features: [
     identityFeature(),
-    usersFeature({ sections: [rolesSection], activityAreas: { crm: "areas.crm" } }),
+    usersFeature({ sections: [rolesSection], profileSections: [{ id: "phone", component: PhonePanel, after: "details" }], activityAreas: { crm: "areas.crm" } }),
     // The dev server's categories: its seeded notifications, and the module's own test one.
     notificationsFeature({ categories: { "devserver.sample": { icon: "user3Line", hue: "blue" }, "system.test": { icon: "checkCircle", hue: "teal" } } }),
     homeFeature,
+    themeFeature, // dark mode switch in the account menu
     ...accessFeatures,
   ],
   router: { history: createWebHashHistory() },
