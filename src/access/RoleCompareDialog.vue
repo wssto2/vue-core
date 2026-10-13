@@ -8,7 +8,7 @@ import { useAccessApi } from "./api";
 import { useAccessLabels } from "./labels";
 
 /**
- * *Compare with a predefined role*: what a custom role holds that the other does not, what it lacks, and where the whose
+ * *Compare with another role* (any the actor may view, the standard ones too): what a custom role holds that the other does not, what it lacks, and where the whose
  * differs. The way to see how far a copy has drifted before replacing it.
  */
 const props = defineProps<{ role: Role; others: readonly RoleSummary[] }>();

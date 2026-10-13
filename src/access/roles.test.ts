@@ -92,6 +92,22 @@ describe("a role's page", () => {
     expect(screen.getByText("Nobody has this role now.")).toBeTruthy();
   });
 
+  it("compares a predefined role with any other, the server answering for the standard one", async () => {
+    running = await startAccess(
+      { "GET /v1/iam/roles/seller": data(seller), "GET /v1/iam/roles/seller/holders": data({ holders: [] }), "GET /v1/iam/roles": data({ roles: [sellerRow, supportRow] }), "GET /v1/iam/roles/seller/compare": data({ only_in_role: [], only_in_other: [], different: [] }) },
+      all,
+      "/iam/roles/seller",
+    );
+    await findTest("role-predefined-note");
+    await fireEvent.click(screen.getAllByRole("button", { name: /^More/ })[0] as HTMLElement);
+    expect(screen.queryByRole("menuitem", { name: "Replace" })).toBeNull();
+    await fireEvent.click(await screen.findByRole("menuitem", { name: "Compare with another role" }));
+    const dialog = await findTest("role-compare");
+    await choose("Other role", "Support");
+    expect(await within(dialog).findByText("The roles do not differ.")).toBeTruthy();
+    expect(running.calls.some((call) => call.url.includes("/roles/seller/compare?with=7"))).toBe(true);
+  });
+
   it("switches on what a loaded role lacks of what its permissions need, and says so", async () => {
     const lacking = role({ ...support, grants: [{ permission: "crm.customer:update", qualifier: "own" }] });
     running = await startAccess(server({ "GET /v1/iam/roles/7": data(lacking) } as never), all, "/iam/roles/7");
@@ -137,18 +153,29 @@ describe("a custom role's actions", () => {
     await fireEvent.click(await screen.findByRole("menuitem", { name: action }));
   };
 
-  it("compares it with a predefined role", async () => {
+  it("compares it with another role", async () => {
     running = await startAccess(
       server({ "GET /v1/iam/roles/7/compare": data({ only_in_role: [{ permission: "crm.customer:view", qualifier: "own" }], only_in_other: [{ permission: "crm.lead:view", qualifier: "all" }], different: [] }) }),
       all,
       "/iam/roles/7",
     );
-    await openAction("Compare with a predefined role");
+    await openAction("Compare with another role");
     const dialog = await findTest("role-compare");
-    await choose("Predefined role", "Seller");
+    await choose("Other role", "Seller");
     expect(await within(dialog).findByText("Only in this role (1)")).toBeTruthy();
-    expect(within(dialog).getByText("Only in the predefined role (1)")).toBeTruthy();
+    expect(within(dialog).getByText("Only in the other role (1)")).toBeTruthy();
     expect(running.calls.some((call) => call.url.includes("/compare?with=seller"))).toBe(true);
+  });
+
+  it("offers every other role in the compare dialog, custom ones too, and never the role itself", async () => {
+    const other = summary({ ref: "9", id: 9, name: "Night shift" });
+    running = await startAccess(server({ "GET /v1/iam/roles": data({ roles: [sellerRow, supportRow, other] }) }), all, "/iam/roles/7");
+    await openAction("Compare with another role");
+    await findTest("role-compare");
+    const named = [...document.querySelectorAll("label")].find((element) => element.textContent?.trim().startsWith("Other role"));
+    (named?.htmlFor ? document.getElementById(named.htmlFor) : null)?.click();
+    const options = (await screen.findAllByRole("option")).map((element) => element.textContent?.trim());
+    expect(options).toEqual(["Seller", "Night shift"]);
   });
 
   it("replaces it with a predefined role, saying how many people move", async () => {

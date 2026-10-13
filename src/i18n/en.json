@@ -69,17 +69,17 @@
         "organization": "Organization"
       },
       "compare": {
-        "action": "Compare with a predefined role",
-        "title": "Comparison with a predefined role",
-        "footer": "Shows how far the custom role has moved from the predefined one.",
-        "with": "Predefined role",
+        "action": "Compare with another role",
+        "title": "Comparison with another role",
+        "footer": "Shows how far the two roles differ.",
+        "with": "Other role",
         "loading": "Comparing…",
         "failed": "The comparison failed. Try again.",
         "identical": "The roles do not differ.",
         "only_in_role": "Only in this role ({count})",
-        "only_in_other": "Only in the predefined role ({count})",
+        "only_in_other": "Only in the other role ({count})",
         "different": "Different whose records ({count})",
-        "whose": "{role}, predefined: {other}"
+        "whose": "{role}, other: {other}"
       },
       "replace": {
         "action": "Replace",

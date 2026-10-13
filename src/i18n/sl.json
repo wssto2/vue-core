@@ -69,17 +69,17 @@
         "organization": "Organizacija"
       },
       "compare": {
-        "action": "Primerjaj s standardno vlogo",
-        "title": "Primerjava s standardno vlogo",
-        "footer": "Pokaže, koliko se je prilagojena vloga oddaljila od standardne.",
-        "with": "Standardna vloga",
+        "action": "Primerjaj z drugo vlogo",
+        "title": "Primerjava z drugo vlogo",
+        "footer": "Pokaže, v čem se vlogi razlikujeta.",
+        "with": "Druga vloga",
         "loading": "Primerjam …",
         "failed": "Primerjava ni uspela. Poskusite znova.",
         "identical": "Vlogi se ne razlikujeta.",
         "only_in_role": "Samo v tej vlogi ({count})",
-        "only_in_other": "Samo v standardni ({count})",
+        "only_in_other": "Samo v drugi ({count})",
         "different": "Drugače čigave zapise vidi ({count})",
-        "whose": "{role}, standardna: {other}"
+        "whose": "{role}, druga: {other}"
       },
       "replace": {
         "action": "Zamenjaj",

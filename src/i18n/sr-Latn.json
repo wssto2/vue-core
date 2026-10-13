@@ -69,17 +69,17 @@
         "organization": "Organizacija"
       },
       "compare": {
-        "action": "Uporedi sa standardnom ulogom",
-        "title": "Poređenje sa standardnom ulogom",
-        "footer": "Pokazuje koliko se prilagođena uloga udaljila od standardne.",
-        "with": "Standardna uloga",
+        "action": "Uporedi sa drugom ulogom",
+        "title": "Poređenje sa drugom ulogom",
+        "footer": "Pokazuje u čemu se dve uloge razlikuju.",
+        "with": "Druga uloga",
         "loading": "Upoređujem…",
         "failed": "Poređenje nije uspelo. Pokušajte ponovo.",
         "identical": "Uloge se ne razlikuju.",
         "only_in_role": "Samo u ovoj ulozi ({count})",
-        "only_in_other": "Samo u standardnoj ({count})",
+        "only_in_other": "Samo u drugoj ({count})",
         "different": "Različito čije zapise vidi ({count})",
-        "whose": "{role}, standardna: {other}"
+        "whose": "{role}, druga: {other}"
       },
       "replace": {
         "action": "Zameni",

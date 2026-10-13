@@ -36,18 +36,20 @@ const api = useAccessApi();
 const role = useRouteResource<Role, string>({ param: "ref", parse: (raw) => (raw === "" ? null : raw), identify: (value) => value.ref, load: (ref, { signal }) => api.role(ref, { signal }) });
 const holders = useResource({ for: role, load: (ref, { signal }) => api.holders(ref, { signal }) });
 
-const others = ref<readonly RoleSummary[]>([]);
+const roles = ref<readonly RoleSummary[]>([]);
+// Compare takes any other role the actor may view, the standard ones included; Replace only a predefined one.
+const comparable = computed(() => roles.value.filter((candidate) => candidate.ref !== role.data.value?.ref));
+const replaceable = computed(() => roles.value.filter((candidate) => candidate.predefined));
 const compareDialog = useTemplateRef<{ present: () => void }>("compareDialog");
 const replaceDialog = useTemplateRef<{ present: () => void }>("replaceDialog");
 const deleteDialog = useTemplateRef<{ present: (subject: Role) => void }>("deleteDialog");
 
 const isCustom = (value: Role) => !value.predefined && !value.computed;
 
-// Compare and Replace offer every predefined role a custom one can become (the computed ones included); the server decides what may be given.
 async function withOthers(open: () => void) {
-  if (others.value.length === 0) {
+  if (roles.value.length === 0) {
     try {
-      others.value = (await api.roles()).filter((candidate) => candidate.predefined);
+      roles.value = await api.roles();
     } catch (error) {
       toast.error(describeError(error));
       return;
@@ -61,8 +63,8 @@ const actions = computed<PageAction[]>(() => {
   if (!value) return [];
   const list: PageAction[] = [];
   if (access.can(accessPermissions.manageRoles)) list.push({ id: "copy", label: t("core.access.copy"), icon: "copy", placement: "secondary", onClick: () => void router.push({ ...accessPages.newRole, query: { copy: value.ref } }) });
+  list.push({ id: "compare", label: t("core.access.compare.action"), icon: "swapBoxLine", placement: "overflow", onClick: () => void withOthers(() => compareDialog.value?.present()) });
   if (isCustom(value) && access.can(accessPermissions.manageRoles)) {
-    list.push({ id: "compare", label: t("core.access.compare.action"), icon: "swapBoxLine", placement: "overflow", onClick: () => void withOthers(() => compareDialog.value?.present()) });
     list.push({ id: "replace", label: t("core.access.replace.action"), icon: "refreshLine", placement: "overflow", onClick: () => void withOthers(() => replaceDialog.value?.present()) });
   }
   if (isCustom(value) && access.can(accessPermissions.deleteRoles)) list.push({ id: "delete", label: t("core.access.delete.action"), icon: "deleteBin2Line", placement: "overflow", tone: "critical", onClick: () => deleteDialog.value?.present(value) });
@@ -104,9 +106,9 @@ const deleteFailed = (error: unknown) => toast.error(describeError(error, { fall
           </template>
         </AsyncSection>
 
+        <RoleCompareDialog ref="compareDialog" :role="record" :others="comparable" />
         <template v-if="isCustom(record)">
-          <RoleCompareDialog ref="compareDialog" :role="record" :others="others" />
-          <ReplaceRoleDialog ref="replaceDialog" :role="record" :others="others" @replaced="role.reload(); holders.reload()" />
+          <ReplaceRoleDialog ref="replaceDialog" :role="record" :others="replaceable" @replaced="role.reload(); holders.reload()" />
           <AlertDialog ref="deleteDialog" tone="critical" :title="t('core.access.delete.title')" :message="t('core.access.delete.body', { name: labels.roleName(record) })"
             :confirm-label="t('core.access.delete.action')" :action="remove" @failed="deleteFailed" />
         </template>
