@@ -26,3 +26,7 @@ export const withRoles = usersFeature({ sections: [roles] });
 
 // The Activity section names the application's areas (the keys the audit records) by its own texts.
 export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm", billing: "areas.billing" } });
+
+// A panel of the application's own on "my profile", after the personal details; it gets the loaded profile.
+const Phone = { props: ["profile"], render() { return h("p", `Phone of ${(this as unknown as { profile: { name: string } }).profile.name}`); } };
+export const withPhonePanel = usersFeature({ profileSections: [{ id: "phone", component: Phone, after: "details", visible: (profile) => profile.id !== 0 }] });

@@ -23,6 +23,7 @@ import { createPlatform, parseBootstrap } from "@wssto2/vue-core/platform";
 import { backofficeShell } from "@wssto2/vue-core/shell";
 import { createWebHashHistory } from "vue-router";
 import "../app.css";
+import { themeFeature } from "../app/features/theme/feature";
 import { shellIcons } from "../app/icons";
 import { appIcons } from "../icons";
 import { accessFeatures } from "./access";
@@ -45,6 +46,7 @@ void createApplication({
     // The dev server's categories: its seeded notifications, and the module's own test one.
     notificationsFeature({ categories: { "devserver.sample": { icon: "user3Line", hue: "blue" }, "system.test": { icon: "checkCircle", hue: "teal" } } }),
     homeFeature,
+    themeFeature, // dark mode switch in the account menu
     ...accessFeatures,
   ],
   router: { history: createWebHashHistory() },

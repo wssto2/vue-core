@@ -44,6 +44,10 @@ Install it for everyone: the server's permission catalogue decides who sees what
 
 **My profile** (`/profile`, route `profile`, no permission) and its entry in the account menu: name and phone; the e-mail address, changed in two steps (the new address and the current password, then the six-digit code mailed to the new address; **Resend** waits for the cooldown the server names, a change that waits for its code can be resumed or cancelled from the page, and an address taken in the meantime sends the person back to the address with the reason on the field); the password (current, new, repeated; every other session ends); the devices (this one marked, the others can be signed out); and the sign-in history (**All / Failed**). Rows carry who did it as `{ id, name }` (go-core `PersonRef`), so no screen looks people up; a person who is gone has an empty name and reads as "somebody else".
 
+**Your own panels on "my profile"** (`profileSections`): an application adds panels (its own phone number with its own endpoint, dealer and location, preferences) next to the built-in ones. Each has an `id` (one lowercase word), a `component` that gets the loaded `profile` as a prop and may emit `updated` with a changed profile, an optional `visible(profile)`, and a place: `after` or `before` one of `details`, `email`, `password`, `sessions`, `signins`. The section joins that panel's column (details and e-mail on the left, password on the right, sessions and sign-ins full width); without a place it goes to the end. Sections with the same place keep the order given (see the example below).
+
+While somebody is signed in as another person, the account menu has a **Return to my account** row (the same way out as the banner's button; a shell without an account menu shows only the banner).
+
 Names of the people who did things (who signed in as the person, who changed their account) are not in go-core's rows, only ids: the screens ask for them one by one, and only for someone who may see people. Without a name a row says "Somebody else".
 
 ## Opting out, linking, adding
@@ -78,6 +82,10 @@ export const withRoles = usersFeature({ sections: [roles] });
 
 // The Activity section names the application's areas (the keys the audit records) by its own texts.
 export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm", billing: "areas.billing" } });
+
+// A panel of the application's own on "my profile", after the personal details; it gets the loaded profile.
+const Phone = { props: ["profile"], render() { return h("p", `Phone of ${(this as unknown as { profile: { name: string } }).profile.name}`); } };
+export const withPhonePanel = usersFeature({ profileSections: [{ id: "phone", component: Phone, after: "details", visible: (profile) => profile.id !== 0 }] });
 ```
 
 - The paths are fixed (`/users`, `/profile`) and so are the route names; link by `usersRoutes` and `profileRoutes`.
