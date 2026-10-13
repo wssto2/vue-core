@@ -5,7 +5,7 @@ import { createMemoryHistory } from "vue-router";
 import { createApplication, defineFeature, type Application } from "../app";
 import { createPlatform, parseBootstrap } from "../platform";
 import { backofficeShell } from "../shell";
-import { jsonResponse, routedTransport, settle, type RecordedCall } from "../testing";
+import { jsonResponse, routedTransport, settle, type Answer, type RecordedCall } from "../testing";
 import fixture from "../../test-data/go-core/session_payload.json";
 import { identityFeature } from "./feature";
 import { identityPlatform } from "./session";
@@ -38,7 +38,7 @@ const payloadOf = (id: number, name: string, extra: object = {}, permissions: st
 const Draft = defineComponent({ setup: () => { const text = ref(""); return () => h("input", { "data-draft": "", value: text.value, onInput: (e: Event) => (text.value = (e.target as HTMLInputElement).value) }); } });
 const Person = defineComponent({ render: () => h(SignInAsButton, { userId: 2, name: "Ivan", permission: "iam.user:impersonate" }) });
 
-async function start(initial: ReturnType<typeof payloadOf>, location = "/draft", own = initial) {
+async function start(initial: ReturnType<typeof payloadOf>, location = "/draft", own = initial, answers: Record<string, Answer> = {}) {
   const server = { me: initial as ReturnType<typeof payloadOf> | null, refresh: false };
   const { transport, calls } = routedTransport({
     "GET /api/v1/auth/me": () => (server.me ? jsonResponse(200, server.me) : jsonResponse(401, { success: false, error: "no", code: "identity.session.invalid" })),
@@ -53,6 +53,7 @@ async function start(initial: ReturnType<typeof payloadOf>, location = "/draft",
     "POST /api/v1/auth/login-as": () => (server.me === null ? jsonResponse(401, { success: false, error: "no", code: "identity.session.invalid" }) : ((server.me = payloadOf(2, "Ivan", { impersonator: { id: 1, name: "Ana" } })), jsonResponse(200, server.me))),
     "POST /api/v1/auth/login-as/return": () => ((server.me = own), jsonResponse(200, own)),
     "POST /api/v1/auth/change-locale": jsonResponse(204),
+    ...answers,
   });
   const platform = createPlatform({ config: parseBootstrap({ locale: "en", app_name: "Test", api_base: "/api" }), transport, ...identityPlatform() });
   const history = createMemoryHistory();
@@ -192,5 +193,63 @@ describe("a request that fails because the session ended", () => {
     expect(dialog()).not.toBeNull();
     error.mockRestore();
     dismiss.mockRestore();
+  });
+});
+
+const refused = (status: number, code: string) => jsonResponse(status, { success: false, error: "", code });
+
+describe("a refused sign in as", () => {
+  it.each([
+    [400, "identity.account.inactive", "This account is not active."],
+    [403, "identity.impersonation.disabled", "Signing in as another person is not enabled."],
+    [403, "authz.forbidden", "You are not allowed to make this change in that place."],
+  ])("says why: %s %s", async (status, code, sentence) => {
+    await start(payloadOf(1, "Ana", {}, ["iam.user:impersonate"]), "/person", undefined, { "POST /api/v1/auth/login-as": refused(status, code) });
+    const error = vi.spyOn(toast, "error");
+    await fireEvent.click(screen.getByRole("button", { name: "Sign in as Ivan" }));
+    await settle();
+    expect(error).toHaveBeenCalledWith(sentence);
+    error.mockRestore();
+  });
+
+  it("says a general sentence when the server gives no reason", async () => {
+    await start(payloadOf(1, "Ana", {}, ["iam.user:impersonate"]), "/person", undefined, { "POST /api/v1/auth/login-as": jsonResponse(422, { success: false }) });
+    const error = vi.spyOn(toast, "error");
+    await fireEvent.click(screen.getByRole("button", { name: "Sign in as Ivan" }));
+    await settle();
+    expect(error).toHaveBeenCalledWith("You cannot sign in as Ivan.");
+    error.mockRestore();
+  });
+});
+
+describe("returning to one's own account", () => {
+  it("is a row of the account menu while signed in as somebody else, and does what the banner does", async () => {
+    const { application, calls } = await start(payloadOf(2, "Ivan", { impersonator: { id: 1, name: "Ana" } }), "/draft", payloadOf(1, "Ana"));
+    await fireEvent.click(screen.getByRole("button", { name: /Ivan/ }));
+    await settle();
+    expect(document.querySelector("[data-return-menu-item]")).not.toBeNull();
+    await fireEvent.click(document.querySelector("[data-return-menu-item] button") as HTMLElement);
+    await settle();
+    expect(calls.filter((call) => call.url.endsWith("/auth/login-as/return"))).toHaveLength(1);
+    expect(application.router.currentRoute.value.name).toBe("home");
+  });
+
+  it("is not in the menu in one's own session", async () => {
+    await start(payloadOf(1, "Ana"));
+    await fireEvent.click(screen.getByRole("button", { name: /Ana/ }));
+    await settle();
+    expect(document.querySelector("[data-return-menu-item]")).toBeNull();
+  });
+});
+
+describe("the language switch", () => {
+  it("says so when the server does not support the language, and goes back to the saved one", async () => {
+    const { application } = await start(payloadOf(1, "Ana"), "/draft", undefined, { "POST /api/v1/auth/change-locale": refused(422, "identity.locale.unsupported") });
+    const error = vi.spyOn(toast, "error");
+    await application.setLocale("hr");
+    await settle();
+    expect(error).toHaveBeenCalledWith("Ovaj jezik nije dostupan za vaš korisnički račun.") // said in the language they chose;
+    expect(application.locale.value).toBe("en");
+    error.mockRestore();
   });
 });

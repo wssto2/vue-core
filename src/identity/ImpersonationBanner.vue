@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useTemplateRef, watchEffect } from "vue";
+import { computed, onBeforeUnmount, useTemplateRef, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
 import { Icon } from "../icon";
-import { useDescribeError } from "../i18n";
-import { toast } from "../overlay";
 import { heldSession, usePlatform } from "../platform";
-import { useIdentityContext } from "./context";
-import { isSessionEnded, returnToOwnAccount } from "./signIn";
+import { useReturnToOwnAccount } from "./useReturnToOwnAccount";
 
 /**
  * The strip across the top while somebody is signed in as another person, with the one way out: "Return to my
@@ -15,16 +11,13 @@ import { isSessionEnded, returnToOwnAccount } from "./signIn";
  */
 const { t } = useI18n();
 const platform = usePlatform();
-const router = useRouter();
-const { home } = useIdentityContext();
-const describeError = useDescribeError();
+const { returning, leave } = useReturnToOwnAccount();
 
 const impersonator = computed(() => heldSession(platform.session.state.value)?.impersonator ?? null);
 const name = computed(() => {
   const user = heldSession(platform.session.state.value)?.user as { name?: unknown; login?: unknown; id: number | string } | undefined;
   return typeof user?.name === "string" ? user.name : typeof user?.login === "string" ? user.login : String(user?.id ?? "");
 });
-const returning = ref(false);
 
 // The shell's sidebar gives the banner's height back to the window (`--shell-banner-h`).
 const strip = useTemplateRef<HTMLElement>("strip");
@@ -45,18 +38,6 @@ onBeforeUnmount(() => {
   document.documentElement.style.removeProperty("--shell-banner-h");
 });
 
-async function leave() {
-  returning.value = true;
-  try {
-    await returnToOwnAccount(platform);
-    await router.push(home); // what was on screen belonged to the other person
-  } catch (error) {
-    if (!isSessionEnded(error)) toast.error(describeError(error));
-    void platform.session.refresh(); // the banner may be stale (the impersonation ended elsewhere)
-  } finally {
-    returning.value = false;
-  }
-}
 </script>
 
 <template>

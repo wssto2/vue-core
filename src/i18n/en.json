@@ -504,7 +504,8 @@
           "not_found": "That device is no longer signed in."
         },
         "locale": {
-          "invalid": "This language is not supported."
+          "invalid": "This language is not supported.",
+          "unsupported": "This language is not available for your account."
         },
         "impersonation": {
           "disabled": "Signing in as another person is not enabled.",
@@ -608,7 +609,8 @@
         "banner": "You are signed in as {name}. Everything you do here is done as them.",
         "banner_short": "Signed in as {name}",
         "return": "Return to my account",
-        "sign_in_as": "Sign in as {name}"
+        "sign_in_as": "Sign in as {name}",
+        "sign_in_as_failed": "You cannot sign in as {name}."
       }
     },
     "users": {

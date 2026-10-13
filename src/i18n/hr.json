@@ -504,7 +504,8 @@
           "not_found": "Taj uređaj više nije prijavljen."
         },
         "locale": {
-          "invalid": "Ovaj jezik nije podržan."
+          "invalid": "Ovaj jezik nije podržan.",
+          "unsupported": "Ovaj jezik nije dostupan za vaš korisnički račun."
         },
         "impersonation": {
           "disabled": "Prijava kao druga osoba nije omogućena.",
@@ -608,7 +609,8 @@
         "banner": "Prijavljeni ste kao {name}. Sve što ovdje radite, radi se u njihovo ime.",
         "banner_short": "Prijavljeni ste kao {name}",
         "return": "Povratak na moj račun",
-        "sign_in_as": "Prijavi se kao {name}"
+        "sign_in_as": "Prijavi se kao {name}",
+        "sign_in_as_failed": "Ne možete se prijaviti kao {name}."
       }
     },
     "users": {

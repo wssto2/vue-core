@@ -4,6 +4,7 @@ import { defineRoutes } from "../router";
 import { identityContextKey } from "./context";
 import LocaleSync from "./LocaleSync.vue";
 import ImpersonationBanner from "./ImpersonationBanner.vue";
+import ReturnMenuItem from "./ReturnMenuItem.vue";
 import SessionExpiry from "./SessionExpiry.vue";
 import { renewIdentityTokens } from "./session";
 
@@ -36,6 +37,8 @@ export function identityFeature(options: IdentityFeatureOptions = {}): Feature {
       { id: "identity.expiry", slot: "host", component: SessionExpiry, scope: "always" },
       // Not optional either: acting as somebody else must always be visible.
       { id: "identity.impersonation", slot: "banner", component: ImpersonationBanner, scope: "authenticated" },
+      // The same way out in the account menu (a shell without that slot shows only the banner's button).
+      { id: "identity.return", slot: "accountMenu", component: ReturnMenuItem, scope: "authenticated", optional: true, order: -20 },
       { id: "identity.locale", slot: "host", component: LocaleSync, scope: "authenticated", optional: true },
     ],
     effects: [keepSessionAlive({ renew: renewIdentityTokens })],

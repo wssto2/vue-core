@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
+import { isApiError } from "../client";
 import { useApplication } from "../app";
 import { useDescribeError } from "../i18n";
 import { identityRoutes } from "../modules/identity/routes";
@@ -11,7 +12,7 @@ import { isSessionEnded } from "./signIn";
  * Keeps the person's language in step with the server while they are signed in, and renders nothing: the
  * language they saved is applied when the session begins (also after a reload), and a language they choose
  * in the account menu is saved with `change-locale`. A save that fails is said in a toast; the page stays in
- * the language they chose.
+ * the language they chose, except when the server does not support it (`identity.locale.unsupported`): that one goes back to the saved language.
  */
 const { http, session } = usePlatform();
 const application = useApplication();
@@ -36,7 +37,10 @@ watch(application.locale, async (locale) => {
     await http.request(identityRoutes.changeLocale, { locale });
     known = locale;
   } catch (error) {
-    if (!isSessionEnded(error)) toast.error(describeError(error));
+    if (isSessionEnded(error)) return;
+    toast.error(describeError(error));
+    // The server will not keep this language for the account: go back to the one it knows rather than show one that is lost on reload.
+    if (isApiError(error) && error.code === "identity.locale.unsupported" && known !== null) await application.setLocale(known);
   }
 });
 </script>
