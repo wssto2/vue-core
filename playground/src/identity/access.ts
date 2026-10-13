@@ -18,6 +18,11 @@ export const personTarget = routes.person;
 
 // What the dev server's administrator edits: roles (/iam/roles) and who holds them (a person's page). The person `user` sees none of it.
 export const accessFeatures = [
-  accessFeature({ catalogue: permissions, subjectRoute: (subject) => (subject.kind === "user" ? routes.person({ id: subject.id }) : null) }),
+  accessFeature({
+    catalogue: permissions,
+    // The dev server stores this in a role's attrs; its role check refuses "used" with the app-owned code vehicle_kind_conflict.
+    roleConstraints: [{ attribute: "vehiclekind", labelKey: "roles.vehicle_kind", options: [{ value: "new", labelKey: "roles.kind.new" }, { value: "used", labelKey: "roles.kind.used" }] }],
+    problems: { vehicle_kind_conflict: "roles.problems.vehicle_kind_conflict" },
+    subjectRoute: (subject) => (subject.kind === "user" ? routes.person({ id: subject.id }) : null) }),
   defineFeature({ id: "people", routes: routes.records }),
 ];

@@ -10,7 +10,8 @@ const person = computed(() => people.find((candidate) => candidate.id === id.val
 </script>
 
 <template>
-  <AdaptivePageShell :title="person?.name ?? 'Unknown person'" :back="{ label: 'People', to: { name: 'people' } }" width="content">
-    <PersonAccess v-if="person" :subject="{ kind: 'user', id: person.id }" :name="person.name" />
+  <AdaptivePageShell :title="person?.name ?? `Person ${id}`" :back="{ label: 'People', to: { name: 'people' } }" width="content">
+    <!-- A person the server does not reach (or know) answers 404: the screen says so. -->
+    <PersonAccess :subject="{ kind: 'user', id }" :name="person?.name ?? `Person ${id}`" />
   </AdaptivePageShell>
 </template>

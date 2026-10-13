@@ -49,6 +49,6 @@ void createApplication({
   router: { history: createWebHashHistory() },
   icons: [appIcons, shellIcons],
   // The names of the categories on the notification settings page: `notifications.categories.<code>.label`, the code split at its dots.
-  i18n: { messages: { en: { ...permissionMessages.en, areas: { crm: "Customers" }, notifications: { categories: { devserver: { sample: { label: "Playground sample", description: "A sample notification from the dev server" } } } } } } },
+  i18n: { messages: { en: { ...permissionMessages.en, roles: { vehicle_kind: "Vehicles", kind: { new: "New only", used: "Used only" }, problems: { vehicle_kind_conflict: "{permission}: used-only roles are not allowed yet." } }, areas: { crm: "Customers" }, notifications: { categories: { devserver: { sample: { label: "Playground sample", description: "A sample notification from the dev server" } } } } } } },
   locale: { flags: { en: "GB", hr: "HR", sl: "SI" } },
 }).mount("#app");
