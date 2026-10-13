@@ -74,7 +74,47 @@ go-core never holds texts, so the library asks your messages (a name nobody wrot
 | `access.roles.<key>` | the name of a predefined role in the person's language (custom roles show the name they were saved with) |
 | `access.levels.<level>` | the name of a level of your hierarchy (`organization` is provided) |
 
-A role's `attrs` (go-core's constraints on a role, your own business) are shown as marks and kept as they are on save; this library edits none of them.
+## Constraints on a role
+
+A role's `attrs` are go-core's constraints on it, your own business. Attributes the library has no field for are shown as marks and kept as they are on save. `roleConstraints` gives one a field: a choice among its `options`, or none. It is a row in the role editor's *Role* group and a read row on a predefined role's page.
+
+<!-- example: docs/examples/access/roleOptions.ts -->
+```ts
+import { accessFeature } from "@wssto2/vue-core/access";
+import { permissions } from "./permissions";
+
+// A role may be for new vehicles only, used only, or both: stored in the role's `attrs` under the key the permissions declare
+// (`authz.Attributes("vehiclekind")` on the server: one lowercase word). "All" leaves the key out.
+export const access = accessFeature({
+  catalogue: permissions,
+  roleConstraints: [
+    {
+      attribute: "vehiclekind",
+      labelKey: "roles.vehicle_kind",
+      options: [
+        { value: "new", labelKey: "roles.kind.new" },
+        { value: "used", labelKey: "roles.kind.used" },
+      ],
+    },
+  ],
+  // The sentences for the codes of the server's own role check (`access.WithRoleCheck`), as keys of the application's messages.
+  problems: { vehicle_kind_conflict: "roles.problems.vehicle_kind_conflict" },
+});
+
+// roles.problems.vehicle_kind_conflict: "{permission} cannot be given to a role for used vehicles."
+```
+
+- The `attribute` is a key your permissions declare (`authz.Attributes(...)`). go-core requires **a single lowercase word** (`vehiclekind`, not `vehicle_kind`) and refuses a catalogue that breaks it; a key no permission declares is refused on save as `unknown_attribute`.
+- The choice "none" (`core.access.constraints.any`, "All" by default; `anyLabelKey` words it otherwise) **omits the key** from `attrs`, which go-core reads as "allows all". A chosen option is stored as one value.
+- A stored value list the choice cannot show (several values, an unknown one) reads as none and is kept as it is until the person changes that choice.
+
+## When the server refuses a role
+
+A role the server refuses as invalid (`authz.invalid`) carries `params.problems`, objects `{code, permission?, detail?}`. The form's failure area says one sentence per problem, and so do the toasts of the access screens. The library has texts for go-core's own codes (`core.access.problems.<code>`, in every language). For a code of your own role check, `problems` maps the code to a key of your messages (also to reword a built-in one). A text may use `{permission}`, the permission's label, and `{detail}`, the server's detail. A code with no text gets a general sentence that names it (`core.access.problems.unknown`). `useDescribeRefusal()` gives the same sentence for your own error handling.
+
+## Compare, and people out of reach
+
+*Compare* sets a role against any other role the actor may view, standard ones and your own alike, from any role's page; *Replace* still takes a predefined role. A person outside the administrator's reach answers 404 like one that does not exist, and the person's access panel shows the not-found state, not an error.
 
 ## Where a role applies
 
