@@ -86,17 +86,15 @@ async function remove(device: Device) {
             <FormRow v-else layout="setting" :label="device.label" :data-device="device.id">
               <template #leading><IconTile tone="anchor" icon="deviceLine" /></template>
               <template #sub>
-                <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                <span class="flex flex-col gap-0.5">
                   <span>{{ t("core.notifications.settings.devices.last_seen", { when: format.dateTime(device.last_seen_at) }) }}</span>
-                  <template v-if="device.last_success_at"><span aria-hidden="true">·</span><span>{{ t("core.notifications.settings.devices.last_push", { when: format.dateTime(device.last_success_at) }) }}</span></template>
+                  <span v-if="device.last_success_at">{{ t("core.notifications.settings.devices.last_push", { when: format.dateTime(device.last_success_at) }) }}</span>
                 </span>
                 <span v-if="device.endpoint_hash === props.hash || !device.active" class="mt-1 flex flex-wrap gap-1">
                   <Badge v-if="device.endpoint_hash === props.hash" tone="positive" dot data-device-current>{{ t("core.notifications.settings.devices.this_device") }}</Badge>
                   <Badge v-if="!device.active" tone="warning" data-device-disabled>{{ t("core.notifications.settings.devices.disabled") }}</Badge>
                 </span>
-              </template>
-              <template #trailing>
-                <span class="flex flex-wrap justify-end gap-1">
+                <span class="-ml-2 mt-1 flex flex-wrap gap-x-1">
                   <Button prominence="plain" size="sm" data-device-rename @click="startRename(device)">{{ t("core.notifications.settings.devices.rename") }}</Button>
                   <Button prominence="plain" size="sm" :disabled="!device.active" :processing="testing === device.id" data-device-test @click="sendTest(device)">{{ t("core.notifications.settings.devices.test") }}</Button>
                   <Button prominence="plain" tone="critical" size="sm" data-device-remove @click="pending = device; dialog?.present(device)">{{ t("core.notifications.settings.devices.remove") }}</Button>

@@ -992,7 +992,7 @@
           "this_device": "This device",
           "disabled": "Disabled",
           "last_seen": "Last used {when}",
-          "last_push": "last push {when}",
+          "last_push": "Last push {when}",
           "rename": "Rename",
           "test": "Send test",
           "remove": "Remove",

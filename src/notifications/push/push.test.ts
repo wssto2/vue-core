@@ -163,7 +163,7 @@ describe("the devices", () => {
     expect(row(1).textContent).toContain("Browser 1");
     expect(row(1).querySelector("[data-device-current]")).not.toBeNull();
     expect(row(1).textContent).toContain("Last used");
-    expect(row(1).textContent).toContain("last push");
+    expect(row(1).textContent).toContain("Last push");
     expect(row(2).querySelector("[data-device-current]")).toBeNull();
     expect(row(2).querySelector("[data-device-disabled]")).not.toBeNull();
     expect(row(2).querySelector<HTMLButtonElement>("[data-device-test]")!.disabled).toBe(true);

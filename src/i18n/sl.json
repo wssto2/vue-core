@@ -992,7 +992,7 @@
           "this_device": "Ta naprava",
           "disabled": "Izklopljena",
           "last_seen": "Nazadnje uporabljena {when}",
-          "last_push": "zadnje obvestilo {when}",
+          "last_push": "Zadnje obvestilo {when}",
           "rename": "Preimenuj",
           "test": "Pošlji preizkus",
           "remove": "Odstrani",
