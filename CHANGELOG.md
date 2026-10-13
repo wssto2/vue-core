@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.1 — 2026-10-13
+
+One renewal, sessions that do not renew, and the language before the first page. Found by ARV's move to the library's sign-in.
+
+### Changed (no backward compatibility)
+- **`session.renew()`: one renewal for everyone.** The timer, the client's 401 path and an app's own fetch wrapper all call it. Concurrent callers share one in-flight renewal, so go-core's rotating refresh token is presented once (before, a timer and a 401 firing together signed the person out). It resolves `true` when the session goes on and `false` when it ended: a refused or throwing renewal expires the session, `onSessionExpired` runs once.
+- **`createPlatform({ renewable })`**: `() => boolean`, asked each time; false for a session that cannot renew (an embed bearer token with no refresh token). Then `session.renew()` ends the session at once (a 401 does not call `renewSession`) and `keepSessionAlive` stays idle. `session.renewable` reads it. Without `renewSession` a session is not renewable. `identityPlatform({ renewable })` passes it through.
+- **`keepSessionAlive()` takes no `renew` option** and calls `platform.session.renew()`. `renewIdentityTokens` is removed: `identityPlatform()`'s `renewSession` does the refresh. The old "without a renew call it only reads the session again" is gone: a session that renews with a read gives `renewSession` that read (`async (session) => (await session.refresh()).status === "authenticated"`).
+- **The session user's language is applied before the first page.** When the session loads with a user whose `locale` is one the application offers and differs from the active one, `mount()` switches to it (loading its texts) before the first navigation. `LocaleSync` stays for later changes. Mapping the server's code to a locale code is the user parser's job.
+
 ## 0.5.0 — 2026-10-13
 
 The screens for go-core v1.8.0. Web push comes into the library (owner 2026-10-12: push belongs in go-core and vue-core). My profile and the notification settings move to the current grouped-rows look. Apps get their own sections on both pages and their own role settings.
