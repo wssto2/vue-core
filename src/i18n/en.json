@@ -957,8 +957,6 @@
           "summary_off": "Quiet hours are off: e-mail and push are sent as soon as a notification is made.",
           "same": "From and to must be different times.",
           "required": "Choose a time.",
-          "submit": "Save quiet hours",
-          "saved": "Quiet hours saved.",
           "description": "E-mail and push made inside these hours wait until they end."
         },
         "channels": {
@@ -970,8 +968,6 @@
           "title": "This device",
           "on": "On",
           "off": "Off",
-          "on_description": "This browser gets push notifications, even when the app is closed.",
-          "off_description": "Turn push on to be notified on this device even when the app is closed.",
           "enable": "Turn on push",
           "disable": "Turn off push",
           "enabled_toast": "Push is on for this device.",
@@ -984,7 +980,8 @@
           "ios_step_open": "Open the app from the home screen and turn push on here.",
           "denied_title": "Notifications are blocked for this site",
           "denied_help": "Allow notifications for this site in the browser's settings, then reload this page.",
-          "description": "Push notifications reach this browser even when the app is closed."
+          "description": "Push notifications reach this browser even when the app is closed.",
+          "row": "Push on this browser"
         },
         "devices": {
           "title": "Your devices",

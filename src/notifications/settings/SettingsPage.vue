@@ -33,7 +33,7 @@ async function change(category: string, channel: Channel, enabled: boolean) {
 </script>
 
 <template>
-  <AdaptivePageShell :title="t('core.notifications.settings.title')" :description="t('core.notifications.settings.description')" :back="back" width="content">
+  <AdaptivePageShell :title="t('core.notifications.settings.title')" :description="t('core.notifications.settings.description')" :back="back" width="readable">
     <AsyncSection :state="settings.loaded.state.value" :skeleton-rows="6" :is-empty="() => false" @retry="settings.loaded.reload()">
       <template #default="{ value }">
         <SettingsBody :preferences="value" :settings="settings" @change="change" />

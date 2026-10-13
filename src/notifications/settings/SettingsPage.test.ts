@@ -109,30 +109,45 @@ describe("the notification settings page", () => {
     expect(summary).not.toContain("Local");
   });
 
-  it("saves quiet hours in minutes after midnight", async () => {
-    const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: true, start: 1320, end: 360 }) });
-    const panel = within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);
-    const from = panel.getByLabelText("From");
+  const quiet = () => within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);
+  const quietPuts = (calls: Parameters<typeof callsTo>[0]) => callsTo(calls, "PUT", "/v1/notifications/quiet-hours").map((call) => JSON.parse(String(call.init.body)));
+
+  it("has no Save button: a time is saved, in minutes after midnight, when it is committed", async () => {
+    const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: true, start: 1320, end: 420 }) });
+    expect(quiet().queryByRole("button", { name: /Save/ })).toBeNull();
+    const from = quiet().getByLabelText("From");
     await fireEvent.update(from, "22:00");
     await fireEvent.blur(from);
-    const to = panel.getByLabelText("To");
-    await fireEvent.update(to, "06:00");
-    await fireEvent.blur(to);
-    await fireEvent.click(panel.getByRole("button", { name: "Save quiet hours" }));
-    await waitFor(() => expect(callsTo(calls, "PUT", "/v1/notifications/quiet-hours")).toHaveLength(1));
-    expect(JSON.parse(String(callsTo(calls, "PUT", "/v1/notifications/quiet-hours")[0]?.init.body))).toEqual({ enabled: true, start: 1320, end: 360 });
+    await waitFor(() => expect(quietPuts(calls)).toEqual([{ enabled: true, start: 1320, end: 420 }]));
+    await settle();
+    expect(document.querySelector("[data-quiet-summary]")?.textContent).toContain("Between 22:00 and 07:00");
+  });
+
+  it("saves the switch at once", async () => {
+    const { calls } = await open({ "PUT /v1/notifications/quiet-hours": dataOf({ enabled: false, start: 1260, end: 420 }) });
+    await fireEvent.click(quiet().getByRole("switch"));
+    await waitFor(() => expect(quietPuts(calls)).toEqual([{ enabled: false, start: 1260, end: 420 }]));
+    expect(document.querySelector("[data-quiet-summary]")?.textContent).toContain("Quiet hours are off");
+  });
+
+  it("puts the last saved values back and says why when the save fails", async () => {
+    await open({ "PUT /v1/notifications/quiet-hours": refusal(422, "notification.quiet.invalid") });
+    const from = quiet().getByLabelText("From");
+    await fireEvent.update(from, "22:00");
+    await fireEvent.blur(from);
+    await waitFor(() => expect(document.querySelector("[data-quiet-failure]")).not.toBeNull());
+    expect((quiet().getByLabelText("From") as HTMLInputElement).value).toBe("21:00");
+    expect(document.querySelector("[data-quiet-summary]")?.textContent).toContain("Between 21:00 and 07:00");
   });
 
   it("refuses the same time twice on the field, without asking the server", async () => {
     const { calls } = await open();
-    const panel = within(document.querySelector<HTMLElement>("[data-notification-quiet-hours]")!);
-    const to = panel.getByLabelText("To");
+    const to = quiet().getByLabelText("To");
     await fireEvent.update(to, "21:00");
     await fireEvent.blur(to);
-    await fireEvent.click(panel.getByRole("button", { name: "Save quiet hours" }));
     await settle();
-    expect(panel.getByText("From and to must be different times.")).toBeTruthy();
-    expect(callsTo(calls, "PUT", "/v1/notifications/quiet-hours")).toHaveLength(0);
+    expect(quiet().getByText("From and to must be different times.")).toBeTruthy();
+    expect(quietPuts(calls)).toHaveLength(0);
   });
 
   it("has an entry in the account menu that opens it", async () => {

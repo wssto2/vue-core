@@ -56,7 +56,7 @@ async function disable() {
     </FormGroup>
 
     <FormGroup v-else>
-      <FormRow layout="setting" :label="props.device.state.value === 'on' ? t('core.notifications.settings.push.on_description') : t('core.notifications.settings.push.off_description')">
+      <FormRow layout="setting" :label="t('core.notifications.settings.push.row')">
         <Badge :tone="props.device.state.value === 'on' ? 'positive' : 'neutral'" dot>{{ props.device.state.value === "on" ? t("core.notifications.settings.push.on") : t("core.notifications.settings.push.off") }}</Badge>
       </FormRow>
       <ActionRow v-if="props.device.state.value === 'off'" :label="t('core.notifications.settings.push.enable')" :disabled="props.device.busy.value" data-push-enable @click="enable" />

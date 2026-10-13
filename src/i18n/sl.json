@@ -957,8 +957,6 @@
           "summary_off": "Tihe ure so izklopljene: e-pošta in potisna obvestila se pošljejo takoj, ko obvestilo nastane.",
           "same": "Od in do morata biti različna časa.",
           "required": "Izberite čas.",
-          "submit": "Shrani tihe ure",
-          "saved": "Tihe ure so shranjene.",
           "description": "E-pošta in potisna obvestila, ustvarjena v teh urah, počakajo do konca."
         },
         "channels": {
@@ -970,8 +968,6 @@
           "title": "Ta naprava",
           "on": "Vklopljeno",
           "off": "Izklopljeno",
-          "on_description": "Ta brskalnik prejema potisna obvestila, tudi ko je aplikacija zaprta.",
-          "off_description": "Vklopite potisna obvestila, da vas obvestila dosežejo na tej napravi, tudi ko je aplikacija zaprta.",
           "enable": "Vklopi potisna obvestila",
           "disable": "Izklopi potisna obvestila",
           "enabled_toast": "Potisna obvestila so vklopljena na tej napravi.",
@@ -984,7 +980,8 @@
           "ios_step_open": "Odprite aplikacijo z domačega zaslona in tu vklopite potisna obvestila.",
           "denied_title": "Obvestila so za to stran blokirana",
           "denied_help": "V nastavitvah brskalnika dovolite obvestila za to stran in ponovno naložite stran.",
-          "description": "Potisna obvestila dosežejo ta brskalnik, tudi ko je aplikacija zaprta."
+          "description": "Potisna obvestila dosežejo ta brskalnik, tudi ko je aplikacija zaprta.",
+          "row": "Potisna obvestila v tem brskalniku"
         },
         "devices": {
           "title": "Vaše naprave",

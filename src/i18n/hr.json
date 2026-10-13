@@ -957,8 +957,6 @@
           "summary_off": "Tihi sati su isključeni: e-pošta i push šalju se čim obavijest nastane.",
           "same": "Od i do moraju biti različita vremena.",
           "required": "Odaberite vrijeme.",
-          "submit": "Spremi tihe sate",
-          "saved": "Tihi sati su spremljeni.",
           "description": "E-pošta i push nastali u ovo doba čekaju do kraja tihih sati."
         },
         "channels": {
@@ -970,8 +968,6 @@
           "title": "Ovaj uređaj",
           "on": "Uključeno",
           "off": "Isključeno",
-          "on_description": "Ovaj preglednik prima push obavijesti, i kad je aplikacija zatvorena.",
-          "off_description": "Uključite push da vas obavijesti stignu na ovaj uređaj i kad je aplikacija zatvorena.",
           "enable": "Uključi push",
           "disable": "Isključi push",
           "enabled_toast": "Push je uključen na ovom uređaju.",
@@ -984,7 +980,8 @@
           "ios_step_open": "Otvorite aplikaciju s početnog zaslona i ovdje uključite push.",
           "denied_title": "Obavijesti su blokirane za ovu stranicu",
           "denied_help": "Dopustite obavijesti za ovu stranicu u postavkama preglednika pa ponovno učitajte stranicu.",
-          "description": "Push obavijesti stižu u ovaj preglednik i kad je aplikacija zatvorena."
+          "description": "Push obavijesti stižu u ovaj preglednik i kad je aplikacija zatvorena.",
+          "row": "Push na ovom pregledniku"
         },
         "devices": {
           "title": "Vaši uređaji",
