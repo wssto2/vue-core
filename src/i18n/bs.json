@@ -154,6 +154,9 @@
         "unknown_requirement": "{permission} traži dozvolu koja ne postoji.",
         "organization_only": "{permission} se može dati samo za cijelu organizaciju.",
         "unknown": "Uloga nije ispravna ({code})."
+      },
+      "constraints": {
+        "any": "Sve"
       }
     },
     "actions": {

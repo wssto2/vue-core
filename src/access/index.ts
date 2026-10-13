@@ -9,6 +9,7 @@ export { accessPages, personRolesSection } from "./routes";
 export { accessPermissions } from "./context";
 export { dependantsClosure, permissionTree, requiredClosure } from "./catalogue";
 export type { Grants, PermissionCatalogue, PermissionEntry, PermissionGroup, PermissionMeta, PermissionScreen } from "./catalogue";
+export type { RoleConstraint, RoleConstraintOption } from "./constraints";
 export { useAccessLabels } from "./labels";
 export { roleProblems, useDescribeRefusal, useRefusalMessage } from "./refusals";
 export type { RoleProblem } from "./refusals";

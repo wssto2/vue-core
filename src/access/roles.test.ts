@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
 import { jsonResponse, settle } from "../testing";
 import { accessPermissions } from "./context";
+import type { RoleConstraint } from "./constraints";
 import { choose, data, findTest, queryAllTest, queryTest, refusal, role, seller, startAccess, summary, support, type Started } from "./testing";
 
 let running: Started | null = null;
@@ -11,6 +12,7 @@ afterEach(() => {
   document.body.innerHTML = ""; // teleported menus and dialogs outlive their application
 });
 
+const vehicleKind: RoleConstraint = { attribute: "vehicle_kind", labelKey: "roles.vehicle_kind", options: [{ value: "new", labelKey: "roles.kind.new" }, { value: "used", labelKey: "roles.kind.used" }] };
 const sellerRow = summary({ ref: "seller", key: "seller", name: "Seller", predefined: true, permission_count: 1 });
 const supportRow = summary({ ref: "7", id: 7, name: "Support", description: "Answers customers", holders: 2, permission_count: 2 });
 const all = [accessPermissions.viewRoles, accessPermissions.manageRoles, accessPermissions.deleteRoles];
@@ -91,6 +93,26 @@ describe("a role's page", () => {
     await fireEvent.click(screen.getByRole("switch", { name: "View leads" }));
     await fireEvent.click(screen.getByRole("button", { name: "Save role" }));
     expect(await screen.findByText("View leads can only be given for the whole organization. Edit customers: this role mixes vehicle kinds.")).toBeTruthy();
+  });
+
+  it("edits the application's constraint of a role, sent in attrs next to the attributes it has no field for", async () => {
+    let body: { attrs?: unknown } = {};
+    const constrained = role({ ...support, attrs: [{ attribute: "vehicle_kind", values: ["new"] }, { attribute: "region", values: ["north"] }] });
+    const put = (call: { init: RequestInit }) => ((body = JSON.parse(String(call.init.body))), data(constrained));
+    running = await startAccess(server({ "GET /v1/iam/roles/7": data(constrained), "PUT /v1/iam/roles/7": put } as never), all, "/iam/roles/7", { roleConstraints: [vehicleKind] });
+    await screen.findByDisplayValue("Support");
+    expect(within(await findTest("role-constraint-vehicle_kind")).getByText("New only")).toBeTruthy();
+    expect(queryTest("role-attrs")?.textContent).toBe("region: north");
+    await choose("Vehicles", "Used only");
+    await fireEvent.click(screen.getByRole("button", { name: "Save role" }));
+    await waitFor(() => expect(body.attrs).toEqual([{ attribute: "region", values: ["north"] }, { attribute: "vehicle_kind", values: ["used"] }]));
+  });
+
+  it("shows the constraint of a predefined role without letting it change", async () => {
+    const constrained = role({ ...seller, attrs: [{ attribute: "vehicle_kind", values: ["used"] }] });
+    running = await startAccess({ "GET /v1/iam/roles/seller": data(constrained), "GET /v1/iam/roles/seller/holders": data({ holders: [] }) }, all, "/iam/roles/seller", { roleConstraints: [vehicleKind] });
+    expect((await findTest("role-constraint-vehicle_kind")).textContent).toContain("Used only");
+    expect(screen.queryByRole("button", { name: "Save role" })).toBeNull();
   });
 
   it("only reads a predefined role, and offers Copy", async () => {

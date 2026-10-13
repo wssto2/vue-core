@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { FormGroup, FormView, TextareaField, TextField, useForm, useSaveChrome, type FormValidator } from "../form";
+import { FormGroup, FormView, SelectField, TextareaField, TextField, useForm, useSaveChrome, type FormValidator } from "../form";
 import type { Role } from "../modules/access/entities";
 import { toast } from "../overlay";
 import { Badge, Banner } from "../state";
 import { useAccessApi } from "./api";
 import { completeRequired, type Grants } from "./catalogue";
+import { constraintAttrs, constraintChoices } from "./constraints";
 import { accessPermissions, useAccessContext } from "./context";
 import { useAccessLabels } from "./labels";
 import PermissionTree from "./PermissionTree.vue";
@@ -29,7 +30,7 @@ const emit = defineEmits<{ saved: [role: Role] }>();
 
 const { t } = useI18n();
 const labels = useAccessLabels();
-const { catalogue } = useAccessContext();
+const { catalogue, constraints } = useAccessContext();
 const api = useAccessApi();
 const { access } = usePlatform();
 
@@ -37,6 +38,8 @@ interface Draft {
   name: string;
   description: string;
   grants: Grants;
+  /** The choice of each of the application's constraints on the role, "" for none. */
+  constraints: Record<string, string>;
 }
 
 const draftOf = (role: Role | null, source: Role | null | undefined): Draft => {
@@ -45,6 +48,7 @@ const draftOf = (role: Role | null, source: Role | null | undefined): Draft => {
     name: role ? role.name : source ? t("core.access.copy_name", { name: labels.roleName(source) }) : "",
     description: from?.description ?? "",
     grants: Object.fromEntries((from?.grants ?? []).map((grant) => [grant.permission, grant.qualifier as Grants[string]])),
+    constraints: constraintChoices(constraints, from?.attrs ?? []),
   };
 };
 
@@ -84,14 +88,15 @@ const completedNote = computed(() =>
 
 async function save() {
   if (readonly.value) return;
+  const from = props.role ?? props.source;
   const result = await form.submit(
     (draft) => {
       const body = {
         name: draft.name.trim(),
         description: draft.description,
         grants: Object.entries(draft.grants).map(([permission, qualifier]) => ({ permission, qualifier })),
-        // Constraints are the application's own business: kept as the role has them.
-        attrs: (props.role ?? props.source)?.attrs ?? [],
+        // The application's constraints are edited; any other attribute stays as the role has it.
+        attrs: constraintAttrs(constraints, from?.attrs ?? [], draftOf(props.role, props.source).constraints, draft.constraints),
       };
       return props.role ? api.update({ ref: props.role.ref, ...body }) : api.create(body);
     },
@@ -104,7 +109,8 @@ async function save() {
 }
 
 useSaveChrome({ form, label: () => t("core.access.save"), allowed: () => !readonly.value, disabledWhileClean: () => props.role !== null, save: () => void save(), cancel: () => form.reset() });
-const attrs = computed(() => (props.role ?? props.source)?.attrs ?? []);
+// Attributes this editor has no field for are shown as marks.
+const attrs = computed(() => (props.role ?? props.source)?.attrs.filter((attr) => !constraints.some((constraint) => constraint.attribute === attr.attribute)) ?? []);
 defineExpose({ form, save });
 </script>
 
@@ -118,7 +124,11 @@ defineExpose({ form, save });
       <FormGroup :header="t('core.access.groups.role')" :editable="!readonly" label-width="12rem">
         <TextField v-bind="form.bind('name')" :label="t('core.access.fields.name')" :max-length="100" required />
         <TextareaField v-bind="form.bind('description')" :label="t('core.access.fields.description')" :rows="2" :max-length="255" />
-        <!-- The application's own constraints on the role (go-core `attrs`): shown, not edited here. -->
+        <SelectField v-for="constraint in constraints" :key="constraint.attribute" :label="t(constraint.labelKey)" :data-test="`role-constraint-${constraint.attribute}`"
+          :model-value="form.values.constraints[constraint.attribute] ?? ''"
+          :options="[{ value: '', label: t(constraint.anyLabelKey ?? 'core.access.constraints.any') }, ...constraint.options.map((option) => ({ value: option.value, label: t(option.labelKey) }))]"
+          @update:model-value="form.values.constraints[constraint.attribute] = $event" />
+        <!-- Other attributes of the role (go-core `attrs`): shown, not edited here. -->
         <div v-if="attrs.length" class="flex flex-wrap gap-1.5 px-row-inset py-2" data-test="role-attrs">
           <Badge v-for="attr in attrs" :key="attr.attribute" tone="neutral">{{ attr.attribute }}: {{ attr.values.join(", ") }}</Badge>
         </div>

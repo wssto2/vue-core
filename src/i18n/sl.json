@@ -154,6 +154,9 @@
         "unknown_requirement": "{permission} zahteva dovoljenje, ki ne obstaja.",
         "organization_only": "{permission} je mogoče dodeliti samo za celotno organizacijo.",
         "unknown": "Vloga ni veljavna ({code})."
+      },
+      "constraints": {
+        "any": "Vse"
       }
     },
     "actions": {

@@ -3,6 +3,7 @@ import { defineFeature, provideContext, type Feature } from "../app";
 import type { ScopeOptions, SubjectRef } from "../modules/access/entities";
 import type { Destination } from "../router";
 import type { PermissionCatalogue } from "./catalogue";
+import type { RoleConstraint } from "./constraints";
 import { accessContextKey } from "./context";
 import { accessPages } from "./routes";
 
@@ -16,6 +17,14 @@ export interface AccessFeatureOptions {
   subjectRoute?: (subject: SubjectRef) => RouteLocationRaw | null;
   /** The places a person may be given roles at. Default: what the server says (`GET /v1/iam/users/:id/scopes`). */
   scopes?: (subject: SubjectRef, signal: AbortSignal) => Promise<ScopeOptions>;
+  /**
+   * Constraints the application puts on a role, kept in the role's `attrs` (go-core: attribute key -> values). Each is a field in the role
+   * editor and on the role page, one choice among its options or none (no key in `attrs`: allows all). The attribute keys are the ones
+   * the permissions declare, or the server refuses the role (`unknown_attribute`). Attributes not listed here are kept as the role has them.
+   *
+   *   accessFeature({ catalogue, roleConstraints: [{ attribute: "vehicle_kind", labelKey: "roles.vehicle_kind", options: [{ value: "new", labelKey: "roles.kind.new" }, { value: "used", labelKey: "roles.kind.used" }] }] })
+   */
+  roleConstraints?: readonly RoleConstraint[];
   /**
    * The sentence for each problem code the application's own role check reports (`access.WithRoleCheck`), as an i18n key; a text may use
    * `{permission}` (the permission's label, when the problem has one) and `{detail}`. Built-in codes have library texts (`core.access.problems.<code>`);
@@ -43,6 +52,7 @@ export function accessFeature(options: AccessFeatureOptions): Feature {
     context: provideContext(accessContextKey, {
       catalogue: options.catalogue,
       subjectRoute: options.subjectRoute ?? (() => null),
+      constraints: options.roleConstraints ?? [],
       problems: options.problems ?? {},
       scopes: options.scopes ?? null,
     }),

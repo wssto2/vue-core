@@ -2,6 +2,7 @@ import type { RouteLocationRaw } from "vue-router";
 import { defineFeatureContext } from "../platform";
 import type { ScopeOptions, SubjectRef } from "../modules/access/entities";
 import type { PermissionCatalogue } from "./catalogue";
+import type { RoleConstraint } from "./constraints";
 
 /** What the access screens need from the feature that installed them. */
 export interface AccessContext {
@@ -9,6 +10,8 @@ export interface AccessContext {
   /** Where a holder's name leads (their record), or null for a name that is not a link. */
   readonly subjectRoute: (subject: SubjectRef) => RouteLocationRaw | null;
   /** The places `subject` may be given roles at; by default what the server says (`GET /v1/iam/users/:id/scopes`). */
+  /** The application's constraints on a role, edited next to its name and kept in its `attrs`. */
+  readonly constraints: readonly RoleConstraint[];
   /** The i18n key of the sentence for each of the application's own role-problem codes (`authz.invalid`). */
   readonly problems: Readonly<Record<string, string>>;
   readonly scopes: ((subject: SubjectRef, signal: AbortSignal) => Promise<ScopeOptions>) | null;
