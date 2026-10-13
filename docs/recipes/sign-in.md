@@ -27,7 +27,8 @@ void application.mount("#app");
 ## What `identityPlatform()` does
 
 - **Reads the session** from `GET /v1/auth/me`. When that answers 401 (the access token ran out while the app was closed) it swaps the refresh cookie for new tokens once before it decides nobody is signed in, so a returning person is not sent to the sign-in page for nothing. Anything but 401 (a server fault, an unreadable payload) is a failed start, not a signed-out user.
-- **Renews on a 401** while signed in: one refresh, then the session is read again and the failed requests are sent once more. If the refresh is refused the session ends with reason `expired` and the router sends the person to the sign-in page, remembering where they were.
+- **Renews on a 401** while signed in: one refresh, then the session is read again and the failed requests are sent once more. If the refresh is refused the session ends with reason `expired` and the router sends the person to the sign-in page, remembering where they were. Timer and 401 share one refresh (`platform.session.renew()`; an app's own fetch wrapper calls it too).
+- **A session that must not renew**: an embed session (a bearer token with no refresh token) passes `identityPlatform({ renewable: () => false })`. A 401 then ends the session at once, and `keepSessionAlive` stays idle instead of calling `/refresh`.
 - **Ends the session** with `POST /v1/auth/logout` after the before-sign-out hooks; a session that is already over is not an error.
 - The user is go-core's default projection, `IdentityUser` (`id`, `login`, `name`, `email`, `locale`). A server with its own `UserProjector` passes `parseUser`, which must keep the `id` and the `login` (the prompt for an expired session shows it):
 
@@ -54,7 +55,7 @@ export const platform = createPlatform({ config: readBootstrap(), ...identityPla
 ## What `identityFeature()` installs
 
 - **The sign-in page** at `/login` (route name `login`, public, the default of `router.login`): a username and a password, a required-field check before the server is asked, and the server's refusals said under the password in the app's language. After signing in the person goes where they were heading (`?redirect=`), else to `home`.
-- **Session upkeep**: `keepSessionAlive`, renewing shortly before the access token expires and when the app comes back to the foreground.
+- **Session upkeep**: `keepSessionAlive`, renewing shortly before the access token expires and when the app comes back to the foreground. It goes through `platform.session.renew()`, the same single renewal a 401 uses, so a timer and a failed request never refresh twice.
 - **The language**: the language saved on the person is applied when their session begins (also after a reload), and a language chosen in the account menu is saved with `change-locale`. A save that fails is a toast; the page stays in the chosen language. Do not also pass `locale.onChange` for this.
 
 ## Refusals

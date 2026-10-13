@@ -6,7 +6,7 @@ export type * as Inputs from "../modules/identity/schemas";
 export { identityRoutes } from "../modules/identity/routes";
 export { identityFeature } from "./feature";
 export type { IdentityFeatureOptions } from "./feature";
-export { identityPlatform, identitySessionAdapter, renewIdentityTokens } from "./session";
+export { identityPlatform, identitySessionAdapter } from "./session";
 export type { IdentityPlatformOptions } from "./session";
 export { usersFeature } from "./users/feature";
 export type { UsersFeatureOptions } from "./users/feature";

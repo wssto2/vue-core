@@ -18,18 +18,21 @@ afterEach(() => {
 type Renewal = (backend: ReturnType<typeof fakeBackend>["backend"]) => Promise<void>;
 
 async function setup(expiresInMinutes: number | null, options: Parameters<typeof keepSessionAlive>[0] = {}, renewal?: Renewal) {
-  const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: expiresInMinutes === null ? null : new Date(NOW + minutes(expiresInMinutes)) }));
+  // `renew` stands for the platform's `renewSession`: the refresh call, then the session read again.
+  const renew = vi.fn();
+  const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: expiresInMinutes === null ? null : new Date(NOW + minutes(expiresInMinutes)) }), {}, {
+    renewSession: async (session) => {
+      renew();
+      await (renewal
+        ? renewal(backend)
+        : (backend.snapshot = signedIn(1, [], { expiresAt: new Date(Date.now() + minutes(5)) }))); // what a real renewal does: a later expiry
+      return (await session.refresh()).status === "authenticated";
+    },
+  });
   await platform.session.restore();
   const controller = new AbortController();
   const report = vi.fn();
-  const renew = vi.fn(
-    renewal
-      ? () => renewal(backend)
-      : async () => {
-          backend.snapshot = signedIn(1, [], { expiresAt: new Date(Date.now() + minutes(5)) }); // what a real renewal does: a later expiry
-        },
-  );
-  const stop = keepSessionAlive({ renew, ...options }).start({ signal: controller.signal, platform, report, user: { id: 1 } }) as () => void;
+  const stop = keepSessionAlive(options).start({ signal: controller.signal, platform, report, user: { id: 1 } }) as () => void;
   return { platform, backend, controller, report, renew, stop };
 }
 
@@ -124,23 +127,25 @@ describe("keepSessionAlive", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it("reports a failed renewal and keeps going", async () => {
-    const { report, stop } = await setup(0.5, {}, async () => {
+  it("a refused renewal ends the session once, and nothing renews after it", async () => {
+    const { platform, renew, stop } = await setup(0.5, {}, async () => {
       throw new Error("refresh refused");
     });
 
-    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(minutes(10));
 
-    expect(report).toHaveBeenCalledWith(expect.objectContaining({ message: "refresh refused" }));
+    expect(platform.session.state.value).toMatchObject({ status: "anonymous", reason: "expired" });
+    expect(renew).toHaveBeenCalledTimes(1);
     stop();
   });
 
   it("does not read the session back after a renew that ended it (ARV signed straight back in, in a loop)", async () => {
-    const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: new Date(NOW + minutes(0.5)) }));
+    const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: new Date(NOW + minutes(0.5)) }), {}, {
+      renewSession: async (session) => (session.expire(), false), // the refresh was refused; the access token still reads /me fine
+    });
     await platform.session.restore();
     const loads = backend.loads;
-    const renew = async () => platform.session.expire(); // the refresh was refused; the access token still reads /me fine
-    const stop = keepSessionAlive({ renew }).start({ signal: new AbortController().signal, platform, report: vi.fn(), user: { id: 1 } }) as () => void;
+    const stop = keepSessionAlive().start({ signal: new AbortController().signal, platform, report: vi.fn(), user: { id: 1 } }) as () => void;
 
     await vi.advanceTimersByTimeAsync(0);
 
@@ -149,15 +154,19 @@ describe("keepSessionAlive", () => {
     stop();
   });
 
-  it("without a renew call it reads the session again", async () => {
-    const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: new Date(NOW + minutes(2)) }));
+  it("stays idle for a session that is not renewable (an embed token): no renewal, no read, no timer", async () => {
+    const renewSession = vi.fn(async () => true);
+    const { platform, backend } = fakeBackend(signedIn(1, [], { expiresAt: new Date(NOW + minutes(2)) }), {}, { renewSession, renewable: () => false });
     await platform.session.restore();
-    const stop = keepSessionAlive().start({ signal: new AbortController().signal, platform, report: vi.fn(), user: { id: 1 } }) as () => void;
     const loads = backend.loads;
+    const stop = keepSessionAlive().start({ signal: new AbortController().signal, platform, report: vi.fn(), user: { id: 1 } }) as () => void;
 
-    await vi.advanceTimersByTimeAsync(minutes(1.1));
+    await vi.advanceTimersByTimeAsync(minutes(10));
 
-    expect(backend.loads).toBe(loads + 1);
+    expect(renewSession).not.toHaveBeenCalled();
+    expect(backend.loads).toBe(loads);
+    expect(vi.getTimerCount()).toBe(0);
+    expect(platform.session.state.value.status).toBe("authenticated");
     stop();
   });
 

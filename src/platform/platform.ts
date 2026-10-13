@@ -34,12 +34,17 @@ export interface PlatformOptions<U extends SessionUser, C extends BootstrapConfi
    */
   session?: SessionAdapter<U> | ((http: HttpClient) => SessionAdapter<U>);
   /**
-   * Called once when a request is answered 401 while signed in, before the session is given up
-   * (concurrent 401s share one call). Renew it with the platform's client (for example a refresh-token call, then
+   * How the session is renewed (`session.renew()`): when a request is answered 401 while signed in, before the
+   * session is given up, and when `keepSessionAlive` finds it due. Concurrent renewals, whoever asked, share one call. Renew it with the platform's client (for example a refresh-token call, then
    * `session.refresh()`) and return true: the failed request is sent again. False or a throw expires
    * the session. Without it a 401 expires the session at once.
    */
   renewSession?: (session: Session<U>, http: HttpClient) => Promise<boolean>;
+  /**
+   * False while the session cannot be renewed, for example an embed session (a bearer token with no refresh token):
+   * a 401 then ends the session at once and `keepSessionAlive` stays idle. Asked each time. Default: renewable when `renewSession` is given.
+   */
+  renewable?: () => boolean;
   /** Called after a 401 expired a signed-in session: the application decides (usually: go to the login page). */
   onSessionExpired?: () => void;
   /** Called with the failure of a session load or of a before-sign-out hook. */
@@ -62,8 +67,6 @@ export function createPlatform<U extends SessionUser, C extends BootstrapConfig>
   options: PlatformOptions<U, C> & { session: NonNullable<PlatformOptions<U, C>["session"]> },
 ): Platform<U, C>;
 export function createPlatform<U extends SessionUser, C extends BootstrapConfig>(options: PlatformOptions<U, C>): Platform<U, C> {
-  let renewal: Promise<boolean> | null = null;
-
   const http = createHttpClient({
     baseUrl: options.config.apiBase,
     transport: options.transport,
@@ -71,25 +74,20 @@ export function createPlatform<U extends SessionUser, C extends BootstrapConfig>
     credentials: options.credentials,
     requestId: options.requestId,
     async onUnauthorized() {
-      if (session.state.value.status !== "authenticated") return "fail"; // nothing to expire
-      if (options.renewSession) {
-        renewal ??= options.renewSession(session, http).then(
-          (renewed) => renewed,
-          () => false,
-        ).finally(() => {
-          renewal = null;
-        });
-        if (await renewal) return "retry";
-      }
-      session.expire();
-      return "fail";
+      return (await session.renew()) ? "retry" : "fail"; // one renewal for every caller; a refused one has ended the session
     },
   });
 
   // Without `session` the overloads fix U to SessionUser, which is what the default adapter produces.
   const source = options.session ?? ((client: HttpClient) => httpSessionAdapter(client) as unknown as SessionAdapter<U>);
   const adapter = typeof source === "function" ? source(http) : source;
-  const session = createSession<U>(adapter, { onError: options.onSessionError, onExpired: options.onSessionExpired, beforeSignOut: options.beforeSignOut });
+  const session = createSession<U>(adapter, {
+    onError: options.onSessionError,
+    onExpired: options.onSessionExpired,
+    beforeSignOut: options.beforeSignOut,
+    renew: options.renewSession && ((current) => options.renewSession!(current, http)),
+    renewable: options.renewable,
+  });
   const access = createAccessClient(
     () => {
       return heldSession(session.state.value)?.access ?? null; // a session that just expired still shows what it showed

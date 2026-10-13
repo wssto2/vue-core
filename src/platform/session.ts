@@ -93,6 +93,19 @@ export interface Session<U extends SessionUser = SessionUser> {
   /** The server rejected the session (401): signed in becomes anonymous with reason `expired`. No-op when nobody is signed in. */
   expire(): void;
   /**
+   * Whether this session can be renewed at all: the platform was given a `renewSession` and its `renewable()` says
+   * yes. An embed session (a bearer token with no refresh token) is not: nothing renews it, and `keepSessionAlive` idles.
+   */
+  readonly renewable: boolean;
+  /**
+   * The one way a session is renewed: the timer's (`keepSessionAlive`), the client's after a 401, and an application's own
+   * fetch wrapper all call it. Concurrent callers share one in-flight renewal, so the refresh token (which go-core rotates
+   * on every use) is presented once. Resolves true when the session goes on (the failed request may be sent again), false
+   * when it ended: a refused or throwing renewal, or a session that is not `renewable`, expires it (`onExpired` runs once).
+   * False without effect when nobody is signed in.
+   */
+  renew(): Promise<boolean>;
+  /**
    * Runs the before-sign-out hooks (together, at most `beforeSignOutTimeout` ms; a failing or late one is reported
    * to `onError` and never blocks), then signs out locally (state cleared before anything else can read it), then
    * ends the session on the server; rejects if that call fails. Concurrent calls share one sign-out.
@@ -118,6 +131,10 @@ export interface SessionOptions<U extends SessionUser = SessionUser> {
   beforeSignOut?: BeforeSignOutHook<U>;
   /** Called after `expire()` moved a signed-in session to anonymous. */
   onExpired?: () => void;
+  /** What a renewal does: renew the tokens and read the session again; true when it goes on. Without it the session is not `renewable`. */
+  renew?: (session: Session<U>) => Promise<boolean>;
+  /** Asked at each renewal and by `keepSessionAlive`; false when this session cannot be renewed (an embed token). Default true. */
+  renewable?: () => boolean;
 }
 
 export function createSession<U extends SessionUser = SessionUser>(
@@ -129,6 +146,7 @@ export function createSession<U extends SessionUser = SessionUser>(
   const hooks = new Set<BeforeSignOutHook<U>>(options.beforeSignOut ? [options.beforeSignOut] : []);
   let holdExpired = false;
   let signingOut: Promise<void> | null = null;
+  let renewing: Promise<boolean> | null = null;
   let current: { controller: AbortController; promise: Promise<SessionState<U>> } | null = null;
 
   function supersede(): void {
@@ -190,7 +208,7 @@ export function createSession<U extends SessionUser = SessionUser>(
     return promise;
   }
 
-  return {
+  const session: Session<U> = {
     state,
     restore: () => (state.value.status === "unknown" || state.value.status === "failed" ? ask() : current?.promise ?? Promise.resolve(state.value)),
     refresh: ask,
@@ -232,6 +250,24 @@ export function createSession<U extends SessionUser = SessionUser>(
       })();
       return signingOut;
     },
+    get renewable() {
+      return options.renew !== undefined && (options.renewable?.() ?? true);
+    },
+    renew() {
+      if (state.value.status !== "authenticated") return Promise.resolve(false);
+      renewing ??= (async () => {
+        try {
+          if (session.renewable && (await options.renew!(session))) return true;
+        } catch {
+          // a throwing renewal is a refused one
+        }
+        session.expire();
+        return false;
+      })().finally(() => {
+        renewing = null;
+      });
+      return renewing;
+    },
     holdExpired(enabled) {
       holdExpired = enabled;
     },
@@ -240,4 +276,5 @@ export function createSession<U extends SessionUser = SessionUser>(
       return () => void hooks.delete(hook);
     },
   };
+  return session;
 }

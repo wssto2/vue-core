@@ -6,7 +6,6 @@ import LocaleSync from "./LocaleSync.vue";
 import ImpersonationBanner from "./ImpersonationBanner.vue";
 import ReturnMenuItem from "./ReturnMenuItem.vue";
 import SessionExpiry from "./SessionExpiry.vue";
-import { renewIdentityTokens } from "./session";
 
 const routes = defineRoutes({
   login: { name: "login", path: "/login", component: () => import("./SignInPage.vue"), meta: { public: true, titleKey: "core.identity.signin.title" } },
@@ -41,6 +40,6 @@ export function identityFeature(options: IdentityFeatureOptions = {}): Feature {
       { id: "identity.return", slot: "accountMenu", component: ReturnMenuItem, scope: "authenticated", optional: true, order: -20 },
       { id: "identity.locale", slot: "host", component: LocaleSync, scope: "authenticated", optional: true },
     ],
-    effects: [keepSessionAlive({ renew: renewIdentityTokens })],
+    effects: [keepSessionAlive()],
   });
 }

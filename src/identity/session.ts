@@ -42,7 +42,15 @@ export function identitySessionAdapter<U extends SessionUser>(http: HttpClient, 
 }
 
 /** What `createPlatform` is given to run on go-core's identity module. */
-export type IdentityPlatformOptions<U extends SessionUser> = Required<Pick<PlatformOptions<U, BootstrapConfig>, "session" | "renewSession">>;
+export type IdentityPlatformOptions<U extends SessionUser> = Required<Pick<PlatformOptions<U, BootstrapConfig>, "session" | "renewSession">> & Pick<PlatformOptions<U, BootstrapConfig>, "renewable">;
+
+/** What `identityPlatform` takes. */
+export interface IdentityPlatformInput<U extends SessionUser> {
+  /** The application's own user projection; see `identityPlatform`. */
+  parseUser?: UserParser<U>;
+  /** False while the session has no refresh token (an embed bearer session): nothing renews it, a 401 ends it. See `PlatformOptions.renewable`. */
+  renewable?: () => boolean;
+}
 
 /**
  * The platform options that wire the session to go-core's identity routes: reading it (`/auth/me`, with one
@@ -53,12 +61,13 @@ export type IdentityPlatformOptions<U extends SessionUser> = Required<Pick<Platf
  * The user is go-core's default projection (`IdentityUser`); an application that projects its own passes
  * `parseUser`, which must keep the `id` and the `login` (the prompt for an expired session shows it).
  */
-export function identityPlatform(): IdentityPlatformOptions<IdentityUser>;
-export function identityPlatform<U extends SessionUser & { readonly login: string }>(options: { parseUser: UserParser<U> }): IdentityPlatformOptions<U>;
-export function identityPlatform(options?: { parseUser: UserParser<SessionUser> }): IdentityPlatformOptions<IdentityUser> | IdentityPlatformOptions<SessionUser> {
+export function identityPlatform(options?: Omit<IdentityPlatformInput<IdentityUser>, "parseUser">): IdentityPlatformOptions<IdentityUser>;
+export function identityPlatform<U extends SessionUser & { readonly login: string }>(options: IdentityPlatformInput<U> & { parseUser: UserParser<U> }): IdentityPlatformOptions<U>;
+export function identityPlatform(options?: IdentityPlatformInput<SessionUser>): IdentityPlatformOptions<IdentityUser> | IdentityPlatformOptions<SessionUser> {
   const parseUser = options?.parseUser ?? parseIdentityUser;
   const wiring: IdentityPlatformOptions<SessionUser> = {
     session: (http) => identitySessionAdapter(http, parseUser),
+    ...(options?.renewable && { renewable: options.renewable }),
     async renewSession(session, http) {
       try {
         await refreshTokens(http);
@@ -70,8 +79,3 @@ export function identityPlatform(options?: { parseUser: UserParser<SessionUser> 
   };
   return wiring;
 }
-
-/** Renews the tokens, for `keepSessionAlive({ renew })`: the session is read again afterwards. */
-export const renewIdentityTokens = async (platform: { readonly http: HttpClient }): Promise<void> => {
-  await refreshTokens(platform.http);
-};

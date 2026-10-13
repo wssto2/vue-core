@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/vue";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../client";
+import { deferred } from "../testing/async";
 import { createPlatform, parseBootstrap, parseSessionPayload } from "../platform";
 import { createTestApp, jsonResponse, routedTransport, settle } from "../testing";
 import fixture from "../../test-data/go-core/session_payload.json";
@@ -88,6 +89,50 @@ describe("renewing on a 401", () => {
     await platform.session.restore();
     await expect(platform.http.get("/v1/things")).rejects.toBeInstanceOf(ApiError);
     expect(platform.session.state.value).toEqual({ status: "anonymous", reason: "expired" });
+  });
+});
+
+describe("one renewal", () => {
+  const refused = jsonResponse(401, { success: false, error: "no", code: "identity.session.invalid" });
+  const refreshesOf = (calls: { method: string; url: string }[]) => calls.filter((call) => call.method === "POST" && call.url.endsWith("/auth/refresh")).length;
+
+  it("a timer's renewal and a 401's renewal together send exactly one refresh request", async () => {
+    const gate = deferred<void>();
+    const { platform, calls } = platformOver({
+      "GET /api/v1/auth/me": jsonResponse(200, payload),
+      "POST /api/v1/auth/refresh": async () => (await gate.promise, jsonResponse(200, payload)),
+      "GET /api/v1/things": jsonResponse(401, { success: false, error: "no" }),
+    });
+    await platform.session.restore();
+    const timer = platform.session.renew(); // what keepSessionAlive calls
+    const request = platform.http.get("/v1/things").catch(() => undefined); // the 401 arrives while the refresh is out
+    await vi.waitFor(() => expect(calls.some((call) => call.url.endsWith("/v1/things"))).toBe(true));
+    gate.resolve();
+    expect(await timer).toBe(true);
+    await request;
+    expect(refreshesOf(calls)).toBe(1);
+    expect(platform.session.state.value.status).toBe("authenticated");
+  });
+
+  it("a refused refresh ends the session once, however many asked", async () => {
+    const onSessionExpired = vi.fn();
+    const { transport } = routedTransport({ "GET /api/v1/auth/me": jsonResponse(200, payload), "POST /api/v1/auth/refresh": refused, "GET /api/v1/things": jsonResponse(401, { success: false, error: "no" }) });
+    const platform = createPlatform({ config, transport, onSessionExpired, ...identityPlatform() });
+    await platform.session.restore();
+    const results = await Promise.all([platform.session.renew(), platform.session.renew(), platform.http.get("/v1/things").catch(() => "failed")]);
+    expect(results).toEqual([false, false, "failed"]);
+    expect(onSessionExpired).toHaveBeenCalledOnce();
+    expect(platform.session.state.value).toEqual({ status: "anonymous", reason: "expired" });
+  });
+
+  it("a session that is not renewable ends on a 401 at once and never refreshes", async () => {
+    const { transport, calls } = routedTransport({ "GET /api/v1/auth/me": jsonResponse(200, payload), "POST /api/v1/auth/refresh": jsonResponse(200, payload), "GET /api/v1/things": jsonResponse(401, { success: false, error: "no" }) });
+    const platform = createPlatform({ config, transport, ...identityPlatform({ renewable: () => false }) });
+    await platform.session.restore();
+    expect(platform.session.renewable).toBe(false);
+    await expect(platform.http.get("/v1/things")).rejects.toBeInstanceOf(ApiError);
+    expect(platform.session.state.value).toEqual({ status: "anonymous", reason: "expired" });
+    expect(refreshesOf(calls)).toBe(0);
   });
 });
 

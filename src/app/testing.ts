@@ -1,7 +1,7 @@
 // Fixtures for this folder's tests; the declaration build excludes it.
 import { defineComponent, h, type Component } from "vue";
 import { createMemoryHistory } from "vue-router";
-import { createPlatform, parseBootstrap, type Platform, type SessionAdapter, type SessionSnapshot } from "../platform";
+import { createPlatform, parseBootstrap, type BootstrapConfig, type Platform, type PlatformOptions, type SessionAdapter, type SessionSnapshot } from "../platform";
 import { createTestSession } from "../testing";
 import { settle as settleRounds } from "../testing/async";
 import type { ApplicationOptions } from "./application";
@@ -11,7 +11,7 @@ import type { Feature } from "./feature";
 export const page = (text: string): Component => defineComponent({ render: () => h("p", { "data-page": "" }, text) });
 
 /** A backend the test steers: who is signed in, whether the server answers, when. */
-export function fakeBackend(initial: SessionSnapshot | null = null, config: Record<string, unknown> = {}) {
+export function fakeBackend(initial: SessionSnapshot | null = null, config: Record<string, unknown> = {}, platformOptions: Partial<PlatformOptions<SessionSnapshot["user"], BootstrapConfig>> = {}) {
   const backend = {
     snapshot: initial,
     failing: false,
@@ -35,6 +35,7 @@ export function fakeBackend(initial: SessionSnapshot | null = null, config: Reco
   const platform: Platform = createPlatform({
     config: parseBootstrap({ locale: "en", app_name: "Test app", ...config }),
     session: adapter,
+    ...platformOptions,
   });
   return { backend, platform };
 }
