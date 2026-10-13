@@ -8,7 +8,8 @@ export function withCategory(preferences: Preferences, settings: CategorySetting
 
 /** One category's e-mail switched here, before the server answers: it is the person's own choice now. */
 export function withEmail(preferences: Preferences, category: string, enabled: boolean): Preferences {
-  return withCategory(preferences, { category, email: { enabled, source: "person" } });
+  const known = preferences.categories.find((one) => one.category === category);
+  return known ? withCategory(preferences, { ...known, email: { enabled, source: "person" } }) : preferences;
 }
 
 /** Minutes after midnight as the `"HH:mm"` a time field edits. */

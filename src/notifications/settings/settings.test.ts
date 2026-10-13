@@ -6,9 +6,10 @@ import { useSettings } from "./settings";
 
 const preferences = (): Preferences => ({
   email_available: true,
+  push_available: true,
   categories: [
-    { category: "tickets.assigned", email: { enabled: true, source: "default" } },
-    { category: "tickets.commented", email: { enabled: false, source: "enforced" } },
+    { category: "tickets.assigned", email: { enabled: true, source: "default" }, push: { enabled: true, source: "default" } },
+    { category: "tickets.commented", email: { enabled: false, source: "enforced" }, push: { enabled: false, source: "enforced" } },
   ],
   quiet_hours: { enabled: true, start: 1260, end: 420 },
   time_zone: "Europe/Zagreb",

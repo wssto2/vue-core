@@ -4,9 +4,10 @@ import { draftOf, minutesOfTime, timeOfMinutes, withCategory, withEmail } from "
 
 const preferences: Preferences = {
   email_available: true,
+  push_available: true,
   categories: [
-    { category: "tickets.assigned", email: { enabled: true, source: "default" } },
-    { category: "tickets.commented", email: { enabled: false, source: "enforced" } },
+    { category: "tickets.assigned", email: { enabled: true, source: "default" }, push: { enabled: true, source: "default" } },
+    { category: "tickets.commented", email: { enabled: false, source: "enforced" }, push: { enabled: false, source: "enforced" } },
   ],
   quiet_hours: { enabled: true, start: 1260, end: 420 },
   time_zone: "Europe/Zagreb",
@@ -15,13 +16,13 @@ const preferences: Preferences = {
 describe("the settings state", () => {
   it("switches one category as the person's own choice and leaves the rest", () => {
     const next = withEmail(preferences, "tickets.assigned", false);
-    expect(next.categories[0]).toEqual({ category: "tickets.assigned", email: { enabled: false, source: "person" } });
+    expect(next.categories[0]).toEqual({ category: "tickets.assigned", email: { enabled: false, source: "person" }, push: { enabled: true, source: "default" } });
     expect(next.categories[1]).toBe(preferences.categories[1]);
     expect(preferences.categories[0]!.email.source).toBe("default");
   });
 
   it("takes what the server answered for a category", () => {
-    const next = withCategory(preferences, { category: "tickets.assigned", email: { enabled: true, source: "default" } });
+    const next = withCategory(preferences, { category: "tickets.assigned", email: { enabled: true, source: "default" }, push: { enabled: true, source: "default" } });
     expect(next.categories[0]!.email.source).toBe("default");
   });
 
