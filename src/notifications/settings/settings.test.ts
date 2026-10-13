@@ -34,7 +34,7 @@ describe("useSettings", () => {
   it("shows a switch at once, then what the server answered", async () => {
     const answer = deferred<Response>();
     const { settings, calls } = await start({ "PUT /v1/notifications/preferences/tickets.assigned": () => answer.promise });
-    const saving = settings.setEmail("tickets.assigned", false);
+    const saving = settings.setChannel("tickets.assigned", "email", false);
     await settle();
     expect(settings.loaded.data.value?.categories[0]?.email).toEqual({ enabled: false, source: "person" });
     expect(settings.saving.value).toEqual(["tickets.assigned"]);
@@ -45,9 +45,17 @@ describe("useSettings", () => {
     expect(settings.loaded.data.value?.categories[0]?.email.source).toBe("person");
   });
 
+  it("saves a push switch on the push route and shows it at once", async () => {
+    const { settings, calls } = await start({ "PUT /v1/notifications/preferences/tickets.assigned/push": ok({ category: "tickets.assigned", email: { enabled: true, source: "default" }, push: { enabled: false, source: "person" } }) });
+    await settings.setChannel("tickets.assigned", "push", false);
+    expect(JSON.parse(String(calls.at(-1)?.init.body))).toEqual({ push: false });
+    expect(settings.loaded.data.value?.categories[0]?.push).toEqual({ enabled: false, source: "person" });
+    expect(settings.loaded.data.value?.categories[0]?.email.source).toBe("default");
+  });
+
   it("puts the switch back and rejects with the server's reason when it is refused", async () => {
     const { settings } = await start({ "PUT /v1/notifications/preferences/tickets.assigned": refused });
-    const error = await settings.setEmail("tickets.assigned", false).catch((reason: unknown) => reason);
+    const error = await settings.setChannel("tickets.assigned", "email", false).catch((reason: unknown) => reason);
     expect(isApiError(error) && error.code).toBe("notification.setting.enforced");
     expect(settings.loaded.data.value?.categories[0]?.email).toEqual({ enabled: true, source: "default" });
     expect(settings.saving.value).toEqual([]);
@@ -56,8 +64,8 @@ describe("useSettings", () => {
   it("does not send a second change of a category while one is on its way", async () => {
     const answer = deferred<Response>();
     const { settings, calls } = await start({ "PUT /v1/notifications/preferences/tickets.assigned": () => answer.promise });
-    void settings.setEmail("tickets.assigned", false);
-    await settings.setEmail("tickets.assigned", true);
+    void settings.setChannel("tickets.assigned", "email", false);
+    await settings.setChannel("tickets.assigned", "email", true);
     expect(calls.filter((call) => call.method === "PUT")).toHaveLength(1);
     answer.resolve(ok({ category: "tickets.assigned", email: { enabled: false, source: "person" } }));
   });

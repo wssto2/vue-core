@@ -939,10 +939,9 @@
       },
       "settings": {
         "title": "Notification settings",
-        "description": "Choose what reaches you by e-mail and when e-mail waits.",
+        "description": "Choose what reaches you by e-mail and push, and when they wait.",
         "open": "Notification settings",
         "email": {
-          "title": "E-mail me about",
           "note": "In the app every notification arrives, always.",
           "in_app": "In the app: always on",
           "locked": "Set by your organisation",
@@ -951,16 +950,58 @@
         },
         "quiet": {
           "title": "Quiet hours",
-          "enabled": "Hold e-mail during quiet hours",
+          "enabled": "Hold e-mail and push during quiet hours",
           "start": "From",
           "end": "To",
-          "summary_on": "Between {start} and {end} ({zone}) e-mail waits until the quiet hours end.",
-          "summary_on_no_zone": "Between {start} and {end} e-mail waits until the quiet hours end.",
-          "summary_off": "Quiet hours are off: e-mail is sent as soon as a notification is made.",
+          "summary_on": "Between {start} and {end} ({zone}) e-mail and push wait until the quiet hours end.",
+          "summary_on_no_zone": "Between {start} and {end} e-mail and push wait until the quiet hours end.",
+          "summary_off": "Quiet hours are off: e-mail and push are sent as soon as a notification is made.",
           "same": "From and to must be different times.",
           "required": "Choose a time.",
           "submit": "Save quiet hours",
           "saved": "Quiet hours saved."
+        },
+        "channels": {
+          "title": "Notify me about",
+          "email": "E-mail",
+          "push": "Push"
+        },
+        "push": {
+          "title": "This device",
+          "on": "On",
+          "off": "Off",
+          "on_description": "This browser gets push notifications, even when the app is closed.",
+          "off_description": "Turn push on to be notified on this device even when the app is closed.",
+          "enable": "Turn on push",
+          "disable": "Turn off push",
+          "enabled_toast": "Push is on for this device.",
+          "enable_error": "Push could not be turned on.",
+          "disable_error": "Push could not be turned off.",
+          "unsupported": "This browser does not support push notifications.",
+          "ios_title": "On iPhone and iPad, push works from the home screen",
+          "ios_step_share": "Tap Share in Safari.",
+          "ios_step_add": "Choose Add to Home Screen.",
+          "ios_step_open": "Open the app from the home screen and turn push on here.",
+          "denied_title": "Notifications are blocked for this site",
+          "denied_help": "Allow notifications for this site in the browser's settings, then reload this page."
+        },
+        "devices": {
+          "title": "Your devices",
+          "empty": "No device has push turned on yet.",
+          "label": "Name",
+          "this_device": "This device",
+          "disabled": "Disabled",
+          "last_seen": "Last used {when}",
+          "last_push": "last push {when}",
+          "rename": "Rename",
+          "test": "Send test",
+          "remove": "Remove",
+          "remove_title": "Remove this device?",
+          "remove_body": "“{label}” stops getting push notifications until push is turned on there again.",
+          "test_sent": "Test sent.",
+          "test_error": "The test could not be sent.",
+          "remove_error": "The device could not be removed.",
+          "rename_error": "The device could not be renamed."
         }
       }
     }

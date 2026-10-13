@@ -6,13 +6,14 @@ import { AdaptivePageShell } from "../../page";
 import { toast } from "../../overlay";
 import { useServerMessages } from "../../identity/fieldMessages";
 import { AsyncSection } from "../../state";
-import EmailPanel from "./EmailPanel.vue";
-import QuietHoursPanel from "./QuietHoursPanel.vue";
+import SettingsBody from "./SettingsBody.vue";
+import type { Channel } from "./state";
 import { useSettings } from "./settings";
 
 /**
- * The signed-in person's own notification settings: which categories are e-mailed to them (each switch saves as it is
- * switched, and is taken back when the server refuses it) and their quiet hours. Needs a session, no permission.
+ * The signed-in person's own notification settings: which categories reach them by e-mail and by push (each switch saves as it is
+ * switched, and is taken back when the server refuses it), their quiet hours, push on this browser and their devices, and the
+ * application's own sections. Needs a session, no permission.
  */
 const { t } = useI18n();
 const router = useRouter();
@@ -22,9 +23,9 @@ const settings = useSettings();
 // Back to "My profile" only where the application installed it.
 const back = computed(() => (router.hasRoute("profile") ? { label: t("core.profile.menu"), to: { name: "profile" } } : undefined));
 
-async function change(category: string, enabled: boolean) {
+async function change(category: string, channel: Channel, enabled: boolean) {
   try {
-    await settings.setEmail(category, enabled);
+    await settings.setChannel(category, channel, enabled);
   } catch (error) {
     toast.error(messages.sentence(error, t("core.notifications.settings.email.save_failed")));
   }
@@ -35,10 +36,7 @@ async function change(category: string, enabled: boolean) {
   <AdaptivePageShell :title="t('core.notifications.settings.title')" :description="t('core.notifications.settings.description')" :back="back" width="content">
     <AsyncSection :state="settings.loaded.state.value" :skeleton-rows="6" :is-empty="() => false" @retry="settings.loaded.reload()">
       <template #default="{ value }">
-        <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-          <EmailPanel :preferences="value" @change="change" />
-          <QuietHoursPanel v-if="value.email_available" :quiet-hours="value.quiet_hours" :time-zone="value.time_zone" :submit="settings.saveQuietHours" />
-        </div>
+        <SettingsBody :preferences="value" :settings="settings" @change="change" />
       </template>
     </AsyncSection>
   </AdaptivePageShell>

@@ -939,10 +939,9 @@
       },
       "settings": {
         "title": "Podešavanja obaveštenja",
-        "description": "Izaberite šta vam stiže e-poštom i kada e-pošta čeka.",
+        "description": "Izaberite šta vam stiže e-poštom i push obaveštenjima i kada čekaju.",
         "open": "Podešavanja obaveštenja",
         "email": {
-          "title": "Obavesti me e-poštom o",
           "note": "U aplikaciji stiže svako obaveštenje, uvek.",
           "in_app": "U aplikaciji: uvek uključeno",
           "locked": "Određuje vaša organizacija",
@@ -951,16 +950,58 @@
         },
         "quiet": {
           "title": "Tihi sati",
-          "enabled": "Zadrži e-poštu tokom tihih sati",
+          "enabled": "Zadrži e-poštu i push tokom tihih sati",
           "start": "Od",
           "end": "Do",
-          "summary_on": "Između {start} i {end} ({zone}) e-pošta čeka do kraja tihih sati.",
-          "summary_on_no_zone": "Između {start} i {end} e-pošta čeka do kraja tihih sati.",
-          "summary_off": "Tihi sati su isključeni: e-pošta se šalje čim obaveštenje nastane.",
+          "summary_on": "Između {start} i {end} ({zone}) e-pošta i push čekaju do kraja tihih sati.",
+          "summary_on_no_zone": "Između {start} i {end} e-pošta i push čekaju do kraja tihih sati.",
+          "summary_off": "Tihi sati su isključeni: e-pošta i push šalju se čim obaveštenje nastane.",
           "same": "Od i do moraju biti različita vremena.",
           "required": "Izaberite vreme.",
           "submit": "Sačuvaj tihe sate",
           "saved": "Tihi sati su sačuvani."
+        },
+        "channels": {
+          "title": "Obavesti me o",
+          "email": "E-pošta",
+          "push": "Push"
+        },
+        "push": {
+          "title": "Ovaj uređaj",
+          "on": "Uključeno",
+          "off": "Isključeno",
+          "on_description": "Ovaj pregledač prima push obaveštenja, i kad je aplikacija zatvorena.",
+          "off_description": "Uključite push da vam obaveštenja stižu na ovaj uređaj i kad je aplikacija zatvorena.",
+          "enable": "Uključi push",
+          "disable": "Isključi push",
+          "enabled_toast": "Push je uključen na ovom uređaju.",
+          "enable_error": "Push nije uključen.",
+          "disable_error": "Push nije isključen.",
+          "unsupported": "Ovaj pregledač ne podržava push obaveštenja.",
+          "ios_title": "Na iPhone-u i iPad-u push radi sa početnog ekrana",
+          "ios_step_share": "Dodirnite Podeli u Safariju.",
+          "ios_step_add": "Izaberite Dodaj na početni ekran.",
+          "ios_step_open": "Otvorite aplikaciju sa početnog ekrana i ovde uključite push.",
+          "denied_title": "Obaveštenja su blokirana za ovu stranicu",
+          "denied_help": "Dozvolite obaveštenja za ovu stranicu u podešavanjima pregledača pa ponovo učitajte stranicu."
+        },
+        "devices": {
+          "title": "Vaši uređaji",
+          "empty": "Nijedan uređaj još nema uključen push.",
+          "label": "Naziv",
+          "this_device": "Ovaj uređaj",
+          "disabled": "Isključen",
+          "last_seen": "Poslednji put korišćen {when}",
+          "last_push": "poslednji push {when}",
+          "rename": "Preimenuj",
+          "test": "Pošalji probno",
+          "remove": "Ukloni",
+          "remove_title": "Ukloniti ovaj uređaj?",
+          "remove_body": "„{label}” više neće primati push obaveštenja dok se push na njemu ponovo ne uključi.",
+          "test_sent": "Probno obaveštenje je poslano.",
+          "test_error": "Probno obaveštenje nije poslato.",
+          "remove_error": "Uređaj nije uklonjen.",
+          "rename_error": "Uređaj nije preimenovan."
         }
       }
     }

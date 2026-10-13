@@ -939,10 +939,9 @@
       },
       "settings": {
         "title": "Nastavitve obvestil",
-        "description": "Izberite, kaj vam pride po e-pošti in kdaj e-pošta počaka.",
+        "description": "Izberite, kaj vam pride po e-pošti in kot potisno obvestilo ter kdaj počaka.",
         "open": "Nastavitve obvestil",
         "email": {
-          "title": "Obvesti me po e-pošti o",
           "note": "V aplikaciji prispe vsako obvestilo, vedno.",
           "in_app": "V aplikaciji: vedno vklopljeno",
           "locked": "Določa vaša organizacija",
@@ -951,16 +950,58 @@
         },
         "quiet": {
           "title": "Tihe ure",
-          "enabled": "Zadrži e-pošto med tihimi urami",
+          "enabled": "Zadrži e-pošto in potisna obvestila med tihimi urami",
           "start": "Od",
           "end": "Do",
-          "summary_on": "Med {start} in {end} ({zone}) e-pošta počaka do konca tihih ur.",
-          "summary_on_no_zone": "Med {start} in {end} e-pošta počaka do konca tihih ur.",
-          "summary_off": "Tihe ure so izklopljene: e-pošta se pošlje takoj, ko obvestilo nastane.",
+          "summary_on": "Med {start} in {end} ({zone}) e-pošta in potisna obvestila počakajo do konca tihih ur.",
+          "summary_on_no_zone": "Med {start} in {end} e-pošta in potisna obvestila počakajo do konca tihih ur.",
+          "summary_off": "Tihe ure so izklopljene: e-pošta in potisna obvestila se pošljejo takoj, ko obvestilo nastane.",
           "same": "Od in do morata biti različna časa.",
           "required": "Izberite čas.",
           "submit": "Shrani tihe ure",
           "saved": "Tihe ure so shranjene."
+        },
+        "channels": {
+          "title": "Obvesti me o",
+          "email": "E-pošta",
+          "push": "Potisno obvestilo"
+        },
+        "push": {
+          "title": "Ta naprava",
+          "on": "Vklopljeno",
+          "off": "Izklopljeno",
+          "on_description": "Ta brskalnik prejema potisna obvestila, tudi ko je aplikacija zaprta.",
+          "off_description": "Vklopite potisna obvestila, da vas obvestila dosežejo na tej napravi, tudi ko je aplikacija zaprta.",
+          "enable": "Vklopi potisna obvestila",
+          "disable": "Izklopi potisna obvestila",
+          "enabled_toast": "Potisna obvestila so vklopljena na tej napravi.",
+          "enable_error": "Potisnih obvestil ni bilo mogoče vklopiti.",
+          "disable_error": "Potisnih obvestil ni bilo mogoče izklopiti.",
+          "unsupported": "Ta brskalnik ne podpira potisnih obvestil.",
+          "ios_title": "Na iPhonu in iPadu potisna obvestila delujejo z domačega zaslona",
+          "ios_step_share": "V Safariju tapnite Deli.",
+          "ios_step_add": "Izberite Dodaj na domači zaslon.",
+          "ios_step_open": "Odprite aplikacijo z domačega zaslona in tu vklopite potisna obvestila.",
+          "denied_title": "Obvestila so za to stran blokirana",
+          "denied_help": "V nastavitvah brskalnika dovolite obvestila za to stran in ponovno naložite stran."
+        },
+        "devices": {
+          "title": "Vaše naprave",
+          "empty": "Nobena naprava še nima vklopljenih potisnih obvestil.",
+          "label": "Ime",
+          "this_device": "Ta naprava",
+          "disabled": "Izklopljena",
+          "last_seen": "Nazadnje uporabljena {when}",
+          "last_push": "zadnje obvestilo {when}",
+          "rename": "Preimenuj",
+          "test": "Pošlji preizkus",
+          "remove": "Odstrani",
+          "remove_title": "Odstranim to napravo?",
+          "remove_body": "»{label}« ne bo več prejemala potisnih obvestil, dokler jih tam znova ne vklopite.",
+          "test_sent": "Preizkusno obvestilo je poslano.",
+          "test_error": "Preizkusnega obvestila ni bilo mogoče poslati.",
+          "remove_error": "Naprave ni bilo mogoče odstraniti.",
+          "rename_error": "Naprave ni bilo mogoče preimenovati."
         }
       }
     }

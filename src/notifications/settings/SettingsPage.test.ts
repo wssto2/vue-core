@@ -1,5 +1,7 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { defineComponent, h, type PropType } from "vue";
+import type { Preferences } from "../../modules/notification/entities";
 import { callsTo, dataOf, refusal, startScreen, stopApplications } from "../../identity/testing";
 import { toast } from "../../overlay";
 import { settle } from "../../testing";
@@ -88,13 +90,13 @@ describe("the notification settings page", () => {
     const summary = document.querySelector("[data-quiet-summary]")?.textContent ?? "";
     expect(summary).toContain("Europe/Zagreb");
     expect(summary).toContain("Between 21:00 and 07:00 (Europe/Zagreb)");
-    expect(summary).toContain("e-mail waits until the quiet hours end");
+    expect(summary).toContain("e-mail and push wait until the quiet hours end");
   });
 
   it("leaves out a zone the server cannot name (Go's \"Local\")", async () => {
     await open({ "GET /v1/notifications/preferences": preferences({ time_zone: "Local" }) });
     const summary = document.querySelector("[data-quiet-summary]")?.textContent ?? "";
-    expect(summary).toContain("Between 21:00 and 07:00 e-mail waits until the quiet hours end");
+    expect(summary).toContain("Between 21:00 and 07:00 e-mail and push wait until the quiet hours end");
     expect(summary).not.toContain("Local");
   });
 
@@ -134,5 +136,27 @@ describe("the notification settings page", () => {
   it("is left out with settings: false", async () => {
     const { application } = await open({}, { settings: false }, "/");
     expect(application.router.hasRoute("notifications.settings")).toBe(false);
+  });
+});
+
+describe("the application's own sections", () => {
+  const dealer = { render: () => h("section", "Dealer policies") };
+  const seen = () => [...document.querySelectorAll("[data-notification-channels], [data-notification-quiet-hours], [data-settings-section]")].map((node) => node.getAttribute("data-settings-section") ?? node.getAttributeNames().find((name) => name.startsWith("data-notification-")));
+
+  it("adds a panel after the built-in ones, given the preferences", async () => {
+    const component = defineComponent({ props: { preferences: { type: Object as PropType<Preferences>, required: true } }, setup: (props) => () => h("section", `Categories: ${props.preferences.categories.length}`) });
+    await open({}, { settingsSections: [{ id: "dealer", component }] });
+    expect(seen()).toEqual(["data-notification-channels", "data-notification-quiet-hours", "dealer"]);
+    expect(document.querySelector("[data-settings-section=dealer]")?.textContent).toBe("Categories: 3");
+  });
+
+  it("places a section by its order among the built-in panels and leaves out one that is not visible", async () => {
+    await open({}, { settingsSections: [{ id: "first", component: dealer, order: -1 }, { id: "between", component: dealer, order: 5 }, { id: "hidden", component: dealer, visible: () => false }] });
+    expect(seen()).toEqual(["first", "data-notification-channels", "between", "data-notification-quiet-hours"]);
+  });
+
+  it("refuses a built-in id and an id given twice", () => {
+    expect(() => notificationsFeature({ settingsSections: [{ id: "quiet", component: dealer }] })).toThrow(/"quiet"/);
+    expect(() => notificationsFeature({ settingsSections: [{ id: "a", component: dealer }, { id: "a", component: dealer }] })).toThrow(/"a"/);
   });
 });
