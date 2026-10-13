@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import type { Preferences } from "../../modules/notification/entities";
 import { useNotificationsContext } from "../context";
-import DevicesPanel from "../push/DevicesPanel.vue";
-import ThisDevicePanel from "../push/ThisDevicePanel.vue";
+import SectionIntro from "../../identity/shared/SectionIntro.vue";
+import DevicesSection from "../push/DevicesSection.vue";
+import ThisDeviceSection from "../push/ThisDeviceSection.vue";
 import { useDevices } from "../push/devices";
 import { useThisDevice } from "../push/thisDevice";
-import ChannelsPanel from "./ChannelsPanel.vue";
-import QuietHoursPanel from "./QuietHoursPanel.vue";
+import ChannelsSection from "./ChannelsSection.vue";
+import QuietHoursSection from "./QuietHoursSection.vue";
 import type { Settings } from "./settings";
 import type { Channel } from "./state";
 
 /**
- * The panels of the settings page in their order: the built-in ones (channels 0, quiet hours 10, this device 20, devices 30)
- * and the application's own sections. Push is created only here, once the preferences say the server has it.
+ * The sections of the settings page in their order: the built-in ones (channels 0, quiet hours 10, this device 20, devices 30)
+ * and the application's own sections (each under its own title, like the built-in ones). Push is created only here, once the preferences say the server has it.
  */
 const props = defineProps<{ preferences: Preferences; settings: Settings }>();
 const emit = defineEmits<{ change: [category: string, channel: Channel, enabled: boolean] }>();
 
+const { t } = useI18n();
 const context = useNotificationsContext();
 const withPush = context.push && props.preferences.push_available;
 const device = withPush ? useThisDevice() : null;
@@ -35,13 +38,16 @@ const entries = computed(() =>
 </script>
 
 <template>
-  <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+  <div class="flex flex-col gap-10">
     <template v-for="entry in entries" :key="entry.id">
-      <ChannelsPanel v-if="entry.id === 'channels'" :preferences="props.preferences" @change="(...args) => emit('change', ...args)" />
-      <QuietHoursPanel v-else-if="entry.id === 'quiet'" :quiet-hours="props.preferences.quiet_hours" :time-zone="props.preferences.time_zone" :submit="props.settings.saveQuietHours" />
-      <ThisDevicePanel v-else-if="entry.id === 'device' && device" :device="device" @changed="devices?.loaded.reload()" />
-      <DevicesPanel v-else-if="entry.id === 'devices' && devices" :devices="devices" :hash="device?.hash.value ?? null" />
-      <component :is="entry.section.component" v-else-if="'section' in entry" :preferences="props.preferences" :data-settings-section="entry.id" />
+      <ChannelsSection v-if="entry.id === 'channels'" :preferences="props.preferences" @change="(...args) => emit('change', ...args)" />
+      <QuietHoursSection v-else-if="entry.id === 'quiet'" :quiet-hours="props.preferences.quiet_hours" :time-zone="props.preferences.time_zone" :submit="props.settings.saveQuietHours" />
+      <ThisDeviceSection v-else-if="entry.id === 'device' && device" :device="device" @changed="devices?.loaded.reload()" />
+      <DevicesSection v-else-if="entry.id === 'devices' && devices" :devices="devices" :hash="device?.hash.value ?? null" />
+      <section v-else-if="'section' in entry" class="flex min-w-0 flex-col gap-group-gap" :data-settings-section="entry.id">
+        <SectionIntro :title="t(entry.section.titleKey)" :description="entry.section.descriptionKey ? t(entry.section.descriptionKey) : undefined" />
+        <component :is="entry.section.component" :preferences="props.preferences" />
+      </section>
     </template>
   </div>
 </template>

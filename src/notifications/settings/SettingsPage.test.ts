@@ -32,7 +32,7 @@ const preferences = (extra: object = {}) =>
     ...extra,
   });
 
-const messages = { en: { notifications: { categories: { tickets: { assigned: { label: "Ticket assigned to me", description: "When someone gives you a ticket" } } } } } };
+const messages = { en: { dealer: { title: "Dealer policies", line: "Which dealer notices reach you" }, notifications: { categories: { tickets: { assigned: { label: "Ticket assigned to me", description: "When someone gives you a ticket" } } } } } };
 
 async function open(answers: Record<string, Parameters<typeof startScreen>[0]["answers"][string]> = {}, feature?: NotificationsFeatureOptions, location = "/profile/notifications") {
   return startScreen({ permissions: [], location, features: [notificationsFeature(feature)], messages, answers: { "GET /v1/notifications/preferences": preferences(), ...answers } });
@@ -41,6 +41,15 @@ const row = (code: string) => document.querySelector<HTMLElement>(`[data-categor
 const switchOf = (code: string) => within(row(code)).getByRole("switch");
 
 describe("the notification settings page", () => {
+  it("is grouped sections with a title each and no card around them: a group per category, rows inside", async () => {
+    await open();
+    const titles = [...document.querySelectorAll("main h2, [data-notification-channels] h2, [data-notification-quiet-hours] h2")].map((node) => node.textContent);
+    expect(titles).toEqual(["Notify me about", "Quiet hours"]);
+    expect(document.querySelectorAll("[data-notification-channels] [data-category]")).toHaveLength(3);
+    expect(document.querySelector("[data-category=\"tickets.assigned\"]")?.textContent).toContain("Ticket assigned to me");
+    expect(document.querySelector("[data-notification-channels]")?.parentElement?.className).not.toMatch(/rounded|border|shadow/); // no card chrome around a section
+  });
+
   it("lists the categories by the application's texts, falling back to the code", async () => {
     await open();
     expect(row("tickets.assigned").textContent).toContain("Ticket assigned to me");
@@ -143,20 +152,27 @@ describe("the application's own sections", () => {
   const dealer = { render: () => h("section", "Dealer policies") };
   const seen = () => [...document.querySelectorAll("[data-notification-channels], [data-notification-quiet-hours], [data-settings-section]")].map((node) => node.getAttribute("data-settings-section") ?? node.getAttributeNames().find((name) => name.startsWith("data-notification-")));
 
-  it("adds a panel after the built-in ones, given the preferences", async () => {
+  it("adds a section after the built-in ones, given the preferences", async () => {
     const component = defineComponent({ props: { preferences: { type: Object as PropType<Preferences>, required: true } }, setup: (props) => () => h("section", `Categories: ${props.preferences.categories.length}`) });
-    await open({}, { settingsSections: [{ id: "dealer", component }] });
+    await open({}, { settingsSections: [{ id: "dealer", titleKey: "dealer.title", component }] });
     expect(seen()).toEqual(["data-notification-channels", "data-notification-quiet-hours", "dealer"]);
-    expect(document.querySelector("[data-settings-section=dealer]")?.textContent).toBe("Categories: 3");
+    expect(document.querySelector("[data-settings-section=dealer]")?.textContent).toContain("Categories: 3");
   });
 
-  it("places a section by its order among the built-in panels and leaves out one that is not visible", async () => {
-    await open({}, { settingsSections: [{ id: "first", component: dealer, order: -1 }, { id: "between", component: dealer, order: 5 }, { id: "hidden", component: dealer, visible: () => false }] });
+  it("gives it a title and a line in the page's own style, from the application's keys", async () => {
+    await open({}, { settingsSections: [{ id: "dealer", titleKey: "dealer.title", descriptionKey: "dealer.line", component: dealer }] });
+    const section = document.querySelector<HTMLElement>("[data-settings-section=dealer]")!;
+    expect(section.querySelector("h2")?.textContent).toBe("Dealer policies");
+    expect(section.textContent).toContain("Which dealer notices reach you");
+  });
+
+  it("places a section by its order among the built-in sections and leaves out one that is not visible", async () => {
+    await open({}, { settingsSections: [{ id: "first", titleKey: "dealer.title", component: dealer, order: -1 }, { id: "between", titleKey: "dealer.title", component: dealer, order: 5 }, { id: "hidden", titleKey: "dealer.title", component: dealer, visible: () => false }] });
     expect(seen()).toEqual(["first", "data-notification-channels", "between", "data-notification-quiet-hours"]);
   });
 
   it("refuses a built-in id and an id given twice", () => {
-    expect(() => notificationsFeature({ settingsSections: [{ id: "quiet", component: dealer }] })).toThrow(/"quiet"/);
-    expect(() => notificationsFeature({ settingsSections: [{ id: "a", component: dealer }, { id: "a", component: dealer }] })).toThrow(/"a"/);
+    expect(() => notificationsFeature({ settingsSections: [{ id: "quiet", titleKey: "x", component: dealer }] })).toThrow(/"quiet"/);
+    expect(() => notificationsFeature({ settingsSections: [{ id: "a", titleKey: "x", component: dealer }, { id: "a", titleKey: "x", component: dealer }] })).toThrow(/"a"/);
   });
 });

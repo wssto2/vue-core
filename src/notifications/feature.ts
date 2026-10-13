@@ -28,10 +28,10 @@ export interface NotificationsFeatureOptions {
    * split at its dots; a category without a text is shown by its code. `false` leaves the page, the menu entry and the gear out. Default true.
    */
   settings?: boolean;
-  /** Panels of the application's own on the settings page (`NotificationSettingsSection`), placed by `order` among the built-in ones. */
+  /** Sections of the application's own on the settings page (`NotificationSettingsSection`: a title, groups of rows), placed by `order` among the built-in ones. */
   settingsSections?: readonly NotificationSettingsSection[];
   /**
-   * Web push: on the settings page the "This device" panel (turn push on for this browser) and the list of devices, both shown only
+   * Web push: on the settings page the "This device" section (turn push on for this browser) and the list of devices, both shown only
    * when the server has push (`push_available`), the push switch next to e-mail for each category, and, for a signed-in person whose
    * browser already holds a subscription, registering it again once per session (and removing it when they sign out). The
    * service worker is the application's own: it imports `@wssto2/vue-core/push-worker`. `false` leaves all of it out. Default true.

@@ -45,7 +45,7 @@ async function open(browser: FakePushOptions, answers: Record<string, Parameters
   });
 }
 const thisDevice = () => document.querySelector<HTMLElement>("[data-notification-this-device]")!;
-const stateOf = () => thisDevice().querySelector("[data-state]")?.getAttribute("data-state");
+const stateOf = () => thisDevice()?.getAttribute("data-state");
 
 describe("push on this device", () => {
   it("is left out when the server has no push", async () => {
@@ -71,7 +71,7 @@ describe("push on this device", () => {
     const { calls } = await open({}, { "POST /v1/notifications/devices": dataOf(device(1)) });
     await waitFor(() => expect(stateOf()).toBe("off"));
     expect(push.prompts).toBe(0);
-    await fireEvent.click(thisDevice().querySelector("[data-push-enable]")!);
+    await fireEvent.click(thisDevice().querySelector("[data-push-enable] button")!);
     await waitFor(() => expect(stateOf()).toBe("on"));
     expect(push.prompts).toBe(1);
     expect(push.subscribed).toBe(1);
@@ -82,7 +82,7 @@ describe("push on this device", () => {
   it("registers nothing when the permission is refused, and says it is blocked", async () => {
     const { calls } = await open({ answer: "denied" });
     await waitFor(() => expect(stateOf()).toBe("off"));
-    await fireEvent.click(thisDevice().querySelector("[data-push-enable]")!);
+    await fireEvent.click(thisDevice().querySelector("[data-push-enable] button")!);
     await waitFor(() => expect(stateOf()).toBe("denied"));
     expect(callsTo(calls, "POST", "/v1/notifications/devices")).toHaveLength(0);
   });
@@ -91,7 +91,7 @@ describe("push on this device", () => {
     const subscription = fakeSubscription();
     const { calls } = await open({ permission: "granted", subscription }, { "POST /v1/notifications/devices/unsubscribe": devices() });
     await waitFor(() => expect(stateOf()).toBe("on"));
-    await fireEvent.click(thisDevice().querySelector("[data-push-disable]")!);
+    await fireEvent.click(thisDevice().querySelector("[data-push-disable] button")!);
     await waitFor(() => expect(stateOf()).toBe("off"));
     expect(JSON.parse(String(callsTo(calls, "POST", "/v1/notifications/devices/unsubscribe")[0]?.init.body))).toEqual({ endpoint: subscription.endpoint });
     expect(subscription.unsubscribe).toHaveBeenCalledTimes(1);
@@ -101,7 +101,7 @@ describe("push on this device", () => {
     const error = vi.spyOn(toast, "error").mockImplementation(() => undefined as never);
     await open({}, { "POST /v1/notifications/devices": refusal(500, "internal") });
     await waitFor(() => expect(stateOf()).toBe("off"));
-    await fireEvent.click(thisDevice().querySelector("[data-push-enable]")!);
+    await fireEvent.click(thisDevice().querySelector("[data-push-enable] button")!);
     await waitFor(() => expect(error).toHaveBeenCalledWith("Push could not be turned on."));
   });
 });
@@ -154,6 +154,12 @@ describe("the subscription of the session", () => {
 
 describe("the devices", () => {
   const row = (id: number) => document.querySelector<HTMLElement>(`[data-device="${id}"]`)!;
+  /** Opens the row's "⋯" menu and returns its item of that name. */
+  async function menuItem(id: number, name: string) {
+    await fireEvent.click(row(id).querySelector("[data-device-menu]")!);
+    await settle();
+    return screen.getByRole("menuitem", { name });
+  }
 
   it("lists each device with its name, this device, a disabled one and when it was last used", async () => {
     const subscription = fakeSubscription();
@@ -166,8 +172,10 @@ describe("the devices", () => {
     expect(row(1).textContent).toContain("Last push");
     expect(row(2).querySelector("[data-device-current]")).toBeNull();
     expect(row(2).querySelector("[data-device-disabled]")).not.toBeNull();
-    expect(row(2).querySelector<HTMLButtonElement>("[data-device-test]")!.disabled).toBe(true);
-    expect(row(1).querySelector<HTMLButtonElement>("[data-device-test]")!.disabled).toBe(false);
+    expect((await menuItem(2, "Send test")).hasAttribute("disabled")).toBe(true);
+    await fireEvent.keyDown(document.body, { key: "Escape" });
+    await settle();
+    expect((await menuItem(1, "Send test")).hasAttribute("disabled")).toBe(false);
   });
 
   it("has its own sentence when no device has push on", async () => {
@@ -178,7 +186,7 @@ describe("the devices", () => {
   it("renames a device in place", async () => {
     const { calls } = await open({}, { "GET /v1/notifications/devices": devices(device(1)), "PATCH /v1/notifications/devices/1": dataOf(device(1, { label: "Work laptop" })) });
     await waitFor(() => expect(row(1)).toBeTruthy());
-    await fireEvent.click(row(1).querySelector("[data-device-rename]")!);
+    await fireEvent.click(await menuItem(1, "Rename"));
     await settle();
     await fireEvent.update(screen.getByLabelText("Name"), "Work laptop");
     await fireEvent.click(document.querySelector("[data-device-save]")!);
@@ -189,7 +197,7 @@ describe("the devices", () => {
   it("removes a device only after the confirmation", async () => {
     const { calls } = await open({}, { "GET /v1/notifications/devices": devices(device(1), device(2)), "DELETE /v1/notifications/devices/1": devices(device(2)) });
     await waitFor(() => expect(row(1)).toBeTruthy());
-    await fireEvent.click(row(1).querySelector("[data-device-remove]")!);
+    await fireEvent.click(await menuItem(1, "Remove"));
     await settle();
     expect(callsTo(calls, "DELETE", "/v1/notifications/devices/1")).toHaveLength(0);
     expect(screen.getByText(/“Browser 1” stops getting push notifications/)).toBeTruthy();
@@ -202,7 +210,7 @@ describe("the devices", () => {
     const success = vi.spyOn(toast, "success").mockImplementation(() => undefined as never);
     const { calls } = await open({}, { "GET /v1/notifications/devices": devices(device(1)), "POST /v1/notifications/devices/1/test": devices(device(1)) });
     await waitFor(() => expect(row(1)).toBeTruthy());
-    await fireEvent.click(row(1).querySelector("[data-device-test]")!);
+    await fireEvent.click(await menuItem(1, "Send test"));
     await waitFor(() => expect(success).toHaveBeenCalledWith("Test sent."));
     expect(callsTo(calls, "POST", "/v1/notifications/devices/1/test")).toHaveLength(1);
   });

@@ -10,7 +10,8 @@ import { identityFeature, identityPlatform } from "@wssto2/vue-core/identity";
 import { notificationsFeature } from "@wssto2/vue-core/notifications";
 import { createPlatform, parseBootstrap } from "@wssto2/vue-core/platform";
 import { backofficeShell } from "@wssto2/vue-core/shell";
-import { defineComponent, h } from "vue";
+import { FormGroup, FormRow, SwitchField } from "@wssto2/vue-core/form";
+import { defineComponent, h, ref } from "vue";
 import { createWebHashHistory } from "vue-router";
 import "../app.css";
 import { shellIcons } from "../app/icons";
@@ -98,7 +99,19 @@ const platform = createPlatform({
   },
 });
 
-const dealerPolicies = defineComponent({ setup: () => () => h("section", { class: "rounded-xl bg-surface-raised p-4 text-body" }, "Dealer policies: an application's own panel.") });
+// An application's own section: groups of rows, the title and line come from the feature's keys.
+const dealerPolicies = defineComponent({
+  setup() {
+    const own = ref(true);
+    const team = ref(false);
+    return () =>
+      h(FormGroup, { footer: "Policies the dealer network decides." }, () => [
+        h(SwitchField, { modelValue: own.value, "onUpdate:modelValue": (v: boolean) => (own.value = v), label: "My dealership's notices" }),
+        h(SwitchField, { modelValue: team.value, "onUpdate:modelValue": (v: boolean) => (team.value = v), label: "Other locations' notices" }),
+        h(FormRow, { layout: "setting", label: "Set by the network", value: "Daily summary" }),
+      ]);
+  },
+});
 
 void createApplication({
   platform,
@@ -108,10 +121,10 @@ void createApplication({
     defineFeature({ id: "home", routes: [{ name: "home", path: "/", component: { render: () => null } }] }),
     notificationsFeature({
       categories: { "tickets.assigned": { icon: "user3Line", hue: "blue" } },
-      ...(query.get("section") ? { settingsSections: [{ id: "dealer", component: dealerPolicies }] } : {}),
+      ...(query.get("section") ? { settingsSections: [{ id: "dealer", titleKey: "dealer.title", descriptionKey: "dealer.line", component: dealerPolicies }] } : {}),
     }),
   ],
   router: { history: createWebHashHistory() },
   icons: [appIcons, shellIcons],
-  i18n: { messages: { en: { notifications: { categories: { tickets: { assigned: { label: "Ticket assigned to me", description: "When someone gives you a ticket" }, commented: { label: "New comment on my ticket" } }, billing: { overdue: { label: "Overdue invoices" } } } } } } },
+  i18n: { messages: { en: { dealer: { title: "Dealer policies", line: "What your dealership network sends you." }, notifications: { categories: { tickets: { assigned: { label: "Ticket assigned to me", description: "When someone gives you a ticket" }, commented: { label: "New comment on my ticket" } }, billing: { overdue: { label: "Overdue invoices" } } } } } } },
 }).mount("#app");

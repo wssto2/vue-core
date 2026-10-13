@@ -942,7 +942,6 @@
         "description": "Izaberite šta vam stiže e-poštom i push obavještenjima te kada čekaju.",
         "open": "Postavke obavještenja",
         "email": {
-          "note": "U aplikaciji stiže svako obavještenje, uvijek.",
           "in_app": "U aplikaciji: uvijek uključeno",
           "locked": "Određuje vaša organizacija",
           "unavailable": "E-pošta ovdje nije dostupna pa obavještenja stižu samo u aplikaciji.",
@@ -959,7 +958,8 @@
           "same": "Od i do moraju biti različita vremena.",
           "required": "Izaberite vrijeme.",
           "submit": "Sačuvaj tihe sate",
-          "saved": "Tihi sati su sačuvani."
+          "saved": "Tihi sati su sačuvani.",
+          "description": "E-pošta i push nastali u ovo doba čekaju do kraja tihih sati."
         },
         "channels": {
           "title": "Obavijesti me o",
@@ -983,7 +983,8 @@
           "ios_step_add": "Izaberite Dodaj na početni ekran.",
           "ios_step_open": "Otvorite aplikaciju s početnog ekrana i ovdje uključite push.",
           "denied_title": "Obavještenja su blokirana za ovu stranicu",
-          "denied_help": "Dozvolite obavještenja za ovu stranicu u postavkama preglednika pa ponovo učitajte stranicu."
+          "denied_help": "Dozvolite obavještenja za ovu stranicu u postavkama preglednika pa ponovo učitajte stranicu.",
+          "description": "Push obavještenja stižu u ovaj preglednik i kad je aplikacija zatvorena."
         },
         "devices": {
           "title": "Vaši uređaji",
@@ -1001,7 +1002,9 @@
           "test_sent": "Probno obavještenje je poslano.",
           "test_error": "Probno obavještenje nije poslano.",
           "remove_error": "Uređaj nije uklonjen.",
-          "rename_error": "Uređaj nije preimenovan."
+          "rename_error": "Uređaj nije preimenovan.",
+          "description": "Preglednici u kojima ste uključili push.",
+          "menu": "Radnje za {label}"
         }
       }
     }

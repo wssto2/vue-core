@@ -942,7 +942,6 @@
         "description": "Izberite, kaj vam pride po e-pošti in kot potisno obvestilo ter kdaj počaka.",
         "open": "Nastavitve obvestil",
         "email": {
-          "note": "V aplikaciji prispe vsako obvestilo, vedno.",
           "in_app": "V aplikaciji: vedno vklopljeno",
           "locked": "Določa vaša organizacija",
           "unavailable": "E-pošta tu ni na voljo, zato obvestila prispejo samo v aplikaciji.",
@@ -959,7 +958,8 @@
           "same": "Od in do morata biti različna časa.",
           "required": "Izberite čas.",
           "submit": "Shrani tihe ure",
-          "saved": "Tihe ure so shranjene."
+          "saved": "Tihe ure so shranjene.",
+          "description": "E-pošta in potisna obvestila, ustvarjena v teh urah, počakajo do konca."
         },
         "channels": {
           "title": "Obvesti me o",
@@ -983,7 +983,8 @@
           "ios_step_add": "Izberite Dodaj na domači zaslon.",
           "ios_step_open": "Odprite aplikacijo z domačega zaslona in tu vklopite potisna obvestila.",
           "denied_title": "Obvestila so za to stran blokirana",
-          "denied_help": "V nastavitvah brskalnika dovolite obvestila za to stran in ponovno naložite stran."
+          "denied_help": "V nastavitvah brskalnika dovolite obvestila za to stran in ponovno naložite stran.",
+          "description": "Potisna obvestila dosežejo ta brskalnik, tudi ko je aplikacija zaprta."
         },
         "devices": {
           "title": "Vaše naprave",
@@ -1001,7 +1002,9 @@
           "test_sent": "Preizkusno obvestilo je poslano.",
           "test_error": "Preizkusnega obvestila ni bilo mogoče poslati.",
           "remove_error": "Naprave ni bilo mogoče odstraniti.",
-          "rename_error": "Naprave ni bilo mogoče preimenovati."
+          "rename_error": "Naprave ni bilo mogoče preimenovati.",
+          "description": "Brskalniki, v katerih ste vklopili potisna obvestila.",
+          "menu": "Dejanja za {label}"
         }
       }
     }

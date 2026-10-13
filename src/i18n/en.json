@@ -942,7 +942,6 @@
         "description": "Choose what reaches you by e-mail and push, and when they wait.",
         "open": "Notification settings",
         "email": {
-          "note": "In the app every notification arrives, always.",
           "in_app": "In the app: always on",
           "locked": "Set by your organisation",
           "unavailable": "E-mail is not available here, so notifications reach you in the app only.",
@@ -959,7 +958,8 @@
           "same": "From and to must be different times.",
           "required": "Choose a time.",
           "submit": "Save quiet hours",
-          "saved": "Quiet hours saved."
+          "saved": "Quiet hours saved.",
+          "description": "E-mail and push made inside these hours wait until they end."
         },
         "channels": {
           "title": "Notify me about",
@@ -983,7 +983,8 @@
           "ios_step_add": "Choose Add to Home Screen.",
           "ios_step_open": "Open the app from the home screen and turn push on here.",
           "denied_title": "Notifications are blocked for this site",
-          "denied_help": "Allow notifications for this site in the browser's settings, then reload this page."
+          "denied_help": "Allow notifications for this site in the browser's settings, then reload this page.",
+          "description": "Push notifications reach this browser even when the app is closed."
         },
         "devices": {
           "title": "Your devices",
@@ -1001,7 +1002,9 @@
           "test_sent": "Test sent.",
           "test_error": "The test could not be sent.",
           "remove_error": "The device could not be removed.",
-          "rename_error": "The device could not be renamed."
+          "rename_error": "The device could not be renamed.",
+          "description": "The browsers where you turned push on.",
+          "menu": "Actions for {label}"
         }
       }
     }
