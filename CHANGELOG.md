@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.3 — 2026-10-13
+
+The access rows on a phone.
+
+### Fixed
+- **A role on a person and an effective permission read on a phone.** `BindingRow` and the rows of `EffectiveAccess` kept the place and the action in a right-hand column, which left the name one word per line. On compact widths they now stack: the name (and its icon) on the full width, the constraint line, the place (or where the permission comes from and its reach), then the action (*Remove*, *Why*) on its own line. Wide layouts are unchanged.
+
+### New
+- **`FormRow` `stackOnCompact`** (`setting` layout): the same stacking for an application's own settings-style rows.
+
 ## 0.5.2 — 2026-10-13
 
 Access for service accounts, a working "turn on all", worded constraints, and this browser's push state for an app's own screens. Found by ARV's moves to the library's access and notifications.

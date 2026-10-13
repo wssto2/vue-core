@@ -46,7 +46,7 @@ const reach = (screen: EffectiveScreen) => [screen.qualifier ? labels.qualifierN
 
     <template v-else>
       <FormGroup v-for="group in shown" :key="group.key" :header="labels.groupLabel(group.key)" :footer="group === shown[shown.length - 1] ? t('core.access.effective.footer') : undefined">
-        <FormRow v-for="screen in group.screens" :key="screen.key" layout="setting" :label="labels.screenLabel(screen.key)">
+        <FormRow v-for="screen in group.screens" :key="screen.key" layout="setting" stack-on-compact :label="labels.screenLabel(screen.key)">
           <template #sub>
             <span class="block" data-test="effective-actions">{{ actionsText(screen) }}</span>
             <span class="block" data-test="effective-sources">{{ t("core.access.effective.from_roles", { roles: sourcesText(screen) }) }}</span>
@@ -67,7 +67,7 @@ const reach = (screen: EffectiveScreen) => [screen.qualifier ? labels.qualifierN
           </template>
 
           <span v-if="screen.allUnavailable" class="contents" data-test="effective-unavailable"><Badge tone="warning">{{ t("core.access.effective.unavailable") }}</Badge></span>
-          <span class="text-right text-footnote text-content-muted" data-test="effective-reach">{{ reach(screen) }}</span>
+          <span class="text-right text-footnote text-content-muted compact:text-left" data-test="effective-reach">{{ reach(screen) }}</span>
           <span class="contents" :data-test="`why-${screen.key}`">
             <Button prominence="secondary" size="sm" @click="open[screen.key] = !open[screen.key]">{{ open[screen.key] ? t("core.access.effective.hide_why") : t("core.access.effective.show_why") }}</Button>
           </span>

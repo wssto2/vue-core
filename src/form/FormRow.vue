@@ -38,6 +38,8 @@ const props = withDefaults(defineProps<{
   labelLines?: 1 | 2 | 3;
   /** `top` aligns the label with the first line of a tall control (a textarea). */
   labelAlign?: "center" | "top";
+  /** A `setting` row on a phone: the label and sub on the full width, the value and the actions on their own lines under it. */
+  stackOnCompact?: boolean;
 }>(), {
   label: undefined,
   labelHidden: false,
@@ -53,6 +55,7 @@ const props = withDefaults(defineProps<{
   indent: 0,
   labelLines: undefined,
   labelAlign: "center",
+  stackOnCompact: false,
 });
 
 const slots = defineSlots<{
@@ -83,7 +86,7 @@ const bodyLayout = computed(() => {
       // The label keeps its longest word; the value wraps beside it.
       return "grid grid-cols-[minmax(min-content,1fr)_minmax(0,auto)] items-center gap-x-4";
     case "setting":
-      return "flex items-center gap-4";
+      return props.stackOnCompact ? "flex items-center gap-4 compact:flex-col compact:items-stretch compact:gap-1" : "flex items-center gap-4";
     default:
       return "flex flex-col gap-1";
   }
@@ -111,7 +114,7 @@ const hasValue = computed(() => props.value !== undefined && props.value !== nul
           <small v-if="props.sub || slots.sub" :id="props.subId" class="mt-0.5 block text-footnote text-content-muted"><slot name="sub">{{ props.sub }}</slot></small>
         </div>
 
-        <div class="flex min-w-0 items-center gap-2" :class="layout === 'value' ? 'justify-end text-right' : layout === 'setting' ? 'flex-wrap justify-end text-right' : layout === 'entry' ? 'compact:justify-end' : ''">
+        <div class="flex min-w-0 items-center gap-2" :data-stacked="layout === 'setting' && props.stackOnCompact ? 'compact' : undefined" :class="layout === 'value' ? 'justify-end text-right' : layout === 'setting' ? ['flex-wrap justify-end text-right', props.stackOnCompact ? 'compact:justify-start compact:text-left' : ''] : layout === 'entry' ? 'compact:justify-end' : ''">
           <slot>
             <span v-if="hasValue" class="break-words text-body text-content-strong">{{ props.value }}</span>
           </slot>

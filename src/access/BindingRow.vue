@@ -17,9 +17,9 @@ const sub = computed(() => [labels.roleKind(props.binding.role), ...props.bindin
 </script>
 
 <template>
-  <FormRow layout="setting" :label="labels.roleName(props.binding.role)" :sub="sub">
+  <FormRow layout="setting" stack-on-compact :label="labels.roleName(props.binding.role)" :sub="sub">
     <template #leading><IconTile :tone="props.binding.role.predefined ? 'anchor' : 'brand'" icon="shieldStarFill" /></template>
-    <span class="text-right text-footnote text-content-muted" data-test="binding-scope">{{ labels.scopeLabel(props.binding.scope) }}</span>
+    <span class="text-right text-footnote text-content-muted compact:text-left" data-test="binding-scope">{{ labels.scopeLabel(props.binding.scope) }}</span>
     <template v-if="$slots.trailing" #trailing><slot name="trailing" /></template>
   </FormRow>
 </template>

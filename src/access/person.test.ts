@@ -4,7 +4,7 @@ import { defineComponent, h } from "vue";
 import { defineFeature } from "../app";
 import type { Binding, Role, Scope, ScopeOptions, SubjectAccess } from "../modules/access/entities";
 import { toast } from "../overlay";
-import { settle, type Answer } from "../testing";
+import { mockMedia, settle, type Answer } from "../testing";
 import { accessPermissions } from "./context";
 import PersonAccess from "./PersonAccess.vue";
 import { choose, data, findTest, queryTest, refusal, seller, startAccess, summary, support, type Started } from "./testing";
@@ -231,5 +231,36 @@ describe("the application's adapters", () => {
     expect(ana.closest("a")?.getAttribute("href")).toBe("/people/4");
     expect(screen.getByText("Importer").closest("a")).toBeNull();
     expect(screen.getByText("Service account")).toBeTruthy();
+  });
+});
+
+describe("on a phone", () => {
+  // jsdom draws no CSS: the stacking is the `compact:` classes on the row, and the reading order is the DOM order.
+  const stacked = (row: HTMLElement) => {
+    const body = row.querySelector(".row-body > div") as HTMLElement;
+    expect(row.dataset.layout).toBe("setting");
+    expect(body.className).toContain("compact:flex-col");
+    expect(body.querySelector("[data-stacked='compact']")?.className).toContain("compact:justify-start");
+    return body;
+  };
+  const inOrder = (...parts: (HTMLElement | null)[]) =>
+    parts.slice(1).forEach((part, i) => expect(parts[i]!.compareDocumentPosition(part as Node) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy());
+
+  it("stacks a role: name and constraints, then the place, then Remove", async () => {
+    const media = mockMedia({ compact: true });
+    await mount({ "GET /v1/iam/users/4/access": data(access()) });
+    const row = (await screen.findByText("Support")).closest("[data-test='form-row']") as HTMLElement;
+    const body = stacked(row);
+    inOrder(body.querySelector("span.block"), queryTest("binding-scope"), within(row).getByRole("button", { name: "Remove" }));
+    media.restore();
+  });
+
+  it("stacks an effective permission: name, where it comes from, the reach, then Why", async () => {
+    const media = mockMedia({ compact: true });
+    await mount({ "GET /v1/iam/users/4/access": data(access()) });
+    const row = (await findTest("effective-reach")).closest("[data-test='form-row']") as HTMLElement;
+    const body = stacked(row);
+    inOrder(body.querySelector("span.block"), queryTest("effective-sources"), queryTest("effective-reach"), within(row).getByRole("button", { name: "Why" }));
+    media.restore();
   });
 });
