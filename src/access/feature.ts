@@ -4,7 +4,7 @@ import type { ScopeOptions, SubjectRef } from "../modules/access/entities";
 import type { Destination } from "../router";
 import type { PermissionCatalogue } from "./catalogue";
 import type { RoleConstraint } from "./constraints";
-import { accessContextKey } from "./context";
+import { accessContextKey, type AccessSubjects } from "./context";
 import { accessPages } from "./routes";
 
 export interface AccessFeatureOptions {
@@ -33,6 +33,13 @@ export interface AccessFeatureOptions {
    *   accessFeature({ catalogue, problems: { vehicle_kind_conflict: "roles.problems.vehicle_kind_conflict" } })
    */
   problems?: Readonly<Record<string, string>>;
+  /**
+   * Where the routes of a subject kind other than `user` are (go-core leaves them to the application); the paths answer in go-core's own wire.
+   * `PersonAccess` and the add dialog with such a subject read and write there. Without an entry the subject is refused, never sent to the user routes.
+   *
+   *   accessFeature({ catalogue, subjects: { service: { base: "/v1/iam/service-accounts", bindable: "/v1/iam/service-accounts/bindable-roles" } } })
+   */
+  subjects?: AccessSubjects;
   /** The backend's navigation destination that opens the roles list. Without it the application links to `accessPages.roles` itself. */
   destination?: Destination;
 }
@@ -54,6 +61,7 @@ export function accessFeature(options: AccessFeatureOptions): Feature {
       subjectRoute: options.subjectRoute ?? (() => null),
       constraints: options.roleConstraints ?? [],
       problems: options.problems ?? {},
+      subjects: options.subjects ?? {},
       scopes: options.scopes ?? null,
     }),
     navigation: options.destination ? [{ destination: options.destination, to: accessPages.roles, within: ["access.role", "access.roles.new"] }] : [],

@@ -109,7 +109,7 @@ async function loadRoles() {
   rolesLoading.value = true;
   const asked = `${values.level}:${values.place}`;
   try {
-    const found = await api.bindable(level.value.level, values.place);
+    const found = await api.bindable(props.subject, level.value.level, values.place);
     if (asked === `${values.level}:${values.place}`) roles.value = found;
   } catch {
     if (asked === `${values.level}:${values.place}`) rolesFailed.value = true;
