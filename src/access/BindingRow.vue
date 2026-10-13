@@ -13,7 +13,7 @@ const props = defineProps<{ binding: Pick<Binding, "role" | "scope"> }>();
 defineSlots<{ trailing?: () => unknown }>();
 
 const labels = useAccessLabels();
-const sub = computed(() => [labels.roleKind(props.binding.role), ...props.binding.role.attrs.map((attr) => `${attr.attribute}: ${attr.values.join(", ")}`)].join(" · "));
+const sub = computed(() => [labels.roleKind(props.binding.role), ...props.binding.role.attrs.map(labels.constraintLabel)].join(" · "));
 </script>
 
 <template>

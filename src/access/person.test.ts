@@ -52,6 +52,14 @@ describe("a person's roles", () => {
     expect(queryTest("effective-why")?.textContent).toContain("Support · Own · Organization");
   });
 
+  it("words a role's constraints as the application did, and leaves one it gave no text for as it is", async () => {
+    const constrained = summary({ ref: "7", id: 7, name: "Support", attrs: [{ attribute: "vehicle_kind", values: ["used"] }, { attribute: "region", values: ["north"] }] });
+    running = await startAccess({ "GET /v1/iam/users/4/access": data(access({ bindings: [binding(11, constrained)] })) }, [accessPermissions.viewAccess], "/people/4", { roleConstraints: [{ attribute: "vehicle_kind", labelKey: "roles.vehicle_kind", options: [{ value: "new", labelKey: "roles.kind.new" }, { value: "used", labelKey: "roles.kind.used" }] }] }, [personFeature]);
+    expect(await screen.findByText(/Used only/)).toBeTruthy();
+    expect(screen.getByText(/region: north/)).toBeTruthy();
+    expect(screen.queryByText(/vehicle_kind/)).toBeNull();
+  });
+
   it("says what a person without roles can do: nothing", async () => {
     await mount({ "GET /v1/iam/users/4/access": data(access({ bindings: [], effective: [] })) });
     expect(await screen.findByText("No roles")).toBeTruthy();

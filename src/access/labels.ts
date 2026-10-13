@@ -23,7 +23,7 @@ export interface ScopeName {
  */
 export function useAccessLabels() {
   const { t, te } = useI18n();
-  const { catalogue } = useAccessContext();
+  const { catalogue, constraints } = useAccessContext();
   const first = (keys: readonly string[], fallback: string): string => {
     const found = keys.find((key) => te(key));
     return found ? t(found) : fallback;
@@ -43,6 +43,12 @@ export function useAccessLabels() {
     levelLabel,
     /** A place: the level and its name (`Dealer · Auto Zagreb`); the root, which has no name, by its level. */
     scopeLabel: (scope: ScopeName) => (scope.name ? `${levelLabel(scope.level)} · ${scope.name}` : levelLabel(scope.level)),
+    /** A role's constraint as the application worded it (`Used only`); an attribute or value it gave no text for stays as `attribute: value`. */
+    constraintLabel: (attr: { attribute: string; values: readonly string[] }) => {
+      const options = constraints.find((constraint) => constraint.attribute === attr.attribute)?.options ?? [];
+      const named = attr.values.map((value) => options.find((option) => option.value === value)?.labelKey);
+      return named.every((key) => key !== undefined && te(key)) ? named.map((key) => t(key as string)).join(", ") : `${attr.attribute}: ${attr.values.join(", ")}`;
+    },
     roleKind: (role: { predefined: boolean; computed: boolean }) => t(`core.access.role_kind.${role.computed ? "computed" : role.predefined ? "predefined" : "custom"}`),
   };
 }
