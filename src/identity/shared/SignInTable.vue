@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import { DataTable, type TableColumns } from "../../collection";
 import type { SignInRow } from "../../modules/identity/entities";
 import { Badge } from "../../state";
+import { deviceLabel } from "./deviceLabel";
 import { signInEventKey, signInEventStyle } from "./signInEvents";
 
 /**
@@ -31,7 +32,7 @@ const words = (row: SignInRow) => t(signInEventKey(row.event, row.actor?.name ||
   <div class="overflow-hidden rounded-group bg-surface-cell shadow-group" data-signin-table>
     <DataTable :rows="props.rows" :columns="columns" :row-key="(row) => row.id" :loading="props.loading">
       <template #cell-event="{ item }"><Badge :tone="signInEventStyle(item.event).tone" :data-event="item.event">{{ words(item) }}</Badge></template>
-      <template #cell-device="{ item }"><span class="block truncate" :title="item.device">{{ item.device || "—" }}</span></template>
+      <template #cell-device="{ item }"><span class="block truncate" :title="item.device">{{ deviceLabel(item.device) || "—" }}</span></template>
       <template #cell-ip="{ item }"><span class="font-mono text-footnote">{{ item.ip || "—" }}</span></template>
       <template #empty><p class="px-4 py-8 text-center text-body text-content-muted" data-signin-empty>{{ t("core.account.signins.empty") }}</p></template>
     </DataTable>

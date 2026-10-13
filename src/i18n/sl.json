@@ -849,7 +849,6 @@
       "details": {
         "title": "Osebni podatki",
         "login_hint": "Uporabniško ime lahko spremeni samo skrbnik.",
-        "submit": "Shrani podatke",
         "saved": "Osebni podatki so shranjeni"
       },
       "email": {
@@ -886,7 +885,8 @@
         "show": "Pokaži gesla",
         "hide": "Skrij gesla",
         "submit": "Spremeni geslo",
-        "changed": "Geslo je spremenjeno. Odjavljeni ste na drugih napravah."
+        "changed": "Geslo je spremenjeno. Odjavljeni ste na drugih napravah.",
+        "row_sub": "Vse vaše druge naprave bodo odjavljene."
       },
       "sessions": {
         "title": "Seje",

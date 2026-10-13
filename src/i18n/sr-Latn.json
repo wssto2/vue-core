@@ -849,7 +849,6 @@
       "details": {
         "title": "Lični podaci",
         "login_hint": "Korisničko ime može promeniti samo administrator.",
-        "submit": "Sačuvaj podatke",
         "saved": "Lični podaci su sačuvani"
       },
       "email": {
@@ -886,7 +885,8 @@
         "show": "Prikaži lozinke",
         "hide": "Sakrij lozinke",
         "submit": "Promeni lozinku",
-        "changed": "Lozinka je promenjena. Odjavljeni ste na ostalim uređajima."
+        "changed": "Lozinka je promenjena. Odjavljeni ste na ostalim uređajima.",
+        "row_sub": "Svi vaši ostali uređaji biće odjavljeni."
       },
       "sessions": {
         "title": "Sesije",

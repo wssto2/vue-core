@@ -849,7 +849,6 @@
       "details": {
         "title": "Personal details",
         "login_hint": "Only an administrator can change the username.",
-        "submit": "Save details",
         "saved": "Personal details saved"
       },
       "email": {
@@ -886,7 +885,8 @@
         "show": "Show passwords",
         "hide": "Hide passwords",
         "submit": "Change password",
-        "changed": "Password changed. You were signed out on your other devices."
+        "changed": "Password changed. You were signed out on your other devices.",
+        "row_sub": "Every other device is signed out."
       },
       "sessions": {
         "title": "Sessions",

@@ -14,6 +14,7 @@ export type { PersonSection } from "./users/personSections";
 export type { ProfilePanel, ProfileSection } from "./profile/profileSections";
 export { profileRoutes } from "./profile/routes";
 export { usersRoutes } from "./users/routes";
+export { default as ActionRow } from "./shared/ActionRow.vue";
 export { default as SignInAsButton } from "./SignInAsButton.vue";
 export { isSessionEnded, lockedUntil, returnToOwnAccount, signIn, signInAs } from "./signIn";
 export { parseIdentityUser } from "./user";
