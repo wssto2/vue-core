@@ -1,3 +1,4 @@
+import type { ProfileSection } from "../profile/profileSections";
 import { defineFeatureContext, type Permission } from "../../platform";
 
 /** What the screens of `usersFeature` need from the feature that installed them. */
@@ -6,6 +7,8 @@ export interface UsersContext {
   readonly signInAs: Permission | false;
   /** The application's areas for the Activity section: an area key of the server's audit, and the i18n key that names it. */
   readonly activityAreas: Readonly<Record<string, string>>;
+  /** The panels the application adds to "My profile". */
+  readonly profileSections: readonly ProfileSection[];
 }
 
 export const [usersContextKey, useUsersContext] = defineFeatureContext<UsersContext>("vue-core.users");

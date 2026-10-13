@@ -11,6 +11,7 @@ export type { IdentityPlatformOptions } from "./session";
 export { usersFeature } from "./users/feature";
 export type { UsersFeatureOptions } from "./users/feature";
 export type { PersonSection } from "./users/personSections";
+export type { ProfilePanel, ProfileSection } from "./profile/profileSections";
 export { profileRoutes } from "./profile/routes";
 export { usersRoutes } from "./users/routes";
 export { default as SignInAsButton } from "./SignInAsButton.vue";

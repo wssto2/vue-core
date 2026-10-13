@@ -1,6 +1,7 @@
 import { defineFeature, provideContext, type Feature } from "../../app";
 import type { Permission } from "../../platform";
 import type { Destination } from "../../router";
+import type { ProfileSection } from "../profile/profileSections";
 import ProfileMenuItem from "../profile/ProfileMenuItem.vue";
 import { profileRoutes } from "../profile/routes";
 import { usersContextKey } from "./context";
@@ -23,6 +24,8 @@ export interface UsersFeatureOptions {
   activityAreas?: Readonly<Record<string, string>>;
   /** Sections the application adds to a person's record after the feature's own (their roles); each is a child route `users.record.<path>`. */
   sections?: readonly PersonSection[];
+  /** Panels the application adds to "My profile" (mobile phone, dealer and location, preferences), each placed after or before a built-in panel. */
+  profileSections?: readonly ProfileSection[];
   /** The destination of the backend's menu that opens the users list. Without it the application binds the list itself. */
   destination?: Destination;
 }
@@ -49,7 +52,7 @@ export function usersFeature(options: UsersFeatureOptions = {}): Feature {
   return defineFeature({
     id: "users",
     routes: [...(people ? withSections(options.sections ?? []) : []), ...(profile ? profileRoutes.records : [])],
-    context: provideContext(usersContextKey, { signInAs, activityAreas: options.activityAreas ?? {} }),
+    context: provideContext(usersContextKey, { signInAs, activityAreas: options.activityAreas ?? {}, profileSections: options.profileSections ?? [] }),
     navigation: people && options.destination ? [{ destination: options.destination, to: usersRoutes.index, within: ["users.record"] }] : [],
     // The entry of the account menu; a shell without that menu leaves it out.
     contributions: profile ? [{ id: "users.profile", slot: "accountMenu", component: ProfileMenuItem, scope: "authenticated", optional: true, order: -10 }] : [],
