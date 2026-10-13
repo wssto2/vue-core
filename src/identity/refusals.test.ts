@@ -63,7 +63,7 @@ describe("field errors from the server land on the fields", () => {
 
   it("of the e-mail change: a wrong password, and an address that is taken", async () => {
     await mine({ "POST /v1/iam/profile/email": fields({ current_password: "identity.password.wrong", email: "identity.email.taken" }) });
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     const dialog = within(screen.getByRole("dialog"));
     await fireEvent.update(dialog.getByLabelText(/^New e-mail address/), "ivan@example.test");
@@ -123,7 +123,7 @@ describe("a refusal of the whole action says its reason", () => {
       "POST /v1/iam/profile/email": dataOf(pending()),
       "POST /v1/iam/profile/email/confirm": jsonResponse(422, { success: false, error: "x", code: "identity.code.mismatch", params: { attempts_left: 4 } }),
     });
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^New e-mail address/), "new@example.test");
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^Current password/), "my password");
@@ -139,7 +139,7 @@ describe("a refusal of the whole action says its reason", () => {
       "POST /v1/iam/profile/email": dataOf(pending()),
       "POST /v1/iam/profile/email/confirm": fields({ email: "identity.email.taken" }),
     });
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^New e-mail address/), "new@example.test");
     await fireEvent.update(within(screen.getByRole("dialog")).getByLabelText(/^Current password/), "my password");

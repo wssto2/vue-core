@@ -16,9 +16,15 @@ describe("a session row on a narrow screen", () => {
     const separators = [...facts.querySelectorAll("[aria-hidden]")];
     expect(separators).toHaveLength(2);
     for (const separator of separators) expect(separator.className).toContain("hidden md:inline"); // no separator can start or end a line below md
-    const end = container.querySelector("[data-end-session]")!;
-    expect(end.closest("[data-session]")).not.toBeNull();
-    expect(facts.compareDocumentPosition(end) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(facts.contains(end)).toBe(false);
+    // Compact: under the facts. From md up: the row's trailing action, vertically centred (the row is not made taller).
+    const inline = container.querySelector("[data-end-session-inline]")!;
+    expect(inline.className).toContain("md:hidden");
+    expect(inline.closest("[data-session]")).not.toBeNull();
+    expect(facts.compareDocumentPosition(inline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(facts.contains(inline)).toBe(false);
+    const trailing = container.querySelector("[data-end-session]")!;
+    expect(trailing.className).toContain("hidden md:inline-flex");
+    expect(trailing.closest("[data-session]")).not.toBeNull();
+    expect(inline.contains(trailing) || trailing.contains(inline)).toBe(false);
   });
 });

@@ -28,7 +28,7 @@ const dialog = () => within(screen.getByRole("dialog"));
 const type = (code: string) => fireEvent.update(document.querySelector("[data-test='otp-input-field']") as HTMLInputElement, code);
 
 async function requestChange() {
-  await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+  await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
   await settle();
   await fireEvent.update(dialog().getByLabelText(/^New e-mail address/), "new@example.test");
   await fireEvent.update(dialog().getByLabelText(/^Current password/), "my password");
@@ -47,7 +47,7 @@ describe("changing the e-mail address", () => {
 
   it("asks for both before the server is asked", async () => {
     const { calls } = await open();
-    await fireEvent.click(document.querySelector("[data-email-change]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-change] button") as HTMLElement);
     await settle();
     await fireEvent.click(dialog().getByRole("button", { name: "Send code" }));
     await settle();
@@ -87,7 +87,7 @@ describe("changing the e-mail address", () => {
     const { calls } = await open(profile({ pending_email: pending({ resend_available_at: new Date(Date.now() - 1000).toISOString() }) }), {
       "POST /v1/iam/profile/email/resend": dataOf(pending()),
     });
-    await fireEvent.click(document.querySelector("[data-email-enter-code]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-enter-code] button") as HTMLElement);
     await settle();
     const resend = document.querySelector("[data-verify-resend]") as HTMLButtonElement;
     expect(resend.disabled).toBe(false);
@@ -115,7 +115,7 @@ describe("changing the e-mail address", () => {
     });
     const banner = document.querySelector("[data-email-pending]") as HTMLElement;
     expect(banner.textContent).toContain("Waiting for confirmation of the new address new@example.test.");
-    await fireEvent.click(document.querySelector("[data-email-enter-code]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-enter-code] button") as HTMLElement);
     await settle();
     expect(dialog().getByText("Enter the 6-digit code we sent to new@example.test.")).toBeTruthy();
     await fireEvent.click(dialog().getByRole("button", { name: "Cancel the change" }));
@@ -154,7 +154,7 @@ describe("changing the e-mail address", () => {
         "GET /v1/iam/profile/signins": listOf([]),
       },
     });
-    await fireEvent.click(document.querySelector("[data-email-enter-code]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-enter-code] button") as HTMLElement);
     await settle();
     const text = document.querySelector("[data-verify-expires]")?.textContent ?? "";
     expect(text).toMatch(/\d{2}:\d{2}/);
@@ -166,7 +166,7 @@ describe("changing the e-mail address", () => {
     await open(profile({ pending_email: pending({ resend_available_at: new Date(Date.now() - 1000).toISOString() }) }), {
       "POST /v1/iam/profile/email/resend": jsonResponse(400, { success: false, error: "x", code: "identity.code.no_pending" }),
     });
-    await fireEvent.click(document.querySelector("[data-email-enter-code]") as HTMLElement);
+    await fireEvent.click(document.querySelector("[data-email-enter-code] button") as HTMLElement);
     await settle();
     await fireEvent.click(document.querySelector("[data-verify-resend]") as HTMLElement);
     expect(await screen.findByText("There is no active code. Request a new one.")).toBeTruthy();

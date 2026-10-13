@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
-import { Button } from "../../button";
 import { IconTile } from "../../controls";
 import { useFormat } from "../../format";
 import { FormGroup, FormRow } from "../../form";
@@ -10,6 +9,7 @@ import { identityRoutes } from "../../modules/identity/routes";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
 import { useServerMessages } from "../fieldMessages";
+import ActionRow from "../shared/ActionRow.vue";
 import { isSessionEnded } from "../signIn";
 import EmailChangeDialog from "./EmailChangeDialog.vue";
 
@@ -44,17 +44,15 @@ async function cancelPending() {
 
 <template>
   <FormGroup :header="t('core.profile.email.title')" data-profile-email>
-    <FormRow layout="setting" :label="t('core.profile.email.current')" :sub="props.profile.email" data-profile-email-current>
-      <template #leading><IconTile tone="anchor" icon="mailUnreadFill" /></template>
-      <template #trailing><Button size="sm" data-email-change @click="dialog?.present(null)">{{ t("core.profile.email.change") }}</Button></template>
-    </FormRow>
-    <FormRow v-if="pending" layout="setting" :label="t('core.profile.email.pending', { email: pending.email })" :sub="t('core.profile.email.valid_until', { time: format.time(pending.expires_at) })" data-email-pending>
-      <template #leading><IconTile tone="neutral" icon="timeLine" /></template>
-      <template #trailing>
-        <Button size="sm" prominence="primary" data-email-enter-code @click="dialog?.present(pending)">{{ t("core.profile.email.enter_code") }}</Button>
-        <Button size="sm" :processing="cancelling" data-email-cancel @click="cancelPending">{{ t("core.profile.email.cancel_change") }}</Button>
-      </template>
-    </FormRow>
+    <FormRow layout="value" :label="t('core.profile.email.current')" data-profile-email-current>{{ props.profile.email }}</FormRow>
+    <ActionRow :label="t('core.profile.email.change')" data-email-change @click="dialog?.present(null)" />
+    <template v-if="pending">
+      <FormRow layout="setting" :label="t('core.profile.email.pending', { email: pending.email })" :sub="t('core.profile.email.valid_until', { time: format.time(pending.expires_at) })" data-email-pending>
+        <template #leading><IconTile tone="neutral" icon="timeLine" /></template>
+      </FormRow>
+      <ActionRow :label="t('core.profile.email.enter_code')" data-email-enter-code @click="dialog?.present(pending)" />
+      <ActionRow :label="t('core.profile.email.cancel_change')" tone="critical" :disabled="cancelling" data-email-cancel @click="cancelPending" />
+    </template>
   </FormGroup>
   <EmailChangeDialog ref="dialog" @pending="withPending" @changed="emit('updated', $event)" @cancelled="withPending(null)" />
 </template>

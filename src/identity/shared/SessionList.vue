@@ -46,7 +46,11 @@ const format = useFormat();
             {{ session.opened_by.name ? t("core.account.sessions.opened_by", { name: session.opened_by.name }) : t("core.account.sessions.opened_by_other") }}
           </Badge>
         </span>
-        <Button v-if="props.canEnd && !session.current" prominence="plain" tone="critical" size="sm" class="mt-1 -ml-2" :data-end-session="session.id" @click="emit('end', session)">{{ t("core.account.sessions.end") }}</Button>
+        <!-- Under the facts on compact; the row's trailing action from md up (below). -->
+        <Button v-if="props.canEnd && !session.current" prominence="plain" tone="critical" size="sm" class="mt-1 -ml-2 md:hidden" :data-end-session-inline="session.id" @click="emit('end', session)">{{ t("core.account.sessions.end") }}</Button>
+      </template>
+      <template v-if="props.canEnd && !session.current" #trailing>
+        <Button prominence="plain" tone="critical" size="sm" class="hidden md:inline-flex" :data-end-session="session.id" @click="emit('end', session)">{{ t("core.account.sessions.end") }}</Button>
       </template>
     </FormRow>
   </FormGroup>

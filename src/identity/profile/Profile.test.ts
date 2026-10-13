@@ -56,10 +56,11 @@ describe("my profile", () => {
 
   it("shows a change that waits for its code as a row of the e-mail group", async () => {
     const { target } = await open({}, profile({ pending_email: { email: "new@example.test", expires_at: new Date(Date.now() + 900_000).toISOString(), resend_available_at: new Date(Date.now() + 60_000).toISOString(), attempts_left: 5 } }));
-    const row = target.querySelector("[data-profile-email] [data-email-pending]");
-    expect(row?.textContent).toContain("new@example.test");
-    expect(row?.querySelector("[data-email-enter-code]")).not.toBeNull();
-    expect(row?.querySelector("[data-email-cancel]")).not.toBeNull();
+    const group = target.querySelector("[data-profile-email]")!;
+    expect(group.querySelector("[data-email-pending]")?.textContent).toContain("new@example.test");
+    expect(group.querySelector("[data-email-enter-code] button")).not.toBeNull(); // actions are rows, never inline buttons
+    expect(group.querySelector("[data-email-cancel] button")?.textContent).toContain("Cancel the change");
+    expect(group.querySelector("[data-email-change] button")).not.toBeNull();
   });
 
   it("filters its own sign-ins by All / Failed, with the server's counts", async () => {
