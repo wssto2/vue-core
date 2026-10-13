@@ -240,7 +240,7 @@ describe("on a phone", () => {
     const body = row.querySelector(".row-body > div") as HTMLElement;
     expect(row.dataset.layout).toBe("setting");
     expect(body.className).toContain("compact:flex-col");
-    expect(body.querySelector("[data-stacked='compact']")?.className).toContain("compact:justify-start");
+    expect(body.querySelector("[data-stacked='compact']")?.className).toContain("compact:flex-col");
     return body;
   };
   const inOrder = (...parts: (HTMLElement | null)[]) =>

@@ -114,7 +114,7 @@ const hasValue = computed(() => props.value !== undefined && props.value !== nul
           <small v-if="props.sub || slots.sub" :id="props.subId" class="mt-0.5 block text-footnote text-content-muted"><slot name="sub">{{ props.sub }}</slot></small>
         </div>
 
-        <div class="flex min-w-0 items-center gap-2" :data-stacked="layout === 'setting' && props.stackOnCompact ? 'compact' : undefined" :class="layout === 'value' ? 'justify-end text-right' : layout === 'setting' ? ['flex-wrap justify-end text-right', props.stackOnCompact ? 'compact:justify-start compact:text-left' : ''] : layout === 'entry' ? 'compact:justify-end' : ''">
+        <div class="flex min-w-0 items-center gap-2" :data-stacked="layout === 'setting' && props.stackOnCompact ? 'compact' : undefined" :class="layout === 'value' ? 'justify-end text-right' : layout === 'setting' ? ['flex-wrap justify-end text-right', props.stackOnCompact ? 'compact:flex-col compact:items-start compact:text-left' : ''] : layout === 'entry' ? 'compact:justify-end' : ''">
           <slot>
             <span v-if="hasValue" class="break-words text-body text-content-strong">{{ props.value }}</span>
           </slot>
