@@ -92,6 +92,25 @@ export const sendTest = notificationRoutes.test;
 export const title = (notification: Notification) => notification.title;
 ```
 
+## This browser's push, in your own screens
+
+The settings page shows push; an onboarding step of yours can too. `usePushState()` (from `@wssto2/vue-core/notifications`) reads what the settings page reads: `ready` (settled), `available` (the server has push and this browser can use it), `permission` (the browser's), `subscribed` (this browser holds a subscription its permission backs: true as soon as `ready` for a browser that already has push on, so do not offer it again), `busy`, and `enable()` (asks for the permission; call it from a tap) and `disable()`, which act on this browser only.
+
+<!-- example: docs/examples/notifications/pushState.vue -->
+```vue
+<script setup lang="ts">
+import { usePushState } from "@wssto2/vue-core/notifications";
+
+// An onboarding step: offer push only to a browser that can have it and does not yet.
+const push = usePushState();
+</script>
+
+<template>
+  <p v-if="push.permission.value === 'denied'">Notifications are blocked in this browser.</p>
+  <button v-else-if="push.ready.value && push.available.value && !push.subscribed.value" :disabled="push.busy.value" @click="push.enable()">Turn on notifications</button>
+</template>
+```
+
 ## Texts
 
 `core.notifications.*` (the inbox), `core.notifications.settings.*` and `core.notifications.dead_letters.*` in en, hr, bs, sl and sr-Latn; an application overrides any of them. go-core's reasons are `core.errors.notification.*` (`setting.enforced`, `email.unavailable`, `quiet_hours.invalid`, `category.unknown`), looked up after the application's own `errors.<reason>`. The application adds the names of its categories under `notifications.categories`:
@@ -111,4 +130,3 @@ The dev server seeds two notifications for `user` (one read, one unread) and dra
 
 Sign in as `user` and open **Notification settings** (account menu, or the gear in the inbox): the sample category and the quiet hours save against the dev server, which prints the e-mails it would send. Its categories are not enforced, so the locked row is only covered by the library's tests.
 
-Not in these screens yet: devices and push permission.

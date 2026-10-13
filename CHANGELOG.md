@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.2 — 2026-10-13
+
+Access for service accounts, a working "turn on all", worded constraints, and this browser's push state for an app's own screens. Found by ARV's moves to the library's access and notifications.
+
+### Changed (no backward compatibility)
+- **Access takes the subject's kind.** `accessFeature({ subjects: { service: { base, bindable } } })` says where an application serves the routes of a kind other than `user` (`${base}/:id/{access,scopes,bindings,bindings/:binding_id}`, in go-core's wire). `PersonAccess` and *Add role* read and write there; a kind with no entry is refused with an error that names it, never sent to the user routes. `createAccessApi(http, subjects)` takes the entries, and its `bindable(subject, level, scopeId)` now takes the subject first.
+
+### New
+- **`usePushState()`** from `/notifications`: `ready`, `available`, `permission`, `subscribed`, `busy`, `enable()`, `disable()`, built on the settings page's own state. `subscribed` is true as soon as `ready` for a browser that already has push on. Type `PushState`.
+
+### Fixed
+- **Turn on all** granted only part of a module: it read "all on" inside its loop, and once the closures had granted everything the rest were revoked again.
+- **Constraints are worded.** A role's constraints on a person's roles (`BindingRow`) use the `roleConstraints` option labels ("Used only"); an attribute or value with no label stays `attribute: value`.
+
+### Docs
+- The access recipe gains subjects and constraint labels; the notifications recipe gains `usePushState` and loses the stale "devices and push permission are not in these screens".
+
 ## 0.5.1 — 2026-10-13
 
 One renewal, sessions that do not renew, and the language before the first page. Found by ARV's move to the library's sign-in.

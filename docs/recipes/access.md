@@ -107,6 +107,24 @@ export const access = accessFeature({
 - The `attribute` is a key your permissions declare (`authz.Attributes(...)`). go-core requires **a single lowercase word** (`vehiclekind`, not `vehicle_kind`) and refuses a catalogue that breaks it; a key no permission declares is refused on save as `unknown_attribute`.
 - The choice "none" (`core.access.constraints.any`, "All" by default; `anyLabelKey` words it otherwise) **omits the key** from `attrs`, which go-core reads as "allows all". A chosen option is stored as one value.
 - A stored value list the choice cannot show (several values, an unknown one) reads as none and is kept as it is until the person changes that choice.
+- Wherever a role is shown with its constraints (a person's roles, `BindingRow`), a constraint is worded by the option's `labelKey` ("Used only"). An attribute with no `roleConstraints` entry, or a value with no option, stays as `attribute: value`.
+
+## Other kinds of subject
+
+`PersonAccess` and *Add role* take a `subject: { kind, id }`. For a `user` they use go-core's routes. go-core leaves the routes of any other kind (a service account) to the application, so give them to `accessFeature({ subjects })`, one entry per kind, answering in go-core's wire: `${base}/:id/{access,scopes,bindings,bindings/:binding_id}` and `bindable` for the roles that kind may be given. The screen then reads and writes there, and *Add role* asks that kind's `bindable`. A kind with no entry is refused with an error that names it; it is never sent to the user routes.
+
+<!-- example: docs/examples/access/subjects.ts -->
+```ts
+import { accessFeature } from "@wssto2/vue-core/access";
+import { permissions } from "./permissions";
+
+// go-core serves the access routes of people only (`/v1/iam/users/:id/...`). A service account's are yours; they answer in the same wire:
+// `${base}/:id/access`, `/scopes`, `/bindings`, `/bindings/:binding_id`, and `bindable` lists the roles it may be given at a place.
+export const access = accessFeature({
+  catalogue: permissions,
+  subjects: { service: { base: "/v1/iam/service-accounts", bindable: "/v1/iam/service-accounts/bindable-roles" } },
+});
+```
 
 ## When the server refuses a role
 
