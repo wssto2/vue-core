@@ -48,7 +48,7 @@ type RequestArguments<In> = [In] extends [void]
     : [input: In, options?: RequestOptions];
 
 /** A route declared `void` has no body: its data is `null`. */
-export type RouteResult<Out> = ApiResult<[Out] extends [void] ? null : Out>;
+export type RouteResult<Out, Meta = unknown> = ApiResult<[Out] extends [void] ? null : Out, Meta>;
 
 export interface HttpClient {
   /**
@@ -57,7 +57,7 @@ export interface HttpClient {
    * parameter rejects with a plain `Error` (a bug in the caller, not an answer from the server) before
    * anything is sent. Abort, request ids and 401 handling are those of `get` and `post`.
    */
-  request<In, Out>(route: ApiRoute<In, Out>, ...args: RequestArguments<In>): Promise<RouteResult<Out>>;
+  request<In, Out, Meta>(route: ApiRoute<In, Out, Meta>, ...args: RequestArguments<In>): Promise<RouteResult<Out, Meta>>;
   get<TData = unknown, TMeta = unknown>(path: string, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   post<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   put<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
@@ -135,7 +135,7 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     }
   }
 
-  async function request<In, Out>(route: ApiRoute<In, Out>, input?: unknown, callOptions: RequestOptions = {}): Promise<RouteResult<Out>> {
+  async function request<In, Out, Meta>(route: ApiRoute<In, Out, Meta>, input?: unknown, callOptions: RequestOptions = {}): Promise<RouteResult<Out, Meta>> {
     const values: Record<string, unknown> = typeof input === "object" && input !== null && !Array.isArray(input) ? { ...input } : {};
     const path = route.path.replace(/:([A-Za-z_][A-Za-z0-9_]*)/g, (_, name: string) => {
       const value = values[name];
@@ -147,9 +147,9 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     });
     const hasRest = Object.keys(values).length > 0;
     if (route.method === "GET" || route.method === "DELETE") {
-      return send<RouteResult<Out>["data"], unknown>(route.method, path, undefined, { ...callOptions, query: { ...(values as Record<string, QueryValue>), ...callOptions.query } });
+      return send<RouteResult<Out, Meta>["data"], Meta>(route.method, path, undefined, { ...callOptions, query: { ...(values as Record<string, QueryValue>), ...callOptions.query } });
     }
-    return send<RouteResult<Out>["data"], unknown>(route.method, path, hasRest ? values : undefined, callOptions);
+    return send<RouteResult<Out, Meta>["data"], Meta>(route.method, path, hasRest ? values : undefined, callOptions);
   }
 
   return {

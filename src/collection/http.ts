@@ -1,4 +1,4 @@
-import type { ApiResult, HttpClient, ListResult, QueryValue } from "../client";
+import type { ApiResult, HttpClient, ListResult, PageMeta, QueryValue } from "../client";
 import type { CollectionLoader, ListPage, CollectionQuery } from "./types";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -27,10 +27,11 @@ export function listParams(query: CollectionQuery): Record<string, QueryValue> {
 /**
  * Reads a list answer into a `ListPage`. Understands go-core's envelope (`data` is the rows,
  * `meta` has `total`, `page`, `per_page`, `last_page`, `from`, `to`, and may carry `views` and lookups)
- * and the shape with the numbers next to `data` (`current_page`), which is `ListResult<Row>`: pass a typed
+ * and the shape with the numbers next to `data` (`current_page`), which is `ListResult<Row>`; a `route.Page` route answers `Row[]` with a `PageMeta`. Pass a typed
  * route's result (`client.request(route, input)`) and `Row` is inferred. Missing numbers are derived
  * from what is there rather than becoming 0; `query` supplies the page and size that were asked for.
  */
+export function readListPage<Row>(result: ApiResult<readonly Row[], PageMeta>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row>;
 export function readListPage<Row>(result: ApiResult<ListResult<Row>, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row>;
 export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row>;
 export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row> {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHttpClient } from "../client";
-import { route, type ListResult } from "../client";
+import { route, type ListResult, type PageMeta } from "../client";
 import { jsonResponse, scriptedTransport } from "../testing";
 import { httpList, listParams, readListPage } from "./http";
 import { defineCollection } from "./definition";
@@ -48,6 +48,18 @@ describe("a typed route feeding a collection", () => {
     // `meta.views` is typed: no cast to read a count
     const count: number | undefined = result.data.meta?.views?.[0]?.count;
     expect(count).toBe(31);
+  });
+});
+
+describe("a route.Page route feeding a collection", () => {
+  it("reads Row[] with a PageMeta, no cast", async () => {
+    const list = route<{ page: number }, { id: number }[], PageMeta>("GET", "/v1/vehicles");
+    const meta = { total: 31, page: 2, per_page: 10, last_page: 4, from: 11, to: 11, views: [{ key: "all", count: 31 }] };
+    const { transport } = scriptedTransport(jsonResponse(200, { success: true, data: [{ id: 1 }], meta }));
+    const result = await createHttpClient({ transport }).request(list, { page: 2 });
+    const page = readListPage(result, { page: 2, pageSize: 10 });
+    expect(page.rows[0]?.id).toBe(1);
+    expect(page).toMatchObject({ total: 31, page: 2, pageSize: 10, lastPage: 4, views: [{ key: "all", count: 31 }] });
   });
 });
 

@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { createHttpClient } from "./client";
 import { isAborted, isApiError } from "./error";
-import { route } from "./route";
+import { route, type PageMeta } from "./route";
 import { jsonResponse, scriptedTransport } from "../testing";
 
 interface Ticket {
@@ -84,5 +84,29 @@ describe("client.request", () => {
     expect((await renewing.request(health)).data).toBe("again");
     const refused = await seen.client.request(health).catch((error: unknown) => error);
     expect(isApiError(refused) && refused.kind).toBe("unauthorized");
+  });
+});
+
+describe("typed meta", () => {
+  interface Totals {
+    total_price: number;
+  }
+  const withMeta = route<{ id: number }, Ticket, Totals>("GET", "/v1/tickets/:id/totals");
+  const page = route<{ page: number }, Ticket[], PageMeta>("GET", "/v1/tickets");
+
+  it("types the meta a route declares; a route without one keeps unknown", async () => {
+    const { client } = setup(
+      jsonResponse(200, { success: true, data: { id: 1, title: "x" }, meta: { total_price: 12 } }),
+      jsonResponse(200, { success: true, data: [], meta: { total: 0, page: 1, per_page: 25, last_page: 0, from: 0, to: 0 } }),
+      jsonResponse(200, { success: true, data: { id: 1, title: "x" } }),
+    );
+    const typed = await client.request(withMeta, { id: 1 });
+    expectTypeOf(typed.meta).toEqualTypeOf<Totals | null>();
+    expect(typed.meta?.total_price).toBe(12);
+    const paged = await client.request(page, { page: 1 });
+    expectTypeOf(paged.meta).toEqualTypeOf<PageMeta | null>();
+    expectTypeOf(paged.data).toEqualTypeOf<Ticket[]>();
+    const plain = await client.request(show, { id: 1 });
+    expectTypeOf(plain.meta).toEqualTypeOf<unknown>();
   });
 });
