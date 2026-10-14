@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.4 — 2026-10-14
+
+A route says what its envelope's `meta` is, so a paged list reads its numbers with no cast. Needed by go-core v1.8.7's route tables.
+
+### New
+- **`route<In, Out, Meta = unknown>`** (and `ApiRoute<In, Out, Meta>`, `RouteResult<Out, Meta>`): a route can declare the type of go-core's top-level `meta`, and `client.request` resolves to `ApiResult<Out, Meta>`. A route without a meta type is unchanged (`meta: unknown`).
+- **`PageMeta`** from `/client`: what go-core's `route.Page[T]` (`web.PageMeta`) writes: `total`, `page`, `per_page`, `last_page`, `from`, `to`, optional `views`, and any other key as `unknown`.
+- **`readListPage`** accepts an `ApiResult<Row[], PageMeta>` with no cast.
+
 ## 0.5.3 — 2026-10-13
 
 The access rows on a phone.

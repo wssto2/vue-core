@@ -166,3 +166,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | 0.5.1 | Done | branch `release-0501` | One renewal: `session.renew()` is single-flight for the timer and the 401, `renewable: false` for sessions that must not renew (embed token), and the session user's language applied before the first page. |
 | 0.5.2 | Done | branch `release-0502` | Access for any subject kind (`accessFeature({ subjects })`), "turn on all" fixed, constraint option labels on a person's roles, and `usePushState()` for an app's own screens. |
 | 0.5.3 | Done | branch `release-0503` | The access rows (`BindingRow`, `EffectiveAccess`) stack on a phone; `FormRow` `stackOnCompact`. |
+| 0.5.4 | Done | branch `release-054` | A route declares its envelope `meta` type (`route<In, Out, Meta>`); `PageMeta`; `readListPage` reads `Row[]` + `PageMeta` with no cast. |
