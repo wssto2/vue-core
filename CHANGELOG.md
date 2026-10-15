@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.8.0 — 2026-10-15
+
+Saved views over go-core's `savedview` module, for go-core v1.12.0. The `SavedViews` seam gets its server adapter, so an application no longer writes its own.
+
+### Requires
+- **go-core `v1.12.0`**: the `savedview` module (`savedview.Install`, `GET | POST /v1/saved-views` and `DELETE /v1/saved-views/:id`, a person's views per list, 20 per list). `src/modules` is regenerated and gains `savedview/`; the other modules change only in their version header. **`vue` 3.5.19 or later**, unchanged.
+
+### New
+- **`serverSavedViews(http)`** from `/collection`: a `SavedViews` over the generated `savedview` routes. Pass it as `useCollection(def, { savedViews: serverSavedViews(usePlatform().http) })`; lists stay opt-in.
+  - `list` passes the library's abort signal; `save` sends the state as a JSON string and returns the view with its state as the object it was saved as; `remove` takes the id.
+  - The state is stored as the library wrote it, with its `version`. A view that carries none is not given one: `useCollection` skips it like a view of another `stateVersion`.
+  - The server's refusals (400 at the cap, 404 for another person's view) reach the caller as `ApiError`.
+
+### Docs
+- The `SavedViews` doc comment names the adapter (it said go-core had no endpoint); the [list page](docs/recipes/list-page.md) recipe shows how a list opts in.
+
 ## 0.7.0 — 2026-10-15
 
 The incident screens and the reporter of the browser's own errors, for go-core v1.11.0. ARV's own screens (list, incident, report dialog) move into the library, on the generated `incident` module types.
