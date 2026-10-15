@@ -161,6 +161,12 @@ The account menu (desktop popover and phone sheet) lists the languages by their 
 
 The library's Bosnian is `bs` and its Serbian is `sr-Latn` (ekavian, Latin script; a bare `sr` would print Cyrillic): name the locales that way, not by market (`ba`, `rs`), which `Intl` reads as other languages. A locale the library has no texts for shows the `locale.fallback` language's. Chromium's `Intl` has no Bosnian data (it formats `bs` as English and still reports `bs`), so the library hands `Intl` `sr-Latn-BA` for `bs`: numbers, amounts, dates, calendars, relative times and country names read Bosnian in every browser, with nothing to configure.
 
+## Amounts, install and offline
+
+`createFormatting({ locale, currencySymbol: "KM" })` takes a `currencySymbol`, which is a display symbol (not an ISO code), shown after the amount and a space, and `format.money(amount)` without a currency uses it (two decimals, through your `number` formatter); `format.money(amount, "EUR")` still uses `Intl`'s currency style. `<Money :amount="price" />` from `@wssto2/vue-core/content` draws an amount that way (tabular figures, a quieter symbol) with `whole` (no fraction on a whole amount), `decimals`, `:symbol="false"`, `empty-zero` (a dash for null or 0) and `signed` (a green "+" or a red "−" for a change); a null amount reads as zero.
+
+`@wssto2/vue-core/pwa` is the client half of an installable app: call `captureInstallPrompt()` at start-up (the browser fires `beforeinstallprompt` once, early), then `useInstallPrompt()` gives `canInstall`, `installed` and `install()` for a button, with `isStandalone()` and `currentPlatform()` ("ios" | "android" | "desktop") for the iPhone hint. `registerServiceWorker({ url: "/sw.js", enabled: import.meta.env.PROD })` registers your own worker after the page loads, with the build's entry script as `?build=` so each deploy installs a fresh one; pass `enabled: false` in development and inside an embedding page's frame. The worker's caching and offline page stay yours (`installPushHandlers` from `push-worker` belongs in it).
+
 ## Permissions in the UI
 
 `AccessGate` (from `@wssto2/vue-core/platform`) shows its content only when the session's access allows it: one `permission`, `any` of several or `all` of several, typed against your `PermissionRegistry` (the same names as route `meta.access`). It follows the session, so a permission refresh applies at once, and its `fallback` slot shows something else when access is missing. It decides what to offer; the server authorizes every request.
