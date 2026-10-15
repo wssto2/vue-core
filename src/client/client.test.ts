@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createHttpClient } from "./client";
+import { createHttpClient, RECENT_REQUEST_IDS } from "./client";
 import { ApiError, isAborted, isApiError } from "./error";
 import { jsonResponse, scriptedTransport } from "../testing";
 
@@ -149,6 +149,23 @@ describe("request ids", () => {
   it("carries the id on the server's error answer, which ARV's requestVoid dropped", async () => {
     const { transport } = scriptedTransport(jsonResponse(409, { success: false, error: "in use" }, { "X-Request-ID": "abc" }));
     expect((await failure(createHttpClient({ transport }).delete("/a"))).requestId).toBe("abc");
+  });
+
+  it("keeps the ids of the last 20 answers, oldest first, and none for a cancelled request", async () => {
+    const answers = Array.from({ length: 22 }, (_, index) => jsonResponse(index === 21 ? 500 : 200, { success: true }, { "X-Request-ID": `id-${index}` }));
+    const { transport } = scriptedTransport(...answers);
+    const client = createHttpClient({ transport });
+    expect(client.recentRequestIds()).toEqual([]);
+    for (let index = 0; index < 21; index++) await client.get("/a");
+    await failure(client.get("/b"));
+    const controller = new AbortController();
+    controller.abort();
+    await failure(client.get("/c", { signal: controller.signal }));
+    const ids = client.recentRequestIds();
+    expect(ids).toHaveLength(RECENT_REQUEST_IDS);
+    expect(ids[0]).toBe("id-2");
+    expect(ids.at(-1)).toBe("id-21");
+    expect(createHttpClient({ transport }).recentRequestIds()).toEqual([]);
   });
 
   it("can be customised or turned off", async () => {

@@ -1,4 +1,4 @@
-export { createHttpClient } from "./client";
+export { createHttpClient, RECENT_REQUEST_IDS } from "./client";
 export type { HttpClient, RouteResult, HttpClientOptions, RequestOptions, UnauthorizedContext, UnauthorizedDecision } from "./client";
 export type { QueryValue } from "./encode";
 export { REQUEST_ID_HEADER } from "./envelope";

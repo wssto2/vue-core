@@ -503,7 +503,8 @@ export function createApplication(options: ApplicationOptions): Application {
   };
 }
 
-function defaultOnError(report: ApplicationErrorReport): void {
+/** What `onError` does without an application's own: one console line. Exported for handlers that add to it (`clientErrorReporter`); not part of the public API. */
+export function defaultOnError(report: ApplicationErrorReport): void {
   console.error(`[vue-core] ${report.source}${report.feature ? ` (${report.feature})` : ""}${report.detail ? `: ${report.detail}` : ""}`, report.error);
 }
 

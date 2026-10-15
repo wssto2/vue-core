@@ -63,7 +63,15 @@ export interface HttpClient {
   put<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   patch<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   delete<TData = unknown, TMeta = unknown>(path: string, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
+  /**
+   * The `X-Request-ID`s of the last requests this client got an answer to or failed to reach (the server's id, else the one sent),
+   * oldest first, at most `RECENT_REQUEST_IDS`: what a bug report quotes so the server's log can be found. A cancelled request leaves none.
+   */
+  recentRequestIds(): readonly string[];
 }
+
+/** How many request ids `recentRequestIds` keeps. */
+export const RECENT_REQUEST_IDS = 20;
 
 const isAbsolute = (path: string) => /^[a-z][a-z0-9+.-]*:\/\//i.test(path);
 
@@ -79,6 +87,12 @@ const aborted = (requestId: string | null, cause?: unknown) =>
 /** A client over a transport. Nothing is global: every call of this factory is independent. */
 export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
   const { baseUrl = "", transport = fetchTransport, credentials = "include" } = options;
+  const recent: string[] = [];
+  const remember = (id: string | null) => {
+    if (id === null) return;
+    recent.push(id);
+    if (recent.length > RECENT_REQUEST_IDS) recent.shift();
+  };
 
   async function attempt<TData, TMeta>(
     method: string,
@@ -104,10 +118,16 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
 
     try {
       const response = await transport(url, init);
-      return await readResponse<TData, TMeta>(response, sentId);
+      const result = await readResponse<TData, TMeta>(response, sentId);
+      remember(result.requestId);
+      return result;
     } catch (error) {
-      if (isApiError(error)) throw error;
+      if (isApiError(error)) {
+        remember(error.requestId);
+        throw error;
+      }
       if (signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw aborted(sentId, error);
+      remember(sentId);
       throw new ApiError({
         kind: "network",
         message: error instanceof Error ? error.message : "The server could not be reached",
@@ -160,5 +180,6 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     put: (path, body, callOptions) => send("PUT", path, body, callOptions),
     patch: (path, body, callOptions) => send("PATCH", path, body, callOptions),
     delete: (path, callOptions) => send("DELETE", path, undefined, callOptions),
+    recentRequestIds: () => [...recent],
   };
 }
