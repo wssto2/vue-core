@@ -4,13 +4,6 @@ import type { ScopeOptions, SubjectRef } from "../modules/access/entities";
 import type { PermissionCatalogue } from "./catalogue";
 import type { RoleConstraint } from "./constraints";
 
-/** Where an application serves the access routes of a subject kind other than `user`: `${base}/:id/{access,scopes,bindings,bindings/:binding_id}`, and the roles it may be given. */
-export interface SubjectRoutes {
-  readonly base: string;
-  readonly bindable: string;
-}
-export type AccessSubjects = Readonly<Partial<Record<Exclude<SubjectRef["kind"], "user">, SubjectRoutes>>>;
-
 /** What the access screens need from the feature that installed them. */
 export interface AccessContext {
   readonly catalogue: PermissionCatalogue;
@@ -21,7 +14,6 @@ export interface AccessContext {
   readonly constraints: readonly RoleConstraint[];
   /** The i18n key of the sentence for each of the application's own role-problem codes (`authz.invalid`). */
   readonly problems: Readonly<Record<string, string>>;
-  readonly subjects: AccessSubjects;
   readonly scopes: ((subject: SubjectRef, signal: AbortSignal) => Promise<ScopeOptions>) | null;
 }
 
@@ -34,4 +26,6 @@ export const accessPermissions = {
   deleteRoles: "iam.role:delete",
   viewAccess: "iam.user:view",
   manageBindings: "iam.user:manage",
+  /** The same for the roles of a service account (`kind: "service"`). */
+  manageServiceBindings: "iam.serviceaccount:manage",
 } as const;

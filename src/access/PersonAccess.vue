@@ -34,6 +34,8 @@ const { t } = useI18n();
 const labels = useAccessLabels();
 const describeError = useDescribeRefusal();
 const api = useAccessApi();
+// Whoever holds the permission of the subject's kind: a service account's roles are `iam.serviceaccount:manage`, a person's `iam.user:manage`.
+const managePermission = computed(() => (props.subject.kind === "service" ? accessPermissions.manageServiceBindings : accessPermissions.manageBindings));
 
 // A person outside the actor's reach answers 404, the same as one that does not exist: one not-found state, not an error banner.
 const missing = ref(false);
@@ -75,7 +77,7 @@ defineExpose({ reload: access.reload });
 
           <BindingRow v-for="binding in value.bindings" :key="binding.id" :binding="binding">
             <template v-if="value.can_manage" #trailing>
-              <AccessGate :permission="accessPermissions.manageBindings">
+              <AccessGate :permission="managePermission">
                 <span class="contents" :data-test="`remove-binding-${binding.id}`">
                   <Button tone="critical" prominence="secondary" size="sm" @click="((removing = binding), removeDialog?.present(binding))">{{ t("core.access.remove") }}</Button>
                 </span>
@@ -83,7 +85,7 @@ defineExpose({ reload: access.reload });
             </template>
           </BindingRow>
 
-          <AccessGate v-if="value.can_manage" :permission="accessPermissions.manageBindings">
+          <AccessGate v-if="value.can_manage" :permission="managePermission">
             <FormRow layout="stacked">
               <span class="contents" data-test="add-role">
                 <Button prominence="secondary" icon="addLine" @click="addDialog?.present()">{{ t("core.access.add_role") }}</Button>
