@@ -22,6 +22,7 @@ declare module "@wssto2/vue-core/router" {
     tickets: true;
     accounts: true;
     users: true;
+    serviceaccounts: true;
     "iam.roles": true;
     "events.deadletters": true;
   }

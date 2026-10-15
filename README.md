@@ -18,7 +18,7 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | `@wssto2/vue-core/resource`, `/page` | `useRouteResource`, `ResourcePage`, `SectionNavigator`, `AdaptivePageShell` |
 | `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives |
 | `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, `useDescribeError`, formatting, `HttpClient` and `ApiError` |
-| `@wssto2/vue-core/identity`, `/access` | go-core's module contracts (types, route tables) and, in `/identity`, `identityFeature` (sign-in page, language), `identityPlatform()` and `usersFeature` (users, "my profile"): [sign-in](docs/recipes/sign-in.md), [users](docs/recipes/users.md) |
+| `@wssto2/vue-core/identity`, `/access` | go-core's module contracts (types, route tables) and, in `/identity`, `identityFeature` (sign-in page, language), `identityPlatform()` and `usersFeature` (users, "my profile") and `serviceAccountsFeature` (service accounts and their API keys): [sign-in](docs/recipes/sign-in.md), [users](docs/recipes/users.md), [service accounts](docs/recipes/service-accounts.md) |
 | `@wssto2/vue-core/access` (screens) | `accessFeature({ catalogue })`: roles list and editor, compare, replace, a person's roles (`PersonAccess`) and what they can do: [roles and access](docs/recipes/access.md) |
 | `@wssto2/vue-core/notifications` | go-core's notification and events modules: `notificationsFeature({ categories, deadLetters })`: the bell with the unread count, the inbox (popover, bottom sheet on phones), the live stream, the failed-events page: [notifications](docs/recipes/notifications.md) |
 | `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
@@ -243,6 +243,7 @@ declare module "@wssto2/vue-core/router" {
     tickets: true;
     accounts: true;
     users: true;
+    serviceaccounts: true;
     "iam.roles": true;
     "events.deadletters": true;
   }
@@ -334,6 +335,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Sign-in](docs/recipes/sign-in.md): go-core's identity module: the sign-in page, the session wiring, the language, the module's committed types, the dev server
 - [Users and profile](docs/recipes/users.md): the users list and a person's record, "my profile" with the e-mail change by code, opting out, extra sections, refusals
+- [Service accounts](docs/recipes/service-accounts.md): the list and an account's record, its roles, API keys shown once, tenants, linking
 - [Roles and access](docs/recipes/access.md): go-core's access module: the roles list and editor from your catalogue, a person's roles and effective access, where a role applies, the refusals
 - [Notifications](docs/recipes/notifications.md): the bell, the inbox and the live stream, categories, the failed-events page, trying it against go-core's dev server
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
