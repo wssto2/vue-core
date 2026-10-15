@@ -1110,6 +1110,115 @@
           "menu": "Actions for {label}"
         }
       }
+    },
+    "incidents": {
+      "title": "Incidents",
+      "description": "Application errors and user-submitted bug reports",
+      "actions": {
+        "report": "Report a bug",
+        "add_comment": "Add comment",
+        "save": "Save changes"
+      },
+      "toasts": {
+        "report_success": "Thank you, your report has been submitted."
+      },
+      "table_columns": {
+        "title": "Title",
+        "severity": "Severity",
+        "status": "Status",
+        "source": "Source",
+        "report_count": "Reports",
+        "occurrence_count": "Occurrences",
+        "last_seen_at": "Last seen"
+      },
+      "table_filters": {
+        "status": "Status",
+        "severity": "Severity",
+        "source": "Source"
+      },
+      "statuses": {
+        "new": "New",
+        "triaged": "Triaged",
+        "in_progress": "In progress",
+        "resolved": "Resolved",
+        "ignored": "Ignored",
+        "duplicate": "Duplicate"
+      },
+      "severities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "sources": {
+        "user_report": "User report",
+        "runtime_error": "Runtime error",
+        "client_error": "Browser error",
+        "mixed": "Mixed"
+      },
+      "visibilities": {
+        "reporter_and_staff": "Reporter and staff",
+        "staff_only": "Staff only"
+      },
+      "comment_visibilities": {
+        "public": "Public",
+        "internal": "Internal (staff only)"
+      },
+      "ticket_providers": {
+        "none": "None",
+        "github": "GitHub",
+        "jira": "Jira"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "severity": "Severity",
+        "status": "Status",
+        "visibility": "Visibility",
+        "source": "Source",
+        "affected_module": "Affected module",
+        "affected_route": "Affected route",
+        "page_url": "Page URL",
+        "environment": "Environment",
+        "error_class": "Error class",
+        "error_message_sample": "Error message",
+        "stacktrace_sample": "Stack trace",
+        "steps_to_reproduce": "Steps to reproduce",
+        "expected_result": "Expected result",
+        "actual_result": "Actual result",
+        "browser_info": "Browser info",
+        "app_version": "App version",
+        "frontend_error_message": "Frontend error message",
+        "frontend_stacktrace": "Frontend stack trace",
+        "first_seen_at": "First seen",
+        "last_seen_at": "Last seen",
+        "occurrence_count": "Occurrences",
+        "reporter": "Reporter",
+        "assignee": "Assignee",
+        "external_ticket": "External ticket",
+        "external_ticket_provider": "External ticket provider",
+        "external_ticket_id": "External ticket ID",
+        "external_ticket_url": "External ticket URL",
+        "resolution_summary": "Resolution summary",
+        "comment_body": "Comment",
+        "comment_visibility": "Comment visibility"
+      },
+      "report_modal": {
+        "title": "Report a bug",
+        "description": "Let us know what went wrong",
+        "advanced_fields": "Additional details (staff)",
+        "submit": "Submit report",
+        "menu": "Report a bug"
+      },
+      "details": {
+        "overview": "Overview",
+        "user_reports": "User reports",
+        "no_reports": "No reports linked to this incident yet.",
+        "comments": "Comments",
+        "no_comments": "No comments yet.",
+        "summary": "Summary",
+        "management": "Management"
+      }
     }
   }
 }

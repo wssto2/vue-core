@@ -1110,6 +1110,115 @@
           "menu": "Dejanja za {label}"
         }
       }
+    },
+    "incidents": {
+      "title": "Incidenti",
+      "description": "Napake v aplikaciji in prijave uporabnikov",
+      "actions": {
+        "report": "Prijavi napako",
+        "add_comment": "Dodaj komentar",
+        "save": "Shrani spremembe"
+      },
+      "toasts": {
+        "report_success": "Hvala, vaša prijava je bila poslana."
+      },
+      "table_columns": {
+        "title": "Naslov",
+        "severity": "Resnost",
+        "status": "Status",
+        "source": "Vir",
+        "report_count": "Prijave",
+        "occurrence_count": "Pojavitve",
+        "last_seen_at": "Nazadnje videno"
+      },
+      "table_filters": {
+        "status": "Status",
+        "severity": "Resnost",
+        "source": "Vir"
+      },
+      "statuses": {
+        "new": "Novo",
+        "triaged": "Razvrščeno",
+        "in_progress": "V teku",
+        "resolved": "Rešeno",
+        "ignored": "Prezrto",
+        "duplicate": "Podvojeno"
+      },
+      "severities": {
+        "low": "Nizka",
+        "medium": "Srednja",
+        "high": "Visoka",
+        "critical": "Kritična"
+      },
+      "sources": {
+        "user_report": "Prijava uporabnika",
+        "runtime_error": "Sistemska napaka",
+        "client_error": "Napaka brskalnika",
+        "mixed": "Mešano"
+      },
+      "visibilities": {
+        "reporter_and_staff": "Prijavitelj in osebje",
+        "staff_only": "Samo osebje"
+      },
+      "comment_visibilities": {
+        "public": "Javno",
+        "internal": "Interno (samo osebje)"
+      },
+      "ticket_providers": {
+        "none": "Brez",
+        "github": "GitHub",
+        "jira": "Jira"
+      },
+      "fields": {
+        "title": "Naslov",
+        "description": "Opis",
+        "severity": "Resnost",
+        "status": "Status",
+        "visibility": "Vidnost",
+        "source": "Vir",
+        "affected_module": "Prizadeti modul",
+        "affected_route": "Prizadeta pot",
+        "page_url": "URL strani",
+        "environment": "Okolje",
+        "error_class": "Vrsta napake",
+        "error_message_sample": "Sporočilo napake",
+        "stacktrace_sample": "Stack trace",
+        "steps_to_reproduce": "Koraki za ponovitev",
+        "expected_result": "Pričakovan rezultat",
+        "actual_result": "Dejanski rezultat",
+        "browser_info": "Podatki o brskalniku",
+        "app_version": "Različica aplikacije",
+        "frontend_error_message": "Sporočilo napake (frontend)",
+        "frontend_stacktrace": "Stack trace (frontend)",
+        "first_seen_at": "Prvič videno",
+        "last_seen_at": "Nazadnje videno",
+        "occurrence_count": "Število pojavitev",
+        "reporter": "Prijavitelj",
+        "assignee": "Odgovorna oseba",
+        "external_ticket": "Zunanji ticket",
+        "external_ticket_provider": "Ponudnik zunanjega ticketa",
+        "external_ticket_id": "ID zunanjega ticketa",
+        "external_ticket_url": "URL zunanjega ticketa",
+        "resolution_summary": "Povzetek rešitve",
+        "comment_body": "Komentar",
+        "comment_visibility": "Vidnost komentarja"
+      },
+      "report_modal": {
+        "title": "Prijavi napako",
+        "description": "Povejte nam, kaj ni v redu",
+        "advanced_fields": "Dodatni podatki (osebje)",
+        "submit": "Pošlji prijavo",
+        "menu": "Prijavi napako"
+      },
+      "details": {
+        "overview": "Pregled",
+        "user_reports": "Prijave uporabnikov",
+        "no_reports": "Za ta incident še ni povezanih prijav.",
+        "comments": "Komentarji",
+        "no_comments": "Še ni komentarjev.",
+        "summary": "Povzetek",
+        "management": "Upravljanje"
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@wssto2/vue-core",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "goCore": "v1.11.0",
   "description": "Shared Vue 3 library for go-core applications: app shell, list / record / form pages and their controls.",
   "keywords": [
@@ -120,6 +120,10 @@
     "./notifications": {
       "types": "./dist/notifications/index.d.ts",
       "import": "./dist/notifications/index.js"
+    },
+    "./incidents": {
+      "types": "./dist/incidents/index.d.ts",
+      "import": "./dist/incidents/index.js"
     },
     "./push-worker": {
       "types": "./dist/push-worker/index.d.ts",
