@@ -103,8 +103,8 @@ export interface ApplicationOptions {
   router?: ApplicationRouterOptions;
   i18n?: ApplicationI18nOptions;
   locale?: ApplicationLocaleOptions;
-  /** Replace any of the `Intl` formatters (ARV shows `DD.MM.YYYY.`). */
-  formatting?: Partial<Formatters>;
+  /** Replace any of the `Intl` formatters (ARV shows `DD.MM.YYYY.`), and the symbol shown after an amount without an ISO currency ("€", "KM"). */
+  formatting?: Partial<Formatters> & { currencySymbol?: string };
   /** Message namespaces the application or its shell owns itself, outside any feature. */
   messages?: readonly MessageNamespace[];
   /** The application's icons (`installIcons`): one set, or several partial ones (a feature's own) that are merged. */
@@ -230,7 +230,8 @@ export function createApplication(options: ApplicationOptions): Application {
   for (const [locale, messages] of Object.entries(coreMessages)) composer.mergeLocaleMessage(locale, messages);
   for (const [locale, messages] of Object.entries(options.i18n?.messages ?? {})) composer.mergeLocaleMessage(locale, messages as Record<string, unknown>);
 
-  const formatting: Formatting = createFormatting({ locale: () => composer.locale.value, formatters: options.formatting });
+  const { currencySymbol, ...formatters } = options.formatting ?? {};
+  const formatting: Formatting = createFormatting({ locale: () => composer.locale.value, formatters, currencySymbol });
 
   const namespaces = [...features.flatMap((feature) => feature.messages), ...(options.messages ?? [])];
   const report = (value: Omit<ApplicationErrorReport, "route">) =>

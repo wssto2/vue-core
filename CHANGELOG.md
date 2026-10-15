@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.0 — 2026-10-15
+
+File downloads and streams on the client, keyboard shortcuts that work on every layout, amounts with an application's own currency symbol, and the client half of an installable web app. go-core is unchanged (`v1.12.0`).
+
+### Fixed
+- **Shortcuts on a symbol key** (`/`, `?`) now fire on layouts where the symbol needs Shift, such as Shift+7 for `/` on a Croatian keyboard. Set `shiftKey` explicitly to require Shift. The help dialog's `?` no longer requires Shift.
+
+### New
+- **client:** `http.download(path, options)` fetches a file and resolves to `{ blob, filename, requestId }`; `filename` comes from `Content-Disposition` (RFC 6266: `filename*` wins, quotes handled, null when absent). `http.stream(path, options)` resolves to the raw `Response` for server-sent events and other streams. Both use the same base URL, credentials, `headers()` hook, `X-Request-ID`, abort and single 401 renew-and-retry as the JSON calls. `options` takes `accept` (default: any type) and, with `method: "POST"`, a `body` encoded like `post`. A non-2xx answer throws an `ApiError` built from the JSON error body, keeping `code`, `params` and `fields`. New exported types: `DownloadResult`, `RawRequestOptions`.
+- **shortcuts:** `KeyboardShortcut.mod`. One registration `{ key: "k", mod: true }` means Ctrl or ⌘ alone, and is listed as "⌘ K" on Apple platforms and "Ctrl K" elsewhere.
+- **format:** `createFormatting({ currencySymbol })` and `Formatting.currencySymbol`; `format.money(amount)` without an ISO currency shows the amount with two decimals through `formatters.number`, then the symbol (`1.234,50 KM`). `createApplication({ formatting: { currencySymbol } })` passes it on.
+- **content:** `<Money>` (`amount`, `whole`, `decimals`, `symbol`, `emptyZero`, `signed`), formatted through the application's number formatter and currency symbol.
+- **`@wssto2/vue-core/pwa`:** `captureInstallPrompt()`, `useInstallPrompt()` (`canInstall`, `installed`, `install()`), `isStandalone()`, `currentPlatform()`, and `registerServiceWorker({ url = "/sw.js", enabled = true })` with a `?build=` cache-buster. The caller passes `enabled: import.meta.env.PROD` (a worker would cache the dev server's modules). The worker itself stays the application's own file.
+
+### Docs
+- Typed-routes recipe: downloads and streams. App-setup recipe: amounts, install and offline.
+
 ## 0.8.0 — 2026-10-15
 
 Saved views over go-core's `savedview` module, for go-core v1.12.0. The `SavedViews` seam gets its server adapter, so an application no longer writes its own.

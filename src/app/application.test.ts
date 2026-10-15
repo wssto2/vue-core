@@ -203,6 +203,15 @@ describe("mount", () => {
     expect(target.textContent).toBe("DD.MM.YYYY.");
   });
 
+  it("passes the application's currency symbol to the formatting", async () => {
+    const { platform } = fakeBackend(signedIn(1));
+    const { useFormat } = await import("../format");
+    const probe = defineComponent({ setup() { const format = useFormat(); return () => h("p", format.currencySymbol); } });
+    const feature = defineFeature({ id: "f", routes: [{ name: "f", path: "/f", component: probe }] });
+    const target = await start(createApplication(options(platform, [loginFeature, feature], "/f", { formatting: { currencySymbol: "KM" } })));
+    expect(target.textContent).toBe("KM");
+  });
+
   it("mounting twice, or after dispose, is an error", async () => {
     const { platform } = fakeBackend(signedIn(1));
     const application = createApplication(options(platform, [loginFeature, ticketsFeature()], "/tickets"));
