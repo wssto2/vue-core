@@ -53,6 +53,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "happy-dom",
+    setupFiles: ["./vitest.setup.ts"],
+    // Room for the 5 s waits of vitest.setup.ts inside one test.
+    testTimeout: 15_000,
     // The documentation's examples are tested too: they import the library by its public name, so that name points at the source here.
     include: ["src/**/*.test.ts", "docs/examples/**/*.test.ts"],
     alias: [
