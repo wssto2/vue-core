@@ -1,5 +1,6 @@
 import { buildQuery, encodeBody, newRequestId, type QueryValue } from "./encode";
 import { readResponse, REQUEST_ID_HEADER, type ApiResult } from "./envelope";
+import { filenameFromDisposition } from "./disposition";
 import { ApiError, isApiError } from "./error";
 import type { ApiRoute } from "./route";
 import { fetchTransport, type Transport } from "./transport";
@@ -11,6 +12,21 @@ export interface RequestOptions {
   signal?: AbortSignal;
   /** False for calls that establish or end the session (sign-in, `/auth/me`), where a 401 is an answer, not an expiry. Default true. */
   handleUnauthorized?: boolean;
+}
+
+/**
+ * Options of `download` and `stream`: those of the JSON calls plus the `Accept` header (default: any type) and, for
+ * `POST`, a body encoded like the body of `post`. A body without `method: "POST"` does not compile.
+ */
+export type RawRequestOptions = RequestOptions & {
+  accept?: string;
+} & ({ method?: "GET"; body?: undefined } | { method: "POST"; body?: unknown });
+
+/** A file the server answered: the bytes, the name its `Content-Disposition` proposes (RFC 6266; null when it proposes none) and the exchange's request id. */
+export interface DownloadResult {
+  blob: Blob;
+  filename: string | null;
+  requestId: string | null;
 }
 
 /** What `onUnauthorized` decides: send the request once more (the session was renewed) or let the 401 fail. */
@@ -64,6 +80,20 @@ export interface HttpClient {
   patch<TData = unknown, TMeta = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   delete<TData = unknown, TMeta = unknown>(path: string, options?: RequestOptions): Promise<ApiResult<TData, TMeta>>;
   /**
+   * Fetches a file. Base URL, credentials, `headers()`, `X-Request-ID`, abort and the single 401 renew-and-retry are those of
+   * `get`; `Accept` accepts any type unless `options.accept` says otherwise. A non-2xx answer throws the same `ApiError` a JSON call
+   * would (its `code`, `fields` and `params` come from the JSON error body), so the caller words a failed download like any failure.
+   * The whole body is read before this resolves.
+   */
+  download(path: string, options?: RawRequestOptions): Promise<DownloadResult>;
+  /**
+   * Opens a long-lived answer (server-sent events, a streamed file) and resolves with the raw `Response` as soon as its headers
+   * are in, body unread: read `response.body`, and pass `options.signal` to end it. Headers, credentials, request id and the 401
+   * retry are those of `download`; a non-2xx answer throws an `ApiError`. Once it has resolved, a read that fails or is cancelled
+   * rejects with the platform's own error, not an `ApiError`.
+   */
+  stream(path: string, options?: RawRequestOptions): Promise<Response>;
+  /**
    * The `X-Request-ID`s of the last requests this client got an answer to or failed to reach (the server's id, else the one sent),
    * oldest first, at most `RECENT_REQUEST_IDS`: what a bug report quotes so the server's log can be found. A cancelled request leaves none.
    */
@@ -94,18 +124,15 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     if (recent.length > RECENT_REQUEST_IDS) recent.shift();
   };
 
-  async function attempt<TData, TMeta>(
-    method: string,
-    path: string,
-    body: unknown,
-    callOptions: RequestOptions,
-  ): Promise<ApiResult<TData, TMeta>> {
+  type Reader<T> = (response: Response, sentId: string | null) => Promise<T>;
+
+  async function attempt<T>(method: string, path: string, body: unknown, callOptions: RequestOptions, accept: string, read: Reader<T>): Promise<T> {
     const { signal } = callOptions;
     const sentId = options.requestId === false ? null : (options.requestId ?? newRequestId)();
     if (signal?.aborted) throw aborted(sentId, signal.reason);
 
     const encoded = encodeBody(body);
-    const headers = new Headers({ Accept: "application/json" });
+    const headers = new Headers({ Accept: accept });
     const extra = options.headers ? await options.headers() : undefined;
     for (const source of [extra, callOptions.headers]) {
       if (source) new Headers(source).forEach((value, name) => headers.set(name, value));
@@ -118,9 +145,7 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
 
     try {
       const response = await transport(url, init);
-      const result = await readResponse<TData, TMeta>(response, sentId);
-      remember(result.requestId);
-      return result;
+      return await read(response, sentId);
     } catch (error) {
       if (isApiError(error)) {
         remember(error.requestId);
@@ -137,22 +162,35 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     }
   }
 
-  async function send<TData, TMeta>(
-    method: string,
-    path: string,
-    body: unknown,
-    callOptions: RequestOptions = {},
-  ): Promise<ApiResult<TData, TMeta>> {
+  async function send<T>(method: string, path: string, body: unknown, callOptions: RequestOptions, accept: string, read: Reader<T>): Promise<T> {
     try {
-      return await attempt<TData, TMeta>(method, path, body, callOptions);
+      return await attempt(method, path, body, callOptions, accept, read);
     } catch (error) {
       if (!isApiError(error) || error.kind !== "unauthorized" || callOptions.handleUnauthorized === false || !options.onUnauthorized) {
         throw error;
       }
       const decision = await options.onUnauthorized({ error, method, path });
       if (decision !== "retry") throw error;
-      return attempt<TData, TMeta>(method, path, body, callOptions);
+      return attempt(method, path, body, callOptions, accept, read);
     }
+  }
+
+  const sendJson = <TData, TMeta>(method: string, path: string, body: unknown, callOptions: RequestOptions = {}) =>
+    send<ApiResult<TData, TMeta>>(method, path, body, callOptions, "application/json", async (response, sentId) => {
+      const result = await readResponse<TData, TMeta>(response, sentId);
+      remember(result.requestId);
+      return result;
+    });
+
+  /** The raw calls: an error answer is read as a JSON call reads it (and throws); a success is handed to `use`. */
+  function sendRaw<T>(path: string, options: RawRequestOptions = {}, use: (response: Response, requestId: string | null) => Promise<T>): Promise<T> {
+    const { accept = "*/*", method = "GET", body, ...callOptions } = options;
+    return send(method, path, body, callOptions, accept, async (response, sentId) => {
+      if (!response.ok) await readResponse(response, sentId); // always throws for a non-2xx answer
+      const requestId = response.headers.get(REQUEST_ID_HEADER) ?? sentId;
+      remember(requestId);
+      return use(response, requestId);
+    });
   }
 
   async function request<In, Out, Meta>(route: ApiRoute<In, Out, Meta>, input?: unknown, callOptions: RequestOptions = {}): Promise<RouteResult<Out, Meta>> {
@@ -167,19 +205,26 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     });
     const hasRest = Object.keys(values).length > 0;
     if (route.method === "GET" || route.method === "DELETE") {
-      return send<RouteResult<Out, Meta>["data"], Meta>(route.method, path, undefined, { ...callOptions, query: { ...(values as Record<string, QueryValue>), ...callOptions.query } });
+      return sendJson<RouteResult<Out, Meta>["data"], Meta>(route.method, path, undefined, { ...callOptions, query: { ...(values as Record<string, QueryValue>), ...callOptions.query } });
     }
-    return send<RouteResult<Out, Meta>["data"], Meta>(route.method, path, hasRest ? values : undefined, callOptions);
+    return sendJson<RouteResult<Out, Meta>["data"], Meta>(route.method, path, hasRest ? values : undefined, callOptions);
   }
 
   return {
     // the rest-tuple overload is the public contract; the implementation takes its arguments positionally
     request: request as HttpClient["request"],
-    get: (path, callOptions) => send("GET", path, undefined, callOptions),
-    post: (path, body, callOptions) => send("POST", path, body, callOptions),
-    put: (path, body, callOptions) => send("PUT", path, body, callOptions),
-    patch: (path, body, callOptions) => send("PATCH", path, body, callOptions),
-    delete: (path, callOptions) => send("DELETE", path, undefined, callOptions),
+    get: (path, callOptions) => sendJson("GET", path, undefined, callOptions),
+    post: (path, body, callOptions) => sendJson("POST", path, body, callOptions),
+    put: (path, body, callOptions) => sendJson("PUT", path, body, callOptions),
+    patch: (path, body, callOptions) => sendJson("PATCH", path, body, callOptions),
+    delete: (path, callOptions) => sendJson("DELETE", path, undefined, callOptions),
+    download: (path, options) =>
+      sendRaw(path, options, async (response, requestId) => ({
+        blob: await response.blob(),
+        filename: filenameFromDisposition(response.headers.get("Content-Disposition")),
+        requestId,
+      })),
+    stream: (path, options) => sendRaw(path, options, async (response) => response),
     recentRequestIds: () => [...recent],
   };
 }
