@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.7.0 — 2026-10-15
+
+The incident screens and the reporter of the browser's own errors, for go-core v1.11.0. ARV's own screens (list, incident, report dialog) move into the library, on the generated `incident` module types.
+
+### Requires
+- **go-core `v1.11.0`**: the `incident` module (`incident.Install`, the routes under `/v1/incidents` with `POST /v1/incidents/client-errors`, the permissions `incident:view | create | update | manage`, the people as `{ id, name, email }`). `src/modules` is regenerated and gains `incident/`. **`vue` 3.5.19 or later**, unchanged.
+
+### New
+- **`incidentsFeature({ destination?, appVersion? })`** from `/incidents`, with `incidentsRoutes` (`incidents.index` at `/incidents`, `incidents.details` at `/incidents/:incidentID`), `incidentRoutes` and the types (`Incident`, `IncidentReport`, `IncidentComment`, `IncidentPerson`, `IncidentMeta`).
+  - **The list** (`CollectionPage`): last seen first, code, severity, status, source, report and occurrence counts; filters on date, status, severity and source; *Report a bug* behind `incident:create`.
+  - **An incident**: what happened, the reports and comments (internal ones marked), a summary, previous / next within the list; for `incident:update` the management form (status, severity, visibility, resolution, external ticket); comments public or, for `incident:manage`, internal. The people (reporter, assignee, authors) show as name and e-mail.
+  - **Report a bug**: a dialog from an account-menu row and the list, behind `incident:create`; the page, the browser and `appVersion` are filled in, and `incident:manage` also sees the advanced fields.
+  - Texts in English, Croatian, Bosnian, Slovenian and Serbian (`core.incidents.*`, 81 keys each). The `client_error` source reads "Browser error".
+- **`clientErrorReporter({ platform, appVersion?, onError?, origin? })`** from `/incidents`: an `onError` for `createApplication` that reports the browser's errors to `POST /v1/incidents/client-errors`. Reported: component errors, unhandled rejections and window errors that carry a real `Error` with a frame of the application's own origin, while someone is signed in. Not reported: `ApiError` of any kind, `Script error.`, extension and cross-origin errors, and effect, load and router failures. Each error (message plus top frame) goes once per page session, at most `MAX_REPORTS_PER_SESSION` (20); the message, stack, route path, browser, version and the last request ids are sent, cut to the server's bounds. It never throws, is never awaited and never reports its own failure; every report is handed on to `onError` (the console line by default).
+- **`HttpClient.recentRequestIds()`** from `/client`, and `RECENT_REQUEST_IDS` (20): the `X-Request-ID`s of the last requests the client got an answer to or failed to reach, oldest first. A bug report quotes them to find the server's log.
+- Three icons in the library's own set: `gitRepositoryCommitsFill`, `fileTextLine`, `chat4Fill`.
+
+### Changed (no backward compatibility)
+- **`HttpClient` has a new method, `recentRequestIds()`.** A fake that implements the interface adds it (`() => []`); `createHttpClient` and the test platform have it.
+
+### Docs
+- New recipe [incidents](docs/recipes/incidents.md); the README lists `/incidents`.
+
 ## 0.6.0 — 2026-10-15
 
 The service account screens, for go-core v1.9.0. ARV's own screens (list, record, keys, new-key sheet, the key shown once) move into the library, on the generated `serviceaccount` module types.

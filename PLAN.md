@@ -168,3 +168,4 @@ Later (not in this run; they need go-core backend modules first): users & sign-i
 | 0.5.3 | Done | branch `release-0503` | The access rows (`BindingRow`, `EffectiveAccess`) stack on a phone; `FormRow` `stackOnCompact`. |
 | 0.5.4 | Done | branch `release-054` | A route declares its envelope `meta` type (`route<In, Out, Meta>`); `PageMeta`; `readListPage` reads `Row[]` + `PageMeta` with no cast. |
 | 0.6.0 | Done | branch `release-060` | The service account screens for go-core v1.9.0 (`serviceAccountsFeature`: list, record with access and API keys, the key shown once); a `service` subject uses go-core's own routes and `accessFeature({ subjects })` is removed. |
+| 0.7.0 | Done | branch `release-070` | The incident screens for go-core v1.11.0 (`incidentsFeature`: list, incident with reports, comments and management form, "Report a bug") and `clientErrorReporter` (the browser's errors reported as incidents); `HttpClient.recentRequestIds()`. |
