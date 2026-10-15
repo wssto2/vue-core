@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.6.0 — 2026-10-15
+
+The service account screens, for go-core v1.9.0. ARV's own screens (list, record, keys, new-key sheet, the key shown once) move into the library, on the generated `serviceaccount` module types.
+
+### Requires
+- **go-core `v1.9.0`**: `identity.WithServiceAccounts` (the routes under `/v1/iam/service-accounts`, with the access routes of an account), the wire names `tenant` / `tenant_id` and `owner` / `owner_id`. `src/modules` is regenerated and gains `serviceaccount/`. **`vue` 3.5.19 or later**, unchanged.
+
+### New
+- **`serviceAccountsFeature({ tenants?, destination? })`** from `/identity`, with `serviceAccountsRoutes` (`serviceaccounts.index` at `/iam/service-accounts`, `serviceaccounts.record` at `/iam/service-accounts/:id`) and `serviceaccountRoutes`, `ServiceAccount`, `ApiKey`, `CreatedApiKey`, `AccountTenant` and the list types. It requires `accessFeature()`.
+  - **The list** in grouped rows: description, tenant (when the application has them), the person who answers, last call, live keys. Views Active / Inactive / All counted under the search, which reads name, description and the responsible person. *New service account* opens the new account on its *Access* tab.
+  - **An account's record** in tabs (`?tab=general | access | keys`): its data, its roles (`PersonAccess` with `{ kind: "service", id }`) and its keys; *Edit account* and *Deactivate account* (which asks first and cannot be undone) behind `iam.serviceaccount:manage`.
+  - **API keys**: each key with the start of it, who made it, last use and expiry; *New API key* (`:manage`; name and an optional expiry, the end of the chosen day), *Revoke* (`:revoke`, asks first). The secret is shown **once**, in a sheet with *Copy* (the clipboard, or the old selection copy on a page without one) that only *I have saved the key* closes, and is dropped when it does.
+  - **Tenants** (`tenants: { labelKey, options }`): the application's word for a tenant and the ones to offer. Whoever holds `:manage` outside every tenant may also make an account of the whole organization; anyone who holds it at one tenant has to choose one. Without `tenants` none is shown or asked.
+  - Texts in English, Croatian, Bosnian, Slovenian and Serbian (`core.serviceaccounts.*`).
+- **`accessPermissions.manageServiceBindings`** (`iam.serviceaccount:manage`).
+
+### Changed (no backward compatibility)
+- **`accessFeature({ subjects })` is removed**, with `createAccessApi(http, subjects)`'s second argument, `AccessSubjects` and `SubjectRoutes`. A subject is a `user` or a `service` (go-core's `SubjectKind`), and go-core serves both: a `service` subject goes to `/v1/iam/service-accounts/:id/{access,scopes,bindings,bindings/:binding_id}` and `bindable-roles` with no configuration. An application that passed `subjects: { service: … }` deletes it.
+- **`PersonAccess` offers *Add role* and removal by the subject's kind**: `iam.serviceaccount:manage` for a service account, `iam.user:manage` for a person (before, a service account's roles needed `iam.user:manage`).
+
+### Docs
+- New recipe [service accounts](docs/recipes/service-accounts.md); the access recipe's "Other kinds of subject" becomes "A service account's roles".
+
 ## 0.5.4 — 2026-10-14
 
 A route says what its envelope's `meta` is, so a paged list reads its numbers with no cast. Needed by go-core v1.8.7's route tables.
