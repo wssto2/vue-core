@@ -13,6 +13,11 @@ export interface KeyboardShortcut {
   shiftKey?: boolean;
   altKey?: boolean;
   metaKey?: boolean;
+  /**
+   * The platform's command modifier: Ctrl or ⌘ alone (one of the two, with `shiftKey`/`altKey` as set), on every platform,
+   * so a Mac keyboard on a Windows browser still works; listed as ⌘ on Apple platforms and Ctrl elsewhere. Replaces `ctrlKey` and `metaKey`.
+   */
+  mod?: boolean;
   /** What it does, in the app's language ("Search the list"); a function is read when the list is read, so it follows the locale. An empty text is not listed. */
   label?: string | (() => string);
   /** The heading it is listed under; any name the app has a heading for. The library's own use `"list"` and `"record"`. */
@@ -22,14 +27,11 @@ export interface KeyboardShortcut {
 const SYMBOL_KEY = /^[^\p{L}\p{N}\s]$/u;
 
 export function matchesShortcut(event: KeyboardEvent, shortcut: KeyboardShortcut): boolean {
-  const shift = shortcut.shiftKey === undefined && SYMBOL_KEY.test(shortcut.key) ? true : event.shiftKey === (shortcut.shiftKey ?? false);
-  return (
-    event.key.toLowerCase() === shortcut.key.toLowerCase() &&
-    event.ctrlKey === (shortcut.ctrlKey ?? false) &&
-    shift &&
-    event.altKey === (shortcut.altKey ?? false) &&
-    event.metaKey === (shortcut.metaKey ?? false)
-  );
+  const shift = (shortcut.shiftKey === undefined && SYMBOL_KEY.test(shortcut.key)) || event.shiftKey === (shortcut.shiftKey ?? false);
+  const modifiers = shortcut.mod
+    ? event.ctrlKey !== event.metaKey
+    : event.ctrlKey === (shortcut.ctrlKey ?? false) && event.metaKey === (shortcut.metaKey ?? false);
+  return event.key.toLowerCase() === shortcut.key.toLowerCase() && shift && modifiers && event.altKey === (shortcut.altKey ?? false);
 }
 
 function isTyping(target: EventTarget | null): boolean {
@@ -57,7 +59,7 @@ export function useKeyboardShortcut(
 
     const listener = (event: KeyboardEvent) => {
       if (event.repeat || !matchesShortcut(event, current)) return;
-      if (!(current.ctrlKey || current.altKey || current.metaKey) && isTyping(event.target)) return;
+      if (!(current.mod || current.ctrlKey || current.altKey || current.metaKey) && isTyping(event.target)) return;
       if (run(event) !== false) event.preventDefault();
     };
     window.addEventListener("keydown", listener);
@@ -85,12 +87,14 @@ function list(shortcut: KeyboardShortcut): { remove(): void } {
 export function shortcutKeys(shortcut: KeyboardShortcut): string[] {
   const apple = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
   const names = apple ? { ctrl: "⌃", alt: "⌥", shift: "⇧", meta: "⌘" } : { ctrl: "Ctrl", alt: "Alt", shift: "Shift", meta: "Meta" };
+  const ctrl = shortcut.mod ? !apple : shortcut.ctrlKey;
+  const meta = shortcut.mod ? apple : shortcut.metaKey;
   const key = KEY_NAMES[shortcut.key] ?? (shortcut.key.length === 1 ? shortcut.key.toUpperCase() : shortcut.key);
   return [
-    ...(shortcut.ctrlKey ? [names.ctrl] : []),
+    ...(ctrl ? [names.ctrl] : []),
     ...(shortcut.altKey ? [names.alt] : []),
     ...(shortcut.shiftKey ? [names.shift] : []),
-    ...(shortcut.metaKey ? [names.meta] : []),
+    ...(meta ? [names.meta] : []),
     key,
   ];
 }

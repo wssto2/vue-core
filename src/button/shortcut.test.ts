@@ -1,5 +1,5 @@
 import { render } from "@testing-library/vue";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick, ref } from "vue";
 import { matchesShortcut, shortcutKeys, useKeyboardShortcut, useShortcutRegistry, type KeyboardShortcut } from "./shortcut";
 
@@ -79,5 +79,35 @@ describe("matchesShortcut: Shift", () => {
     expect(matchesShortcut(press({ key: "j" }), { key: "j" })).toBe(true);
     expect(matchesShortcut(press({ key: "ArrowRight", shiftKey: true }), { key: "ArrowRight" })).toBe(false);
     expect(matchesShortcut(press({ key: "7", shiftKey: true }), { key: "7" })).toBe(false);
+  });
+});
+
+describe("mod", () => {
+  const platform = (value: string) => vi.spyOn(navigator, "platform", "get").mockReturnValue(value);
+  afterEach(() => vi.restoreAllMocks());
+
+  it("matches Ctrl or Meta alone, on every platform", () => {
+    const k = { key: "k", mod: true };
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true }), k)).toBe(true);
+    expect(matchesShortcut(press({ key: "k", metaKey: true }), k)).toBe(true);
+    expect(matchesShortcut(press({ key: "k" }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, metaKey: true }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, altKey: true }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, shiftKey: true }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, shiftKey: true }), { ...k, shiftKey: true })).toBe(true);
+  });
+
+  it("is listed as ⌘ on Apple platforms and Ctrl elsewhere", () => {
+    platform("MacIntel");
+    expect(shortcutKeys({ key: "k", mod: true })).toEqual(["⌘", "K"]);
+    platform("Win32");
+    expect(shortcutKeys({ key: "k", mod: true })).toEqual(["Ctrl", "K"]);
+  });
+
+  it("fires inside a field, like any shortcut with a modifier", () => {
+    const run = vi.fn();
+    render(defineComponent({ setup() { useKeyboardShortcut({ key: "k", mod: true }, run); return () => h("input", { "data-testid": "field" }); } }));
+    document.querySelector("input")!.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
+    expect(run).toHaveBeenCalledOnce();
   });
 });
