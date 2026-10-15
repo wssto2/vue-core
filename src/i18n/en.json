@@ -808,6 +808,92 @@
         "signed_in_as_other": "Signed in as, by somebody else"
       }
     },
+    "serviceaccounts": {
+      "title": "Service account",
+      "title_plural": "Service accounts",
+      "description": "Systems that reach the API with their keys, without signing in to the app.",
+      "search": "Search service accounts",
+      "create": "New service account",
+      "create_title": "New service account",
+      "edit_title": "Edit service account",
+      "save": "Save",
+      "no_password": "A service account has no password and cannot sign in to the app.",
+      "views": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "all": "All"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "owner": "Responsible person",
+        "owner_hint": "The responsible person answers for the account and its keys."
+      },
+      "active_keys": "Active keys: {count}",
+      "last_call": "Last call: {at}",
+      "last_call_label": "Last call",
+      "deactivated": "Deactivated",
+      "deactivated_on": "Deactivated {date}",
+      "active": "Active",
+      "status": "Status",
+      "made_by": "Created by",
+      "never_used": "Never used",
+      "empty": "No service accounts.",
+      "tabs": {
+        "general": "General",
+        "access": "Access",
+        "keys": "API keys"
+      },
+      "actions": {
+        "edit": "Edit account",
+        "deactivate": "Deactivate account"
+      },
+      "deactivate_title": "Deactivate the service account?",
+      "deactivate_body": "The keys of “{name}” stop working at once. Deactivation cannot be undone.",
+      "toasts": {
+        "saved": "Service account saved",
+        "deactivated": "Service account deactivated"
+      },
+      "errors": {
+        "too_long": "The maximum length is exceeded.",
+        "deactivate": "The account was not deactivated. Try again."
+      },
+      "keys": {
+        "title": "API keys",
+        "footer": "A key is shown only once, when it is made; only its fingerprint is stored. To replace one, make a new key, move the system over to it, then revoke the old one.",
+        "empty_title": "No API keys",
+        "empty_description": "Without a key the account cannot call the API.",
+        "new": "New API key",
+        "new_title": "New API key",
+        "new_footer": "The name says where the key is used (e.g. Production, Test). The account sends the key in the X-API-Key header.",
+        "create": "Create key",
+        "fields": {
+          "name": "Name",
+          "name_placeholder": "Production",
+          "expires": "Expires",
+          "expires_hint": "Optional. Without a date the key does not expire."
+        },
+        "errors": {
+          "revoke": "The key was not revoked. Try again."
+        },
+        "created_title": "The API key is created",
+        "saved_it": "I have saved the key",
+        "copy": "Copy",
+        "copied": "Key copied",
+        "once": "This is the only time the key is shown. Save it in the system now; later it can only be revoked and a new one made.",
+        "no_expiry": "Does not expire",
+        "made_by": "made by {name}, {date}",
+        "last_used": "last used {at}",
+        "never_used": "never used",
+        "expires": "expires {date}",
+        "revoked": "Revoked {date}",
+        "expired": "Expired",
+        "revoke": "Revoke",
+        "revoke_title": "Revoke the key?",
+        "revoke_body": "The key “{name}” of “{account}” stops working at once. Revoking cannot be undone.",
+        "revoked_toast": "Key revoked"
+      }
+    },
     "account": {
       "validation": {
         "required": "Required.",

@@ -19,10 +19,15 @@ export function stopApplications(): void {
   }
 }
 
-const organization = { scope: { level: "organization" }, qualifier: "all", clauses: [{ scope: { level: "organization" }, qualifier: "all" }] };
+/** Where a person holds a permission: the whole organization, or a place of a level (`{ level: "dealer", id: 1 }`). */
+export interface HeldAt {
+  readonly level: string;
+  readonly id?: number;
+}
 
-/** The answer of go-core's `/auth/me` for a person who holds `permissions` at the organization. */
-export function sessionOf(user: { id: number; name: string; login?: string; locale?: string }, permissions: readonly string[], extra: object = {}) {
+/** The answer of go-core's `/auth/me` for a person who holds `permissions` at the organization, or at `scope`. */
+export function sessionOf(user: { id: number; name: string; login?: string; locale?: string }, permissions: readonly string[], extra: object = {}, scope: HeldAt = { level: "organization" }) {
+  const organization = { scope, qualifier: "all", clauses: [{ scope, qualifier: "all" }] };
   return {
     success: true,
     data: {
@@ -50,6 +55,8 @@ export interface ScreenOptions {
   /** Who is signed in. Default Ana (id 1). */
   user?: { id: number; name: string; login?: string; locale?: string };
   permissions: readonly string[];
+  /** Where the permissions are held. Default the whole organization. */
+  scope?: HeldAt;
   /** Where the router starts. */
   location: string;
   /** The fake server's other answers, by `"METHOD /path"`. */
@@ -65,7 +72,7 @@ export interface ScreenOptions {
 
 /** Starts the application with the users feature on a fake server and waits until it settles. */
 export async function startScreen(options: ScreenOptions) {
-  const me = sessionOf(options.user ?? { id: 1, name: "Ana" }, options.permissions, options.navigation ? { navigation: options.navigation } : {});
+  const me = sessionOf(options.user ?? { id: 1, name: "Ana" }, options.permissions, options.navigation ? { navigation: options.navigation } : {}, options.scope);
   const { transport, calls } = routedTransport({
     "GET /api/v1/auth/me": jsonResponse(200, me),
     "POST /api/v1/auth/refresh": jsonResponse(401, { success: false, error: "no", code: "identity.session.invalid" }),

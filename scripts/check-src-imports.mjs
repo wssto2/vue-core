@@ -23,7 +23,7 @@ const specifier = /(?:\bfrom\s*|\bimport\s*\(?\s*|@import\s+(?:url\()?\s*)["']([
 
 const problems = [];
 for (const file of files(src)) {
-  const isTest = /\.test\.ts$/.test(file); // tests are not shipped: they may reach package.json and Node built-ins
+  const isTest = /(\.test\.ts|[\\/]testing\.ts)$/.test(file); // tests and their fixtures (`testing.ts`, not in the build) are not shipped: they may reach package.json and Node built-ins
   const code = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, ""); // comments may show example imports
   for (const [, spec] of code.matchAll(specifier)) {
     const where = `${relative(root, file)}: "${spec}"`;

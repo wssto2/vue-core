@@ -808,6 +808,92 @@
         "signed_in_as_other": "Prijava kao, neko drugi"
       }
     },
+    "serviceaccounts": {
+      "title": "Servisni nalog",
+      "title_plural": "Servisni nalozi",
+      "description": "Sistemi koji pristupaju API-ju svojim ključevima, bez prijave u aplikaciju.",
+      "search": "Pretraži servisne naloge",
+      "create": "Novi servisni nalog",
+      "create_title": "Novi servisni nalog",
+      "edit_title": "Uredi servisni nalog",
+      "save": "Sačuvaj",
+      "no_password": "Servisni nalog nema lozinku i ne može se prijaviti u aplikaciju.",
+      "views": {
+        "active": "Aktivni",
+        "inactive": "Neaktivni",
+        "all": "Svi"
+      },
+      "fields": {
+        "name": "Naziv",
+        "description": "Opis",
+        "owner": "Odgovorna osoba",
+        "owner_hint": "Odgovorna osoba odgovara za nalog i njegove ključeve."
+      },
+      "active_keys": "Aktivnih ključeva: {count}",
+      "last_call": "Poslednji poziv: {at}",
+      "last_call_label": "Poslednji poziv",
+      "deactivated": "Deaktiviran",
+      "deactivated_on": "Deaktiviran {date}",
+      "active": "Aktivan",
+      "status": "Status",
+      "made_by": "Izradio",
+      "never_used": "Nije korišćen",
+      "empty": "Nema servisnih naloga.",
+      "tabs": {
+        "general": "Opšte",
+        "access": "Pristup",
+        "keys": "API ključevi"
+      },
+      "actions": {
+        "edit": "Uredi nalog",
+        "deactivate": "Deaktiviraj nalog"
+      },
+      "deactivate_title": "Deaktivirati servisni nalog?",
+      "deactivate_body": "Ključevi naloga „{name}” prestaju da rade odmah. Deaktivacija se ne može poništiti.",
+      "toasts": {
+        "saved": "Servisni nalog je sačuvan",
+        "deactivated": "Servisni nalog je deaktiviran"
+      },
+      "errors": {
+        "too_long": "Prekoračena je najveća dužina.",
+        "deactivate": "Nalog nije deaktiviran. Pokušajte ponovo."
+      },
+      "keys": {
+        "title": "API ključevi",
+        "footer": "Ključ se prikazuje samo jednom, pri izradi; čuvamo samo njegov otisak. Za zamenu izradite novi ključ, prebacite sistem na njega, pa opozovite stari.",
+        "empty_title": "Nema API ključeva",
+        "empty_description": "Bez ključa nalog ne može pozvati API.",
+        "new": "Novi API ključ",
+        "new_title": "Novi API ključ",
+        "new_footer": "Naziv kaže gde se ključ koristi (npr. Produkcija, Test okruženje). Nalog ključem šalje zaglavlje X-API-Key.",
+        "create": "Izradi ključ",
+        "fields": {
+          "name": "Naziv",
+          "name_placeholder": "Produkcija",
+          "expires": "Ističe",
+          "expires_hint": "Neobavezno. Bez datuma ključ ne ističe."
+        },
+        "errors": {
+          "revoke": "Ključ nije opozvan. Pokušajte ponovo."
+        },
+        "created_title": "API ključ je izrađen",
+        "saved_it": "Sačuvao sam ključ",
+        "copy": "Kopiraj",
+        "copied": "Ključ je kopiran",
+        "once": "Ovo je jedini put da se ključ prikazuje. Sačuvajte ga u sistem sada; kasnije se može samo opozvati i izraditi novi.",
+        "no_expiry": "Ne ističe",
+        "made_by": "izradio {name}, {date}",
+        "last_used": "poslednje korišćenje {at}",
+        "never_used": "nije korišćen",
+        "expires": "ističe {date}",
+        "revoked": "Opozvan {date}",
+        "expired": "Istekao",
+        "revoke": "Opozovi",
+        "revoke_title": "Opozvati ključ?",
+        "revoke_body": "Ključ „{name}” naloga „{account}” prestaje da radi odmah. Opoziv se ne može poništiti.",
+        "revoked_toast": "Ključ je opozvan"
+      }
+    },
     "account": {
       "validation": {
         "required": "Obavezno polje.",

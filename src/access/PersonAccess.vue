@@ -5,7 +5,7 @@ import { Button } from "../button";
 import { FormGroup, FormRow } from "../form";
 import type { Binding, SubjectRef } from "../modules/access/entities";
 import { AlertDialog, toast } from "../overlay";
-import { AccessGate } from "../platform";
+import { AccessGate, type Permission } from "../platform";
 import { isApiError } from "../client";
 import { AsyncSection, EmptyState, useLoad } from "../state";
 import AddRoleDialog from "./AddRoleDialog.vue";
@@ -35,7 +35,7 @@ const labels = useAccessLabels();
 const describeError = useDescribeRefusal();
 const api = useAccessApi();
 // Whoever holds the permission of the subject's kind: a service account's roles are `iam.serviceaccount:manage`, a person's `iam.user:manage`.
-const managePermission = computed(() => (props.subject.kind === "service" ? accessPermissions.manageServiceBindings : accessPermissions.manageBindings));
+const managePermission = computed(() => (props.subject.kind === "service" ? accessPermissions.manageServiceBindings : accessPermissions.manageBindings) as Permission);
 
 // A person outside the actor's reach answers 404, the same as one that does not exist: one not-found state, not an error banner.
 const missing = ref(false);

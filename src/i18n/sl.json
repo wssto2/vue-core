@@ -808,6 +808,92 @@
         "signed_in_as_other": "Prijava kot, nekdo drug"
       }
     },
+    "serviceaccounts": {
+      "title": "Storitveni račun",
+      "title_plural": "Storitveni računi",
+      "description": "Sistemi, ki dostopajo do API-ja s svojimi ključi, brez prijave v aplikacijo.",
+      "search": "Išči storitvene račune",
+      "create": "Nov storitveni račun",
+      "create_title": "Nov storitveni račun",
+      "edit_title": "Uredi storitveni račun",
+      "save": "Shrani",
+      "no_password": "Storitveni račun nima gesla in se ne more prijaviti v aplikacijo.",
+      "views": {
+        "active": "Aktivni",
+        "inactive": "Neaktivni",
+        "all": "Vsi"
+      },
+      "fields": {
+        "name": "Naziv",
+        "description": "Opis",
+        "owner": "Odgovorna oseba",
+        "owner_hint": "Odgovorna oseba odgovarja za račun in njegove ključe."
+      },
+      "active_keys": "Aktivnih ključev: {count}",
+      "last_call": "Zadnji klic: {at}",
+      "last_call_label": "Zadnji klic",
+      "deactivated": "Deaktiviran",
+      "deactivated_on": "Deaktiviran {date}",
+      "active": "Aktiven",
+      "status": "Stanje",
+      "made_by": "Ustvaril",
+      "never_used": "Ni bil uporabljen",
+      "empty": "Ni storitvenih računov.",
+      "tabs": {
+        "general": "Splošno",
+        "access": "Dostop",
+        "keys": "API-ključi"
+      },
+      "actions": {
+        "edit": "Uredi račun",
+        "deactivate": "Deaktiviraj račun"
+      },
+      "deactivate_title": "Deaktivirati storitveni račun?",
+      "deactivate_body": "Ključi računa »{name}« takoj prenehajo delovati. Deaktivacije ni mogoče razveljaviti.",
+      "toasts": {
+        "saved": "Storitveni račun je shranjen",
+        "deactivated": "Storitveni račun je deaktiviran"
+      },
+      "errors": {
+        "too_long": "Presežena je največja dolžina.",
+        "deactivate": "Račun ni bil deaktiviran. Poskusite znova."
+      },
+      "keys": {
+        "title": "API-ključi",
+        "footer": "Ključ se prikaže samo enkrat, ob izdelavi; shranimo samo njegov odtis. Za zamenjavo naredite nov ključ, preusmerite sistem nanj in nato prekličite starega.",
+        "empty_title": "Ni API-ključev",
+        "empty_description": "Brez ključa račun ne more klicati API-ja.",
+        "new": "Nov API-ključ",
+        "new_title": "Nov API-ključ",
+        "new_footer": "Naziv pove, kje se ključ uporablja (npr. Produkcija, Testno okolje). Račun pošilja ključ v glavi X-API-Key.",
+        "create": "Ustvari ključ",
+        "fields": {
+          "name": "Naziv",
+          "name_placeholder": "Produkcija",
+          "expires": "Poteče",
+          "expires_hint": "Neobvezno. Brez datuma ključ ne poteče."
+        },
+        "errors": {
+          "revoke": "Ključ ni bil preklican. Poskusite znova."
+        },
+        "created_title": "API-ključ je ustvarjen",
+        "saved_it": "Ključ sem shranil",
+        "copy": "Kopiraj",
+        "copied": "Ključ je kopiran",
+        "once": "To je edini prikaz ključa. Shranite ga v sistem zdaj; pozneje ga je mogoče samo preklicati in ustvariti nov ključ.",
+        "no_expiry": "Ne poteče",
+        "made_by": "ustvaril {name}, {date}",
+        "last_used": "zadnja uporaba {at}",
+        "never_used": "ni bil uporabljen",
+        "expires": "poteče {date}",
+        "revoked": "Preklican {date}",
+        "expired": "Potekel",
+        "revoke": "Prekliči",
+        "revoke_title": "Preklicati ključ?",
+        "revoke_body": "Ključ »{name}« računa »{account}« takoj preneha delovati. Preklica ni mogoče razveljaviti.",
+        "revoked_toast": "Ključ je preklican"
+      }
+    },
     "account": {
       "validation": {
         "required": "Obvezno polje.",
