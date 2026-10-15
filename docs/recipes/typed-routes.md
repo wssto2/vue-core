@@ -102,3 +102,45 @@ export async function safely() {
 - **Misuse does not compile.** A wrong or missing input field, a wrong use of the response, and `request` on a `route.raw` (an event stream or a file: it keeps `method` and `path` for a link) are `vue-tsc` errors.
 - **Path parameters are checked by go-core**, not by TypeScript: it refuses at start-up and in `contract.Generate` a path whose `:param` has no matching `path:"..."` input field, and the reverse. The client still throws a plain `Error` naming the route and the parameter, before sending anything, if a value is missing at runtime (a `null` from an unchecked source). It is a plain `Error` because it is a bug in the caller, not an answer from the server: `isApiError` stays about the wire.
 - **The base URL.** Paths carry the version (`/v1/...`); the application's prefix (`/api`) is the client's `baseUrl`.
+
+## Downloads and streams
+
+`get` and `request` read JSON. A file or an event stream goes through `download` and `stream`, which share everything else with them: base URL, credentials, the `headers` hook, `X-Request-ID` (and `recentRequestIds`), abort through `signal`, and the single 401 renew-and-retry of `onUnauthorized`.
+
+<!-- example: docs/examples/routes/files.ts -->
+```ts
+import { createHttpClient, isApiError } from "@wssto2/vue-core/client";
+
+const http = createHttpClient({ baseUrl: "/api" });
+
+// A file: the bytes, the name the server proposes (null when it proposes none) and the request id.
+export async function saveReport(id: number, signal: AbortSignal) {
+  try {
+    const { blob, filename } = await http.download(`/v1/reports/${id}/pdf`, { signal, accept: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename ?? `report-${id}.pdf`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    // the same ApiError as a JSON call: kind, code, params, requestId from the server's error body
+    if (isApiError(error)) return error.code;
+    throw error;
+  }
+}
+
+// A POST with a body, encoded like `post`.
+export const exportRows = (ids: number[]) => http.download("/v1/rows/export", { method: "POST", body: { ids } });
+
+// A stream: the raw Response once the headers are in; the signal ends it.
+export async function follow(onEvent: (chunk: string) => void, signal: AbortSignal) {
+  const response = await http.stream("/v1/events", { accept: "text/event-stream", signal });
+  const reader = response.body!.pipeThrough(new TextDecoderStream()).getReader();
+  for (let part = await reader.read(); !part.done; part = await reader.read()) onEvent(part.value);
+}
+```
+
+- **`download(path, { method?, body?, accept?, query?, headers?, signal?, handleUnauthorized? })`** resolves to `{ blob, filename, requestId }` once the whole body is in. `method` is `GET` (default) or `POST`; `accept` defaults to any type. `filename` is read from `Content-Disposition` (RFC 6266): `filename*=UTF-8''…` wins over `filename=`, quotes are handled, a directory part is dropped, and it is `null` when the header proposes no name. Fall back to a name of your own, as above.
+- **A failed download is an `ApiError`**, built from the JSON error body exactly as for `get`: `kind` from the status, and the server's `code`, `params` and `fields`. Word it with `describeError` like any other failure. An error answer that is not JSON gives the status message and `code: null`.
+- **`stream(path, options)`** takes the same options and resolves to the raw `Response` as soon as its headers are in, so the body is yours to read; end it with the `signal`. Only the opening can throw an `ApiError` (non-2xx, 401 after the retry, network). A read that fails later, or is cancelled, rejects with the platform's own error.
+- Neither call reads the `{ success, data }` envelope; a success answer is the bytes.
