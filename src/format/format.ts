@@ -54,7 +54,13 @@ export interface Formatting {
   dateTime(value: DateInput): string;
   time(value: DateInput): string;
   number(value: number | null | undefined, options?: Intl.NumberFormatOptions): string;
-  money(amount: number | null | undefined, currency: string): string;
+  /**
+   * With an ISO `currency` ("EUR"): `Intl`'s currency style. Without one: the amount with two decimals, then the
+   * `currencySymbol` after a space ("1.234,50 KM"), or the bare amount when the application set no symbol.
+   */
+  money(amount: number | null | undefined, currency?: string): string;
+  /** The display symbol the application set (`""` when none), for a caller that draws it apart from the amount. */
+  readonly currencySymbol: string;
   /** "3 days ago", "in 2 hours", "now": the largest whole unit. */
   relative(value: DateInput, now?: Date): string;
 }
@@ -106,6 +112,8 @@ export interface FormattingOptions {
   locale: () => string;
   /** Replaces any of the `Intl` defaults. */
   formatters?: Partial<Formatters>;
+  /** The symbol shown after an amount when no ISO currency is passed: "€", "KM". It is text, not a currency code. */
+  currencySymbol?: string;
 }
 
 export function createFormatting(options: FormattingOptions): Formatting {
@@ -129,7 +137,16 @@ export function createFormatting(options: FormattingOptions): Formatting {
       return date ? formatters.time(date, options.locale()) : "";
     },
     number: (value, numberOptions) => (finite(value) ? formatters.number(value, options.locale(), numberOptions) : ""),
-    money: (amount, currency) => (finite(amount) ? formatters.money(amount, currency, options.locale()) : ""),
+    get currencySymbol() {
+      return options.currencySymbol ?? "";
+    },
+    money: (amount, currency) => {
+      if (!finite(amount)) return "";
+      if (currency) return formatters.money(amount, currency, options.locale());
+      // Through `formatters.number`, so an application's own number format applies to its amounts too.
+      const text = formatters.number(amount, options.locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return options.currencySymbol ? `${text} ${options.currencySymbol}` : text;
+    },
     relative: (value, now = new Date()) => {
       const date = toDate(value);
       return date ? formatters.relative(date, options.locale(), now) : "";

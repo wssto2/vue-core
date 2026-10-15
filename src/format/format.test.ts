@@ -17,6 +17,30 @@ describe("toDate", () => {
   });
 });
 
+describe("money without an ISO currency", () => {
+  it("shows two decimals and the display symbol after a space", () => {
+    const format = createFormatting({ locale: () => "en", currencySymbol: "KM" });
+
+    expect(format.money(1234.5)).toBe("1,234.50 KM");
+    expect(format.money(null)).toBe("");
+    expect(format.currencySymbol).toBe("KM");
+  });
+
+  it("goes through the application's number format, and an ISO currency still wins", () => {
+    const format = createFormatting({ locale: () => "en", currencySymbol: "€", formatters: { number: (value) => `<${value}>` } });
+
+    expect(format.money(2)).toBe("<2> €");
+    expect(format.money(1234.5, "USD")).toBe("$1,234.50");
+  });
+
+  it("is the bare amount when no symbol was set", () => {
+    const format = createFormatting({ locale: () => "en" });
+
+    expect(format.money(5)).toBe("5.00");
+    expect(format.currencySymbol).toBe("");
+  });
+});
+
 describe("createFormatting", () => {
   it("formats dates numerically by default, in the active locale", () => {
     const locale = ref("hr");
