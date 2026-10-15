@@ -1,7 +1,7 @@
 import { render } from "@testing-library/vue";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick, ref } from "vue";
-import { shortcutKeys, useKeyboardShortcut, useShortcutRegistry, type KeyboardShortcut } from "./shortcut";
+import { matchesShortcut, shortcutKeys, useKeyboardShortcut, useShortcutRegistry, type KeyboardShortcut } from "./shortcut";
 
 const Owner = (shortcut: () => KeyboardShortcut | undefined) =>
   defineComponent({ setup() { useKeyboardShortcut(shortcut, () => undefined); return () => h("p"); } });
@@ -55,5 +55,59 @@ describe("shortcutKeys", () => {
     const keys = shortcutKeys({ key: "s", ctrlKey: true, shiftKey: true });
     expect(keys.at(-1)).toBe("S");
     expect(keys).toHaveLength(3);
+  });
+});
+
+const press = (init: KeyboardEventInit) => new KeyboardEvent("keydown", init);
+
+describe("matchesShortcut: Shift", () => {
+  it("fires a symbol key whatever the Shift state, as on a layout where the symbol needs Shift", () => {
+    expect(matchesShortcut(press({ key: "/", shiftKey: true, code: "Digit7" }), { key: "/" })).toBe(true);
+    expect(matchesShortcut(press({ key: "/", code: "Slash" }), { key: "/" })).toBe(true);
+    expect(matchesShortcut(press({ key: "?", shiftKey: true }), { key: "?" })).toBe(true);
+    expect(matchesShortcut(press({ key: "?" }), { key: "?" })).toBe(true);
+  });
+
+  it("still requires the other modifiers exactly, and Shift when the shortcut sets it", () => {
+    expect(matchesShortcut(press({ key: "/", shiftKey: true, ctrlKey: true }), { key: "/" })).toBe(false);
+    expect(matchesShortcut(press({ key: "?" }), { key: "?", shiftKey: true })).toBe(false);
+    expect(matchesShortcut(press({ key: "?", shiftKey: true }), { key: "?", shiftKey: true })).toBe(true);
+  });
+
+  it("keeps exact Shift for letters, digits and named keys", () => {
+    expect(matchesShortcut(press({ key: "J", shiftKey: true }), { key: "j" })).toBe(false);
+    expect(matchesShortcut(press({ key: "j" }), { key: "j" })).toBe(true);
+    expect(matchesShortcut(press({ key: "ArrowRight", shiftKey: true }), { key: "ArrowRight" })).toBe(false);
+    expect(matchesShortcut(press({ key: "7", shiftKey: true }), { key: "7" })).toBe(false);
+  });
+});
+
+describe("mod", () => {
+  const platform = (value: string) => vi.spyOn(navigator, "platform", "get").mockReturnValue(value);
+  afterEach(() => vi.restoreAllMocks());
+
+  it("matches Ctrl or Meta alone, on every platform", () => {
+    const k = { key: "k", mod: true };
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true }), k)).toBe(true);
+    expect(matchesShortcut(press({ key: "k", metaKey: true }), k)).toBe(true);
+    expect(matchesShortcut(press({ key: "k" }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, metaKey: true }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, altKey: true }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, shiftKey: true }), k)).toBe(false);
+    expect(matchesShortcut(press({ key: "k", ctrlKey: true, shiftKey: true }), { ...k, shiftKey: true })).toBe(true);
+  });
+
+  it("is listed as ⌘ on Apple platforms and Ctrl elsewhere", () => {
+    platform("MacIntel");
+    expect(shortcutKeys({ key: "k", mod: true })).toEqual(["⌘", "K"]);
+    platform("Win32");
+    expect(shortcutKeys({ key: "k", mod: true })).toEqual(["Ctrl", "K"]);
+  });
+
+  it("fires inside a field, like any shortcut with a modifier", () => {
+    const run = vi.fn();
+    render(defineComponent({ setup() { useKeyboardShortcut({ key: "k", mod: true }, run); return () => h("input", { "data-testid": "field" }); } }));
+    document.querySelector("input")!.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
+    expect(run).toHaveBeenCalledOnce();
   });
 });
