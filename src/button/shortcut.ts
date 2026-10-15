@@ -3,6 +3,8 @@ import { perDocument } from "../internal/perDocument";
 
 /**
  * A keyboard shortcut: the key (case-insensitive, as `KeyboardEvent.key`) and exactly the modifiers listed.
+ * A symbol key (`/`, `?`, one character that is no letter, digit or space) matches whatever the Shift state is
+ * unless `shiftKey` is set, because on many layouts the symbol itself needs Shift (Shift+7 is `/` on a Croatian keyboard).
  * With a `label` it is listed by `useShortcutRegistry()` (a help dialog) for as long as its owner is mounted.
  */
 export interface KeyboardShortcut {
@@ -17,11 +19,14 @@ export interface KeyboardShortcut {
   group?: string;
 }
 
+const SYMBOL_KEY = /^[^\p{L}\p{N}\s]$/u;
+
 export function matchesShortcut(event: KeyboardEvent, shortcut: KeyboardShortcut): boolean {
+  const shift = shortcut.shiftKey === undefined && SYMBOL_KEY.test(shortcut.key) ? true : event.shiftKey === (shortcut.shiftKey ?? false);
   return (
     event.key.toLowerCase() === shortcut.key.toLowerCase() &&
     event.ctrlKey === (shortcut.ctrlKey ?? false) &&
-    event.shiftKey === (shortcut.shiftKey ?? false) &&
+    shift &&
     event.altKey === (shortcut.altKey ?? false) &&
     event.metaKey === (shortcut.metaKey ?? false)
   );

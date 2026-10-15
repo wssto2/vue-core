@@ -14,7 +14,7 @@ const { t, te } = useI18n();
 const modal = ref<InstanceType<typeof Modal> | null>(null);
 const rows = useShortcutRegistry();
 
-useKeyboardShortcut({ key: "?", shiftKey: true, group: "general", label: () => t("core.shortcuts.show_help") }, () => modal.value?.present());
+useKeyboardShortcut({ key: "?", group: "general", label: () => t("core.shortcuts.show_help") }, () => modal.value?.present());
 
 const sections = computed(() => {
   const groups = new Map<string, typeof rows.value>();
