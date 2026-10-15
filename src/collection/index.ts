@@ -11,7 +11,7 @@ export { useCollectionBack } from "./back";
 export type { CollectionBackOptions } from "./back";
 export { useCollectionNeighbors } from "./neighbors";
 export type { CollectionNeighbors, Neighbor, NeighborOptions } from "./neighbors";
-export { createMemorySavedViews } from "./savedViews";
+export { createMemorySavedViews, serverSavedViews } from "./savedViews";
 export type { SavedView, SavedViews, SavedViewState } from "./savedViews";
 export { default as CollectionPage } from "./CollectionPage.vue";
 export { default as CollectionTable } from "./CollectionTable.vue";
