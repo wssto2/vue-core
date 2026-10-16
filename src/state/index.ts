@@ -12,3 +12,6 @@ export { default as StatusLine } from "./StatusLine.vue";
 export type { Tone } from "./tone";
 export { useLoad, type Load, type LoadContext, type LoadOptions } from "./useLoad";
 export { DONE_BEAT_MS, WAIT_VISIBLE_AFTER_MS, useWaitStatus } from "./useWaitStatus";
+export { default as BackgroundTaskCapsule } from "./BackgroundTaskCapsule.vue";
+export { backgroundTasksKey, createBackgroundTasks, installBackgroundTasks, useBackgroundTasks } from "./backgroundTasks";
+export type { BackgroundTask, BackgroundTasks, BackgroundTaskSpec, BackgroundTaskStatus } from "./backgroundTasks";
