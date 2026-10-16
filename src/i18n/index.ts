@@ -81,6 +81,7 @@ export type CoreMessages = {
       saving: string;
       saved: string;
       more: string;
+      open: string;
     };
     state: {
       loading: string;
@@ -95,6 +96,12 @@ export type CoreMessages = {
     };
     wait: {
       seconds: string;
+    };
+    /** The install guides of `@wssto2/vue-core/pwa`; `{app}` is the application's name. */
+    pwa: {
+      android: Texts<"title" | "text" | "install">;
+      ios: { title: string; subtitle: string; next: string; steps: Texts<"more" | "share" | "add"> };
+      qr: Texts<"title" | "label" | "text" | "install_here">;
     };
     discard_changes: {
       title: string;
@@ -266,3 +273,5 @@ export { createMessageRuntime } from "./runtime";
 export type { MessageFailure, MessageRuntime, MessageRuntimeOptions, MessageTarget } from "./runtime";
 export { appErrorDescriberKey, appFieldErrorDescriberKey, useDescribeError } from "./describeError";
 export type { AppErrorDescriber, AppFieldErrorDescriber, DescribeError, DescribeErrorOptions } from "./describeError";
+export { slavicPluralRule, slavicPluralRules, slovenianPluralRule } from "./plural";
+export type { PluralCategory } from "./plural";

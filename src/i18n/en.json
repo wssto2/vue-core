@@ -170,7 +170,8 @@
       "more": "More",
       "edit": "Edit",
       "clear": "Clear",
-      "done": "Done"
+      "done": "Done",
+      "open": "Open"
     },
     "collection": {
       "search": {
@@ -258,6 +259,29 @@
     },
     "wait": {
       "seconds": "{count} s"
+    },
+    "pwa": {
+      "android": {
+        "title": "{app} as an app",
+        "text": "On the home screen, with notifications",
+        "install": "Install"
+      },
+      "ios": {
+        "title": "Add {app} to your home screen",
+        "subtitle": "Three taps — we show you where.",
+        "next": "Next",
+        "steps": {
+          "more": "Tap ⋯ at the bottom right",
+          "share": "Tap Share",
+          "add": "Choose Add to Home Screen"
+        }
+      },
+      "qr": {
+        "title": "{app} on your phone",
+        "label": "QR code of the address of {app}",
+        "text": "Scan it with your phone's camera and sign in. On Android {app} installs with one tap; on iPhone we show the three taps to the home screen.",
+        "install_here": "On this computer"
+      }
     },
     "discard_changes": {
       "title": "Unsaved changes",
