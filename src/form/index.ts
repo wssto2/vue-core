@@ -32,6 +32,8 @@ export { default as FormRow } from "./FormRow.vue";
 export { default as FormView } from "./FormView.vue";
 export { default as I18nField } from "./I18nField.vue";
 export { missingLocales } from "./i18nText";
+export { hasUnsupportedCharacters, refineStorableText, unsupportedCharactersCode } from "./storableText";
+export type { StorableTextContext } from "./storableText";
 export type { I18nText } from "./i18nText";
 export { default as MoneyField } from "./MoneyField.vue";
 export { default as MonthYearField } from "./MonthYearField.vue";

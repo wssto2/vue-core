@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4 — 2026-10-16
+
+### New
+- **form:** `refineStorableText` (a `.superRefine` callback) and `hasUnsupportedCharacters(text)` flag text a utf8mb3 database column cannot store (emoji and other 4-byte characters) before the form is sent, the client half of go-core's `validation.CheckStorable`. The issue is `custom` with `params.code` `unsupportedCharactersCode` (`unsupported_characters`, the server's 422 code); the wording is the app's i18n.
 ## 0.9.3 — 2026-10-16
 
 ### Changed

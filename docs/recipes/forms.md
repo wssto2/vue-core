@@ -685,6 +685,10 @@ export function memoryRecents(): RecentChoices {
 
 A free-text field with suggestions is left-aligned on phones, where other fields right-align their value: the grey completion needs the text to start at one edge. `TextField` emits `picked` with the `{ text, detail }` chosen, for filling a postcode from the city.
 
+## Text a database cannot store
+
+Where the tables are utf8mb3, an emoji (any 4-byte character) is refused by the server as `unsupported_characters` (go-core's `validation.CheckStorable`). The form flags it first: `schema.superRefine(refineStorableText)` reports every string in the value, on its own path, as a `custom` issue whose `params.code` is `unsupportedCharactersCode`, and your i18n turns that code into the message. `hasUnsupportedCharacters(text)` is the same check for one string, such as a comment box that is not a form.
+
 ## Text in several languages
 
 `I18nField` edits one text in each language of the app: the title of an advert, a product name. The value is `Record<locale, string>` (`{ hr: "Naslov", en: "Title" }`, `""` is not written yet); a locale the field does not list is kept as it is.
