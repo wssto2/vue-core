@@ -15,3 +15,4 @@ export { DONE_BEAT_MS, WAIT_VISIBLE_AFTER_MS, useWaitStatus } from "./useWaitSta
 export { default as BackgroundTaskCapsule } from "./BackgroundTaskCapsule.vue";
 export { backgroundTasksKey, createBackgroundTasks, installBackgroundTasks, useBackgroundTasks } from "./backgroundTasks";
 export type { BackgroundTask, BackgroundTasks, BackgroundTaskSpec, BackgroundTaskStatus } from "./backgroundTasks";
+export { useCountUp } from "./useCountUp";
