@@ -170,7 +170,8 @@
       "more": "Više",
       "edit": "Uredi",
       "clear": "Očisti",
-      "done": "Gotovo"
+      "done": "Gotovo",
+      "open": "Otvori"
     },
     "collection": {
       "search": {
@@ -258,6 +259,29 @@
     },
     "wait": {
       "seconds": "{count} s"
+    },
+    "pwa": {
+      "android": {
+        "title": "{app} kao aplikacija",
+        "text": "Na početnom ekranu, s obavještenjima",
+        "install": "Instaliraj"
+      },
+      "ios": {
+        "title": "Dodaj {app} na početni ekran",
+        "subtitle": "Tri dodira — pokazujemo gdje.",
+        "next": "Dalje",
+        "steps": {
+          "more": "Dodirni ⋯ dolje desno",
+          "share": "Dodirni Dijeli",
+          "add": "Izaberi Dodaj na početni ekran"
+        }
+      },
+      "qr": {
+        "title": "{app} na telefonu",
+        "label": "QR kod adrese aplikacije {app}",
+        "text": "Skeniraj kamerom telefona i prijavi se. Na Androidu {app} instaliraš jednim dodirom; na iPhoneu pokazat ćemo tri dodira do početnog ekrana.",
+        "install_here": "Na ovom računaru"
+      }
     },
     "discard_changes": {
       "title": "Nesačuvane promjene",

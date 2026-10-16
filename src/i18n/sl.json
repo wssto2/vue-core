@@ -170,7 +170,8 @@
       "more": "Več",
       "edit": "Uredi",
       "clear": "Počisti",
-      "done": "Končano"
+      "done": "Končano",
+      "open": "Odpri"
     },
     "collection": {
       "search": {
@@ -258,6 +259,29 @@
     },
     "wait": {
       "seconds": "{count} s"
+    },
+    "pwa": {
+      "android": {
+        "title": "{app} kot aplikacija",
+        "text": "Na začetnem zaslonu, z obvestili",
+        "install": "Namesti"
+      },
+      "ios": {
+        "title": "Dodaj {app} na začetni zaslon",
+        "subtitle": "Trije dotiki — pokažemo, kje.",
+        "next": "Naprej",
+        "steps": {
+          "more": "Tapni ⋯ spodaj desno",
+          "share": "Tapni Deli",
+          "add": "Izberi Dodaj na začetni zaslon"
+        }
+      },
+      "qr": {
+        "title": "{app} na telefonu",
+        "label": "QR koda naslova aplikacije {app}",
+        "text": "Skeniraj s kamero telefona in se prijavi. Na Androidu {app} namestiš z enim dotikom; na iPhonu pokažemo tri dotike do začetnega zaslona.",
+        "install_here": "Na tem računalniku"
+      }
     },
     "discard_changes": {
       "title": "Neshranjene spremembe",
