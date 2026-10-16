@@ -23,3 +23,8 @@ export { default as ShellSidebar } from "./ShellSidebar.vue";
 export { default as ShellStage } from "./ShellStage.vue";
 export { default as ShellTopBar } from "./ShellTopBar.vue";
 export { installViewTransitions, viewTransitions } from "./viewTransitions";
+export { quickSearch } from "./quickSearch";
+export { default as QuickSearchButton } from "./QuickSearchButton.vue";
+export { default as QuickSearchPalette } from "./QuickSearchPalette.vue";
+export { useQuickSearch } from "./quickSearchControl";
+export type { QuickSearchAnswer, QuickSearchControl, QuickSearchGroup, QuickSearchOptions, QuickSearchRow } from "./quickSearchControl";

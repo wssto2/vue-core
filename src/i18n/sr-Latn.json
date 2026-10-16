@@ -280,6 +280,21 @@
       "update": {
         "available": "Dostupna je nova verzija aplikacije",
         "reload": "Osveži"
+      },
+      "search": {
+        "title": "Brza pretraga",
+        "open": "Pretraži",
+        "placeholder": "Pretraži…",
+        "searching": "Tražim…",
+        "hint": "Unesite pojam za pretragu.",
+        "recent": "Nedavno otvoreno",
+        "none": "Ništa za „{query}“",
+        "none_hint": "Proverite pravopis ili pokušajte sa drugim rečima.",
+        "failed": "Pretraga trenutno ne radi. Pokušajte ponovo.",
+        "unavailable": "Deo rezultata trenutno nije dostupan: {groups}.",
+        "select": "izaberi",
+        "open_row": "otvori",
+        "new_tab": "u novoj kartici"
       }
     },
     "activity": {

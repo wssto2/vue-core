@@ -280,6 +280,21 @@
       "update": {
         "available": "Na voljo je nova različica aplikacije",
         "reload": "Osveži"
+      },
+      "search": {
+        "title": "Hitro iskanje",
+        "open": "Išči",
+        "placeholder": "Išči…",
+        "searching": "Iščem…",
+        "hint": "Vpišite iskani pojem.",
+        "recent": "Nedavno odprto",
+        "none": "Nič za „{query}“",
+        "none_hint": "Preverite črkovanje ali poskusite z drugimi besedami.",
+        "failed": "Iskanje trenutno ne deluje. Poskusite znova.",
+        "unavailable": "Del rezultatov trenutno ni na voljo: {groups}.",
+        "select": "izberi",
+        "open_row": "odpri",
+        "new_tab": "v novem zavihku"
       }
     },
     "activity": {
