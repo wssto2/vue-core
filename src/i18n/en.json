@@ -282,6 +282,17 @@
         "reload": "Reload"
       }
     },
+    "activity": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "comments": {
+      "title": "Comments",
+      "none": "No comments yet.",
+      "placeholder": "Write a comment…",
+      "send": "Send comment",
+      "remove": "Delete comment"
+    },
     "no_access": {
       "title": "No access",
       "body": "Your access does not include this page. If you believe this is a mistake, contact your administrator."

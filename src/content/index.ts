@@ -1,4 +1,7 @@
+export { default as ActivityStream, type ActivityComment, type ActivityEvent, type ActivityItem } from "./ActivityStream.vue";
 export { default as Avatar } from "./Avatar.vue";
+export { default as CommentThread, type CommentItem } from "./CommentThread.vue";
+export { default as Composer } from "./Composer.vue";
 export { default as Divider } from "./Divider.vue";
 export { initialsFor } from "./initials";
 export { default as KeyValue } from "./KeyValue.vue";

@@ -282,6 +282,17 @@
         "reload": "Osveži"
       }
     },
+    "activity": {
+      "today": "Danas",
+      "yesterday": "Juče"
+    },
+    "comments": {
+      "title": "Komentari",
+      "none": "Još nema komentara.",
+      "placeholder": "Napišite komentar…",
+      "send": "Pošalji komentar",
+      "remove": "Obriši komentar"
+    },
     "no_access": {
       "title": "Nemate pristup",
       "body": "Vaša ovlašćenja ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."

@@ -282,6 +282,17 @@
         "reload": "Osveži"
       }
     },
+    "activity": {
+      "today": "Danes",
+      "yesterday": "Včeraj"
+    },
+    "comments": {
+      "title": "Komentarji",
+      "none": "Komentarjev še ni.",
+      "placeholder": "Napišite komentar…",
+      "send": "Pošlji komentar",
+      "remove": "Izbriši komentar"
+    },
     "no_access": {
       "title": "Ni dostopa",
       "body": "Vaše pravice ne vključujejo te strani. Če menite, da je prišlo do napake, se obrnite na skrbnika."
