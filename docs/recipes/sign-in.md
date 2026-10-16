@@ -28,7 +28,24 @@ void application.mount("#app");
 
 - **Reads the session** from `GET /v1/auth/me`. When that answers 401 (the access token ran out while the app was closed) it swaps the refresh cookie for new tokens once before it decides nobody is signed in, so a returning person is not sent to the sign-in page for nothing. Anything but 401 (a server fault, an unreadable payload) is a failed start, not a signed-out user.
 - **Renews on a 401** while signed in: one refresh, then the session is read again and the failed requests are sent once more. If the refresh is refused the session ends with reason `expired` and the router sends the person to the sign-in page, remembering where they were. Timer and 401 share one refresh (`platform.session.renew()`; an app's own fetch wrapper calls it too).
-- **A session that must not renew**: an embed session (a bearer token with no refresh token) passes `identityPlatform({ renewable: () => false })`. A 401 then ends the session at once, and `keepSessionAlive` stays idle instead of calling `/refresh`.
+- **A session that must not renew**: a bearer session with no refresh token passes `identityPlatform({ renewable: () => false })`. A 401 then ends the session at once, and `keepSessionAlive` stays idle instead of calling `/refresh`.
+- **An embed session** (the page runs in a cross-origin iframe, where the browser blocks cookies and the host hands over a token): `identityPlatform({ embed })` with an `embedSession()`.
+
+<!-- example: docs/examples/identity/embed.ts -->
+```ts
+// A page inside a cross-origin iframe, where the browser blocks cookies: the host hands over a bearer token, which this tab keeps.
+import { embedSession, identityPlatform } from "@wssto2/vue-core/identity";
+import { createPlatform, readBootstrap } from "@wssto2/vue-core/platform";
+
+export const embed = embedSession(); // sessionStorage, keys `embed_access_token` and `embed_expires_at`
+
+// The page that receives the token (the server's embed entry) keeps it: embed.start(token, expiresAt)
+
+// Requests carry the token, the session is read with it and is not renewable; a refused token is forgotten, and so is it at sign-out.
+export const platform = createPlatform({ config: readBootstrap(), credentials: "include", ...identityPlatform({ embed }) });
+```
+
+  While a token is held, every request carries `Authorization: Bearer <token>`, the session is read with it (no refresh) and cannot be renewed, a token that ran out or is refused is forgotten (the page is signed out), and signing out forgets it too. Without a token it is the ordinary cookie session. The token lives in `sessionStorage` (tab-scoped, which iOS Safari allows in an iframe), under `embed_access_token` and `embed_expires_at`; `embedSession({ storage, tokenKey, expiresKey })` changes that. `identityPlatform({ embed })` sets the platform's `headers` and `onSessionExpired`: if you set either yourself, spread it first and keep the embed's part (`embedHeaders(embed)`, `embed.end()`).
 - **Ends the session** with `POST /v1/auth/logout` after the before-sign-out hooks; a session that is already over is not an error.
 - The user is go-core's default projection, `IdentityUser` (`id`, `login`, `name`, `email`, `locale`). A server with its own `UserProjector` passes `parseUser`, which must keep the `id` and the `login` (the prompt for an expired session shows it):
 

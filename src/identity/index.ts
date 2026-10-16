@@ -8,6 +8,8 @@ export { identityFeature } from "./feature";
 export type { IdentityFeatureOptions } from "./feature";
 export { identityPlatform, identitySessionAdapter } from "./session";
 export type { IdentityPlatformOptions } from "./session";
+export { embedHeaders, embedSession } from "./embed";
+export type { EmbedSession, EmbedSessionOptions, EmbedStorage } from "./embed";
 export { usersFeature } from "./users/feature";
 export type { UsersFeatureOptions } from "./users/feature";
 export type { PersonSection } from "./users/personSections";
