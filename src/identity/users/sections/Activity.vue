@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { RouterLink } from "vue-router";
 import { IconTile, Tabs, type TabItem } from "../../../controls";
 import { useFormat } from "../../../format";
 import { DateField, FormGroup, FormRow } from "../../../form";
@@ -23,7 +24,7 @@ const { t, te } = useI18n();
 const { http } = usePlatform();
 const format = useFormat();
 const person = useRouteResourceContext(PERSON);
-const { activityAreas } = useUsersContext();
+const { activityAreas, activityRecords } = useUsersContext();
 
 const area = ref("all");
 const since = ref<string | null>(null);
@@ -59,16 +60,23 @@ const tabs = computed<TabItem<string>[]>(() => {
   return listed.length > 0 ? listed : [{ value: "all", label: label("all") }];
 });
 
+// A record type the application named reads by its name and links to its page; any other as the server wrote it.
+const recordOf = (type: string, id: number) => {
+  const known = activityRecords[type];
+  return known && te(known.labelKey) ? { text: `${t(known.labelKey)} #${id}`, to: known.to?.(id) } : { text: `${type} #${id}`, to: undefined };
+};
+
 const verb = (action: string) => (te(`core.users.activity.actions.${action}`) ? t(`core.users.activity.actions.${action}`) : t("core.users.activity.actions.other"));
 
 // Days, newest first, as the server sent them.
 const days = computed(() => {
-  const out: { key: string; header: string; rows: ActivityRow[] }[] = [];
+  const out: { key: string; header: string; rows: { row: ActivityRow; record: ReturnType<typeof recordOf> }[] }[] = [];
   for (const row of history.data.value?.data ?? []) {
+    const entry = { row, record: recordOf(row.record_type, row.record_id) };
     const key = row.created_at.slice(0, 10);
     const last = out[out.length - 1];
-    if (last && last.key === key) last.rows.push(row);
-    else out.push({ key, header: format.date(row.created_at), rows: [row] });
+    if (last && last.key === key) last.rows.push(entry);
+    else out.push({ key, header: format.date(row.created_at), rows: [entry] });
   }
   return out;
 });
@@ -91,7 +99,7 @@ const days = computed(() => {
         <p v-if="!value || value.data.length === 0" class="px-row-inset py-4 text-body text-content-muted" data-activity-empty>{{ t("core.users.activity.empty") }}</p>
         <div v-else class="flex min-w-0 flex-col gap-group-gap" data-activity-feed>
           <FormGroup v-for="day in days" :key="day.key" :header="day.header">
-            <FormRow v-for="row in day.rows" :key="row.id" layout="setting" :label="`${verb(row.action)}`" data-activity-row>
+            <FormRow v-for="{ row, record } in day.rows" :key="row.id" layout="setting" :label="verb(row.action)" data-activity-row>
               <template #leading>
                 <IconTile tone="anchor" icon="listCheck" />
               </template>
@@ -99,7 +107,8 @@ const days = computed(() => {
                 <span class="flex flex-wrap items-center gap-x-1.5">
                   <span>{{ label(row.area) }}</span>
                   <span aria-hidden="true">·</span>
-                  <span>{{ row.record_type }} #{{ row.record_id }}</span>
+                  <RouterLink v-if="record.to" :to="record.to" class="text-content-link" data-activity-link>{{ record.text }}</RouterLink>
+                  <span v-else>{{ record.text }}</span>
                 </span>
               </template>
               <Badge v-if="row.signed_in_as" tone="warning" data-activity-signed-in-as>

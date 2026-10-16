@@ -2,6 +2,7 @@ import { isApiError, type HttpClient } from "../client";
 import { parseSessionPayload, type PlatformOptions, type SessionAdapter, type SessionUser, type UserParser } from "../platform";
 import type { BootstrapConfig } from "../platform";
 import { identityRoutes } from "../modules/identity/routes";
+import { embedHeaders, embeddedSessionAdapter, type EmbedSession } from "./embed";
 import { parseIdentityUser, type IdentityUser } from "./user";
 
 const unauthorized = (error: unknown): boolean => isApiError(error) && error.kind === "unauthorized";
@@ -42,7 +43,7 @@ export function identitySessionAdapter<U extends SessionUser>(http: HttpClient, 
 }
 
 /** What `createPlatform` is given to run on go-core's identity module. */
-export type IdentityPlatformOptions<U extends SessionUser> = Required<Pick<PlatformOptions<U, BootstrapConfig>, "session" | "renewSession">> & Pick<PlatformOptions<U, BootstrapConfig>, "renewable">;
+export type IdentityPlatformOptions<U extends SessionUser> = Required<Pick<PlatformOptions<U, BootstrapConfig>, "session" | "renewSession">> & Pick<PlatformOptions<U, BootstrapConfig>, "renewable" | "headers" | "onSessionExpired">;
 
 /** What `identityPlatform` takes. */
 export interface IdentityPlatformInput<U extends SessionUser> {
@@ -50,6 +51,13 @@ export interface IdentityPlatformInput<U extends SessionUser> {
   parseUser?: UserParser<U>;
   /** False while the session has no refresh token (an embed bearer session): nothing renews it, a 401 ends it. See `PlatformOptions.renewable`. */
   renewable?: () => boolean;
+  /**
+   * A session handed over as a bearer token (an iframe whose cookies are blocked): while one is held the requests carry it,
+   * the session is read with it and cannot be renewed, a refused or run-out token is forgotten, and signing out forgets
+   * it. It sets `headers` and `onSessionExpired` of the platform, so spread `identityPlatform()` first and, when you set
+   * either yourself, keep the embed's part (`embed.end()` on expiry, `embedHeaders(embed)`).
+   */
+  embed?: EmbedSession;
 }
 
 /**
@@ -65,9 +73,14 @@ export function identityPlatform(options?: Omit<IdentityPlatformInput<IdentityUs
 export function identityPlatform<U extends SessionUser & { readonly login: string }>(options: IdentityPlatformInput<U> & { parseUser: UserParser<U> }): IdentityPlatformOptions<U>;
 export function identityPlatform(options?: IdentityPlatformInput<SessionUser>): IdentityPlatformOptions<IdentityUser> | IdentityPlatformOptions<SessionUser> {
   const parseUser = options?.parseUser ?? parseIdentityUser;
+  const embed = options?.embed;
   const wiring: IdentityPlatformOptions<SessionUser> = {
-    session: (http) => identitySessionAdapter(http, parseUser),
-    ...(options?.renewable && { renewable: options.renewable }),
+    session: (http) => {
+      const cookies = identitySessionAdapter(http, parseUser);
+      return embed ? embeddedSessionAdapter(cookies, http, parseUser, embed) : cookies;
+    },
+    ...((embed || options?.renewable) && { renewable: () => !embed?.active() && (options?.renewable?.() ?? true) }),
+    ...(embed && { headers: embedHeaders(embed), onSessionExpired: embed.end }),
     async renewSession(session, http) {
       try {
         await refreshTokens(http);

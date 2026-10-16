@@ -1,3 +1,4 @@
+import type { RouteRecordRaw } from "vue-router";
 import { defineFeature, provideContext, type Feature } from "../../app";
 import type { Permission } from "../../platform";
 import type { Destination } from "../../router";
@@ -6,11 +7,21 @@ import ProfileMenuItem from "../profile/ProfileMenuItem.vue";
 import { profileRoutes } from "../profile/routes";
 import { usersContextKey } from "./context";
 import { personSectionRoute, type PersonSection } from "./personSections";
+import type { UsersReplace } from "./replace";
 import { usersRoutes } from "./routes";
+import type { ActivityRecord, ChangeWordsFn } from "./words";
 
-/** The users routes, the record carrying the application's own sections after its own. */
-function withSections(sections: readonly PersonSection[]) {
-  return usersRoutes.records.map((record) => (record.name === "users.record" ? { ...record, children: [...(record.children ?? []), ...sections.map(personSectionRoute)] } : record));
+/**
+ * The users routes at the application's path, with the list and the details swapped when it replaced them, and the
+ * record carrying the application's own sections after its own.
+ */
+function peopleRoutes(base: string, replace: UsersReplace, sections: readonly PersonSection[]): RouteRecordRaw[] {
+  return usersRoutes.records.map((record) => {
+    if (record.name === "users.index") return { ...record, path: base, ...(replace.list && { component: replace.list }) } as RouteRecordRaw;
+    if (record.name !== "users.record") return record;
+    const children = (record.children ?? []).map((child) => (child.name === "users.record.general" && replace.general ? ({ ...child, component: replace.general } as RouteRecordRaw) : child));
+    return { ...record, path: `${base}/:id`, children: [...children, ...sections.map(personSectionRoute)] } as RouteRecordRaw;
+  });
 }
 
 export interface UsersFeatureOptions {
@@ -28,6 +39,14 @@ export interface UsersFeatureOptions {
   profileSections?: readonly ProfileSection[];
   /** The destination of the backend's menu that opens the users list. Without it the application binds the list itself. */
   destination?: Destination;
+  /** The base path of the list; a record is `<path>/:id`. Default `/users`. The route names stay (`users.index`, `users.record`), so links by name follow it. */
+  path?: `/${string}`;
+  /** Whole screens the application swaps for its own, each keeping the contract documented on `UsersReplace`: the list, the details section, the New user and the Deactivate dialogs. */
+  replace?: UsersReplace;
+  /** What the Activity section calls and links the records the application knows, by the server's `record_type`; an unknown type reads as the type itself. */
+  activityRecords?: Readonly<Record<string, ActivityRecord>>;
+  /** The application's wording for a change (sentence and details, with links), asked for every row of the Changes section with its `ext`; the library words what it returns nothing for. */
+  changeWords?: ChangeWordsFn;
 }
 
 /**
@@ -49,10 +68,19 @@ export function usersFeature(options: UsersFeatureOptions = {}): Feature {
   const people = options.people ?? true;
   const profile = options.profile ?? true;
   const signInAs = options.signInAs ?? ("iam.user:impersonate" as Permission);
+  const replace = options.replace ?? {};
+  const base = (options.path ?? "/users").replace(/\/+$/, "") || "/users";
   return defineFeature({
     id: "users",
-    routes: [...(people ? withSections(options.sections ?? []) : []), ...(profile ? profileRoutes.records : [])],
-    context: provideContext(usersContextKey, { signInAs, activityAreas: options.activityAreas ?? {}, profileSections: options.profileSections ?? [] }),
+    routes: [...(people ? peopleRoutes(base, replace, options.sections ?? []) : []), ...(profile ? profileRoutes.records : [])],
+    context: provideContext(usersContextKey, {
+      signInAs,
+      activityAreas: options.activityAreas ?? {},
+      profileSections: options.profileSections ?? [],
+      replace,
+      activityRecords: options.activityRecords ?? {},
+      changeWords: options.changeWords,
+    }),
     navigation: people && options.destination ? [{ destination: options.destination, to: usersRoutes.index, within: ["users.record"] }] : [],
     // The entry of the account menu; a shell without that menu leaves it out.
     contributions: profile ? [{ id: "users.profile", slot: "accountMenu", component: ProfileMenuItem, scope: "authenticated", optional: true, order: -10 }] : [],

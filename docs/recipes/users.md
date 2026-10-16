@@ -55,10 +55,11 @@ Names of the people who did things (who signed in as the person, who changed the
 <!-- example: docs/examples/identity/usersOptions.ts -->
 ```ts
 // What an application can leave out, link to, or add.
-import type { PersonSection } from "@wssto2/vue-core/identity";
-import { usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import type { ChangeRowWithExt, PersonSection } from "@wssto2/vue-core/identity";
+import { PERSON, usePersonActions, usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import { useRouteResourceContext } from "@wssto2/vue-core/resource";
 import { FormGroup, FormRow } from "@wssto2/vue-core/form";
-import { h } from "vue";
+import { defineComponent, h } from "vue";
 
 // Only "my profile": no users list, no record.
 export const profileOnly = usersFeature({ people: false });
@@ -92,13 +93,87 @@ const Phone = {
   },
 };
 export const withPhoneGroup = usersFeature({ profileSections: [{ id: "phone", component: Phone, after: "details", visible: (profile) => profile.id !== 0 }] });
+
+// The list under another path (a record is `<path>/:id`); the route names stay, so links by name follow.
+export const underIam = usersFeature({ path: "/iam/users" });
+
+// The application's own words for the records the Activity section names: a kind (an i18n key) and the page of the record.
+export const withActivityRecords = usersFeature({
+  activityRecords: { customers: { labelKey: "records.customer", to: (id) => ({ name: "customer", params: { id } }) } },
+});
+
+// The application's wording for a change the library has no sentence for (the server's change log wrote an `ext`).
+// Return nothing for a row the library words well; details may link.
+export const withChangeWords = usersFeature({
+  changeWords: (row: ChangeRowWithExt, t) => {
+    const ext = row.ext as { role: string; binding: number } | undefined;
+    if (row.action !== "role_granted" || !ext) return undefined;
+    return { sentence: t("changes.role_granted", { role: ext.role }), details: [{ text: t("changes.binding"), to: { name: "binding", params: { id: ext.binding } } }] };
+  },
+});
+
+// A whole screen swapped for the application's own. This details section reads the person (with the `ext` the server's
+// user extension wrote) and the actions the record page offers; the list, the New user dialog and the Deactivate dialog
+// are swapped the same way (the contract of each is on `UsersReplace`).
+const Details = defineComponent({
+  setup() {
+    const person = useRouteResourceContext(PERSON);
+    const actions = usePersonActions();
+    return () => h("p", `${(person.data.value?.ext as { dealer?: string } | undefined)?.dealer ?? "-"} ${actions.can.manage ? "(editable)" : ""}`);
+  },
+});
+
+export const withReplacements = usersFeature({ replace: { general: Details } });
 ```
 
-- The paths are fixed (`/users`, `/profile`) and so are the route names; link by `usersRoutes` and `profileRoutes`.
+- The route names are fixed (`users.index`, `users.record`, `profile`); link by `usersRoutes` and `profileRoutes`. The paths are `/users` and `/profile`; `path` moves the users list (a record is `<path>/:id`), and links by name follow it.
 - `destination` binds the list to the node of the backend's menu that opens it; the record keeps it highlighted.
 - `sections` adds a child route `users.record.<path>` after the feature's own. The component gets what `props` makes of the loaded person, so a feature of another module (the roles screens) is passed in by the application and identity never imports it. The section's label and icon texts are the application's keys.
 - `activityAreas` names the application's areas of the Activity section: the area key the server's audit records (`crm`) and the i18n key of its name; `all`, `identity` and `other` are the library's, and an area without a name reads as "Other".
-- `signInAs: false` leaves out "Sign in as"; otherwise `identityFeature()` must be installed too (it is checked at start-up).
+- `activityRecords` names the kinds of record the Activity section lists (`record_type` from the server): an i18n key and, when the record has a page, a link. Any other type reads as the server wrote it (`invoices #9`).
+- `changeWords(row, t)` words a change for the Changes section: asked for every row with its `ext`, it returns a `sentence` and `details` (text, or `{ text, to }` for a link), or nothing for a row the library words well. An action without a sentence of its own reads as "Account changed" until you give it one.
+- `replace` swaps a whole screen (see below). `signInAs: false` leaves out "Sign in as"; otherwise `identityFeature()` must be installed too (it is checked at start-up).
+
+## Replacing a screen, and the server's `ext`
+
+When the server adds to go-core's users (a dealer, roles, a hand-over on deactivation: go-core's `UserExtension`), rows, details and changes carry an `ext`, the create and update bodies accept one, and the deactivation takes `details`. The library does not know its shape, so it types it `unknown` (`UserRowWithExt`, `UserDetailWithExt`, `ChangeRowWithExt`, `CreateUserWithExt`, `UpdateUserWithExt`, `DeactivateUserInput`; `WithExt<T>`) and the application narrows it. `usersExtRoutes.create`, `.update` and `.deactivate` are the routes with those bodies for a replacement to call.
+
+`usersFeature({ replace })` swaps whole screens; a replacement is mounted where the built-in was, with these contracts:
+
+| `replace.` | Props | Events / exposed | Finds |
+|---|---|---|---|
+| `list` | none (the page of `users.index`) | | `userList(http)` (the collection, also used by the record's pager), `useUserDialogs().newUser`, `usersRoutes.record` |
+| `general` | none (the section `users.record.general`) | | `useRouteResourceContext(PERSON)` (the loaded person, with `ext`), `usePersonActions()` (`can`, `deactivate()`, `activate()`, `setPassword()`, `refresh()`), `useSaveChrome` |
+| `newUser` | none | emits `created` (the new person); exposes `create()` (`NewUserDialogHandle`) | the list calls `create()` through a template ref and opens the record on `created` |
+| `deactivate` | `DeactivateDialogProps`: `id`, `name`, `sessionCount` | emits `done`; exposes `open()` (`DeactivateDialogHandle`) | the record page and the details' rows call `open()`, and reload on `done` |
+
+<!-- example: docs/examples/identity/usersDeactivate.ts -->
+```ts
+// A Deactivate dialog that sends the application's hand-over plan as `details` (the server's deactivation hook reads it).
+// It keeps the contract of `replace.deactivate`: the props of `DeactivateDialogProps`, an `open()` the record page calls,
+// and a `done` event after it deactivated.
+import { usersExtRoutes, usersFeature, type DeactivateDialogEmits, type DeactivateDialogProps } from "@wssto2/vue-core/identity";
+import { usePlatform } from "@wssto2/vue-core/platform";
+import { defineComponent, h, ref } from "vue";
+
+const Deactivate = defineComponent(
+  (props: DeactivateDialogProps, { emit, expose }: { emit: <E extends keyof DeactivateDialogEmits>(event: E) => void; expose: (exposed: { open(): void }) => void }) => {
+    const { http } = usePlatform();
+    const shown = ref(false);
+    expose({ open: () => (shown.value = true) });
+    const run = async () => {
+      await http.request(usersExtRoutes.deactivate, { id: props.id, details: { handOver: { leads: 5 } } });
+      emit("done");
+    };
+    return () => (shown.value ? h("button", { onClick: run }, `Hand over ${props.name}`) : null);
+  },
+  { props: { id: { type: Number, required: true }, name: { type: String, required: true }, sessionCount: { type: Number, default: null } }, emits: ["done"] },
+);
+
+export const withDeactivate = usersFeature({ replace: { deactivate: Deactivate } });
+```
+
+`useUserDialogs()` gives a screen the dialogs in use (yours, or the library's `NewUserDialog` and `DeactivateDialog`, which are also exported). The shared pieces of the built-in screens are exported for a replacement to reuse: `PageBar`, `SectionIntro`, `SessionList`, `SignInList`, `SignInTable`, `ChangeFeed`, `ActionRow`, `statusTone` and `USER_VIEWS`. Sections of the application's own (`sections`) get the person with its `ext` too.
 
 ## Refusals
 

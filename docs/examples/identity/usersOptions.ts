@@ -1,8 +1,9 @@
 // What an application can leave out, link to, or add.
-import type { PersonSection } from "@wssto2/vue-core/identity";
-import { usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import type { ChangeRowWithExt, PersonSection } from "@wssto2/vue-core/identity";
+import { PERSON, usePersonActions, usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import { useRouteResourceContext } from "@wssto2/vue-core/resource";
 import { FormGroup, FormRow } from "@wssto2/vue-core/form";
-import { h } from "vue";
+import { defineComponent, h } from "vue";
 
 // Only "my profile": no users list, no record.
 export const profileOnly = usersFeature({ people: false });
@@ -36,3 +37,34 @@ const Phone = {
   },
 };
 export const withPhoneGroup = usersFeature({ profileSections: [{ id: "phone", component: Phone, after: "details", visible: (profile) => profile.id !== 0 }] });
+
+// The list under another path (a record is `<path>/:id`); the route names stay, so links by name follow.
+export const underIam = usersFeature({ path: "/iam/users" });
+
+// The application's own words for the records the Activity section names: a kind (an i18n key) and the page of the record.
+export const withActivityRecords = usersFeature({
+  activityRecords: { customers: { labelKey: "records.customer", to: (id) => ({ name: "customer", params: { id } }) } },
+});
+
+// The application's wording for a change the library has no sentence for (the server's change log wrote an `ext`).
+// Return nothing for a row the library words well; details may link.
+export const withChangeWords = usersFeature({
+  changeWords: (row: ChangeRowWithExt, t) => {
+    const ext = row.ext as { role: string; binding: number } | undefined;
+    if (row.action !== "role_granted" || !ext) return undefined;
+    return { sentence: t("changes.role_granted", { role: ext.role }), details: [{ text: t("changes.binding"), to: { name: "binding", params: { id: ext.binding } } }] };
+  },
+});
+
+// A whole screen swapped for the application's own. This details section reads the person (with the `ext` the server's
+// user extension wrote) and the actions the record page offers; the list, the New user dialog and the Deactivate dialog
+// are swapped the same way (the contract of each is on `UsersReplace`).
+const Details = defineComponent({
+  setup() {
+    const person = useRouteResourceContext(PERSON);
+    const actions = usePersonActions();
+    return () => h("p", `${(person.data.value?.ext as { dealer?: string } | undefined)?.dealer ?? "-"} ${actions.can.manage ? "(editable)" : ""}`);
+  },
+});
+
+export const withReplacements = usersFeature({ replace: { general: Details } });

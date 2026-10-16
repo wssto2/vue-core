@@ -2,10 +2,11 @@ import type { InjectionKey } from "vue";
 import { defineFeatureContext } from "../../platform";
 import type { RouteResource } from "../../resource";
 import type { Load } from "../../state";
-import type { SessionList, UserDetail } from "../../modules/identity/entities";
+import type { SessionList } from "../../modules/identity/entities";
+import type { UserDetailWithExt } from "./ext";
 
 /** The person a record page is about, shared with its routed sections (`useRouteResourceContext(PERSON)`). */
-export const PERSON: InjectionKey<RouteResource<UserDetail>> = Symbol("vue-core.users.person");
+export const PERSON: InjectionKey<RouteResource<UserDetailWithExt>> = Symbol("vue-core.users.person");
 
 /** What the viewer may do with this person right now, and the dialogs that do it (they live on the record page). */
 export interface PersonActions {
