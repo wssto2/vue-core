@@ -3,7 +3,7 @@
 ## 0.9.2 — 2026-10-16
 
 ### Fixed
-- **Shortcuts and an open dialog:** while a Modal, Sheet or other dialog is open, only the shortcuts registered inside it fire; the page's own (`?`, `/`, the record pager's J/K) wait until it closes, as the help text says. New: `topDialogRoot()` from the dialog stack.
+- **Shortcuts and an open dialog:** while a Modal, Sheet or other dialog is open, only the shortcuts registered inside it fire; the page's own (`?`, `/`, the record pager's J/K) wait until it closes, as the help text says.
 
 ## 0.9.1 — 2026-10-16
 
