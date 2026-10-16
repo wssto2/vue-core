@@ -88,7 +88,7 @@ describe("quickSearch", () => {
     await fireEvent.keyDown(palette()!, { key: "Enter" });
 
     await vi.waitFor(() => expect(screen.getByText("other page")).toBeTruthy());
-    expect(palette()).toBeNull();
+    await vi.waitFor(() => expect(palette()).toBeNull());
   });
 
   it("lets the app remember a chosen row and offers the recent ones before anything is typed", async () => {
