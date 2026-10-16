@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.0 — 2026-10-16
+
+The last generic pieces an application kept to itself, and an identity whose users screens an application can shape. Needs go-core v1.15.0 (`goCore`, `src/modules` synced).
+
+### New
+- **identity:** `usersFeature` can be shaped by the application: `path` moves the users list (a record is `<path>/:id`; the route names `users.index` / `users.record` stay), `replace: { list, general, newUser, deactivate }` swaps a whole screen for the application's own under a documented contract (`UsersReplace`, `NewUserDialogHandle`, `DeactivateDialogProps`, `DeactivateDialogHandle`), `activityRecords` names and links the kinds of record in a person's Activity, and `changeWords(row, t)` words changes the library has no sentence for (with links in the details). `OpenChangeRow` is go-core's `ChangeRow` with an open `action`, for the actions only the application's change log writes.
+- **identity:** the users list has a Last sign-in filter (never signed in, or not for a long time), sent as go-core's `last_sign_in`.
+- **identity:** the pieces a replaced screen reuses are exported: `PageBar`, `SectionIntro`, `SessionList`, `SignInList`, `SignInTable`, `ChangeFeed`, `NewUserDialog`, `DeactivateDialog`, `statusTone`, `USER_VIEWS`, `userList`, `PERSON`, `usePersonActions`, `usePersonSessions`, `useUsersContext` and `useUserDialogs`. A replacement reads the server's `ext` from the person (`ext?: unknown` in go-core 1.15's generated types) and calls `identityRoutes.usersCreate`, `usersUpdate` and `usersDeactivate` (`details` on the deactivation) with it. `PersonSection.props` receives the person with its `ext`.
+- **identity:** `identityPlatform({ embed })` with `embedSession()`: the client half of a bearer session for a page in a cross-origin iframe (token in `sessionStorage`, `Authorization: Bearer`, not renewable, cleared when it is refused, runs out or the person signs out).
+- **content:** `ActivityStream` (events and comments in one chronological stream, day separators, oldest first), `Composer` (a capsule text area that grows, sends on Ctrl or ⌘ + Enter) and `CommentThread` (the two together: `comments`, `canAdd`, `canRemove`, `onAdd`, `@remove`; the draft clears unless `onAdd` resolves to `false`). Texts are `core.activity.*` and `core.comments.*`.
+- **shell:** `quickSearch({ search, suggest?, recent?, onChoose?, placeholder?, hint?, noneHint?, minLength?, delayMs? })`, a feature with a search field in the `search` slot and a palette in `host`, opened by Ctrl or ⌘ + K (listed in the shortcut help, silent while a dialog is open). The app returns groups of rows (`QuickSearchGroup`, `QuickSearchRow`); typing is debounced, an older answer is dropped, words are highlighted, Ctrl or ⌘ + Enter opens a row in a new tab. `useQuickSearch()` opens it from a trigger of your own; `QuickSearchPalette` and `QuickSearchButton` are exported for custom shells.
+- **shell:** `darkMode({ dark, set, themeColor? })` puts the mode on the page (the `dark` class and `<meta name="theme-color">`) and adds the switch to the account menu; the preference lives where the app keeps it. `DarkModeRow` and `applyDarkMode` are exported. `offlineNotice()` (and `OfflineNotice`) shows a status in the bottom dock while the browser is offline.
+- **collection:** `createPicker<Row, Options>()` and `PickerModal`: the open, choose and cancel plumbing of a choose-one dialog. `await picker.pick(options)` resolves with the row or `null`; the dialog's body is a `CollectionTable` with `pick`, mounted afresh each time it opens.
+- **collection:** `highlightParts` and `HighlightPart` are exported.
+- **collection:** `ListPage<Row, Meta>` takes the shape of the backend's `meta` as a second type parameter, carried through `CollectionLoader`, `defineCollection`, `useCollection`, `Collection`, `httpList` and `readListPage`, so an app reads it without a cast. The default is today's type, now exported as `ListMeta`. Declare the shape with `type`, not `interface`.
+- **pwa:** `AndroidInstallBanner`, `IosInstallGuide`, `InstallQrSheet` and `QrCode`, the install guides of an installable app, generic over `app-name` (texts under `core.pwa`). The QR code needs `uqr`, a new dependency used by this entry only.
+- **i18n:** `slavicPluralRule` (hr, bs, sr-Latn), `slovenianPluralRule` (with the dual) and `slavicPluralRules`, to pass as `pluralRules`. Counts such as 111–114 take the "other" form; a two-form message reads `one | other`.
+- **state:** `installBackgroundTasks`, `createBackgroundTasks`, `useBackgroundTasks` and `BackgroundTaskCapsule`, for work that outlives the page (provided per application, no store library); `useCountUp`, a number that counts up when its value arrives (instant under reduced motion).
+- **format:** `slugify`, a URL-fragment slug that folds diacritics.
+- **i18n:** `core.actions.open` in every locale.
+
+### Changed
+- **identity:** deactivating a person answers go-core's `DeactivateResult` (`{ ext? }`), as go-core v1.15.0 answers 200 instead of 204.
+
 ## 0.9.4 — 2026-10-16
 
 ### New
