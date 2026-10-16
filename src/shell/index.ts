@@ -28,3 +28,8 @@ export { default as QuickSearchButton } from "./QuickSearchButton.vue";
 export { default as QuickSearchPalette } from "./QuickSearchPalette.vue";
 export { useQuickSearch } from "./quickSearchControl";
 export type { QuickSearchAnswer, QuickSearchControl, QuickSearchGroup, QuickSearchOptions, QuickSearchRow } from "./quickSearchControl";
+export { applyDarkMode, darkMode } from "./darkMode";
+export type { DarkModeOptions } from "./darkMode";
+export { default as DarkModeRow } from "./DarkModeRow.vue";
+export { offlineNotice } from "./offlineNotice";
+export { default as OfflineNotice } from "./OfflineNotice.vue";

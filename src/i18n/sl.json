@@ -295,7 +295,9 @@
         "select": "izberi",
         "open_row": "odpri",
         "new_tab": "v novem zavihku"
-      }
+      },
+      "offline": "Ni internetne povezave",
+      "dark_mode": "Temni način"
     },
     "activity": {
       "today": "Danes",

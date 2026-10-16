@@ -295,7 +295,9 @@
         "select": "select",
         "open_row": "open",
         "new_tab": "in a new tab"
-      }
+      },
+      "offline": "No internet connection",
+      "dark_mode": "Dark mode"
     },
     "activity": {
       "today": "Today",

@@ -295,7 +295,9 @@
         "select": "izaberi",
         "open_row": "otvori",
         "new_tab": "u novoj kartici"
-      }
+      },
+      "offline": "Nema veze s internetom",
+      "dark_mode": "Tamni režim"
     },
     "activity": {
       "today": "Danas",
