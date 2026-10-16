@@ -22,3 +22,6 @@ export { default as RecordIdentity } from "./RecordIdentity.vue";
 export { DATE_PRESETS, useDatePresetFilter } from "./datePresets";
 export { highlightParts, type HighlightPart } from "./highlight";
 export type { CellSlots, CollectionSlots, RowsSlots } from "./slots";
+export { createPicker } from "./picker";
+export type { Picker, PickerOptions } from "./picker";
+export { default as PickerModal } from "./PickerModal.vue";
