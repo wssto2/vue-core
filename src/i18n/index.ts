@@ -273,3 +273,5 @@ export { createMessageRuntime } from "./runtime";
 export type { MessageFailure, MessageRuntime, MessageRuntimeOptions, MessageTarget } from "./runtime";
 export { appErrorDescriberKey, appFieldErrorDescriberKey, useDescribeError } from "./describeError";
 export type { AppErrorDescriber, AppFieldErrorDescriber, DescribeError, DescribeErrorOptions } from "./describeError";
+export { slavicPluralRule, slavicPluralRules, slovenianPluralRule } from "./plural";
+export type { PluralCategory } from "./plural";
