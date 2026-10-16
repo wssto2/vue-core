@@ -13,8 +13,8 @@ const { access } = usePlatform();
 
 // A thread awaits what it is given: returning false keeps the draft, so a refused or failed save loses nothing.
 function add(text: string) {
-  if (text.length > 1000) {
-    toast.error(t("tickets.comment_too_long"));
+  if (!navigator.onLine) {
+    toast.error(t("core.shell.offline"));
     return false;
   }
   emit("add", text);

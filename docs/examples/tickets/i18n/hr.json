@@ -19,6 +19,5 @@
   "comment": "Komentar",
   "change": "Promjena statusa",
   "remove": "Ukloni",
-  "pick": "Odaberite tiket",
-  "comment_too_long": "Komentar može imati najviše 1000 znakova."
+  "pick": "Odaberite tiket"
 }
