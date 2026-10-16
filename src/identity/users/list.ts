@@ -1,6 +1,7 @@
 import type { HttpClient } from "../../client";
 import { defineCollection, readListPage } from "../../collection";
 import { identityRoutes } from "../../modules/identity/routes";
+import { LastSignInFilterSchema } from "../../modules/identity/schemas";
 
 /** The views of the list, as go-core's `GET /v1/iam/users` knows them. */
 export const USER_VIEWS = ["active", "locked", "inactive", "all"] as const;
@@ -23,13 +24,14 @@ export function userList(http: HttpClient) {
           order_dir: query.sort ? query.direction : undefined,
           page: query.page,
           per_page: query.pageSize,
+          last_sign_in: LastSignInFilterSchema.safeParse(query.filters.last_sign_in).data,
         },
         { signal },
       );
       return readListPage(result, query);
     },
     key: (user) => user.id,
-    query: { sorts: ["login", "name", "email", "created_at"], filters: [], views: USER_VIEWS },
+    query: { sorts: ["login", "name", "email", "created_at"], filters: ["last_sign_in"], views: USER_VIEWS },
     defaults: { sort: "name", direction: "asc", view: "active" },
   });
 }

@@ -17,8 +17,7 @@ export type { PersonSection } from "./users/personSections";
 // the context and the shared pieces of the built-in screens.
 export type { UsersReplace, NewUserDialogHandle, NewUserDialogEmits, DeactivateDialogProps, DeactivateDialogHandle, DeactivateDialogEmits } from "./users/replace";
 export type { ActivityRecord, ChangeDetail, ChangeWords, ChangeWordsFn, Translate } from "./users/words";
-export type { ChangeRowWithExt, CreateUserWithExt, DeactivateUserInput, UpdateUserWithExt, UserDetailWithExt, UserRowWithExt, WithExt } from "./users/ext";
-export { usersExtRoutes } from "./users/ext";
+export type { OpenChangeRow } from "./users/ext";
 export { PERSON, personActionsKey, usePersonActions, usePersonSessions } from "./users/person";
 export type { PersonActions } from "./users/person";
 export { useUsersContext } from "./users/context";

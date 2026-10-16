@@ -699,6 +699,11 @@
         "status": "Status"
       },
       "never": "Never",
+      "filters": {
+        "last_sign_in": "Last sign-in",
+        "never": "Never signed in",
+        "idle": "Not signed in for a long time"
+      },
       "status": {
         "active": "Active",
         "locked": "Locked",

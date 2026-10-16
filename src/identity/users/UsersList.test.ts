@@ -47,6 +47,14 @@ describe("the users list", () => {
     expect(callsTo(calls, "GET", "/v1/iam/users").at(-1)!.url).toContain("view=locked");
   });
 
+  it("filters by last sign-in (never, or idle for long) with go-core's last_sign_in", async () => {
+    const { calls } = await open(["iam.user:view"]);
+    expect(callsTo(calls, "GET", "/v1/iam/users")[0]!.url).not.toContain("last_sign_in");
+    await fireEvent.click(screen.getByRole("button", { name: /Last sign-in/ }));
+    await fireEvent.click(await screen.findByRole("menuitemradio", { name: "Never signed in" }));
+    await waitFor(() => expect(callsTo(calls, "GET", "/v1/iam/users").at(-1)!.url).toContain("last_sign_in=never"));
+  });
+
   it("offers no way to create a person to someone who may only look", async () => {
     await open(["iam.user:view"]);
     expect(screen.queryByRole("button", { name: "New user" })).toBeNull();

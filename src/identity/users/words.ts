@@ -1,5 +1,5 @@
 import type { RouteLocationRaw } from "vue-router";
-import type { ChangeRowWithExt } from "./ext";
+import type { OpenChangeRow } from "./ext";
 
 /** Where the Activity section sends a record the application knows: its name (an i18n key) and, when it has a page, the link. */
 export interface ActivityRecord {
@@ -27,4 +27,4 @@ export type Translate = (key: string, named?: Record<string, unknown>) => string
  * The application's wording for a change: asked for every row (with its `ext`, as the server's change log wrote it); return
  * `undefined` for a row the library already words well. Used by `usersFeature({ changeWords })`.
  */
-export type ChangeWordsFn = (row: ChangeRowWithExt, t: Translate) => ChangeWords | undefined;
+export type ChangeWordsFn = (row: OpenChangeRow, t: Translate) => ChangeWords | undefined;

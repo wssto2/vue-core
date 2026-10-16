@@ -27,7 +27,7 @@ Install it for everyone: the server's permission catalogue decides who sees what
 
 ## The screens
 
-**Users** (`/users`, route `users.index`). A list with the views Active, Locked, Inactive and All, search by name, username or e-mail, sorting by name, username, e-mail or creation, paging, and the state in the URL. **New user** (for `iam.user:manage`) asks for the username, name, e-mail, language and a password typed twice; the person's record opens after saving. Go-core's datatable does not count the views, so the tabs carry no numbers.
+**Users** (`/users`, route `users.index`). A list with the views Active, Locked, Inactive and All, a **Last sign-in** filter (never signed in, or not for a long time: the server's `WithIdleAfter`), search by name, username or e-mail, sorting by name, username, e-mail or creation, paging, and the state in the URL. **New user** (for `iam.user:manage`) asks for the username, name, e-mail, language and a password typed twice; the person's record opens after saving. Go-core's datatable does not count the views, so the tabs carry no numbers.
 
 **A person** (`/users/:id`, `users.record`, sections as child routes). Opened from the list it steps through the same list (previous / next) and goes back to it.
 
@@ -55,7 +55,7 @@ Names of the people who did things (who signed in as the person, who changed the
 <!-- example: docs/examples/identity/usersOptions.ts -->
 ```ts
 // What an application can leave out, link to, or add.
-import type { ChangeRowWithExt, PersonSection } from "@wssto2/vue-core/identity";
+import type { OpenChangeRow, PersonSection } from "@wssto2/vue-core/identity";
 import { PERSON, usePersonActions, usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
 import { useRouteResourceContext } from "@wssto2/vue-core/resource";
 import { FormGroup, FormRow } from "@wssto2/vue-core/form";
@@ -105,7 +105,7 @@ export const withActivityRecords = usersFeature({
 // The application's wording for a change the library has no sentence for (the server's change log wrote an `ext`).
 // Return nothing for a row the library words well; details may link.
 export const withChangeWords = usersFeature({
-  changeWords: (row: ChangeRowWithExt, t) => {
+  changeWords: (row: OpenChangeRow, t) => {
     const ext = row.ext as { role: string; binding: number } | undefined;
     if (row.action !== "role_granted" || !ext) return undefined;
     return { sentence: t("changes.role_granted", { role: ext.role }), details: [{ text: t("changes.binding"), to: { name: "binding", params: { id: ext.binding } } }] };
@@ -136,7 +136,7 @@ export const withReplacements = usersFeature({ replace: { general: Details } });
 
 ## Replacing a screen, and the server's `ext`
 
-When the server adds to go-core's users (a dealer, roles, a hand-over on deactivation: go-core's `UserExtension`), rows, details and changes carry an `ext`, the create and update bodies accept one, and the deactivation takes `details`. The library does not know its shape, so it types it `unknown` (`UserRowWithExt`, `UserDetailWithExt`, `ChangeRowWithExt`, `CreateUserWithExt`, `UpdateUserWithExt`, `DeactivateUserInput`; `WithExt<T>`) and the application narrows it. `usersExtRoutes.create`, `.update` and `.deactivate` are the routes with those bodies for a replacement to call.
+When the server adds to go-core's users (a dealer, roles, a hand-over on deactivation: go-core's `UserExtension`), rows, details and changes carry an `ext`, the create and update bodies accept one, and the deactivation takes `details`. go-core's generated types carry it as `ext?: unknown` (on `UserRow`, `UserDetail`, `ChangeRow`, `CreateUserInput`, `UpdateUserInput`, `DeactivateResult`) and `details?: unknown` (`DeactivateUserInput`), and the application narrows it to the shape its server writes. A replacement calls the ordinary `identityRoutes.usersCreate`, `usersUpdate` and `usersDeactivate` with them. `OpenChangeRow` is `ChangeRow` with an open `action`, since the server's change log can write actions go-core does not know.
 
 `usersFeature({ replace })` swaps whole screens; a replacement is mounted where the built-in was, with these contracts:
 
@@ -152,7 +152,7 @@ When the server adds to go-core's users (a dealer, roles, a hand-over on deactiv
 // A Deactivate dialog that sends the application's hand-over plan as `details` (the server's deactivation hook reads it).
 // It keeps the contract of `replace.deactivate`: the props of `DeactivateDialogProps`, an `open()` the record page calls,
 // and a `done` event after it deactivated.
-import { usersExtRoutes, usersFeature, type DeactivateDialogEmits, type DeactivateDialogProps } from "@wssto2/vue-core/identity";
+import { identityRoutes, usersFeature, type DeactivateDialogEmits, type DeactivateDialogProps } from "@wssto2/vue-core/identity";
 import { usePlatform } from "@wssto2/vue-core/platform";
 import { defineComponent, h, ref } from "vue";
 
@@ -162,7 +162,7 @@ const Deactivate = defineComponent(
     const shown = ref(false);
     expose({ open: () => (shown.value = true) });
     const run = async () => {
-      await http.request(usersExtRoutes.deactivate, { id: props.id, details: { handOver: { leads: 5 } } });
+      await http.request(identityRoutes.usersDeactivate, { id: props.id, details: { handOver: { leads: 5 } } });
       emit("done");
     };
     return () => (shown.value ? h("button", { onClick: run }, `Hand over ${props.name}`) : null);

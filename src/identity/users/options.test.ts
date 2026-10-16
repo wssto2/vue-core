@@ -6,8 +6,9 @@ import { useRouteResourceContext } from "../../resource";
 import { usePlatform } from "../../platform";
 import { jsonResponse, settle } from "../../testing";
 import * as identity from "../index";
+import type { UserDetail } from "../../modules/identity/entities";
+import { identityRoutes } from "../../modules/identity/routes";
 import { callsTo, dataOf, listOf, startScreen, stopApplications } from "../testing";
-import { usersExtRoutes, type UserDetailWithExt } from "./ext";
 import { PERSON, usePersonActions } from "./person";
 import { useUserDialogs } from "./dialogs";
 
@@ -82,7 +83,7 @@ describe("usersFeature({ replace })", () => {
         const { http } = usePlatform();
         const shown = ref(false);
         expose({ create: () => (shown.value = true) });
-        const save = async () => emit("created", (await http.request(usersExtRoutes.create, { login: "pero", name: "Pero", email: "p@x.test", locale: "en", password: "x", ext: { dealer: 3 } })).data);
+        const save = async () => emit("created", (await http.request(identityRoutes.usersCreate, { login: "pero", name: "Pero", email: "p@x.test", locale: "en", password: "x", ext: { dealer: 3 } })).data);
         return () => (shown.value ? h("button", { onClick: save }, "Save custom") : null);
       },
     });
@@ -109,7 +110,7 @@ describe("usersFeature({ replace })", () => {
         expose({ open: () => (shown.value = true) });
         seen.push(props);
         const run = async () => {
-          await http.request(usersExtRoutes.deactivate, { id: props.id, details: { leads_to: 5 } });
+          await http.request(identityRoutes.usersDeactivate, { id: props.id, details: { leads_to: 5 } });
           emit("done");
         };
         return () => (shown.value ? h("button", { onClick: run }, `Hand over ${props.name}`) : null);
@@ -190,11 +191,11 @@ describe("usersFeature({ activityRecords, changeWords })", () => {
 describe("the pieces a replaced screen reuses", () => {
   it("are exported from the identity entry", () => {
     for (const name of ["PageBar", "SectionIntro", "SessionList", "SignInList", "SignInTable", "ChangeFeed", "NewUserDialog", "DeactivateDialog", "ActionRow"] as const) expect(identity[name]).toBeTruthy();
-    for (const name of ["PERSON", "usePersonActions", "useUsersContext", "useUserDialogs", "userList", "usersExtRoutes"] as const) expect(identity[name]).toBeTruthy();
+    for (const name of ["PERSON", "usePersonActions", "useUsersContext", "useUserDialogs", "userList", "identityRoutes"] as const) expect(identity[name]).toBeTruthy();
   });
 
   it("type the ext as unknown for the application to narrow", () => {
-    const user: UserDetailWithExt = { ...person(), ext: { dealer: "Zagreb" } } as UserDetailWithExt;
+    const user = { ...person(), ext: { dealer: "Zagreb" } } as UserDetail;
     expect((user.ext as { dealer: string }).dealer).toBe("Zagreb");
   });
 });

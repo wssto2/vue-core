@@ -1,5 +1,5 @@
 import type { Component } from "vue";
-import type { UserDetailWithExt } from "./ext";
+import type { UserDetail } from "../../modules/identity/entities";
 
 /**
  * Whole screens of `usersFeature` an application swaps for its own, with the contract each one keeps. A replacement is
@@ -26,7 +26,7 @@ export interface NewUserDialogHandle {
 /** The events of the New user dialog. */
 export interface NewUserDialogEmits {
   /** The person was created; the list opens their record. */
-  created: [user: UserDetailWithExt];
+  created: [user: UserDetail];
 }
 
 /** The props of the Deactivate dialog (`replace.deactivate`). */

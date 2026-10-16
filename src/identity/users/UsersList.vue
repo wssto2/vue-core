@@ -5,14 +5,13 @@ import { useRouter } from "vue-router";
 import { CollectionPage, useCollection, type CollectionColumns } from "../../collection";
 import { Avatar } from "../../content";
 import { useFormat } from "../../format";
-import type { UserRow } from "../../modules/identity/entities";
+import type { UserDetail, UserRow } from "../../modules/identity/entities";
 import type { PageAction } from "../../page";
 import { usePlatform } from "../../platform";
 import { Badge } from "../../state";
 import { MANAGE_USERS } from "./access";
 import { USER_VIEWS, userList } from "./list";
 import { useUserDialogs } from "./dialogs";
-import type { UserDetailWithExt } from "./ext";
 import type { NewUserDialogHandle } from "./replace";
 import { usersRoutes } from "./routes";
 import { statusTone } from "./status";
@@ -36,9 +35,13 @@ const columns = computed(() => [
   { key: "status", label: t("core.users.columns.status"), width: 130, mobile: "accessory" },
 ] satisfies CollectionColumns<UserRow>);
 
+const filters = computed(() => [
+  { key: "last_sign_in" as const, label: t("core.users.filters.last_sign_in"), type: "select" as const, options: [{ value: "never", label: t("core.users.filters.never") }, { value: "idle", label: t("core.users.filters.idle") }] },
+]);
+
 const views = computed(() => USER_VIEWS.map((key) => ({ key, label: t(`core.users.views.${key}`) })));
 
-const users = useCollection(userList(http), { columns, views, state: { kind: "url", key: "query" }, recordRoute: (user) => usersRoutes.record({ id: user.id }) });
+const users = useCollection(userList(http), { columns, filters, views, state: { kind: "url", key: "query" }, recordRoute: (user) => usersRoutes.record({ id: user.id }) });
 
 const actions = computed<PageAction[]>(() =>
   access.can(MANAGE_USERS)
@@ -59,6 +62,6 @@ const actions = computed<PageAction[]>(() =>
     <template #cell-status="{ item, compact }">
       <Badge v-if="!compact || item.status !== 'active'" :tone="statusTone(item.status)" dot>{{ t(`core.users.status.${item.status}`) }}</Badge>
     </template>
-    <NewUser ref="dialog" @created="(user: UserDetailWithExt) => router.push(usersRoutes.record({ id: user.id }))" />
+    <NewUser ref="dialog" @created="(user: UserDetail) => router.push(usersRoutes.record({ id: user.id }))" />
   </CollectionPage>
 </template>

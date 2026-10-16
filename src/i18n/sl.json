@@ -699,6 +699,11 @@
         "status": "Status"
       },
       "never": "Nikoli",
+      "filters": {
+        "last_sign_in": "Zadnja prijava",
+        "never": "Nikoli prijavljen",
+        "idle": "Dolgo ni prijavljen"
+      },
       "status": {
         "active": "Aktivna",
         "locked": "Zaklenjena",

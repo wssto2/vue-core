@@ -1,5 +1,5 @@
 // What an application can leave out, link to, or add.
-import type { ChangeRowWithExt, PersonSection } from "@wssto2/vue-core/identity";
+import type { OpenChangeRow, PersonSection } from "@wssto2/vue-core/identity";
 import { PERSON, usePersonActions, usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
 import { useRouteResourceContext } from "@wssto2/vue-core/resource";
 import { FormGroup, FormRow } from "@wssto2/vue-core/form";
@@ -49,7 +49,7 @@ export const withActivityRecords = usersFeature({
 // The application's wording for a change the library has no sentence for (the server's change log wrote an `ext`).
 // Return nothing for a row the library words well; details may link.
 export const withChangeWords = usersFeature({
-  changeWords: (row: ChangeRowWithExt, t) => {
+  changeWords: (row: OpenChangeRow, t) => {
     const ext = row.ext as { role: string; binding: number } | undefined;
     if (row.action !== "role_granted" || !ext) return undefined;
     return { sentence: t("changes.role_granted", { role: ext.role }), details: [{ text: t("changes.binding"), to: { name: "binding", params: { id: ext.binding } } }] };

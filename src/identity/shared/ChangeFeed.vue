@@ -6,7 +6,7 @@ import { IconTile } from "../../controls";
 import { useFormat } from "../../format";
 import { FormGroup, FormRow } from "../../form";
 import { RouterLink } from "vue-router";
-import type { ChangeRowWithExt } from "../users/ext";
+import type { OpenChangeRow } from "../users/ext";
 import type { ChangeDetail, ChangeWordsFn } from "../users/words";
 
 /**
@@ -16,7 +16,7 @@ import type { ChangeDetail, ChangeWordsFn } from "../users/words";
  * application's own wording (`usersFeature({ changeWords })`): its sentence replaces the library's, its details follow them.
  */
 const props = defineProps<{
-  rows: readonly ChangeRowWithExt[];
+  rows: readonly OpenChangeRow[];
   words?: ChangeWordsFn;
 }>();
 
