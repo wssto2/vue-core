@@ -1,4 +1,5 @@
 export { createHttpClient, RECENT_REQUEST_IDS } from "./client";
+export { openBlob, saveBlob } from "./blob";
 export type { HttpClient, RouteResult, HttpClientOptions, RequestOptions, RawRequestOptions, DownloadResult, UnauthorizedContext, UnauthorizedDecision } from "./client";
 export type { QueryValue } from "./encode";
 export { REQUEST_ID_HEADER } from "./envelope";

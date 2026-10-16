@@ -5,6 +5,9 @@
 ### Fixed
 - **Shortcuts and an open dialog:** while a Modal, Sheet or other dialog is open, only the shortcuts registered inside it fire; the page's own (`?`, `/`, the record pager's J/K) wait until it closes, as the help text says.
 
+### New
+- **client:** `saveBlob(blob, filename)` hands a downloaded file to the browser's downloads; `openBlob(blob)` shows it (a PDF) in a new tab and frees it after a minute. They pair with `http.download`.
+
 ## 0.9.1 — 2026-10-16
 
 ### New

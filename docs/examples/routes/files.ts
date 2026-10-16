@@ -1,4 +1,4 @@
-import { createHttpClient, isApiError } from "@wssto2/vue-core/client";
+import { createHttpClient, isApiError, saveBlob } from "@wssto2/vue-core/client";
 
 const http = createHttpClient({ baseUrl: "/api" });
 
@@ -6,11 +6,7 @@ const http = createHttpClient({ baseUrl: "/api" });
 export async function saveReport(id: number, signal: AbortSignal) {
   try {
     const { blob, filename } = await http.download(`/v1/reports/${id}/pdf`, { signal, accept: "application/pdf" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename ?? `report-${id}.pdf`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    saveBlob(blob, filename ?? `report-${id}.pdf`);
   } catch (error) {
     // the same ApiError as a JSON call: kind, code, params, requestId from the server's error body
     if (isApiError(error)) return error.code;

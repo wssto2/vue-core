@@ -109,7 +109,7 @@ export async function safely() {
 
 <!-- example: docs/examples/routes/files.ts -->
 ```ts
-import { createHttpClient, isApiError } from "@wssto2/vue-core/client";
+import { createHttpClient, isApiError, saveBlob } from "@wssto2/vue-core/client";
 
 const http = createHttpClient({ baseUrl: "/api" });
 
@@ -117,11 +117,7 @@ const http = createHttpClient({ baseUrl: "/api" });
 export async function saveReport(id: number, signal: AbortSignal) {
   try {
     const { blob, filename } = await http.download(`/v1/reports/${id}/pdf`, { signal, accept: "application/pdf" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename ?? `report-${id}.pdf`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    saveBlob(blob, filename ?? `report-${id}.pdf`);
   } catch (error) {
     // the same ApiError as a JSON call: kind, code, params, requestId from the server's error body
     if (isApiError(error)) return error.code;
@@ -140,7 +136,7 @@ export async function follow(onEvent: (chunk: string) => void, signal: AbortSign
 }
 ```
 
-- **`download(path, { method?, body?, accept?, query?, headers?, signal?, handleUnauthorized? })`** resolves to `{ blob, filename, requestId }` once the whole body is in. `method` is `GET` (default) or `POST`; `accept` defaults to any type. `filename` is read from `Content-Disposition` (RFC 6266): `filename*=UTF-8''…` wins over `filename=`, quotes are handled, a directory part is dropped, and it is `null` when the header proposes no name. Fall back to a name of your own, as above.
+- **`download(path, { method?, body?, accept?, query?, headers?, signal?, handleUnauthorized? })`** resolves to `{ blob, filename, requestId }` once the whole body is in. `method` is `GET` (default) or `POST`; `accept` defaults to any type. `filename` is read from `Content-Disposition` (RFC 6266): `filename*=UTF-8''…` wins over `filename=`, quotes are handled, a directory part is dropped, and it is `null` when the header proposes no name. Fall back to a name of your own, as above. `saveBlob(blob, filename)` hands the file to the browser's downloads; `openBlob(blob)` shows a PDF in a new tab instead.
 - **A failed download is an `ApiError`**, built from the JSON error body exactly as for `get`: `kind` from the status, and the server's `code`, `params` and `fields`. Word it with `describeError` like any other failure. An error answer that is not JSON gives the status message and `code: null`.
 - **`stream(path, options)`** takes the same options and resolves to the raw `Response` as soon as its headers are in, so the body is yours to read; end it with the `signal`. Only the opening can throw an `ApiError` (non-2xx, 401 after the retry, network). A read that fails later, or is cancelled, rejects with the platform's own error.
 - Neither call reads the `{ success, data }` envelope; a success answer is the bytes.
