@@ -1,6 +1,7 @@
 import { render } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { defineComponent, h, nextTick, ref } from "vue";
+import { defineComponent, h, nextTick, onMounted, ref } from "vue";
+import { useDialogStack } from "../overlay/dialogStack";
 import { matchesShortcut, shortcutKeys, useKeyboardShortcut, useShortcutRegistry, type KeyboardShortcut } from "./shortcut";
 
 const Owner = (shortcut: () => KeyboardShortcut | undefined) =>
@@ -109,5 +110,40 @@ describe("mod", () => {
     render(defineComponent({ setup() { useKeyboardShortcut({ key: "k", mod: true }, run); return () => h("input", { "data-testid": "field" }); } }));
     document.querySelector("input")!.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
     expect(run).toHaveBeenCalledOnce();
+  });
+});
+
+describe("shortcuts and an open dialog", () => {
+  const press = (key: string) => window.dispatchEvent(new KeyboardEvent("keydown", { key }));
+  const Counter = (key: string, spy: () => void) =>
+    defineComponent({ setup() { useKeyboardShortcut({ key }, () => spy()); return () => h("span"); } });
+
+  it("keeps the page's shortcuts off while a dialog is open, and the dialog's own ones on", async () => {
+    const page = vi.fn();
+    const inside = vi.fn();
+    const Inside = Counter("x", inside);
+    const Dialog = defineComponent({
+      setup() {
+        const root = ref<HTMLElement | null>(null);
+        const { activate } = useDialogStack(root);
+        onMounted(activate);
+        return () => h("div", { ref: root, role: "dialog", "aria-modal": "true" }, [h(Inside)]);
+      },
+    });
+
+    render(Counter("?", page));
+    press("?");
+    expect(page).toHaveBeenCalledTimes(1);
+
+    const dialog = render(Dialog);
+    await nextTick();
+    press("?");
+    press("x");
+    expect(page).toHaveBeenCalledTimes(1);
+    expect(inside).toHaveBeenCalledTimes(1);
+
+    dialog.unmount();
+    press("?");
+    expect(page).toHaveBeenCalledTimes(2);
   });
 });

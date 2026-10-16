@@ -90,6 +90,15 @@ export function useDialogStack(root: Ref<HTMLElement | null>): {
 }
 
 /**
+ * The topmost open dialog's root element: `undefined` when no dialog is open, `null` while the topmost one has not rendered yet.
+ * What a document-wide listener (a keyboard shortcut) reads to stay out of the way of a dialog it does not belong to.
+ */
+export function topDialogRoot(): HTMLElement | null | undefined {
+  const entries = stack().entries.value;
+  return entries.length === 0 ? undefined : entries[entries.length - 1]!.root();
+}
+
+/**
  * How many dialogs are open in the document (Modal, Sheet, AlertDialog, PhotoViewer, the phone navigation drawer; nested ones
  * count each), as a reactive value. An application shown inside a frame uses it to tell the page
  * around it that something covers the viewport (to grow the frame, to dim its own chrome).

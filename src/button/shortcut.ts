@@ -1,5 +1,6 @@
-import { computed, shallowRef, toValue, triggerRef, watchEffect, type ComputedRef, type MaybeRefOrGetter, type ShallowRef } from "vue";
+import { computed, getCurrentInstance, shallowRef, toValue, triggerRef, watchEffect, type ComponentInternalInstance, type ComputedRef, type MaybeRefOrGetter, type ShallowRef } from "vue";
 import { perDocument } from "../internal/perDocument";
+import { topDialogRoot } from "../overlay/dialogStack";
 
 /**
  * A keyboard shortcut: the key (case-insensitive, as `KeyboardEvent.key`) and exactly the modifiers listed.
@@ -48,6 +49,7 @@ export function useKeyboardShortcut(
   shortcut: MaybeRefOrGetter<KeyboardShortcut | undefined>,
   run: (event: KeyboardEvent) => void | false,
 ): void {
+  const owner = getCurrentInstance();
   watchEffect((onCleanup) => {
     const current = toValue(shortcut);
     if (!current) return;
@@ -60,11 +62,20 @@ export function useKeyboardShortcut(
     const listener = (event: KeyboardEvent) => {
       if (event.repeat || !matchesShortcut(event, current)) return;
       if (!(current.mod || current.ctrlKey || current.altKey || current.metaKey) && isTyping(event.target)) return;
+      if (!reachable(owner)) return;
       if (run(event) !== false) event.preventDefault();
     };
     window.addEventListener("keydown", listener);
     onCleanup(() => window.removeEventListener("keydown", listener));
   });
+}
+
+/** While a dialog is open, only the shortcuts of what is inside it work: the page under it is covered (and inert). */
+function reachable(owner: ComponentInternalInstance | null): boolean {
+  const dialog = topDialogRoot();
+  if (dialog === undefined) return true;
+  const element = owner?.subTree.el as Node | null | undefined;
+  return !!dialog && !!element && dialog.contains(element);
 }
 
 // Per document, created on first use. The list is a plain array and `changed` is only triggered, never read by the effect that registers: that effect must not subscribe to what it writes.
