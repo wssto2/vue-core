@@ -15,11 +15,11 @@ const format = useFormat();
 const steps = computed<Record<string, SectionStep>>(() => ({
   "workflows.appraisal.valuation": appraisal.valuation === null
     ? { done: false, sub: t("workflows.appraisal.noValuation"), tone: "warning" }
-    : { done: true, sub: format.money(appraisal.valuation, "EUR") },
+    : { done: true, sub: format.money(appraisal.valuation, { currency: "EUR" }) },
   "workflows.appraisal.report": appraisal.marketComparison
     ? { done: true, sub: t("workflows.appraisal.reportDone", { n: appraisal.photos }), shortSub: t("workflows.appraisal.reportDoneShort") }
     : { done: false, sub: t("workflows.appraisal.reportMissing"), shortSub: t("workflows.appraisal.reportMissingShort"), tone: "warning" },
-  "workflows.appraisal.offer": appraisal.offer === null ? { done: false, sub: t("workflows.appraisal.noOffer") } : { done: true, sub: format.money(appraisal.offer, "EUR"), tone: "positive" },
+  "workflows.appraisal.offer": appraisal.offer === null ? { done: false, sub: t("workflows.appraisal.noOffer") } : { done: true, sub: format.money(appraisal.offer, { currency: "EUR" }), tone: "positive" },
 }));
 </script>
 

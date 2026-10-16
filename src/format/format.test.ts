@@ -1,5 +1,5 @@
 import { render } from "@testing-library/vue";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { defineComponent, h, ref } from "vue";
 import { createFormatting, installFormatting, toDate, useFormat } from "./format";
 import { MissingContextError } from "../platform";
@@ -17,20 +17,56 @@ describe("toDate", () => {
   });
 });
 
-describe("money without an ISO currency", () => {
-  it("shows two decimals and the display symbol after a space", () => {
-    const format = createFormatting({ locale: () => "en", currencySymbol: "KM" });
+describe("money", () => {
+  const en = createFormatting({ locale: () => "en", currencySymbol: "KM" });
 
-    expect(format.money(1234.5)).toBe("1,234.50 KM");
-    expect(format.money(null)).toBe("");
-    expect(format.currencySymbol).toBe("KM");
+  it("shows two decimals and the display symbol after a space", () => {
+    expect(en.money(1234.5)).toBe("1,234.50 KM");
+    expect(en.currencySymbol).toBe("KM");
+  });
+
+  it("formats a missing or non-finite amount as the empty string", () => {
+    for (const amount of [null, undefined, NaN, Infinity]) expect(en.money(amount)).toBe("");
+    expect(en.money(null, { currency: "EUR", symbol: false })).toBe("");
+  });
+
+  it("decimals sets the fraction digits", () => {
+    expect(en.money(1234.5, { decimals: 0 })).toBe("1,235 KM");
+    expect(en.money(1234.5, { decimals: 3 })).toBe("1,234.500 KM");
+    expect(en.money(1234.5, { currency: "USD", decimals: 0 })).toBe("$1,235");
+  });
+
+  it("whole drops the fraction of a whole amount only", () => {
+    expect(en.money(39600, { whole: true })).toBe("39,600 KM");
+    expect(en.money(39600.5, { whole: true })).toBe("39,600.50 KM");
+    expect(en.money(39600.5, { whole: true, decimals: 1 })).toBe("39,600.5 KM");
+    expect(en.money(39600, { whole: true, currency: "USD" })).toBe("$39,600");
+    expect(en.money(39600.5, { whole: true, currency: "USD" })).toBe("$39,600.50");
+  });
+
+  it("symbol: false gives the number alone, with or without a currency", () => {
+    expect(en.money(1234.5, { symbol: false })).toBe("1,234.50");
+    expect(en.money(1234.5, { symbol: false, currency: "USD" })).toBe("1,234.50");
+    expect(en.money(39600, { symbol: false, whole: true, currency: "USD" })).toBe("39,600");
+    expect(en.money(1234.567, { symbol: false, decimals: 1 })).toBe("1,234.6");
   });
 
   it("goes through the application's number format, and an ISO currency still wins", () => {
-    const format = createFormatting({ locale: () => "en", currencySymbol: "€", formatters: { number: (value) => `<${value}>` } });
+    const format = createFormatting({ locale: () => "en", currencySymbol: "€", formatters: { number: (value, _locale, o) => `<${value}|${o?.minimumFractionDigits}>` } });
 
-    expect(format.money(2)).toBe("<2> €");
-    expect(format.money(1234.5, "USD")).toBe("$1,234.50");
+    expect(format.money(2)).toBe("<2|2> €");
+    expect(format.money(2, { whole: true, symbol: false })).toBe("<2|0>");
+    expect(format.money(1234.5, { currency: "USD" })).toBe("$1,234.50");
+  });
+
+  it("hands the digits to an application's own money formatter", () => {
+    const money = vi.fn(() => "x");
+    const format = createFormatting({ locale: () => "en", formatters: { money } });
+
+    expect(format.money(5, { currency: "EUR", whole: true })).toBe("x");
+    expect(money).toHaveBeenCalledWith(5, "EUR", "en", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    format.money(5, { currency: "EUR" });
+    expect(money).toHaveBeenLastCalledWith(5, "EUR", "en", undefined);
   });
 
   it("is the bare amount when no symbol was set", () => {
@@ -60,8 +96,8 @@ describe("createFormatting", () => {
 
     expect(format.number(1234.5)).toMatch(/^1\.?234,5$/); // the ICU data decides whether hr groups four digits
     expect(format.number(0.256, { style: "percent" })).toMatch(/^26\s%$/);
-    expect(format.money(1234.5, "EUR")).toMatch(/^1\.?234,50\s€$/);
-    expect(createFormatting({ locale: () => "en" }).money(1234.5, "USD")).toBe("$1,234.50");
+    expect(format.money(1234.5, { currency: "EUR" })).toMatch(/^1\.?234,50\s€$/);
+    expect(createFormatting({ locale: () => "en" }).money(1234.5, { currency: "USD" })).toBe("$1,234.50");
   });
 
   it("says the largest whole unit relative to now", () => {
@@ -82,7 +118,6 @@ describe("createFormatting", () => {
     expect(format.time("garbage")).toBe("");
     expect(format.number(NaN)).toBe("");
     expect(format.number(undefined)).toBe("");
-    expect(format.money(null, "EUR")).toBe("");
     expect(format.relative(undefined)).toBe("");
   });
 

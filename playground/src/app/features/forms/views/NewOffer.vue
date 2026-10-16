@@ -50,9 +50,9 @@ async function save() {
     <OfferSections :form="form" />
     <template #aside>
       <dl class="mx-2.5 flex flex-col gap-1 border-t border-border-separator pt-3.5 text-footnote">
-        <div class="flex justify-between"><dt class="text-content-muted">{{ t("forms.offer.net") }}</dt><dd class="tabular-nums">{{ format.money(totals.net, "EUR") }}</dd></div>
-        <div class="flex justify-between"><dt class="text-content-muted">{{ t("forms.offer.vat") }}</dt><dd class="tabular-nums">{{ format.money(totals.vat, "EUR") }}</dd></div>
-        <div class="flex justify-between text-body font-semibold"><dt>{{ t("forms.offer.total") }}</dt><dd class="tabular-nums">{{ format.money(totals.total, "EUR") }}</dd></div>
+        <div class="flex justify-between"><dt class="text-content-muted">{{ t("forms.offer.net") }}</dt><dd class="tabular-nums">{{ format.money(totals.net, { currency: "EUR" }) }}</dd></div>
+        <div class="flex justify-between"><dt class="text-content-muted">{{ t("forms.offer.vat") }}</dt><dd class="tabular-nums">{{ format.money(totals.vat, { currency: "EUR" }) }}</dd></div>
+        <div class="flex justify-between text-body font-semibold"><dt>{{ t("forms.offer.total") }}</dt><dd class="tabular-nums">{{ format.money(totals.total, { currency: "EUR" }) }}</dd></div>
       </dl>
     </template>
   </EditorPage>

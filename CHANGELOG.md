@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.3 — 2026-10-16
+
+### Changed
+- **format:** `format.money(amount, options?)` replaces `money(amount, currency?)`. `options` is `{ currency, decimals, whole, symbol }`: `decimals` sets the fraction digits (default 2), `whole` drops the fraction of an amount that has none (`39.600`, not `39.600,00`; `<Money whole>` uses the same rule), `symbol: false` gives the number alone. Migrate `format.money(x, "EUR")` to `format.money(x, { currency: "EUR" })`.
+- **format:** the overridable `Formatters.money(amount, currency, locale)` receives a fourth argument, the `Intl.NumberFormatOptions` with the fraction digits when the caller set `decimals` or `whole`. An override that ignores it keeps working.
+
 ## 0.9.2 — 2026-10-16
 
 ### Fixed

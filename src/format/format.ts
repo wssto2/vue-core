@@ -36,9 +36,21 @@ export interface Formatters {
   dateTime(value: Date, locale: string): string;
   time(value: Date, locale: string): string;
   number(value: number, locale: string, options?: Intl.NumberFormatOptions): string;
-  money(amount: number, currency: string, locale: string): string;
+  /** `options` carries the fraction digits when the caller asked for them; ignoring it is allowed. */
+  money(amount: number, currency: string, locale: string, options?: Intl.NumberFormatOptions): string;
   /** `now` is the moment to count from. */
   relative(value: Date, locale: string, now: Date): string;
+}
+
+export interface MoneyOptions {
+  /** An ISO code ("EUR"): `Intl`'s currency style instead of the application's `currencySymbol`. */
+  currency?: string;
+  /** Fraction digits (default 2; with a `currency`, the currency's own). */
+  decimals?: number;
+  /** An amount with no fraction shows none ("39.600", not "39.600,00"); any other keeps `decimals`. */
+  whole?: boolean;
+  /** `false` gives the number alone (default true). */
+  symbol?: boolean;
 }
 
 /**
@@ -55,10 +67,11 @@ export interface Formatting {
   time(value: DateInput): string;
   number(value: number | null | undefined, options?: Intl.NumberFormatOptions): string;
   /**
-   * With an ISO `currency` ("EUR"): `Intl`'s currency style. Without one: the amount with two decimals, then the
-   * `currencySymbol` after a space ("1.234,50 KM"), or the bare amount when the application set no symbol.
+   * Without a `currency`: the amount through `formatters.number`, then the `currencySymbol` after a space
+   * ("1.234,50 KM"), or the bare amount when the application set no symbol. With an ISO `currency` ("EUR"):
+   * `Intl`'s currency style. A missing or non-finite amount is the empty string, like the other functions.
    */
-  money(amount: number | null | undefined, currency?: string): string;
+  money(amount: number | null | undefined, options?: MoneyOptions): string;
   /** The display symbol the application set (`""` when none), for a caller that draws it apart from the amount. */
   readonly currencySymbol: string;
   /** "3 days ago", "in 2 hours", "now": the largest whole unit. */
@@ -97,8 +110,8 @@ export function intlFormatters(): Formatters {
     dateTime: (value, locale) => dateFormat(locale, { ...DATE, ...TIME }).format(value),
     time: (value, locale) => dateFormat(locale, TIME).format(value),
     number: (value, locale, options) => cached(`n|${locale}|${JSON.stringify(options ?? {})}`, () => new Intl.NumberFormat(intlLocale(locale), options)).format(value),
-    money: (amount, currency, locale) =>
-      cached(`m|${locale}|${currency}`, () => new Intl.NumberFormat(intlLocale(locale), { style: "currency", currency })).format(amount),
+    money: (amount, currency, locale, options) =>
+      cached(`m|${locale}|${currency}|${JSON.stringify(options ?? {})}`, () => new Intl.NumberFormat(intlLocale(locale), { ...options, style: "currency", currency })).format(amount),
     relative(value, locale, now) {
       const seconds = Math.trunc((value.getTime() - now.getTime()) / 1000);
       const [unit, size] = RELATIVE_UNITS.find(([, length]) => Math.abs(seconds) >= length) ?? RELATIVE_UNITS[RELATIVE_UNITS.length - 1]!;
@@ -140,12 +153,16 @@ export function createFormatting(options: FormattingOptions): Formatting {
     get currencySymbol() {
       return options.currencySymbol ?? "";
     },
-    money: (amount, currency) => {
+    money: (amount, { currency, decimals, whole, symbol = true } = {}) => {
       if (!finite(amount)) return "";
-      if (currency) return formatters.money(amount, currency, options.locale());
+      const value = amount;
+      // The one rule for "whole": the same for <Money whole>, which formats through here.
+      const digits = whole && Number.isInteger(value) ? 0 : decimals;
+      const intl = digits === undefined ? undefined : { minimumFractionDigits: digits, maximumFractionDigits: digits };
+      if (currency && symbol) return formatters.money(value, currency, options.locale(), intl);
       // Through `formatters.number`, so an application's own number format applies to its amounts too.
-      const text = formatters.number(amount, options.locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      return options.currencySymbol ? `${text} ${options.currencySymbol}` : text;
+      const text = formatters.number(value, options.locale(), intl ?? { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return symbol && !currency && options.currencySymbol ? `${text} ${options.currencySymbol}` : text;
     },
     relative: (value, now = new Date()) => {
       const date = toDate(value);

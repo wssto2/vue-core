@@ -55,7 +55,7 @@ const asNumber = computed(() => (typeof value.value === "number" ? value.value :
   <span v-else-if="props.column.kind === 'number'" class="tabular-nums">{{ format.number(asNumber, props.column.format) }}</span>
 
   <span v-else-if="props.column.kind === 'money'" class="tabular-nums">
-    {{ format.money(asNumber, typeof props.column.currency === "function" ? props.column.currency(props.item) : props.column.currency) }}
+    {{ format.money(asNumber, { currency: typeof props.column.currency === "function" ? props.column.currency(props.item) : props.column.currency }) }}
   </span>
 
   <Badge v-else-if="props.column.kind === 'badge'" :tone="props.column.tone(props.item)" dot>{{ props.column.text?.(props.item) ?? text }}</Badge>

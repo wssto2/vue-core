@@ -30,7 +30,7 @@ onBeforeUnmount(() => clearTimeout(timer));
 <template>
   <Panel title="Locale data">
     <div class="flex flex-col gap-4">
-      <p class="text-body text-content-strong">{{ format.number(400000.5, { minimumFractionDigits: 2 }) }} · {{ format.money(1234.5, "BAM") }} · {{ format.date(new Date(2026, 9, 10)) }}</p>
+      <p class="text-body text-content-strong">{{ format.number(400000.5, { minimumFractionDigits: 2 }) }} · {{ format.money(1234.5, { currency: "BAM" }) }} · {{ format.date(new Date(2026, 9, 10)) }}</p>
       <FormGroup>
         <NumberField v-model="quantity" label="Quantity" :decimals="2" />
         <MoneyField v-model="amount" label="Amount" currency="KM" />

@@ -36,10 +36,7 @@ const sign = computed(() => {
   if (!Math.round(Math.abs(value.value) * 10 ** props.decimals)) return "";
   return value.value > 0 ? "+" : "−";
 });
-const text = computed(() => {
-  const digits = props.whole && Number.isInteger(value.value) ? 0 : props.decimals;
-  return format.number(props.signed ? Math.abs(value.value) : value.value, { minimumFractionDigits: digits, maximumFractionDigits: digits });
-});
+const text = computed(() => format.money(props.signed ? Math.abs(value.value) : value.value, { decimals: props.decimals, whole: props.whole, symbol: false }));
 // The whole figure takes the colour, as a stock ticker colours a change: a sign alone is too thin to carry it.
 const tone = computed(() => (sign.value === "+" ? "font-medium text-status-success-content" : sign.value === "−" ? "font-medium text-status-danger-content" : ""));
 const currencySymbol = computed(() => (props.symbol ? format.currencySymbol : ""));
