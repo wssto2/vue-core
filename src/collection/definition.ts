@@ -1,4 +1,4 @@
-import type { CollectionLoader, CollectionQuery, SortDirection } from "./types";
+import type { CollectionLoader, CollectionQuery, ListMeta, SortDirection } from "./types";
 
 /** The page sizes ARV's lists offer; a definition may narrow or replace them. */
 export const DEFAULT_PAGE_SIZES: readonly number[] = [5, 8, 10, 15, 25, 50, 100];
@@ -32,13 +32,13 @@ export type CollectionDefaults<Sort extends string, Filter extends string, View 
 /** The state a stored version of a list's state (a link, a saved view) is migrated from. */
 export type StoredState = Readonly<Record<string, unknown>>;
 
-export interface CollectionDefinitionInput<Row, Sort extends string, Filter extends string, View extends string> {
+export interface CollectionDefinitionInput<Row, Sort extends string, Filter extends string, View extends string, Meta extends ListMeta = ListMeta> {
   /** Stable identity of the list: saved views and logs use it. It is not the URL key (two lists on a page each have their own). */
   readonly id: string;
   /** Bump it when the meaning of stored state changes (a renamed sort key); see `migrate`. */
   readonly stateVersion: number;
   /** The feature API's list function. */
-  readonly load: CollectionLoader<Row, NoInfer<Sort>, NoInfer<Filter>, NoInfer<View>>;
+  readonly load: CollectionLoader<Row, NoInfer<Sort>, NoInfer<Filter>, NoInfer<View>, Meta>;
   /** The record's identity: neighbors find the current record by it. */
   readonly key: (row: Row) => string | number;
   readonly defaults?: CollectionDefaults<NoInfer<Sort>, NoInfer<Filter>, NoInfer<View>>;
@@ -51,10 +51,10 @@ export interface CollectionDefinitionInput<Row, Sort extends string, Filter exte
 }
 
 /** A collection's definition: pure data and a loader. Nothing runs until `useCollection` or `useCollectionNeighbors` uses it. */
-export interface CollectionDefinition<Row, Sort extends string = string, Filter extends string = string, View extends string = string> {
+export interface CollectionDefinition<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Meta extends ListMeta = ListMeta> {
   readonly id: string;
   readonly stateVersion: number;
-  readonly load: CollectionLoader<Row, Sort, Filter, View>;
+  readonly load: CollectionLoader<Row, Sort, Filter, View, Meta>;
   readonly key: (row: Row) => string | number;
   /** Complete: every field of the query has a value. */
   readonly defaults: CollectionQuery<Sort, Filter, View>;
@@ -88,9 +88,9 @@ const DEFAULT_PAGE_SIZE = 25;
  * Pure: it validates its input (and throws a descriptive error on a contradiction, e.g. a default
  * sort the contract does not list) but starts nothing.
  */
-export function defineCollection<Row, Sort extends string = string, Filter extends string = string, View extends string = string>(
-  input: CollectionDefinitionInput<Row, Sort, Filter, View>,
-): CollectionDefinition<Row, Sort, Filter, View> {
+export function defineCollection<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Meta extends ListMeta = ListMeta>(
+  input: CollectionDefinitionInput<Row, Sort, Filter, View, Meta>,
+): CollectionDefinition<Row, Sort, Filter, View, Meta> {
   const where = `defineCollection("${input.id}")`;
   if (typeof input.id !== "string" || input.id.trim() === "") throw new Error("defineCollection: `id` must be a non-empty string.");
   if (!Number.isInteger(input.stateVersion) || input.stateVersion < 1) throw new Error(`${where}: \`stateVersion\` must be a positive integer.`);
@@ -131,7 +131,7 @@ export function defineCollection<Row, Sort extends string = string, Filter exten
   return Object.freeze({
     id: input.id,
     stateVersion: input.stateVersion,
-    load: input.load as CollectionLoader<Row, Sort, Filter, View>,
+    load: input.load as CollectionLoader<Row, Sort, Filter, View, Meta>,
     key: input.key,
     defaults: Object.freeze({
       page,

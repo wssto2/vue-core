@@ -18,8 +18,14 @@ export interface CollectionQuery<Sort extends string = string, Filter extends st
   readonly filters: Readonly<Partial<Record<Filter, string>>>;
 }
 
-/** One page of a list, normalized: what `load` returns, whatever envelope the backend used. */
-export interface ListPage<Row> {
+/** What the backend adds next to a list's rows, untouched: any object until the app says what it sends (`ListPage<Row, MyMeta>`). */
+export type ListMeta = Readonly<Record<string, unknown>>;
+
+/**
+ * One page of a list, normalized: what `load` returns, whatever envelope the backend used. `Meta` is the shape of `meta`
+ * for a list whose backend sends one, so the app reads it without a cast (declare it as a `type`, not an `interface`, which has no index signature).
+ */
+export interface ListPage<Row, Meta extends ListMeta = ListMeta> {
   readonly rows: readonly Row[];
   /** Rows in the whole result set. */
   readonly total: number;
@@ -33,7 +39,7 @@ export interface ListPage<Row> {
   /** Counts the server reports per view (the tabs' badges). */
   readonly views?: readonly { readonly key: string; readonly count?: number }[];
   /** Enrichment the backend adds next to the rows (authors, lookups), untouched. */
-  readonly meta?: Readonly<Record<string, unknown>>;
+  readonly meta?: Meta;
   /** The `X-Request-ID` of the exchange, to quote in a bug report. */
   readonly requestId?: string | null;
 }
@@ -44,10 +50,10 @@ export interface LoadContext {
 }
 
 /** The typed call a collection makes: the feature's API function. It never builds URLs in a view. */
-export type CollectionLoader<Row, Sort extends string, Filter extends string, View extends string> = (
+export type CollectionLoader<Row, Sort extends string, Filter extends string, View extends string, Meta extends ListMeta = ListMeta> = (
   query: CollectionQuery<Sort, Filter, View>,
   context: LoadContext,
-) => Promise<ListPage<Row>>;
+) => Promise<ListPage<Row, Meta>>;
 
 /** Where a list keeps its state between visits. */
 export type CollectionStateSource =

@@ -22,7 +22,7 @@ import { LIST_CONTEXT_PARAM, withQuery } from "./location";
 import type { SavedView, SavedViewState, SavedViews } from "./savedViews";
 import { onSessionChange } from "./session";
 import { decodeState, encodeState, restoreState, type Json } from "./state";
-import type { ListPage, CollectionQuery, CollectionStateSource, SortDirection } from "./types";
+import type { ListMeta, ListPage, CollectionQuery, CollectionStateSource, SortDirection } from "./types";
 
 /**
  * A link into a list carries plain parameters (`?scope=long`, `?followup=overdue`): a count on the
@@ -94,7 +94,7 @@ export interface SavedViewsHandle {
  * batch into one request (several calls in a tick load once), a newer request supersedes the older,
  * and a failure is never confused with an empty list.
  */
-export interface Collection<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Col extends Column<Row> = Column<Row>> {
+export interface Collection<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Col extends Column<Row> = Column<Row>, Meta extends ListMeta = ListMeta> {
   /** The definition's id. */
   readonly id: string;
   /** The record's identity (the definition's `key`): what rows are keyed by. */
@@ -104,11 +104,11 @@ export interface Collection<Row, Sort extends string = string, Filter extends st
   /** Whether the list can be searched by text (the definition's `query.search`); the toolbar shows the search field only then. */
   readonly searchable: boolean;
   /** The request state: loading (nothing to show), loaded, refreshing (previous rows stay), stale (a refresh failed, previous rows stay) or failed. */
-  readonly state: Readonly<Ref<AsyncState<ListPage<Row>>>>;
+  readonly state: Readonly<Ref<AsyncState<ListPage<Row, Meta>>>>;
   /** The query the list shows or is loading. */
   readonly query: Readonly<Ref<CollectionQuery<Sort, Filter, View>>>;
   /** The last page that loaded, kept while another loads, refreshes or fails (so the pager and the count stay); null before the first and after a session change. */
-  readonly page: ComputedRef<ListPage<Row> | null>;
+  readonly page: ComputedRef<ListPage<Row, Meta> | null>;
   readonly rows: ComputedRef<readonly Row[]>;
   readonly total: ComputedRef<number>;
   readonly display: ComputedRef<CollectionDisplay>;
@@ -192,10 +192,10 @@ const messageOf = (error: unknown): string => (error instanceof Error && error.m
  * request only, treats a cancelled request as nothing happened, and follows the URL when the
  * user goes back or forward. It stops with the scope it was created in.
  */
-export function useCollection<Row, Sort extends string, Filter extends string, View extends string, const Col extends Column<Row> = Column<Row>>(
-  definition: CollectionDefinition<Row, Sort, Filter, View>,
+export function useCollection<Row, Sort extends string, Filter extends string, View extends string, const Col extends Column<Row> = Column<Row>, Meta extends ListMeta = ListMeta>(
+  definition: CollectionDefinition<Row, Sort, Filter, View, Meta>,
   options: UseCollectionOptions<Row, Filter, View, Col, Sort>,
-): Collection<Row, Sort, Filter, View, Col> {
+): Collection<Row, Sort, Filter, View, Col, Meta> {
   const where = `useCollection("${definition.id}")`;
   const source = options.state;
   let router: Router | null = null;
@@ -231,10 +231,10 @@ export function useCollection<Row, Sort extends string, Filter extends string, V
     return decodeState(definition, Array.isArray(raw) ? raw[0] : raw, startOption) ?? begin;
   })();
   const query = shallowRef<CollectionQuery<Sort, Filter, View>>(start);
-  const state = shallowRef<AsyncState<ListPage<Row>>>({ status: "loading" });
+  const state = shallowRef<AsyncState<ListPage<Row, Meta>>>({ status: "loading" });
   const error = shallowRef<unknown>(null);
   // The last page that loaded, kept through loading and failures: the pager and the count must not flicker to nothing between pages.
-  const known = shallowRef<ListPage<Row> | null>(null);
+  const known = shallowRef<ListPage<Row, Meta> | null>(null);
   const page = computed(() => (hasValue(state.value) ? state.value.value : known.value));
 
   let disposed = false;

@@ -120,3 +120,31 @@ export function page() {
 
   return list;
 }
+
+// A list whose backend sends `meta` says its shape once, and reads it without a cast; without it `meta` is untyped.
+type TicketMeta = { readonly totals: { readonly open: number } };
+
+export function typedMeta() {
+  const withMeta: ListPage<Ticket, TicketMeta> = { ...empty, meta: { totals: { open: 3 } } };
+  const open: number | undefined = withMeta.meta?.totals.open;
+  void open;
+
+  const definition = defineCollection({
+    id: "helpdesk.tickets",
+    stateVersion: 1,
+    load: async (): Promise<ListPage<Ticket, TicketMeta>> => withMeta,
+    key: (ticket) => ticket.id,
+  });
+  const list = useCollection(definition, { state: { kind: "memory" } });
+  const fromPage: number | undefined = list.page.value?.meta?.totals.open;
+  // @ts-expect-error the meta is the declared shape, not any key
+  void list.page.value?.meta?.nope;
+  void fromPage;
+
+  // Without a type parameter `meta` is what it always was: keys of unknown.
+  const loose: unknown = tickets && useCollection(tickets, { state: { kind: "memory" } }).page.value?.meta?.anything;
+  void loose;
+  // @ts-expect-error unknown is not a number
+  const wrong: number | undefined = useCollection(tickets, { state: { kind: "memory" } }).page.value?.meta?.anything;
+  void wrong;
+}

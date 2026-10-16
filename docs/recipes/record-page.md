@@ -310,3 +310,38 @@ const items = (): PhotoViewerItem[] => props.photos.map((photo) => ({ src: photo
 
 `#actions` is where your own actions on the picture on show go (make it the cover, delete it); the slot is given the `item` and its `index`. Fill it with `PhotoViewerAction`s: a text button made for the viewer's dark surface, with a `label`, `disabled?` and `tone="critical"` for the destructive one (it reads in the danger colour), emitting `select`. Every app's actions then look the same; do not style your own buttons for the slot. On a wide screen they sit in the header next to zoom; on a phone they move to a toolbar under the picture, within reach of the thumb, and the header keeps the counter, rotate, download and close. The slot renders in one place at a time, so a `data-test` on an action stays unique, and with no `#actions` there is no toolbar. The pictures are the app's: the viewer loads `src` as an image, never as markup, and Download only keeps `downloadName` for a picture served from this origin.
 
+## 6. Comments and activity
+
+A record people talk about gets `CommentThread` (from `@wssto2/vue-core/content`): the comments as bubbles under day separators ("Today", "Yesterday", a date), the person's own on the trailing side, a composer under them (Enter adds a line, Ctrl or ⌘ + Enter sends). It owns the draft and nothing else: you map your rows to `CommentItem`s (`avatarUrl` is a full URL you built, initials show without it) and own the calls. `:can-add` and `:can-remove` are the permissions you already worked out. `:on-add` is a prop so the thread can await it: the draft clears once it resolves to anything but `false`, so a refused or failed save keeps what was typed (that is also where your own check of the text goes).
+
+<!-- example: docs/examples/tickets/components/TicketComments.vue -->
+```vue
+<script setup lang="ts">
+import { CommentThread, type CommentItem } from "@wssto2/vue-core/content";
+import { toast } from "@wssto2/vue-core/overlay";
+import { usePlatform } from "@wssto2/vue-core/platform";
+import { useI18n } from "vue-i18n";
+
+// The comments are the record's; saving and deleting are the application's calls. The thread owns the draft.
+defineProps<{ comments: CommentItem[] }>();
+const emit = defineEmits<{ add: [text: string]; remove: [comment: CommentItem] }>();
+
+const { t } = useI18n();
+const { access } = usePlatform();
+
+// A thread awaits what it is given: returning false keeps the draft, so a refused or failed save loses nothing.
+function add(text: string) {
+  if (!navigator.onLine) {
+    toast.error(t("core.shell.offline"));
+    return false;
+  }
+  emit("add", text);
+}
+</script>
+
+<template>
+  <CommentThread :comments="comments" :can-add="access.can('tickets:update')" :can-remove="access.can('tickets:update')" :on-add="add" @remove="emit('remove', $event)" />
+</template>
+```
+
+For a history that mixes comments with what happened (an assignment, a phase change), use `ActivityStream` and `Composer` directly: `items` are `{ kind: "event", icon, tone?, actor?, text? }` and `{ kind: "comment", body, author?, avatarUrl?, mine? }`, oldest first so the newest sits by the composer; the `#event` slot draws an event's content (a badge), `#comment-meta` and `#comment-actions` add to a comment's line.

@@ -129,6 +129,46 @@ export const appearanceFeature = defineFeature({
 });
 ```
 
+### Features the library ships
+
+Four things nearly every backoffice wants are features you list, not code you write. `darkMode({ dark, set })` puts the mode on the page (the `dark` class and the status-bar colour) and adds the switch above to the account menu; the preference lives wherever you keep it. `offlineNotice()` shows a quiet status in the bottom dock while the browser is offline. `quickSearch({ search })` adds a search field to the sidebar and the phone drawer and a palette opened by Ctrl or ⌘ + K (listed in the shortcut help, and silent while a dialog is open): you ask your server and map the answer to groups of rows, it debounces, drops stale answers, highlights the words typed and opens a row in the same tab or, with Ctrl or ⌘ + Enter, a new one. `suggest` adds rows derived from the text alone (a VIN's "enter this vehicle") and `recent` lists what was opened last when nothing is typed. `useQuickSearch().open()` opens it from a button of your own.
+
+<!-- example: docs/examples/shell/builtins.ts -->
+```ts
+import { darkMode, offlineNotice, quickSearch } from "@wssto2/vue-core/shell";
+import { ref } from "vue";
+import { ticketRoutes } from "../tickets/routes";
+import type { Ticket } from "../tickets/api";
+
+// Where the preference lives is the application's: here a ref, usually a field of the session user saved on the server.
+const dark = ref(false);
+
+/** The shell's opt-in features: put them in `createApplication({ features })` beside your own. */
+export function shellBuiltins(searchTickets: (query: string, signal: AbortSignal) => Promise<readonly Ticket[]>) {
+  return [
+    darkMode({ dark: () => dark.value, set: (value) => void (dark.value = value) }),
+    offlineNotice(),
+    quickSearch({
+      // The application asks its server and maps the answer to rows; the palette debounces, drops stale answers and highlights.
+      search: async (query, signal) => ({
+        groups: [{
+          key: "tickets",
+          label: "Tickets",
+          rows: (await searchTickets(query, signal)).map((ticket) => ({
+            key: `ticket-${ticket.id}`,
+            title: ticket.subject,
+            meta: `#${ticket.id}`,
+            icon: "fileTextLine",
+            to: ticketRoutes.record({ ticketID: ticket.id }),
+          })),
+        }],
+      }),
+      placeholder: "Search tickets…",
+    }),
+  ];
+}
+```
+
 A contribution is mounted once, wherever the shell draws its outlet. Slots are an interface you can extend by declaration merging (`ShellSlots` in `@wssto2/vue-core/app`) when a custom shell offers more places.
 
 ## Keyboard shortcuts

@@ -280,7 +280,35 @@
       "update": {
         "available": "A new version of the app is available",
         "reload": "Reload"
-      }
+      },
+      "search": {
+        "title": "Quick search",
+        "open": "Search",
+        "placeholder": "Search…",
+        "searching": "Searching…",
+        "hint": "Type to search.",
+        "recent": "Recently opened",
+        "none": "Nothing for “{query}”",
+        "none_hint": "Check the spelling or try other words.",
+        "failed": "Search is not working right now. Try again.",
+        "unavailable": "Some results are unavailable right now: {groups}.",
+        "select": "select",
+        "open_row": "open",
+        "new_tab": "in a new tab"
+      },
+      "offline": "No internet connection",
+      "dark_mode": "Dark mode"
+    },
+    "activity": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "comments": {
+      "title": "Comments",
+      "none": "No comments yet.",
+      "placeholder": "Write a comment…",
+      "send": "Send comment",
+      "remove": "Delete comment"
     },
     "no_access": {
       "title": "No access",

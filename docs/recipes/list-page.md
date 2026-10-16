@@ -138,6 +138,36 @@ What to know:
 - **Screen readers** hear a listbox named by `pick-label` ("Choose one" by default; say what is chosen) with options, and which one is current (`aria-activedescendant`). The same on the table and on the phone rows; with `pick` the table's own column headers are not announced, as in a native picker.
 - **`pick` replaces `recordRoute` and the open-record link.** The dialog closes itself in the handler (`dialog.dismiss()`); the library does not know it is in one.
 
+A picker any screen can ask for (and `await`) is one `createPicker()` per kind of record and one `PickerModal` mounted once. `ticketPicker.pick(options)` opens the dialog and resolves with the chosen row, or `null` when it is dismissed (picking again while it is open answers the earlier call with `null`). The dialog's body is yours, mounted afresh each time it opens: the list above, with `select` as its `pick`. A title or description passed to `pick` names the dialog for that call; the options type can carry whatever the list needs (a location, a record to leave out).
+
+<!-- example: docs/examples/tickets/picker.ts -->
+```ts
+import { createPicker, type PickerOptions } from "@wssto2/vue-core/collection";
+import type { Ticket } from "./api";
+
+/** "Choose a ticket", for any screen to ask: `const ticket = await ticketPicker.pick({ title: "Merge into…" })` is a Ticket, or null when dismissed. */
+export const ticketPicker = createPicker<Ticket, PickerOptions>();
+```
+
+<!-- example: docs/examples/tickets/components/TicketPickerDialog.vue -->
+```vue
+<script setup lang="ts">
+import { PickerModal } from "@wssto2/vue-core/collection";
+import { useI18n } from "vue-i18n";
+import { ticketPicker } from "../picker";
+import TicketPicker from "./TicketPicker.vue";
+
+// Mounted once where the application keeps its dialogs (a `host` contribution). The list inside is mounted each time the dialog opens.
+const { t } = useI18n();
+</script>
+
+<template>
+  <PickerModal :picker="ticketPicker" :title="t('tickets.pick')" v-slot="{ select }">
+    <TicketPicker @select="select" />
+  </PickerModal>
+</template>
+```
+
 ## A table over an array
 
 Not every table is a list. A child table on a record page, a summary on a dashboard, the lines of an order: the rows are already in hand, there is nothing to fetch, page, search or keep in the URL. `DataTable` is that table: the collection's columns, cells, phone rows and row actions over a `rows` array, without the collection.
@@ -216,6 +246,10 @@ defineProps<{ row: { updated_at: string; updated_by: string } }>();
   <Timestamp :value="row.updated_at" :author="{ name: row.updated_by }" />
 </template>
 ```
+
+## Typed meta, and highlighting in your own cells
+
+A backend that sends more than rows (totals, lookups) puts it in `meta`. Say its shape once and read it without a cast: the loader returns `ListPage<Row, MyMeta>` (`httpList<Row, Sort, Filter, View, MyMeta>` and `readListPage<Row, MyMeta>` take it as a type argument; like `Row` it is your word about the wire, not checked), and `collection.page.value?.meta?.totals` is typed. Declare it with `type`, not `interface`; without it `meta` is `ListMeta`, an object of `unknown`. `highlightParts(text, search)` is what `RecordIdentity :highlight` uses: it splits a text around the words of the search, for a cell of your own to wrap the `match` parts in `<mark>`.
 
 ## A row's menu
 

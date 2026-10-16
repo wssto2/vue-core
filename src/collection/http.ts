@@ -1,5 +1,5 @@
 import type { ApiResult, HttpClient, ListResult, PageMeta, QueryValue } from "../client";
-import type { CollectionLoader, ListPage, CollectionQuery } from "./types";
+import type { CollectionLoader, ListMeta, ListPage, CollectionQuery } from "./types";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const count = (...candidates: unknown[]): number | null => {
@@ -31,10 +31,10 @@ export function listParams(query: CollectionQuery): Record<string, QueryValue> {
  * route's result (`client.request(route, input)`) and `Row` is inferred. Missing numbers are derived
  * from what is there rather than becoming 0; `query` supplies the page and size that were asked for.
  */
-export function readListPage<Row>(result: ApiResult<readonly Row[], PageMeta>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row>;
-export function readListPage<Row>(result: ApiResult<ListResult<Row>, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row>;
-export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row>;
-export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row> {
+export function readListPage<Row, Meta extends ListMeta = ListMeta>(result: ApiResult<readonly Row[], PageMeta>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row, Meta>;
+export function readListPage<Row, Meta extends ListMeta = ListMeta>(result: ApiResult<ListResult<Row>, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row, Meta>;
+export function readListPage<Row, Meta extends ListMeta = ListMeta>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row, Meta>;
+export function readListPage<Row, Meta extends ListMeta = ListMeta>(result: ApiResult<unknown, unknown>, query: Pick<CollectionQuery, "page" | "pageSize">): ListPage<Row, Meta> {
   const body = result.data;
   const legacy = isRecord(body) && Array.isArray(body.data);
   const rows = (Array.isArray(body) ? body : legacy ? body.data : []) as Row[];
@@ -58,7 +58,8 @@ export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pi
     from,
     to,
     views: views?.filter(isRecord).flatMap((view) => (typeof view.key === "string" ? [{ key: view.key, count: count(view.count) ?? undefined }] : [])),
-    meta,
+    // Like `Row`, the shape of `meta` is the caller's word, not checked.
+    meta: meta as Meta,
     requestId: result.requestId,
   };
 }
@@ -70,13 +71,13 @@ export function readListPage<Row>(result: ApiResult<unknown, unknown>, query: Pi
  *
  * `params` adds or renames parameters when the endpoint deviates from the datatable convention.
  */
-export function httpList<Row, Sort extends string = string, Filter extends string = string, View extends string = string>(
+export function httpList<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Meta extends ListMeta = ListMeta>(
   http: HttpClient,
   path: string,
   options: { params?: (query: CollectionQuery<Sort, Filter, View>) => Record<string, QueryValue> } = {},
-): CollectionLoader<Row, Sort, Filter, View> {
+): CollectionLoader<Row, Sort, Filter, View, Meta> {
   return async (query, { signal }) => {
     const result = await http.get<unknown>(path, { query: options.params ? options.params(query) : listParams(query), signal });
-    return readListPage<Row>(result, query);
+    return readListPage<Row, Meta>(result, query);
   };
 }
