@@ -11,6 +11,27 @@ export type { IdentityPlatformOptions } from "./session";
 export { usersFeature } from "./users/feature";
 export type { UsersFeatureOptions } from "./users/feature";
 export type { PersonSection } from "./users/personSections";
+// What a replaced screen (`usersFeature({ replace })`) is given and reuses: the contract of each, the person it is about,
+// the context and the shared pieces of the built-in screens.
+export type { UsersReplace, NewUserDialogHandle, NewUserDialogEmits, DeactivateDialogProps, DeactivateDialogHandle, DeactivateDialogEmits } from "./users/replace";
+export type { ActivityRecord, ChangeDetail, ChangeWords, ChangeWordsFn, Translate } from "./users/words";
+export type { ChangeRowWithExt, CreateUserWithExt, DeactivateUserInput, UpdateUserWithExt, UserDetailWithExt, UserRowWithExt, WithExt } from "./users/ext";
+export { usersExtRoutes } from "./users/ext";
+export { PERSON, personActionsKey, usePersonActions, usePersonSessions } from "./users/person";
+export type { PersonActions } from "./users/person";
+export { useUsersContext } from "./users/context";
+export type { UsersContext } from "./users/context";
+export { useUserDialogs } from "./users/dialogs";
+export { USER_VIEWS, userList } from "./users/list";
+export { default as NewUserDialog } from "./users/NewUserDialog.vue";
+export { default as DeactivateDialog } from "./users/DeactivateDialog.vue";
+export { statusTone } from "./users/status";
+export { default as PageBar } from "./shared/PageBar.vue";
+export { default as SectionIntro } from "./shared/SectionIntro.vue";
+export { default as SessionList } from "./shared/SessionList.vue";
+export { default as SignInList } from "./shared/SignInList.vue";
+export { default as SignInTable } from "./shared/SignInTable.vue";
+export { default as ChangeFeed } from "./shared/ChangeFeed.vue";
 export type { ProfilePanel, ProfileSection } from "./profile/profileSections";
 export { profileRoutes } from "./profile/routes";
 export { usersRoutes } from "./users/routes";

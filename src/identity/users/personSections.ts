@@ -1,8 +1,8 @@
 import { defineComponent, h, type Component } from "vue";
 import type { RouteRecordRaw } from "vue-router";
-import type { UserDetail } from "../../modules/identity/entities";
 import type { AccessRequirement, RouteSection } from "../../router";
 import { useRouteResourceContext } from "../../resource";
+import type { UserDetailWithExt } from "./ext";
 import { PERSON } from "./person";
 
 /**
@@ -15,7 +15,7 @@ export interface PersonSection {
   /** The child route's path under `/users/:id/` and its name suffix (`users.record.<path>`): one lowercase word. */
   readonly path: string;
   readonly component: Component;
-  readonly props?: (person: UserDetail) => Record<string, unknown>;
+  readonly props?: (person: UserDetailWithExt) => Record<string, unknown>;
   readonly meta: { readonly access?: AccessRequirement; readonly section: RouteSection };
 }
 

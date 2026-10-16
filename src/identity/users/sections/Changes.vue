@@ -10,6 +10,7 @@ import ChangeFeed from "../../shared/ChangeFeed.vue";
 import PageBar from "../../shared/PageBar.vue";
 import SectionIntro from "../../shared/SectionIntro.vue";
 import ViewTabs from "../../shared/ViewTabs.vue";
+import { useUsersContext } from "../context";
 import { PERSON } from "../person";
 
 /** What was changed on the person's account and who did it: their details, a password, an address, activation, newest first. */
@@ -17,6 +18,7 @@ const CHANGE_VIEWS = ["all", "access", "details"] as const satisfies readonly Ch
 const { t } = useI18n();
 const { http } = usePlatform();
 const person = useRouteResourceContext(PERSON);
+const { changeWords } = useUsersContext();
 const view = ref<ChangeView>("all");
 const page = ref(1);
 
@@ -43,7 +45,7 @@ watch(page, () => void history.reload());
     <AsyncSection :state="history.state.value" :skeleton-rows="5" :is-empty="() => false" @retry="history.reload()">
       <template #default="{ value }">
         <p v-if="!value || value.data.length === 0" class="px-row-inset py-4 text-body text-content-muted" data-changes-empty>{{ t("core.users.changes.empty") }}</p>
-        <ChangeFeed v-else :rows="value.data" />
+        <ChangeFeed v-else :rows="value.data" :words="changeWords" />
         <PageBar v-if="value" v-model:page="page" :last-page="value.last_page" :total="value.total" />
       </template>
     </AsyncSection>

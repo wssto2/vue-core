@@ -11,7 +11,9 @@ import { usePlatform } from "../../platform";
 import { Badge } from "../../state";
 import { MANAGE_USERS } from "./access";
 import { USER_VIEWS, userList } from "./list";
-import NewUserDialog from "./NewUserDialog.vue";
+import { useUserDialogs } from "./dialogs";
+import type { UserDetailWithExt } from "./ext";
+import type { NewUserDialogHandle } from "./replace";
 import { usersRoutes } from "./routes";
 import { statusTone } from "./status";
 
@@ -24,7 +26,8 @@ const { t } = useI18n();
 const { http, access } = usePlatform();
 const format = useFormat();
 const router = useRouter();
-const dialog = useTemplateRef<InstanceType<typeof NewUserDialog>>("dialog");
+const dialog = useTemplateRef<NewUserDialogHandle>("dialog");
+const { newUser: NewUser } = useUserDialogs();
 
 const columns = computed(() => [
   { key: "name", label: t("core.users.columns.person"), kind: "identity", subtitle: (user: UserRow) => user.email, sort: "name", mobile: "primary" },
@@ -56,6 +59,6 @@ const actions = computed<PageAction[]>(() =>
     <template #cell-status="{ item, compact }">
       <Badge v-if="!compact || item.status !== 'active'" :tone="statusTone(item.status)" dot>{{ t(`core.users.status.${item.status}`) }}</Badge>
     </template>
-    <NewUserDialog ref="dialog" @created="(user) => router.push(usersRoutes.record({ id: user.id }))" />
+    <NewUser ref="dialog" @created="(user: UserDetailWithExt) => router.push(usersRoutes.record({ id: user.id }))" />
   </CollectionPage>
 </template>

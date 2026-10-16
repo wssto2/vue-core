@@ -13,9 +13,10 @@ import { AppRouterView } from "../../router";
 import { Badge, useLoad } from "../../state";
 import { isSessionEnded } from "../signIn";
 import { MANAGE_USERS } from "./access";
-import DeactivateDialog from "./DeactivateDialog.vue";
+import { useUserDialogs } from "./dialogs";
 import { userList } from "./list";
 import { PERSON, personActionsKey, personSessionsKey, type PersonActions } from "./person";
+import type { DeactivateDialogHandle } from "./replace";
 import { usersRoutes } from "./routes";
 import SetPasswordDialog from "./SetPasswordDialog.vue";
 import { statusTone } from "./status";
@@ -51,7 +52,8 @@ const neighbors = useCollectionNeighbors(userList(http), { current: () => person
 const record = computed(() => person.data.value);
 const own = computed(() => record.value !== null && session.state.value.status === "authenticated" && session.state.value.user.id === record.value.id);
 
-const deactivateDialog = useTemplateRef<InstanceType<typeof DeactivateDialog>>("deactivateDialog");
+const deactivateDialog = useTemplateRef<DeactivateDialogHandle>("deactivateDialog");
+const { deactivate: Deactivate } = useUserDialogs();
 const passwordDialog = useTemplateRef<InstanceType<typeof SetPasswordDialog>>("passwordDialog");
 const activateDialog = useTemplateRef<{ present: () => void }>("activateDialog");
 
@@ -114,7 +116,7 @@ const counts = computed(() => ({
         <AppRouterView />
       </SectionNavigator>
 
-      <DeactivateDialog ref="deactivateDialog" :id="loaded.id" :name="loaded.name" :session-count="sessions.data.value?.sessions.length ?? null" @done="refresh" />
+      <Deactivate ref="deactivateDialog" :id="loaded.id" :name="loaded.name" :session-count="sessions.data.value?.sessions.length ?? null" @done="refresh" />
       <SetPasswordDialog ref="passwordDialog" :id="loaded.id" :name="loaded.name" @saved="refresh" />
       <AlertDialog ref="activateDialog" icon="checkCircle" :title="t('core.users.activate.title')" :message="t('core.users.activate.body', { name: loaded.name })"
         :confirm-label="t('core.users.actions.activate')" :action="activate" />
