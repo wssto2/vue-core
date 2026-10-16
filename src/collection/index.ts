@@ -2,7 +2,7 @@ export { defineCollection, DEFAULT_PAGE_SIZES } from "./definition";
 export type { CollectionDefaults, CollectionDefinition, CollectionDefinitionInput, FilterOf, QueryContract, RowOf, SortOf, StoredState, ViewOf } from "./definition";
 export { useCollection } from "./useCollection";
 export type { Collection, CollectionDisplay, LinkedQuery, SavedViewsHandle, UseCollectionOptions } from "./useCollection";
-export type { CollectionLoader, ListPage, CollectionQuery, CollectionStateSource, LoadContext, SortDirection } from "./types";
+export type { CollectionLoader, ListMeta, ListPage, CollectionQuery, CollectionStateSource, LoadContext, SortDirection } from "./types";
 export { httpList, listParams, readListPage } from "./http";
 export { LIST_CONTEXT_PARAM } from "./location";
 export type { CollectionColumns, Column, ColumnKey, ColumnKind, ColumnValue, MobileRole, RowAction, SlotKey, TableColumns } from "./columns";

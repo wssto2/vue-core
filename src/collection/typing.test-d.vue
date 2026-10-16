@@ -3,6 +3,7 @@
 // from the row and from the columns, without casts.
 import { computed } from "vue";
 import CollectionPage from "./CollectionPage.vue";
+import CollectionTable from "./CollectionTable.vue";
 import type { CollectionColumns } from "./columns";
 import { defineCollection } from "./definition";
 import type { ListPage } from "./types";
@@ -33,6 +34,16 @@ const columns = computed(
     ] satisfies CollectionColumns<Ticket>,
 );
 const list = useCollection(definition, { columns, state: { kind: "memory" } });
+
+// A list with a typed `meta` is still a collection the components take.
+type Totals = { readonly totals: { readonly open: number } };
+const counted = defineCollection({
+  id: "c",
+  stateVersion: 1,
+  load: async (): Promise<ListPage<Ticket, Totals>> => ({ ...empty, meta: { totals: { open: 1 } } }),
+  key: (ticket) => ticket.id,
+});
+const countedList = useCollection(counted, { columns, state: { kind: "memory" } });
 </script>
 
 <template>
@@ -46,4 +57,5 @@ const list = useCollection(definition, { columns, state: { kind: "memory" } });
       {{ item.nonexistent }}
     </template>
   </CollectionPage>
+  <CollectionTable :collection="countedList" />
 </template>
