@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.1 — 2026-10-16
+
+### New
+- **`EditorPage` `disabledWhileClean`** (default false): an editor of a saved record keeps Save off until something changes. A create page keeps Save on, so an untouched form can be submitted to learn what is missing.
+
+### Tests
+- A 5 s default wait and a 15 s test limit (`vitest.setup.ts`), so a lazily loaded page no longer fails a test at random. Nothing in the package changes.
+
 ## 0.9.0 — 2026-10-15
 
 File downloads and streams on the client, keyboard shortcuts that work on every layout, amounts with an application's own currency symbol, and the client half of an installable web app. go-core is unchanged (`v1.12.0`).

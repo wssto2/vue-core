@@ -487,7 +487,7 @@ A cost row where nothing entered and 0 mean the same takes **`blank-zero`** (`Nu
 
 ## A section edited in place
 
-A settings-style section (a dealer's record sections) edits where it reads, with no sheet and no Cancel. `useSaveChrome` puts Save in the page chrome, disabled while there is nothing to save; `cancel` is optional (without it there is no Cancel, and leaving with edits is still guarded). A page that *creates* passes `disabledWhileClean: false` so an untouched form can be submitted to learn what is missing (`EditorPage` does). `useHiddenFieldErrors({ form })` lists the errors whose field is not on screen, the same list `FormErrors` shows, for a toast of your own; read it after `await nextTick()` once a submit has refused.
+A settings-style section (a dealer's record sections) edits where it reads, with no sheet and no Cancel. `useSaveChrome` puts Save in the page chrome, disabled while there is nothing to save; `cancel` is optional (without it there is no Cancel, and leaving with edits is still guarded). A page that *creates* passes `disabledWhileClean: false` so an untouched form can be submitted to learn what is missing (`EditorPage` does by default; an `EditorPage` that edits a saved record passes `:disabled-while-clean="true"`, so Save stays off until something changes). `useHiddenFieldErrors({ form })` lists the errors whose field is not on screen, the same list `FormErrors` shows, for a toast of your own; read it after `await nextTick()` once a submit has refused.
 
 <!-- example: docs/examples/forms/views/Section.vue:10-20 -->
 ```ts

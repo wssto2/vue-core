@@ -39,7 +39,12 @@ const props = withDefaults(defineProps<{
   canSave?: boolean;
   /** The name of a field for people, for errors whose field is not on screen. */
   fieldLabel?: (field: string) => string;
-}>(), { form: undefined, saveLabel: undefined, canSave: true, fieldLabel: undefined });
+  /**
+   * An edit of a saved record: Save stays off until something changes. Default false, a create page, where an untouched form
+   * is submitted to learn what is missing.
+   */
+  disabledWhileClean?: boolean;
+}>(), { form: undefined, saveLabel: undefined, canSave: true, fieldLabel: undefined, disabledWhileClean: false });
 
 const emit = defineEmits<{ save: []; cancel: [] }>();
 
@@ -68,7 +73,7 @@ const chrome = computed(() =>
         form: props.form,
         label: () => props.saveLabel ?? t("core.actions.save"),
         allowed: () => props.canSave,
-        disabledWhileClean: false, // a create page: an untouched form is submitted to learn what is missing
+        disabledWhileClean: () => props.disabledWhileClean,
         save: () => {
           if (!props.form?.submitting.value) emit("save");
         },

@@ -47,7 +47,7 @@ const makeForm = () =>
   });
 
 /** An offer-like long create form: three sections (the middle one collapsible), two required fields, a summary aside. */
-async function openEditor(options: { submit?: (form: ReturnType<typeof makeForm>) => Promise<unknown>; canSave?: boolean; collapseLines?: boolean } = {}) {
+async function openEditor(options: { submit?: (form: ReturnType<typeof makeForm>) => Promise<unknown>; canSave?: boolean; collapseLines?: boolean; disabledWhileClean?: boolean } = {}) {
   const guard = createLeaveGuard();
   const saved = vi.fn();
   const cancelled = vi.fn();
@@ -62,7 +62,7 @@ async function openEditor(options: { submit?: (form: ReturnType<typeof makeForm>
       return () =>
         h(
           EditorPage,
-          { title: "New offer", back: { label: "Offers", to: "/offers" }, form, saveLabel: "Create offer", canSave: options.canSave ?? true, fieldLabel: (key: string) => key.toUpperCase(), onSave: submit, onCancel: cancelled },
+          { title: "New offer", back: { label: "Offers", to: "/offers" }, form, saveLabel: "Create offer", canSave: options.canSave ?? true, disabledWhileClean: options.disabledWhileClean ?? false, fieldLabel: (key: string) => key.toUpperCase(), onSave: submit, onCancel: cancelled },
           {
             default: () => [
               h(SectionPanel, { title: "Customer", number: "01", presentation: "section" }, () => h(TextField, { ...form.bind("customer"), label: "Customer", required: true })),
@@ -124,6 +124,19 @@ describe("EditorPage", () => {
     expect(saved).toHaveBeenCalledTimes(1);
     gate.release?.();
     await settle();
+  });
+
+  it("keeps Save on for an untouched create form, so a submit can say what is missing", async () => {
+    await openEditor();
+    expect((saveButton() as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("keeps Save off on an unchanged saved record until something changes", async () => {
+    const { form } = await openEditor({ disabledWhileClean: true });
+    expect((saveButton() as HTMLButtonElement).disabled).toBe(true);
+    form().values.customer = "Acme";
+    await settle();
+    expect((saveButton() as HTMLButtonElement).disabled).toBe(false);
   });
 
   it("offers no Save to a viewer who may not save", async () => {
