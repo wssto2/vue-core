@@ -3,7 +3,7 @@ import { computed, nextTick, onScopeDispose, ref, useTemplateRef, watch } from "
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { shortcutKeys, useKeyboardShortcut } from "../button";
-import { highlightParts } from "../collection/highlight";
+import Highlight from "../collection/Highlight.vue";
 import { SearchInput } from "../controls";
 import { Icon } from "../icon";
 import { useDialog } from "../overlay";
@@ -211,14 +211,10 @@ const modKey = computed(() => shortcutKeys({ key: "k", mod: true })[0]);
               </span>
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="truncate text-body font-semibold">
-                  <template v-for="(part, index) in highlightParts(row.title, searching ? trimmed : '')" :key="index">
-                    <mark v-if="part.match" class="rounded-sm bg-tint-soft px-px text-inherit">{{ part.text }}</mark><template v-else>{{ part.text }}</template>
-                  </template>
+                  <Highlight :text="row.title" :search="searching ? trimmed : ''" />
                 </span>
                 <span v-if="row.meta" class="truncate text-footnote text-content-muted" :class="row.mono ? 'font-mono tracking-tight' : ''">
-                  <template v-for="(part, index) in highlightParts(row.meta, searching ? trimmed : '')" :key="index">
-                    <mark v-if="part.match" class="rounded-sm bg-tint-soft px-px text-content-strong">{{ part.text }}</mark><template v-else>{{ part.text }}</template>
-                  </template>
+                  <Highlight :text="row.meta" :search="searching ? trimmed : ''" />
                 </span>
               </span>
               <Badge v-if="row.badge" :tone="row.badge.tone" class="hidden shrink-0 sm:inline-flex">{{ row.badge.label }}</Badge>

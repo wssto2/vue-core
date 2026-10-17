@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from "vue-router";
 import { RouterLink } from "vue-router";
-import { computed } from "vue";
-import { highlightParts } from "./highlight";
+import Highlight from "./Highlight.vue";
 
 /**
  * A record's name in a list row, with an optional quiet line under it (an e-mail, a number). The
@@ -35,20 +34,18 @@ const props = withDefaults(defineProps<{
   subtitleSelectable: false,
 });
 
-const mark = "rounded-sm bg-status-warning-surface text-status-warning-content";
 const SPREAD_TITLE = "col-start-1 row-start-1";
 // max-w-full: `w-fit` alone would size a nowrap line to its whole text and let it run out of the card instead of ending in an ellipsis.
 const SPREAD_SUBTITLE = "col-span-full row-start-2 max-w-full";
-const parts = computed(() => highlightParts(props.title, props.highlight));
 </script>
 
 <template>
   <div :class="props.spread ? 'contents' : 'flex min-w-0 flex-col'">
     <RouterLink v-if="props.to" :to="props.to"
       class="block truncate rounded-sm text-row-title focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus" :class="props.spread ? SPREAD_TITLE : undefined">
-      <template v-for="(part, index) in parts" :key="index"><mark v-if="part.match" :class="mark">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template>
+      <Highlight :text="props.title" :search="props.highlight" />
     </RouterLink>
-    <span v-else class="truncate text-row-title" :class="props.spread ? SPREAD_TITLE : undefined"><template v-for="(part, index) in parts" :key="index"><mark v-if="part.match" :class="mark">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template></span>
+    <span v-else class="truncate text-row-title" :class="props.spread ? SPREAD_TITLE : undefined"><Highlight :text="props.title" :search="props.highlight" /></span>
 
     <!-- A click in it is left to the text (selection), not taken by the row. -->
     <span v-if="props.subtitle" :data-row-click-ignore="props.subtitleSelectable ? '' : undefined"

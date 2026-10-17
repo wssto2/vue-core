@@ -20,6 +20,7 @@ export { default as DataTable } from "./DataTable.vue";
 export { default as RowActions } from "./RowActions.vue";
 export { default as RecordIdentity } from "./RecordIdentity.vue";
 export { DATE_PRESETS, useDatePresetFilter } from "./datePresets";
+export { default as Highlight } from "./Highlight.vue";
 export { highlightParts, type HighlightPart } from "./highlight";
 export type { CellSlots, CollectionSlots, RowsSlots } from "./slots";
 export { createPicker } from "./picker";
