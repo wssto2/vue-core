@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.11.0 — 2026-10-17
+
+The five gaps an application met adopting 0.10.0's users screens and quick search. go-core is unchanged (`v1.15.0`).
+
+### New
+- **identity:** `PersonSection.after` (`general`, `signin`, `sessions`, `signins`, `changes` or `activity`, typed as `BuiltInPersonSection`) places an application's section right behind that built-in one, in its group (the section's own `groupKey` is replaced by the group's). Without it the section stays at the end. Another name is a start-up error that lists the valid ones.
+- **identity:** `usersFeature({ collection })` is the one definition of the people list, used by the list page and by the previous / next of a person's record. Default `userList`. An application whose list filters by more than the library knows passes its own (`UsersCollection`), the one its `replace.list` page uses, and the record's pager then asks the server with those filters too.
+- **i18n:** `useServerMessages` is exported from `@wssto2/vue-core/i18n` (moved from identity): `describeFieldError`, `failureMessage(kind, error)` and `sentence(error)` for any go-core refusal, in the app's `errors.<reason>` or the library's `core.errors.<reason>`.
+- **app:** `useLanguages` is exported from `@wssto2/vue-core/app`: the application's locales as select options, each named in itself.
+- **collection:** `<Highlight :text :search />`, the text with the words of the search in `<mark>`, over `highlightParts`. `RecordIdentity` and the quick-search palette use it, so the library has one highlight.
+
+### Changed
+- **shell:** `quickSearch` `placeholder`, `hint` and `noneHint` are `MaybeRefOrGetter<string>`, read when the palette renders, so an application whose messages load lazily passes `() => t("…")`. A plain string still works.
+- **shell:** the quick-search palette marks matched words with the look `RecordIdentity` uses (the warning tone), not the tint it had.
+
 ## 0.10.0 — 2026-10-16
 
 The last generic pieces an application kept to itself, and an identity whose users screens an application can shape. Needs go-core v1.15.0 (`goCore`, `src/modules` synced).
