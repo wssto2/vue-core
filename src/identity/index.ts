@@ -12,7 +12,7 @@ export { embedHeaders, embedSession } from "./embed";
 export type { EmbedSession, EmbedSessionOptions, EmbedStorage } from "./embed";
 export { usersFeature } from "./users/feature";
 export type { UsersFeatureOptions } from "./users/feature";
-export type { PersonSection } from "./users/personSections";
+export type { BuiltInPersonSection, PersonSection } from "./users/personSections";
 // What a replaced screen (`usersFeature({ replace })`) is given and reuses: the contract of each, the person it is about,
 // the context and the shared pieces of the built-in screens.
 export type { UsersReplace, NewUserDialogHandle, NewUserDialogEmits, DeactivateDialogProps, DeactivateDialogHandle, DeactivateDialogEmits } from "./users/replace";

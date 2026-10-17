@@ -6,7 +6,7 @@ import type { ProfileSection } from "../profile/profileSections";
 import ProfileMenuItem from "../profile/ProfileMenuItem.vue";
 import { profileRoutes } from "../profile/routes";
 import { usersContextKey } from "./context";
-import { personSectionRoute, type PersonSection } from "./personSections";
+import { withPersonSections, type PersonSection } from "./personSections";
 import type { UsersReplace } from "./replace";
 import { usersRoutes } from "./routes";
 import type { ActivityRecord, ChangeWordsFn } from "./words";
@@ -20,7 +20,7 @@ function peopleRoutes(base: string, replace: UsersReplace, sections: readonly Pe
     if (record.name === "users.index") return { ...record, path: base, ...(replace.list && { component: replace.list }) } as RouteRecordRaw;
     if (record.name !== "users.record") return record;
     const children = (record.children ?? []).map((child) => (child.name === "users.record.general" && replace.general ? ({ ...child, component: replace.general } as RouteRecordRaw) : child));
-    return { ...record, path: `${base}/:id`, children: [...children, ...sections.map(personSectionRoute)] } as RouteRecordRaw;
+    return { ...record, path: `${base}/:id`, children: withPersonSections(children, sections) } as RouteRecordRaw;
   });
 }
 
@@ -33,7 +33,7 @@ export interface UsersFeatureOptions {
   signInAs?: Permission | false;
   /** Names of the application's areas in a person's Activity: the area key the audit records (`crm`) and the i18n key of its name. `all`, `identity` and `other` are the library's. An area without a key reads as "Other". */
   activityAreas?: Readonly<Record<string, string>>;
-  /** Sections the application adds to a person's record after the feature's own (their roles); each is a child route `users.record.<path>`. */
+  /** Sections the application adds to a person's record (their roles), at the end or, with `after`, behind a built-in one; each is a child route `users.record.<path>`. */
   sections?: readonly PersonSection[];
   /** Panels the application adds to "My profile" (mobile phone, dealer and location, preferences), each placed after or before a built-in panel. */
   profileSections?: readonly ProfileSection[];
