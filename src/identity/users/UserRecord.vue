@@ -14,7 +14,7 @@ import { Badge, useLoad } from "../../state";
 import { isSessionEnded } from "../signIn";
 import { MANAGE_USERS } from "./access";
 import { useUserDialogs } from "./dialogs";
-import { userList } from "./list";
+import { useUserList } from "./list";
 import { PERSON, personActionsKey, personSessionsKey, type PersonActions } from "./person";
 import type { DeactivateDialogHandle } from "./replace";
 import { usersRoutes } from "./routes";
@@ -47,7 +47,7 @@ const sessions = useLoad(
 );
 provide(personSessionsKey, sessions);
 
-const neighbors = useCollectionNeighbors(userList(http), { current: () => person.id.value, list: usersRoutes.index, param: "id", backLabel: () => t("core.users.title") });
+const neighbors = useCollectionNeighbors(useUserList(), { current: () => person.id.value, list: usersRoutes.index, param: "id", backLabel: () => t("core.users.title") });
 
 const record = computed(() => person.data.value);
 const own = computed(() => record.value !== null && session.state.value.status === "authenticated" && session.state.value.user.id === record.value.id);

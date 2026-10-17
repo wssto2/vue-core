@@ -1,5 +1,6 @@
 import type { ProfileSection } from "../profile/profileSections";
 import { defineFeatureContext, type Permission } from "../../platform";
+import type { UsersCollection } from "./list";
 import type { UsersReplace } from "./replace";
 import type { ActivityRecord, ChangeWordsFn } from "./words";
 
@@ -13,6 +14,8 @@ export interface UsersContext {
   readonly profileSections: readonly ProfileSection[];
   /** The screens the application swapped for its own (`useUserDialogs()` resolves the dialogs). */
   readonly replace: UsersReplace;
+  /** The application's definition of the list, used by the list page and the record's previous / next; without it `userList`. */
+  readonly collection: UsersCollection | undefined;
   /** The records the Activity section names and links, by the server's `record_type`. */
   readonly activityRecords: Readonly<Record<string, ActivityRecord>>;
   /** The application's wording of a change; without it the library's. */

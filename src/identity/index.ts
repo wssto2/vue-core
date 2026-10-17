@@ -24,6 +24,7 @@ export { useUsersContext } from "./users/context";
 export type { UsersContext } from "./users/context";
 export { useUserDialogs } from "./users/dialogs";
 export { USER_VIEWS, userList } from "./users/list";
+export type { UsersCollection } from "./users/list";
 export { default as NewUserDialog } from "./users/NewUserDialog.vue";
 export { default as DeactivateDialog } from "./users/DeactivateDialog.vue";
 export { statusTone } from "./users/status";

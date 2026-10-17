@@ -6,6 +6,7 @@ import type { ProfileSection } from "../profile/profileSections";
 import ProfileMenuItem from "../profile/ProfileMenuItem.vue";
 import { profileRoutes } from "../profile/routes";
 import { usersContextKey } from "./context";
+import type { UsersCollection } from "./list";
 import { withPersonSections, type PersonSection } from "./personSections";
 import type { UsersReplace } from "./replace";
 import { usersRoutes } from "./routes";
@@ -43,6 +44,16 @@ export interface UsersFeatureOptions {
   path?: `/${string}`;
   /** Whole screens the application swaps for its own, each keeping the contract documented on `UsersReplace`: the list, the details section, the New user and the Deactivate dialogs. */
   replace?: UsersReplace;
+  /**
+   * The one definition of the people list, for the list page and for the previous / next of a person's record, so both ask the
+   * server the same question. Default `userList` (the library's). An application whose list filters people by more than the
+   * library knows (a dealer, a role) passes its own collection: the very definition its `replace.list` page calls `useCollection`
+   * on, since the record replays the state that page wrote into the link. A definition, not a factory: the application builds it
+   * once, with its own client; the library's default is built from the platform's.
+   *
+   *   usersFeature({ collection: peopleList, replace: { list: PeopleList } })   // peopleList = defineCollection({ id: "identity.users", …, query: { filters: ["dealer_id", "role"] } })
+   */
+  collection?: UsersCollection;
   /** What the Activity section calls and links the records the application knows, by the server's `record_type`; an unknown type reads as the type itself. */
   activityRecords?: Readonly<Record<string, ActivityRecord>>;
   /** The application's wording for a change (sentence and details, with links), asked for every row of the Changes section with its `ext`; the library words what it returns nothing for. */
@@ -78,6 +89,7 @@ export function usersFeature(options: UsersFeatureOptions = {}): Feature {
       activityAreas: options.activityAreas ?? {},
       profileSections: options.profileSections ?? [],
       replace,
+      collection: options.collection,
       activityRecords: options.activityRecords ?? {},
       changeWords: options.changeWords,
     }),

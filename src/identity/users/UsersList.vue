@@ -10,7 +10,7 @@ import type { PageAction } from "../../page";
 import { usePlatform } from "../../platform";
 import { Badge } from "../../state";
 import { MANAGE_USERS } from "./access";
-import { USER_VIEWS, userList } from "./list";
+import { USER_VIEWS, useUserList } from "./list";
 import { useUserDialogs } from "./dialogs";
 import type { NewUserDialogHandle } from "./replace";
 import { usersRoutes } from "./routes";
@@ -22,7 +22,7 @@ import { statusTone } from "./status";
  * fields in a dialog.
  */
 const { t } = useI18n();
-const { http, access } = usePlatform();
+const { access } = usePlatform();
 const format = useFormat();
 const router = useRouter();
 const dialog = useTemplateRef<NewUserDialogHandle>("dialog");
@@ -41,7 +41,7 @@ const filters = computed(() => [
 
 const views = computed(() => USER_VIEWS.map((key) => ({ key, label: t(`core.users.views.${key}`) })));
 
-const users = useCollection(userList(http), { columns, filters, views, state: { kind: "url", key: "query" }, recordRoute: (user) => usersRoutes.record({ id: user.id }) });
+const users = useCollection(useUserList(), { columns, filters, views, state: { kind: "url", key: "query" }, recordRoute: (user) => usersRoutes.record({ id: user.id }) });
 
 const actions = computed<PageAction[]>(() =>
   access.can(MANAGE_USERS)
