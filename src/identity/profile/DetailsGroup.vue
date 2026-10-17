@@ -7,7 +7,7 @@ import { identityRoutes } from "../../modules/identity/routes";
 import type { UpdateProfileInput } from "../../modules/identity/schemas";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 import DetailsFields from "./DetailsFields.vue";
 
 /**

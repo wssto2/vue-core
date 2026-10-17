@@ -8,7 +8,7 @@ import type { PendingEmail, ProfileResponse } from "../../modules/identity/entit
 import { identityRoutes } from "../../modules/identity/routes";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 import ActionRow from "../shared/ActionRow.vue";
 import { isSessionEnded } from "../signIn";
 import EmailChangeDialog from "./EmailChangeDialog.vue";

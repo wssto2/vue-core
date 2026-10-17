@@ -1,6 +1,6 @@
 import type { FormFailureKind } from "../../form";
 import { useRefusalMessage } from "../../access/refusals";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 
 /**
  * What the forms of these screens speak: go-core's refusals as `useServerMessages` words them, and a refused delegation

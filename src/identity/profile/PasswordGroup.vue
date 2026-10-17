@@ -7,7 +7,7 @@ import { identityRoutes } from "../../modules/identity/routes";
 import type { ChangePasswordInput } from "../../modules/identity/schemas";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 import ActionRow from "../shared/ActionRow.vue";
 
 /**

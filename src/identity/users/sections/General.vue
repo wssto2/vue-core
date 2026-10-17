@@ -9,10 +9,10 @@ import type { UpdateUserInput } from "../../../modules/identity/schemas";
 import { toast } from "../../../overlay";
 import { usePlatform } from "../../../platform";
 import { useRouteResourceContext } from "../../../resource";
-import { useServerMessages } from "../../fieldMessages";
+import { useServerMessages } from "../../../i18n";
 import ActionRow from "../../shared/ActionRow.vue";
 import SectionIntro from "../../shared/SectionIntro.vue";
-import { useLanguages } from "../languages";
+import { useLanguages } from "../../../app";
 import { PERSON, usePersonActions } from "../person";
 
 /**

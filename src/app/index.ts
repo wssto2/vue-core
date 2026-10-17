@@ -28,6 +28,7 @@ export type {
   ShellSlot,
   ShellSlots,
 } from "./feature";
+export { useLanguages } from "./languages";
 export { keepSessionAlive } from "./keepAlive";
 export type { KeepSessionAliveOptions } from "./keepAlive";
 export { ApplicationError } from "./validate";

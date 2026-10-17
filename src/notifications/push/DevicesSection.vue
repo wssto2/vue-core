@@ -5,7 +5,7 @@ import { Button } from "../../button";
 import { IconTile } from "../../controls";
 import { useFormat } from "../../format";
 import { FormGroup, FormRow, TextField } from "../../form";
-import { useServerMessages } from "../../identity/fieldMessages";
+import { useServerMessages } from "../../i18n";
 import type { Device } from "../../modules/notification/entities";
 import SectionIntro from "../../identity/shared/SectionIntro.vue";
 import { AlertDialog, Menu, MenuButton, toast, type MenuItem } from "../../overlay";

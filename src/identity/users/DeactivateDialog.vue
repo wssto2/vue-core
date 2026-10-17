@@ -5,7 +5,7 @@ import { CommandDialog, FormGroup, FormRow, useCommand } from "../../form";
 import { identityRoutes } from "../../modules/identity/routes";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 
 /**
  * "Deactivate": says what it does (signed out on every device now, cannot sign in, roles and history kept) and asks once.

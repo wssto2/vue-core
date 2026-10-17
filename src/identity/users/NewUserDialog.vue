@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { useApplication } from "../../app";
-import { useLanguages } from "./languages";
+import { useApplication, useLanguages } from "../../app";
 import { identityRoutes } from "../../modules/identity/routes";
 import type { UserDetail } from "../../modules/identity/entities";
 import type { CreateUserInput } from "../../modules/identity/schemas";
 import { CommandDialog, FormGroup, SelectField, TextField, useCommand, type FormValidator, type ValidationIssue } from "../../form";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 
 /**
  * "New user": a login, a name, an e-mail, a language and a password (typed twice, so a slip is caught before the person

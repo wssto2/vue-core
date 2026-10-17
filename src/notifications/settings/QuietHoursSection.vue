@@ -3,7 +3,7 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { FormGroup, FormView, SwitchField, TimeField, useForm, type FormValidator } from "../../form";
 import { parseTime } from "../../form/date/time";
-import { useServerMessages } from "../../identity/fieldMessages";
+import { useServerMessages } from "../../i18n";
 import SectionIntro from "../../identity/shared/SectionIntro.vue";
 import type { QuietHours } from "../../modules/notification/entities";
 import type { QuietHoursInput } from "../../modules/notification/schemas";

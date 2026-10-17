@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { AdaptivePageShell } from "../../page";
 import { toast } from "../../overlay";
-import { useServerMessages } from "../../identity/fieldMessages";
+import { useServerMessages } from "../../i18n";
 import { AsyncSection } from "../../state";
 import SettingsBody from "./SettingsBody.vue";
 import type { Channel } from "./state";

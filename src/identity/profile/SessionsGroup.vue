@@ -6,7 +6,7 @@ import { identityRoutes } from "../../modules/identity/routes";
 import { AlertDialog, toast } from "../../overlay";
 import { usePlatform } from "../../platform";
 import { AsyncSection, useLoad } from "../../state";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 import SessionList from "../shared/SessionList.vue";
 import { isSessionEnded } from "../signIn";
 

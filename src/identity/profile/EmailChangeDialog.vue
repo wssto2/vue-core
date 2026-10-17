@@ -8,7 +8,7 @@ import type { PendingEmail, ProfileResponse } from "../../modules/identity/entit
 import { identityRoutes } from "../../modules/identity/routes";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 import { isSessionEnded } from "../signIn";
 import VerifyCode from "./VerifyCode.vue";
 

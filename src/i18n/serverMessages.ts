@@ -2,16 +2,17 @@ import { useI18n } from "vue-i18n";
 import { isApiError } from "../client";
 import { useFormat } from "../format";
 import type { FormFailureKind } from "../form";
-import { useDescribeError } from "../i18n";
+import { useDescribeError } from "./describeError";
 
 /**
- * What a form of these screens needs to speak go-core's refusals, in the app's language (an app's `errors.<reason>` first, then
- * `core.errors.<reason>`): the reason of a field (`identity.email.taken`) becomes a sentence; a refusal of the whole action (a
- * veto of the application's deactivation hook, a lock) says its reason instead of the generic line; a time a lock ends (`locked_until`)
- * reads as a time of day. Spread into `useForm` / `useCommand`; `sentence` is the same for a toast or a line of your own:
+ * What a form needs to speak any go-core refusal, in the app's language (an app's `errors.<reason>` first, then
+ * `core.errors.<reason>`): the reason of a field (`identity.email.taken`) becomes a sentence (`describeFieldError`); a refusal of
+ * the whole action (a veto of the application's hook, a lock) says its reason instead of the generic line (`failureMessage`); a
+ * time a lock ends (`locked_until`) reads as a time of day. Spread into `useForm` / `useCommand`, or call `failureMessage(kind, error)`
+ * inside an `failureMessage` of your own to put the application's refusals first; `sentence` is the same for a toast or a line of your own:
  *
  *   const messages = useServerMessages();
- *   useCommand({ ...messages, run, done });
+ *   useForm({ ...messages, failureMessage: (kind, error) => myRefusal(error) ?? messages.failureMessage(kind, error), defaults, validator });
  */
 export function useServerMessages() {
   const { t, te } = useI18n();

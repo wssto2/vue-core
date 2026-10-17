@@ -5,7 +5,7 @@ import type { SetPasswordInput } from "../../modules/identity/schemas";
 import { identityRoutes } from "../../modules/identity/routes";
 import { toast } from "../../overlay";
 import { usePlatform } from "../../platform";
-import { useServerMessages } from "../fieldMessages";
+import { useServerMessages } from "../../i18n";
 
 /**
  * "Set a new password": a password typed twice. Nobody can read a password, only replace it, and replacing it signs the
