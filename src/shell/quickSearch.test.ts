@@ -118,6 +118,25 @@ describe("quickSearch", () => {
     expect(rows().map((row) => row.textContent)).toEqual([expect.stringContaining("Enter zzz")]);
   });
 
+  it("reads the placeholder, the hint and the none hint when it renders: a getter or a ref follows the language", async () => {
+    const language = ref("one");
+    const hint = ref("Hint one");
+    await start({ search: async () => ({ groups: [] }), placeholder: () => `Find ${language.value}`, hint, noneHint: () => `Covers ${language.value}` });
+    await ctrlK();
+    await settle();
+    expect(field().getAttribute("placeholder")).toBe("Find one");
+    expect(screen.getByText("Hint one")).toBeTruthy();
+
+    language.value = "two";
+    hint.value = "Hint two";
+    await settle();
+    expect(field().getAttribute("placeholder")).toBe("Find two");
+    expect(screen.getByText("Hint two")).toBeTruthy();
+
+    await type("zzz");
+    await vi.waitFor(() => expect(screen.getByText("Covers two")).toBeTruthy());
+  });
+
   it("drops the answer of an older query and says so when some groups could not be searched", async () => {
     const slow = deferred<QuickSearchAnswer>();
     const search = vi.fn<QuickSearchOptions["search"]>()

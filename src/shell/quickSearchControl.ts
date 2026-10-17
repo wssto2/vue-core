@@ -1,4 +1,4 @@
-import { shallowRef, type Ref } from "vue";
+import { shallowRef, type MaybeRefOrGetter, type Ref } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import type { IconName } from "../icon";
 import { perDocument } from "../internal/perDocument";
@@ -44,12 +44,15 @@ export interface QuickSearchOptions {
   recent?: () => readonly QuickSearchRow[];
   /** A row was chosen: remember it as recent. */
   onChoose?: (row: QuickSearchRow) => void;
-  /** The field's placeholder ("Search a vehicle, VIN, customer…"). */
-  placeholder?: string;
+  /**
+   * The field's placeholder ("Search a vehicle, VIN, customer…"). The three texts are read each time the palette renders, so an
+   * application whose messages load lazily passes a getter that follows the language: `placeholder: () => t("search.placeholder")`.
+   */
+  placeholder?: MaybeRefOrGetter<string>;
   /** Shown before anything is typed and no recent rows exist: what can be searched. */
-  hint?: string;
+  hint?: MaybeRefOrGetter<string>;
   /** Shown under "Nothing for …": what the search covers. */
-  noneHint?: string;
+  noneHint?: MaybeRefOrGetter<string>;
   /** Characters before a search runs. Default 2. */
   minLength?: number;
   /** Milliseconds of quiet after typing before a search runs. Default 180. */

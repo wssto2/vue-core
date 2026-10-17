@@ -1,4 +1,6 @@
+import { render } from "@testing-library/vue";
 import { describe, expect, it } from "vitest";
+import Highlight from "./Highlight.vue";
 import { highlightParts } from "./highlight";
 
 describe("highlightParts", () => {
@@ -23,5 +25,20 @@ describe("highlightParts", () => {
 
   it("does not fold accents (as the ARV highlight did)", () => {
     expect(highlightParts("Čačić", "cacic")).toEqual([{ text: "Čačić", match: false }]);
+  });
+});
+
+describe("Highlight", () => {
+  it("marks the words of the search, any case, and leaves the rest as text", () => {
+    const { container } = render(Highlight, { props: { text: "Ana Horvat Hor", search: "ana  HOR" } });
+    expect([...container.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual(["Ana", "Hor", "Hor"]);
+    expect(container.textContent).toBe("Ana Horvat Hor");
+  });
+
+  it("renders no element of its own, and no mark without a search or a match", () => {
+    const { container } = render(Highlight, { props: { text: "Ana", search: null } });
+    expect(container.querySelector("mark")).toBeNull();
+    expect(container.children).toHaveLength(0);
+    expect(render(Highlight, { props: { text: "Ana", search: "zz" } }).container.querySelector("mark")).toBeNull();
   });
 });

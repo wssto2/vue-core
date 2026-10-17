@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onScopeDispose, ref, useTemplateRef, watch } from "vue";
+import { computed, nextTick, onScopeDispose, ref, toValue, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { shortcutKeys, useKeyboardShortcut } from "../button";
@@ -178,7 +178,7 @@ const modKey = computed(() => shortcutKeys({ key: "k", mod: true })[0]);
         data-test="quick-search" @keydown="onKeydown">
         <div class="flex items-center gap-3 border-b border-border-separator px-4 py-3 pt-[max(0.75rem,var(--app-safe-top))] md:px-5 md:py-4">
           <Icon name="search" :size="20" class="shrink-0 text-content-muted" />
-          <SearchInput v-model="query" :label="t('core.shell.search.title')" :placeholder="props.placeholder ?? t('core.shell.search.placeholder')" v-bind="{
+          <SearchInput v-model="query" :label="t('core.shell.search.title')" :placeholder="toValue(props.placeholder) ?? t('core.shell.search.placeholder')" v-bind="{
             role: 'combobox', 'aria-expanded': 'true', 'aria-controls': 'quick-search-results',
             'aria-activedescendant': rows.length ? `quick-search-row-${active}` : undefined, 'data-test': 'quick-search-input',
           }" />
@@ -196,7 +196,7 @@ const modKey = computed(() => shortcutKeys({ key: "k", mod: true })[0]);
 
           <div v-if="nothingFound" class="flex flex-col items-center gap-1 px-6 py-10 text-center" data-test="quick-search-empty">
             <p class="text-headline font-semibold">{{ t("core.shell.search.none", { query: trimmed }) }}</p>
-            <p class="max-w-sm text-subheadline text-content-muted">{{ props.noneHint ?? t("core.shell.search.none_hint") }}</p>
+            <p class="max-w-sm text-subheadline text-content-muted">{{ toValue(props.noneHint) ?? t("core.shell.search.none_hint") }}</p>
           </div>
 
           <template v-for="group in groups" :key="group.key">
@@ -226,7 +226,7 @@ const modKey = computed(() => shortcutKeys({ key: "k", mod: true })[0]);
           <p v-if="unavailable.length" class="px-3 py-2 text-footnote text-content-muted" data-test="quick-search-unavailable">
             {{ t("core.shell.search.unavailable", { groups: unavailable.join(", ") }) }}
           </p>
-          <p v-if="!groups.length && !searching" class="px-3 py-8 text-center text-subheadline text-content-muted">{{ props.hint ?? t("core.shell.search.hint") }}</p>
+          <p v-if="!groups.length && !searching" class="px-3 py-8 text-center text-subheadline text-content-muted">{{ toValue(props.hint) ?? t("core.shell.search.hint") }}</p>
         </div>
 
         <div class="hidden items-center gap-4 border-t border-border-separator px-5 py-2.5 text-footnote text-content-muted md:flex">
