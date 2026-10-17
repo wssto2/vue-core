@@ -249,7 +249,7 @@ defineProps<{ row: { updated_at: string; updated_by: string } }>();
 
 ## Typed meta, and highlighting in your own cells
 
-A backend that sends more than rows (totals, lookups) puts it in `meta`. Say its shape once and read it without a cast: the loader returns `ListPage<Row, MyMeta>` (`httpList<Row, Sort, Filter, View, MyMeta>` and `readListPage<Row, MyMeta>` take it as a type argument; like `Row` it is your word about the wire, not checked), and `collection.page.value?.meta?.totals` is typed. Declare it with `type`, not `interface`; without it `meta` is `ListMeta`, an object of `unknown`. `highlightParts(text, search)` is what `RecordIdentity :highlight` uses: it splits a text around the words of the search, for a cell of your own to wrap the `match` parts in `<mark>`.
+A backend that sends more than rows (totals, lookups) puts it in `meta`. Say its shape once and read it without a cast: the loader returns `ListPage<Row, MyMeta>` (`httpList<Row, Sort, Filter, View, MyMeta>` and `readListPage<Row, MyMeta>` take it as a type argument; like `Row` it is your word about the wire, not checked), and `collection.page.value?.meta?.totals` is typed. Declare it with `type`, not `interface`; without it `meta` is `ListMeta`, an object of `unknown`. `highlightParts(text, search)` is what `RecordIdentity :highlight` uses: it splits a text around the words of the search, for a cell of your own to wrap the `match` parts in `<mark>`; `<Highlight :text :search />` (`@wssto2/vue-core/collection`) does that, with the look `RecordIdentity` and the quick search use.
 
 ## A row's menu
 

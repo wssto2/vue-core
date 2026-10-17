@@ -55,8 +55,10 @@ Names of the people who did things (who signed in as the person, who changed the
 <!-- example: docs/examples/identity/usersOptions.ts -->
 ```ts
 // What an application can leave out, link to, or add.
-import type { OpenChangeRow, PersonSection } from "@wssto2/vue-core/identity";
-import { PERSON, usePersonActions, usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import type { OpenChangeRow, PersonSection, UserRow } from "@wssto2/vue-core/identity";
+import { PERSON, USER_VIEWS, identityRoutes, usePersonActions, usersFeature, usersRoutes, profileRoutes } from "@wssto2/vue-core/identity";
+import type { HttpClient } from "@wssto2/vue-core/client";
+import { defineCollection, readListPage } from "@wssto2/vue-core/collection";
 import { useRouteResourceContext } from "@wssto2/vue-core/resource";
 import { FormGroup, FormRow } from "@wssto2/vue-core/form";
 import { defineComponent, h } from "vue";
@@ -72,18 +74,35 @@ export const toTheList = usersRoutes.index;
 export const toAPerson = (id: number) => usersRoutes.record({ id });
 export const toMyProfile = profileRoutes.index;
 
-// A section of the application's own on a person's record, after the feature's own (their roles, say).
+// A section of the application's own on a person's record (their roles, say): right after Sign-in and in its group ("Access"),
+// or, without `after`, at the end.
 const Roles = { props: ["name"], render() { return h("p", `Roles of ${(this as unknown as { name: string }).name}`); } };
 const roles: PersonSection = {
   path: "roles",
+  after: "signin",
   component: Roles,
   props: (person) => ({ name: person.name }),
-  meta: { section: { labelKey: "people.roles", icon: "user3Line", groupKey: "core.users.section_groups.access" } },
+  meta: { section: { labelKey: "people.roles", icon: "user3Line" } },
 };
 export const withRoles = usersFeature({ sections: [roles] });
 
 // The Activity section names the application's areas (the keys the audit records) by its own texts.
 export const withActivityAreas = usersFeature({ activityAreas: { crm: "areas.crm", billing: "areas.billing" } });
+
+// The list of people with a filter the library does not know (a dealer): the one definition the list page and the record's previous / next
+// both ask the server with. The page that lists with it is the application's (`replace.list`).
+declare const http: HttpClient; // the application's client
+const peopleList = defineCollection({
+  id: "identity.users",
+  stateVersion: 1,
+  load: async (query, { signal }) =>
+    readListPage<UserRow>(await http.request(identityRoutes.usersList, { view: query.view ?? undefined, page: query.page, per_page: query.pageSize, dealer_id: query.filters.dealer_id }, { signal }), query),
+  key: (user: UserRow) => user.id,
+  query: { sorts: ["name"], filters: ["dealer_id"], views: USER_VIEWS },
+  defaults: { sort: "name", view: "active" },
+});
+const PeopleList = defineComponent({ render: () => h("p", "The list, with useCollection(peopleList, …)") });
+export const withDealerFilter = usersFeature({ collection: peopleList, replace: { list: PeopleList } });
 
 // A group of the application's own on "my profile", after the personal details: it renders its own FormGroup and gets the loaded profile.
 const Phone = {
@@ -128,10 +147,11 @@ export const withReplacements = usersFeature({ replace: { general: Details } });
 
 - The route names are fixed (`users.index`, `users.record`, `profile`); link by `usersRoutes` and `profileRoutes`. The paths are `/users` and `/profile`; `path` moves the users list (a record is `<path>/:id`), and links by name follow it.
 - `destination` binds the list to the node of the backend's menu that opens it; the record keeps it highlighted.
-- `sections` adds a child route `users.record.<path>` after the feature's own. The component gets what `props` makes of the loaded person, so a feature of another module (the roles screens) is passed in by the application and identity never imports it. The section's label and icon texts are the application's keys.
+- `sections` adds a child route `users.record.<path>`, at the end or, with `after` (one of `general`, `signin`, `sessions`, `signins`, `changes`, `activity`), right behind that built-in section and in its group; any other name is a start-up error listing the valid ones. The component gets what `props` makes of the loaded person, so a feature of another module (the roles screens) is passed in by the application and identity never imports it. The section's label and icon texts are the application's keys.
 - `activityAreas` names the application's areas of the Activity section: the area key the server's audit records (`crm`) and the i18n key of its name; `all`, `identity` and `other` are the library's, and an area without a name reads as "Other".
 - `activityRecords` names the kinds of record the Activity section lists (`record_type` from the server): an i18n key and, when the record has a page, a link. Any other type reads as the server wrote it (`invoices #9`).
 - `changeWords(row, t)` words a change for the Changes section: asked for every row with its `ext`, it returns a `sentence` and `details` (text, or `{ text, to }` for a link), or nothing for a row the library words well. An action without a sentence of its own reads as "Account changed" until you give it one.
+- `collection` is the one definition of the people list that the list page and the record's previous / next both use (default: the library's `userList`). An application whose list filters by more than the library knows passes its own, the one its `replace.list` page uses with `useCollection`, so the record's pager keeps those filters.
 - `replace` swaps a whole screen (see below). `signInAs: false` leaves out "Sign in as"; otherwise `identityFeature()` must be installed too (it is checked at start-up).
 
 ## Replacing a screen, and the server's `ext`
@@ -142,7 +162,7 @@ When the server adds to go-core's users (a dealer, roles, a hand-over on deactiv
 
 | `replace.` | Props | Events / exposed | Finds |
 |---|---|---|---|
-| `list` | none (the page of `users.index`) | | `userList(http)` (the collection, also used by the record's pager), `useUserDialogs().newUser`, `usersRoutes.record` |
+| `list` | none (the page of `users.index`) | | the collection (`usersFeature({ collection })`, default `userList`; also used by the record's pager), `useUserDialogs().newUser`, `usersRoutes.record` |
 | `general` | none (the section `users.record.general`) | | `useRouteResourceContext(PERSON)` (the loaded person, with `ext`), `usePersonActions()` (`can`, `deactivate()`, `activate()`, `setPassword()`, `refresh()`), `useSaveChrome` |
 | `newUser` | none | emits `created` (the new person); exposes `create()` (`NewUserDialogHandle`) | the list calls `create()` through a template ref and opens the record on `created` |
 | `deactivate` | `DeactivateDialogProps`: `id`, `name`, `sessionCount` | emits `done`; exposes `open()` (`DeactivateDialogHandle`) | the record page and the details' rows call `open()`, and reload on `done` |

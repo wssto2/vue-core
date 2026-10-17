@@ -242,6 +242,8 @@ async function archive() {
 
 The same goes for the messages a server sends for a field (`{ fields: { oib: ["validation_errors.required"] } }`): say once how one becomes a sentence, beside `describeError`, and every form (`useForm`, `useResourceForm`, `useCommand`) uses it unless it has its own `describeFieldError`. Without either, messages show as sent.
 
+`useServerMessages()` (also `@wssto2/vue-core/i18n`) is that rule for go-core's refusals, ready to spread into a form or a command: `describeFieldError` (a field's reason, `identity.email.taken`, becomes your `errors.<reason>` or the library's `core.errors.<reason>`), `failureMessage(kind, error)` (a refusal of the whole action says its reason) and `sentence(error)` for a toast. Put your own refusals first with `failureMessage: (kind, error) => mine(error) ?? messages.failureMessage(kind, error)`.
+
 <!-- example: docs/examples/app/describeFieldError.ts -->
 ```ts
 import type { AppFieldErrorDescriber } from "@wssto2/vue-core/i18n";
