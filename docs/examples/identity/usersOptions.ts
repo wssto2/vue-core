@@ -45,7 +45,7 @@ const peopleList = defineCollection({
   query: { sorts: ["name"], filters: ["dealer_id"], views: USER_VIEWS },
   defaults: { sort: "name", view: "active" },
 });
-const PeopleList = defineComponent({ render: () => h("p", "The list, with useCollection(peopleList, …)") });
+const PeopleList = { render: () => h("p", "The list, with useCollection(peopleList, …)") };
 export const withDealerFilter = usersFeature({ collection: peopleList, replace: { list: PeopleList } });
 
 // A group of the application's own on "my profile", after the personal details: it renders its own FormGroup and gets the loaded profile.
