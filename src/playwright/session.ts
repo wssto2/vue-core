@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import type { AccessQualifier } from "../platform";
-import type { MyAccess, Node, PermissionAccess, Scope, SessionResponse, User } from "../modules/identity/entities";
+import type { MyAccess, Node, Scope, SessionResponse, User } from "../modules/identity/entities";
 import { json, ok } from "./envelope";
 
 const FUTURE_EXPIRY = "2099-01-01T00:00:00.000Z";
@@ -22,14 +22,11 @@ export type MockAuthOptions = {
 /** Where a permission is held: the organization, or a place of a level (`{ level: "dealer", id: 1 }`). */
 export type HeldAt = { level: string; id?: number };
 
-// The wire says qualifiers as strings ("own" | "own_location" | "all"); go-core's generated type says number.
-type WireAccess = Omit<MyAccess, "permissions"> & { permissions: Record<string, Omit<PermissionAccess, "qualifier"> & { qualifier: AccessQualifier }> };
-
 /** Fields of the session payload to set or replace (an `impersonator`, another `expires_at`), and any the application adds. */
-export type SessionExtra = Partial<Omit<SessionResponse, "access">> & { access?: WireAccess } & Record<string, unknown>;
+export type SessionExtra = Partial<Omit<SessionResponse, "access">> & { access?: MyAccess } & Record<string, unknown>;
 
 /** The `/auth/me` `access` payload for the given permissions, every one at `scope` with its qualifier. The organization has no id: it is go-core's root scope, and `root` says a binding is there. */
-export function accessOf(policies: string[], qualifiers: Record<string, AccessQualifier> = {}, scope: HeldAt = { level: "organization" }): WireAccess {
+export function accessOf(policies: string[], qualifiers: Record<string, AccessQualifier> = {}, scope: HeldAt = { level: "organization" }): MyAccess {
   const held: Scope = scope.id === undefined ? { level: scope.level } : { level: scope.level, id: scope.id };
 
   return {
