@@ -346,6 +346,28 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 
 Forms have their own recipe when that phase lands.
 
+## The `vue-core` command
+
+The package installs one command, `vue-core`, with the subcommands `lint`, `check-architecture`, `feature` and `e2e-timings` (`npx vue-core --help`). Each reads its own section of one `vue-core.config.mjs`, found from the current folder upwards (or `--config <path>`); a command with no section runs on its defaults. `eslint`, its plugins and `@playwright/test` are optional peers, installed only by the applications that use them.
+
+```bash
+npx vue-core --help
+npx vue-core lint --config tools/vue-core.config.mjs
+```
+
+<!-- example: docs/examples/devkit/vue-core.config.ts -->
+```ts
+import { defineConfig } from "@wssto2/vue-core/config";
+
+// vue-core.config.mjs at the root of the application; one section per command.
+export default defineConfig({
+  lint: {},
+  architecture: {},
+  generator: {},
+  e2eTimings: {},
+});
+```
+
 ## Working on the library
 
 ```bash
