@@ -323,6 +323,12 @@
       "offline": "Nema veze s internetom",
       "dark_mode": "Tamni način rada"
     },
+    "preferences": {
+      "save_failed": "Postavka nije sačuvana."
+    },
+    "tip": {
+      "ok": "U redu"
+    },
     "activity": {
       "today": "Danas",
       "yesterday": "Jučer"

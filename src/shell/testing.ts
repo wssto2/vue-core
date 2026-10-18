@@ -43,8 +43,10 @@ export async function startShell(shell: Component | ShellDefinition, settings: {
   extra?: Partial<ApplicationOptions>;
   /** Steers the fake backend before the application starts. */
   prepare?: (backend: ReturnType<typeof fakeBackend>["backend"]) => void;
+  /** Options of the platform (a `transport` that answers its requests). */
+  platform?: Parameters<typeof fakeBackend>[2];
 } = {}): Promise<Started> {
-  const { platform, backend } = fakeBackend(settings.session === undefined ? signedIn(1) : settings.session);
+  const { platform, backend } = fakeBackend(settings.session === undefined ? signedIn(1) : settings.session, {}, settings.platform);
   settings.prepare?.(backend);
   const application = createApplication(options(platform, [baseFeature, ...(settings.features ?? [])], settings.location ?? "/", { shell, ...settings.extra }));
   const target = document.createElement("div");

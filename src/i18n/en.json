@@ -323,6 +323,12 @@
       "offline": "No internet connection",
       "dark_mode": "Dark mode"
     },
+    "preferences": {
+      "save_failed": "Your setting could not be saved."
+    },
+    "tip": {
+      "ok": "Got it"
+    },
     "activity": {
       "today": "Today",
       "yesterday": "Yesterday"

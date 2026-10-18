@@ -2,7 +2,9 @@ import { fireEvent, screen } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref } from "vue";
 import { mockMedia } from "../testing/media";
+import { jsonResponse, routedTransport } from "../testing/transport";
 import { backofficeShell } from "./backofficeShell";
+import { toast } from "../overlay";
 import { applyDarkMode, darkMode } from "./darkMode";
 import { offlineNotice } from "./offlineNotice";
 import { settle, signedIn, startShell, stopShells } from "./testing";
@@ -67,6 +69,47 @@ describe("darkMode", () => {
     expect(set).toHaveBeenCalledWith(true);
     await settle();
     expect(screen.getByRole("switch", { name: "Dark mode" }).getAttribute("aria-checked")).toBe("true");
+  });
+});
+
+describe("darkMode on the person's stored preferences", () => {
+  const saved = (dark: boolean) => jsonResponse(200, { success: true, data: { preferences: { dark_mode: dark } } });
+
+  it("puts the stored mode on the page without any option", async () => {
+    await startShell(backofficeShell(), { features: [darkMode()], session: signedIn(1, [], { user, preferences: { dark_mode: true } }) });
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+  });
+
+  it("is light for a person with nothing stored", async () => {
+    await startShell(backofficeShell(), { features: [darkMode()], session: signedIn(1, [], { user }) });
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+  });
+
+  it("saves the opposite through PUT /v1/auth/preferences when the switch is used, and follows the answer", async () => {
+    const { transport, calls } = routedTransport({ "PUT /v1/auth/preferences": saved(true) });
+    await startShell(backofficeShell(), { features: [darkMode()], session: signedIn(1, [], { user, preferences: { dark_mode: false, onboarding: { welcome_done: true } } }), platform: { transport } });
+
+    await fireEvent.click(screen.getByRole("button", { name: /Ana Anić/ }));
+    await settle();
+    await fireEvent.click(screen.getByRole("switch", { name: "Dark mode" }));
+    await settle();
+    expect(calls.map((call) => JSON.parse(String(call.init.body)))).toEqual([{ preferences: { dark_mode: true } }]);
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    expect(screen.getByRole("switch", { name: "Dark mode" }).getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("goes back to the stored mode, with a toast, when the server refuses", async () => {
+    const error = vi.spyOn(toast, "error");
+    const { transport } = routedTransport({ "PUT /v1/auth/preferences": jsonResponse(500, { success: false, error: "boom" }) });
+    await startShell(backofficeShell(), { features: [darkMode()], session: signedIn(1, [], { user, preferences: { dark_mode: false } }), platform: { transport } });
+
+    await fireEvent.click(screen.getByRole("button", { name: /Ana Anić/ }));
+    await settle();
+    await fireEvent.click(screen.getByRole("switch", { name: "Dark mode" }));
+    await settle();
+    expect(error).toHaveBeenCalledOnce();
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+    expect(screen.getByRole("switch", { name: "Dark mode" }).getAttribute("aria-checked")).toBe("false");
   });
 });
 
