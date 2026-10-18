@@ -3,6 +3,8 @@ export { fieldKey, focusFirstError } from "./focus";
 export { useDirtySnapshot, useSheetDiscardGuard } from "./dirty";
 export { createLeaveGuard, installLeaveGuard, MissingLeaveGuardRootError, leaveGuardKey, useLeaveGuard, useLeaveGuardContext } from "./leaveGuard";
 export type { LeaveGuard, PendingLeave } from "./leaveGuard";
+export { zodErrorMap } from "./zodErrorMap";
+export type { ZodErrorMapEnvironment, ZodIssueLike } from "./zodErrorMap";
 export { default as LeaveGuardRoot } from "./LeaveGuardRoot.vue";
 export { useForm } from "./useForm";
 export type { FieldBinding, Form, FormFailure, FormFailureKind, FormOptions, KeysHolding, MonthYearBinding, SubmitContext, SubmitOptions, SubmitResult } from "./useForm";

@@ -1,5 +1,16 @@
 {
   "core": {
+    "validation_errors": {
+      "required": "Obavezno polje.",
+      "min": "Unesite najmanje {min} znakova.",
+      "max": "Unesite najviše {max} znakova.",
+      "min_value": "Vrijednost mora biti najmanje {min}.",
+      "max_value": "Vrijednost smije biti najviše {max}.",
+      "email": "Unesite ispravnu e-mail adresu.",
+      "url": "Unesite ispravan URL.",
+      "date": "Unesite ispravan datum.",
+      "datetime": "Unesite ispravan datum i vrijeme."
+    },
     "access": {
       "title": "Uloge",
       "description": "Skupovi ovlaštenja. Osobi se uloga dodjeljuje na njenom zapisu, zajedno s opsegom.",
