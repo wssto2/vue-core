@@ -73,6 +73,7 @@ run(
     import { localeMessages } from "@wssto2/vue-core/i18n";
     import { backofficeShell, groupNavigation } from "@wssto2/vue-core/shell";
     import { defineConfig } from "@wssto2/vue-core/config";
+    import { authBody, ok } from "@wssto2/vue-core/playwright";
     import { createTestPlatform, createTestI18n, routedTransport, jsonResponse } from "@wssto2/vue-core/testing";
     let thrown;
     try { parseSessionPayload("x"); } catch (error) { thrown = error; }
@@ -91,7 +92,9 @@ run(
     const test = createTestPlatform({ permissions: ["a:b"], transport });
     if (!test.access.can("a:b") || (await test.http.get("/ping")).data !== "pong" || createTestI18n().global.t("core.actions.cancel") === "core.actions.cancel") throw new Error("the testing subpath did not behave");
     if (defineConfig({ lint: {} }).lint === undefined) throw new Error("the config subpath did not behave");
-    console.log("client, platform, app, router, format, i18n, shell, testing and config subpaths import; ApiError is one class");
+    // The playwright subpath evaluates in Node with no Playwright installed: it only imports its types.
+    if (ok(1).data !== 1 || authBody().data.user.id !== 1) throw new Error("the playwright subpath did not behave");
+    console.log("client, platform, app, router, format, i18n, shell, testing, config and playwright subpaths import; ApiError is one class");
     `,
   ],
   playground,

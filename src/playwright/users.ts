@@ -71,7 +71,7 @@ export type UsersOptions = {
   writes?: Write[];
   /** Whether a person is in the list for these query parameters, besides the view and the search (your `ext` filters). */
   filter?: (person: UserDetail, params: URLSearchParams) => boolean;
-  /** Answers first: an answer is served (and a write reported), undefined leaves the request to the routes below. */
+  /** Answers first (after `notManageable`): an answer is served (and a write reported), undefined leaves the request to the routes below. */
   hook?: (request: UsersRequest, state: UsersState) => Answer | undefined;
 };
 
@@ -102,7 +102,6 @@ export async function serveUsers(page: Page, options: UsersOptions = {}) {
       const id = Number(one[1]);
       const rest = one[2] ?? "";
       const found = state.people.find((p) => p.id === id);
-      if (method !== "GET" && state.notManageable) return notFound("identity.account.not_found");
       const record = found ?? person(id, "Unknown Person");
 
       if (rest === "") {
@@ -148,7 +147,9 @@ export async function serveUsers(page: Page, options: UsersOptions = {}) {
   await page.route(/\/api\/v1\/iam\/(users|service-accounts)(\/|\?|$)/, (route) => {
     const { method, url, path, body } = readRequest(route);
     const request = { method, path, url, body };
-    const reply = options.hook?.(request, state) ?? answer(request);
+    // A person that is seen but not managed refuses every write, before anything answers it.
+    const refused = method !== "GET" && state.notManageable && /^\/iam\/users\/\d+/.test(path) ? notFound("identity.account.not_found") : undefined;
+    const reply = refused ?? options.hook?.(request, state) ?? answer(request);
     if (!reply) return route.fallback();
     if (method !== "GET") writes.push({ method, path, body: body ?? null });
     return route.fulfill(reply);

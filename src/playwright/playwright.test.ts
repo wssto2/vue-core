@@ -229,6 +229,14 @@ describe("serveUsers", () => {
     expect((await request("GET", "/api/v1/iam/users/3"))?.status).toBe(200);
   });
 
+  it("refuses a write to a person that is not managed before the hook can answer it", async () => {
+    const { page, request } = stubPage();
+    const { writes } = await serveUsers(page, { state: freshState({ people, notManageable: true }), hook: () => ({ status: 200, body: "{}" }) });
+    expect((await request("POST", "/api/v1/iam/users/3/deactivate", {}))?.status).toBe(404);
+    expect((await request("POST", "/api/v1/iam/users", {}))?.status).toBe(200);
+    expect(writes.map((w) => w.path)).toEqual(["/iam/users/3/deactivate", "/iam/users"]);
+  });
+
   it("serves the service accounts and their keys", async () => {
     const { page, request } = stubPage();
     await serveUsers(page, { state: freshState({ serviceAccounts: [serviceAccount(21, "DMS")] }) });
