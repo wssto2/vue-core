@@ -36,7 +36,7 @@ const [packed] = JSON.parse(
 );
 renameSync(join(packDir, packed.filename), join(packDir, "vue-core.tgz"));
 const shipped = packed.files.map((file) => file.path);
-const stray = shipped.filter((path) => !/^(dist\/|src\/styles\/|package\.json$|README\.md$|CHANGELOG\.md$)/.test(path));
+const stray = shipped.filter((path) => !/^(dist\/|bin\/|src\/styles\/|package\.json$|README\.md$|CHANGELOG\.md$)/.test(path));
 if (stray.length > 0) fail(`tarball ships files outside dist/, src/styles/, package.json, README.md and CHANGELOG.md: ${stray.join(", ")}`);
 if (shipped.some((path) => /\.test\.|^src\/(?!styles\/)/.test(path))) fail("tarball ships sources or tests");
 console.log(`${shipped.length} files, ${(packed.size / 1024).toFixed(0)} kB packed`);
@@ -71,6 +71,7 @@ run(
     import { createFormatting } from "@wssto2/vue-core/format";
     import { localeMessages } from "@wssto2/vue-core/i18n";
     import { backofficeShell, groupNavigation } from "@wssto2/vue-core/shell";
+    import { defineConfig } from "@wssto2/vue-core/config";
     import { createTestPlatform, createTestI18n, routedTransport, jsonResponse } from "@wssto2/vue-core/testing";
     let thrown;
     try { parseSessionPayload("x"); } catch (error) { thrown = error; }
@@ -88,11 +89,17 @@ run(
     const { transport } = routedTransport({ "GET /ping": jsonResponse(200, { success: true, data: "pong" }) });
     const test = createTestPlatform({ permissions: ["a:b"], transport });
     if (!test.access.can("a:b") || (await test.http.get("/ping")).data !== "pong" || createTestI18n().global.t("core.actions.cancel") === "core.actions.cancel") throw new Error("the testing subpath did not behave");
-    console.log("client, platform, app, router, format, i18n, shell and testing subpaths import; ApiError is one class");
+    if (defineConfig({ lint: {} }).lint === undefined) throw new Error("the config subpath did not behave");
+    console.log("client, platform, app, router, format, i18n, shell, testing and config subpaths import; ApiError is one class");
     `,
   ],
   playground,
 );
+
+step("the vue-core command runs from the installed package");
+const help = execFileSync("npx", ["vue-core", "--help"], { cwd: playground, encoding: "utf8" });
+if (!/check-architecture/.test(help)) fail("`vue-core --help` does not list its commands");
+console.log("vue-core --help lists the commands");
 
 step("packed output is free of app knowledge");
 const pkg = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"));

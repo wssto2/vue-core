@@ -20,10 +20,15 @@
     "url": "git+https://github.com/wssto2/vue-core.git"
   },
   "type": "module",
+  "bin": {
+    "vue-core": "bin/vue-core.mjs"
+  },
   "sideEffects": [
     "**/*.css"
   ],
   "files": [
+    "bin",
+    "!bin/**/*.test.mjs",
     "dist",
     "src/styles",
     "CHANGELOG.md"
@@ -137,6 +142,10 @@
       "types": "./dist/testing/index.d.ts",
       "import": "./dist/testing/index.js"
     },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "import": "./dist/config/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tailwind.css": "./src/styles/tailwind.css",
     "./fonts.css": "./src/styles/fonts.css",
@@ -161,8 +170,15 @@
     "check:modules": "node scripts/modules.mjs check"
   },
   "peerDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.59.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-vue": "^10.9.1",
+    "globals": "^17.6.0",
     "tailwindcss": "^4.0.0",
+    "typescript-eslint": "^8.59.2",
     "vue": "^3.5.19",
+    "vue-eslint-parser": "^10.4.0",
     "vue-i18n": "^10.0.0-beta.5",
     "vue-router": "^4.4.3",
     "zod": "^4.0.0"
@@ -198,7 +214,28 @@
     "vue-sonner": "^1.3.2"
   },
   "peerDependenciesMeta": {
+    "@eslint/js": {
+      "optional": true
+    },
+    "@playwright/test": {
+      "optional": true
+    },
+    "eslint": {
+      "optional": true
+    },
+    "eslint-plugin-vue": {
+      "optional": true
+    },
+    "globals": {
+      "optional": true
+    },
     "tailwindcss": {
+      "optional": true
+    },
+    "typescript-eslint": {
+      "optional": true
+    },
+    "vue-eslint-parser": {
       "optional": true
     },
     "zod": {
