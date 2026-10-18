@@ -57,12 +57,8 @@ export function parseSessionPayload<U extends SessionUser = SessionUser>(
   const access = parseAccessSnapshot(raw.access);
   issues.push(...access.issues);
   const navigation = raw.navigation === undefined || raw.navigation === null ? undefined : parseNavigation(raw.navigation, issues);
-  // The generated session type of go-core's identity module follows once vue-core syncs it (`modules:sync`); the wire already carries it.
-  let preferences: Record<string, unknown> = {};
-  if (raw.preferences !== undefined && raw.preferences !== null) {
-    if (isObject(raw.preferences)) preferences = raw.preferences;
-    else issues.push("preferences: expected an object");
-  }
+  // Absent (the app does not keep preferences) or not an object: none. The generated session type follows once vue-core syncs go-core's module (`preferences?: unknown`).
+  const preferences: Record<string, unknown> = isObject(raw.preferences) ? raw.preferences : {};
   if (user === null || issues.length > 0) throw malformed(issues);
   return { user, expiresAt, access: access.snapshot, preferences, ...(impersonator && { impersonator }), ...(navigation && { navigation }) };
 }

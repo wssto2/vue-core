@@ -36,8 +36,9 @@ describe("the session payload", () => {
     expect(parseSessionPayload(payload).preferences).toEqual({});
   });
 
-  it("refuses preferences that are not an object", () => {
-    expect(() => parseSessionPayload({ ...payload, preferences: [1] })).toThrow(/preferences/);
+  it("reads preferences that are not an object as none", () => {
+    expect(parseSessionPayload({ ...payload, preferences: [1] }).preferences).toEqual({});
+    expect(parseSessionPayload({ ...payload, preferences: null }).preferences).toEqual({});
   });
 });
 
