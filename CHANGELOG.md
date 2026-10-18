@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.13.0 — 2026-10-18
+
+Platform features an application kept to itself: per-person preferences (dark mode, dismissed tips) on go-core identity, an
+anchored onboarding tip, the formatting options a house style needs, a Zod error map, handled-error reports and the bound
+application for code outside setup. Needs go-core v1.18.0 (`goCore`, `src/modules` synced).
+
+### New
+- **platform:** `preferencesOf(platform)`, `mergePatch` (RFC 7396), `Preferences`, `PreferencesPatch`. The session snapshot carries `preferences` (the top-level `preferences` of the session payload; `{}` when absent or not an object); `session.update({ preferences })`; `createTestPlatform({ preferences })`.
+- **identity:** `usePreferences<T>()`: a reactive `value` and `save(patch)`, applied at once, sent as `PUT /v1/auth/preferences` (`identityRoutes.preferencesUpdate`), replaced by the server's merged answer, saves one after another; a refusal takes back only that patch, with a toast.
+- **onboarding:** new subpath `@wssto2/vue-core/onboarding` with `Tip`: an anchored, non-modal tip shown until closed and remembered in the person's preferences (`dismissedAt`, default `tips_dismissed`), one open at a time; the anchor glows (`[data-tip-anchor]`).
+- **format:** `createFormatting` and `createApplication({ formatting })` take `intlLocale` (language code → `Intl` tag, used by every formatter and exposed as `format.intlLocale`), `datePattern` (a numeric date per language, `DD`/`MM`/`YYYY`), `numberSymbols` (group and decimal, grouping from four digits, `toFixed` rounding), `emptyNumber` and `translate`; `intlFormatters(settings)` takes the same settings.
+- **format:** `format.day()` and `format.dayTime()`: "Today" / "Yesterday" / the date (`core.activity.*`), and the time after it.
+- **form:** `zodErrorMap(application)`, a Zod 4 `customError` onto `validation_errors.*`: the application's key wins, else the library's new `core.validation_errors` (`required`, `min`, `max`, `min_value`, `max_value`, `email`, `url`, `date`, `datetime`) in five languages. `z.config({ customError: zodErrorMap(application) })`.
+- **app:** `Application.report(error, { detail })` and `useApplication().report`: an error the code handled and the user saw, through `onError` with `source: "handled"`; `clientErrorReporter` sends it as an incident, its message headed `[handled: detail]` (go-core's `ClientErrorInput` has no source field yet).
+- **app:** `currentApplication()`, the application `createApplication` made, for code outside setup (`currentApplication().platform.http` in an `api.ts`); `Application.platform` and `Application.format`. `createTestApplication()` in `@wssto2/vue-core/testing`.
+- **resource / collection:** `readRecord`, `readRecordWithMeta`, `found`; `listLoader`, `routeListLoader`, on the current application.
+- **i18n:** `core.tip.ok`, `core.preferences.save_failed`, `core.validation_errors.*` in hr, en, sl, bs and sr-Latn.
+
+### Changed
+- **shell:** `darkMode()` needs no options: it keeps `dark_mode` in the person's preferences. `dark` and `set` are optional, for a preference kept elsewhere.
+- **format:** `toDate` reads `YYYY-MM-DD HH:mm[:ss]` as local time (Safari's `Date` refuses the space) and anything starting `0000-00-00`, `0001-01-01` or `1970-01-01` as empty, with or without a time.
+- **form, content:** the calendar, the date picker, the phone and country pickers, `I18nField` and `ResourceHeader` follow the application's `intlLocale` map (the first day of the week of `en` → `en-GB` is Monday); `ResourceHeader` and the phone field need the formatting provider (always there in an application). `ActivityStream` writes its day headings with `format.day()`.
+- **Breaking:** `firstWeekday`, `weekendDays`, `countryName` and `searchCountries` take the `Intl` tag (`format.intlLocale`), not the language code. `ApplicationOptions.formatting` is `Partial<Formatters> & FormattingSettings`. `testFormatting(i18n, settings?)`.
+- **modules:** regenerated from go-core v1.18.0 (identity: `PreferencesResponse`, `SessionResponse.preferences`, `UpdatePreferencesInput`, `preferencesUpdate`).
+
 ## 0.12.1 — 2026-10-18
 
 go-core `v1.16.1`: a type the wire writes as text is generated as a string.
