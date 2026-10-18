@@ -23,6 +23,7 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | `@wssto2/vue-core/notifications` | go-core's notification and events modules: `notificationsFeature({ categories, deadLetters })`: the bell with the unread count, the inbox (popover, bottom sheet on phones), the live stream, the failed-events page: [notifications](docs/recipes/notifications.md) |
 | `@wssto2/vue-core/incidents` | go-core's incident module: `incidentsFeature({ destination, appVersion })`: the list, an incident with its reports, comments and management form, "Report a bug" in the account menu; `clientErrorReporter({ platform })`: the browser's own errors reported as incidents: [incidents](docs/recipes/incidents.md) |
 | `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
+| `@wssto2/vue-core/playwright` | `mockAuth`, `serveAccess`, `serveNotifications`, `serveProfile`, `serveUsers`: Playwright mocks of the library's endpoints, [end-to-end specs](docs/recipes/e2e.md) |
 
 Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vue-i18n`; the library never bundles them.
 
@@ -344,6 +345,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Incidents](docs/recipes/incidents.md): go-core's incident module: the list and an incident, "Report a bug", the browser's errors reported (what is and is not sent), source maps
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
+- [End-to-end specs](docs/recipes/e2e.md): `@wssto2/vue-core/playwright`, the Playwright mocks of go-core's envelope, session, access, notification, profile and users routes
 - [Feature generator and e2e timings](docs/recipes/feature-generator.md): `vue-core feature` and `vue-core e2e-timings`
 
 Forms have their own recipe when that phase lands.
