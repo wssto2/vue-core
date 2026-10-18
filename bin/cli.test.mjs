@@ -31,7 +31,7 @@ describe("vue-core", () => {
   });
 
   it("a command still to be built is a stub that exits 2 until its lane replaces it", async () => {
-    for (const name of Object.keys(COMMANDS).filter((name) => !["feature", "e2e-timings"].includes(name))) {
+    for (const name of Object.keys(COMMANDS).filter((name) => !["feature", "e2e-timings", "check-architecture"].includes(name))) {
       const { code, err } = await run([name]);
       expect(code).toBe(2);
       expect(err).toBe(`vue-core ${name}: not implemented yet`);
