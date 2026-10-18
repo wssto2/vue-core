@@ -2,7 +2,7 @@
 // the types of the file are src/config (`@wssto2/vue-core/config`).
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 export const CONFIG_FILE = "vue-core.config.mjs";
 
@@ -10,8 +10,8 @@ export const CONFIG_FILE = "vue-core.config.mjs";
 export const DEFAULTS = {
   lint: {},
   architecture: {},
-  generator: {},
-  e2eTimings: {},
+  generator: { template: join(dirname(fileURLToPath(import.meta.url)), "templates", "feature-crud"), out: "features" },
+  e2eTimings: { report: "e2e-timings/results.json" },
 };
 
 export class ConfigError extends Error {}

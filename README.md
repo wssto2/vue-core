@@ -343,6 +343,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Incidents](docs/recipes/incidents.md): go-core's incident module: the list and an incident, "Report a bug", the browser's errors reported (what is and is not sent), source maps
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
+- [Feature generator and e2e timings](docs/recipes/feature-generator.md): `vue-core feature` and `vue-core e2e-timings`
 
 Forms have their own recipe when that phase lands.
 

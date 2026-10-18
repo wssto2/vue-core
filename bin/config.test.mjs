@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ConfigError, findConfig, loadConfig } from "./config.mjs";
+import { ConfigError, DEFAULTS, findConfig, loadConfig } from "./config.mjs";
 
 // Vite (which runs the tests) cannot import a file outside the project, so the temporary configs live in node_modules.
 const tmpdir = join(process.cwd(), "node_modules", ".cache");
@@ -18,7 +18,7 @@ describe("loadConfig", () => {
   it("without a file gives every section's defaults and the cwd as root", async () => {
     const dir = folder();
     const loaded = await loadConfig({ cwd: dir });
-    expect(loaded).toEqual({ path: null, root: dir, config: { lint: {}, architecture: {}, generator: {}, e2eTimings: {} } });
+    expect(loaded).toEqual({ path: null, root: dir, config: { lint: {}, architecture: {}, generator: DEFAULTS.generator, e2eTimings: DEFAULTS.e2eTimings } });
   });
 
   it("finds the file from a nested folder and fills the sections it leaves out", async () => {
@@ -29,14 +29,14 @@ describe("loadConfig", () => {
     expect(findConfig(nested)).toBe(file);
     const loaded = await loadConfig({ cwd: nested });
     expect(loaded.root).toBe(dir);
-    expect(loaded.config).toEqual({ lint: { files: ["src"] }, architecture: {}, generator: {}, e2eTimings: {} });
+    expect(loaded.config).toEqual({ lint: { files: ["src"] }, architecture: {}, generator: DEFAULTS.generator, e2eTimings: DEFAULTS.e2eTimings });
   });
 
   it("--config names the file, relative to the cwd", async () => {
     const dir = folder();
     write(dir, "export default { generator: { name: 'x' } };", "other.config.mjs");
     const loaded = await loadConfig({ cwd: dir, path: "other.config.mjs" });
-    expect(loaded.config.generator).toEqual({ name: "x" });
+    expect(loaded.config.generator).toEqual({ ...DEFAULTS.generator, name: "x" });
   });
 
   it("refuses a missing --config file, an unknown section, a section that is not an object and a file with no default", async () => {
