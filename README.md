@@ -11,7 +11,7 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | Import | For |
 |---|---|
 | `@wssto2/vue-core/platform` | `readBootstrap`, `createPlatform` (HTTP client, session, access), `AccessGate`, typed contexts |
-| `@wssto2/vue-core/app` | `createApplication`, `defineFeature`, shell outlets, effects |
+| `@wssto2/vue-core/app` | `createApplication`, `defineFeature`, `currentApplication` and `application.report` (outside setup, handled errors), shell outlets, effects |
 | `@wssto2/vue-core/shell` | `backofficeShell`, the shell's parts for a custom one |
 | `@wssto2/vue-core/router` | `defineRoutes` (typed targets), guards, navigation |
 | `@wssto2/vue-core/collection` | `defineCollection`, `useCollection`, `CollectionPage`, `DataTable` (a table over an array), record neighbors |
@@ -23,7 +23,7 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | `@wssto2/vue-core/notifications` | go-core's notification and events modules: `notificationsFeature({ categories, deadLetters })`: the bell with the unread count, the inbox (popover, bottom sheet on phones), the live stream, the failed-events page: [notifications](docs/recipes/notifications.md) |
 | `@wssto2/vue-core/onboarding` | `Tip`: a card beside something new, shown until the person closes it, remembered in their stored preferences (`usePreferences`, in `/identity`): [preferences and tips](docs/recipes/preferences.md) |
 | `@wssto2/vue-core/incidents` | go-core's incident module: `incidentsFeature({ destination, appVersion })`: the list, an incident with its reports, comments and management form, "Report a bug" in the account menu; `clientErrorReporter({ platform })`: the browser's own errors reported as incidents: [incidents](docs/recipes/incidents.md) |
-| `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
+| `@wssto2/vue-core/testing` | `createTestPlatform`, `createTestApp`, `createTestApplication`, fake transports: for your tests, [testing](docs/recipes/testing.md) |
 | `@wssto2/vue-core/playwright` | `mockAuth`, `serveAccess`, `serveNotifications`, `serveProfile`, `serveUsers`: Playwright mocks of the library's endpoints, [end-to-end specs](docs/recipes/e2e.md) |
 
 Nothing is reachable by a deep import. The peers are `vue`, `vue-router` and `vue-i18n`; the library never bundles them.

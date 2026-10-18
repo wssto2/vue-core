@@ -221,6 +221,10 @@ describe("a collection", () => {
 });
 ```
 
+## Code outside setup
+
+An `api.ts`, a router guard or anything else that calls `currentApplication()` needs an application to exist. `createTestApplication({ platform })` makes a real one, never mounted (a test platform, a memory history, no features); it is the current application until you `dispose()` it, so do that after each test. `listLoader`, `routeListLoader` and `readRecord` then read its client, which you steer with `scriptedTransport` or `routedTransport` on `createTestPlatform({ transport })`. A handled error (`currentApplication().report(...)`) goes to the `onError` you pass.
+
 ## The session and the backend's failures
 
 A sequence is `scriptedTransport`: the first answer goes to the first request, the last repeats. A 401 while signed in asks `renewSession`; without a renewal the session ends and `onSessionExpired` runs.

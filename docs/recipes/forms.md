@@ -26,6 +26,24 @@ Nothing to set up. `createApplication` installs the application's leave guard, s
 
 The app's validator is whatever has Zod's `safeParse` shape (Zod 3 and 4, or a hand-written object). The library does not depend on Zod.
 
+### Zod's messages in your words
+
+With Zod 4, `zodErrorMap(application)` is an error map for `z.config({ customError })`: the failures a schema raises by itself (a missing value, a text too short or too long, a number out of range, an e-mail address, a URL, a date) read as the library's `core.validation_errors.*` texts in the active language, and a message a schema carries itself still wins. Register it once, after `createApplication`:
+
+<!-- example: docs/examples/forms/zod.ts -->
+```ts
+// Zod's own messages ("Required", "at least 3 characters") in the application's language and wording.
+import { zodErrorMap } from "@wssto2/vue-core/form";
+import { z } from "zod";
+import { application } from "../app/production";
+
+z.config({ customError: zodErrorMap(application) });
+```
+
+- **Your wording:** every text is looked up as the application's `validation_errors.<key>` first (keys: `required`, `min`, `max`, `min_value`, `max_value`, `email`, `url`, `date`, `datetime`), then the library's `core.validation_errors.<key>`. Define a key in your messages to replace it.
+- **Your own rules:** a `refine` that names its text, `params: { code: "deadline_before_opening" }`, reads `validation_errors.deadline_before_opening` (`code: "required"` is the generated schemas' "zero means missing"). A code without a text, and any issue the map has no sentence for, keeps Zod's own message.
+- **Bounds:** a number bound is written with the application's number format (`9.999.999`); a whole number under 10 000 stays plain, so a year reads `2100`.
+
 ## Form state
 
 <!-- example: docs/examples/forms/form.ts:44-51 -->

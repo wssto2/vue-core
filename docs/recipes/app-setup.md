@@ -272,7 +272,42 @@ Regions and forms word their own failures already (`useResource`, `useLoad`, `us
 
 ## Startup and errors
 
-`mount()` restores the session, loads the essential texts and makes the first navigation before anything renders. If the session or the texts cannot load, a failure view with a retry is mounted instead; `application.state` says which. `onError` receives every error the application caught, tagged by `source`: `vue`, `unhandledrejection`, `window`, `effect`, `messages`, `session`, `router`, `locale`.
+`mount()` restores the session, loads the essential texts and makes the first navigation before anything renders. If the session or the texts cannot load, a failure view with a retry is mounted instead; `application.state` says which. `onError` receives every error the application caught, tagged by `source`: `vue`, `unhandledrejection`, `window`, `effect`, `messages`, `session`, `router`, `locale`, and `handled`: an error your own code caught and the user saw fail, passed to `application.report(error, { detail })` (`useApplication().report` in setup). With `clientErrorReporter` as `onError` it becomes an incident, which a bare `console.error` would not.
+
+## Outside setup
+
+`currentApplication()` is the application `createApplication` made, for code that is not in a component: an `api.ts`, a router guard, a store. `.platform` (the HTTP client, session, access), `.format`, `.router`, `.i18n` and `.report` are on it. Read it when the code runs, not at module load: a module is evaluated before `main.ts` creates the application, so declare a list or a read with `listLoader` / `readRecord` (they read the client at the call) and call `currentApplication()` inside functions. Before one exists it throws an error that says so. The newest application is the current one; `dispose()` releases it.
+
+<!-- example: docs/examples/app/outsideSetup.ts -->
+```ts
+// Code that runs outside a component's setup reaches the application through currentApplication().
+import { currentApplication } from "@wssto2/vue-core/app";
+import { defineCollection, listLoader } from "@wssto2/vue-core/collection";
+import { found, readRecord } from "@wssto2/vue-core/resource";
+
+export interface Dealer {
+  id: number;
+  name: string;
+}
+
+// Declared at module level, before the application exists: the client is read when the call is made.
+export const dealers = defineCollection({ id: "dealers", stateVersion: 1, load: listLoader<Dealer>("/v1/dealers"), key: (dealer) => dealer.id });
+export const dealerRecord = (id: number, context: { signal: AbortSignal }) => readRecord<Dealer | null>(`/v1/dealers/${id}`, context).then(found);
+
+export const archive = (id: number) => currentApplication().platform.http.post(`/v1/dealers/${id}/archive`, {});
+
+// A failure the code caught, and the user saw: a handled error goes to the incidents (and the console), with where it happened.
+export function restoreLayout(): unknown {
+  try {
+    return JSON.parse(localStorage.getItem("layout") ?? "null");
+  } catch (error) {
+    currentApplication().report(error, { detail: "layout-restore" });
+    return null;
+  }
+}
+```
+
+In a unit test of such code, `createTestApplication()` from `@wssto2/vue-core/testing` makes it (see [testing](testing.md)).
 
 `application.dispose()` unmounts and removes every guard, listener, timer and effect; two applications on one page, or one mounted and disposed repeatedly (a test), leave nothing behind.
 
