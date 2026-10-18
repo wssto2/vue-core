@@ -22,6 +22,8 @@ export interface TestSessionOptions<U extends SessionUser = RegisteredUser> {
   root?: boolean;
   navigation?: readonly NavigationNode[];
   expiresAt?: Date | null;
+  /** The person's stored preferences (`usePreferences`). Default: none stored. */
+  preferences?: Readonly<Record<string, unknown>>;
 }
 
 /** What `/auth/me` would say for a user: for `session.establish(...)` mid-test, or an adapter that answers it. */
@@ -36,6 +38,7 @@ export function createTestSession<U extends SessionUser = RegisteredUser>(option
     expiresAt: options.expiresAt ?? null,
     access,
     ...(options.navigation ? { navigation: options.navigation } : {}),
+    ...(options.preferences ? { preferences: options.preferences } : {}),
   };
 }
 
@@ -65,8 +68,8 @@ const noRequests: Transport = async (url, init) => {
  *   platform.access.can("tickets:view"); // true, at once
  */
 export function createTestPlatform<U extends SessionUser = RegisteredUser>(options: TestPlatformOptions<U> = {}): Platform<U> {
-  const { user, permissions, unavailable, root, navigation, expiresAt, transport, config, session, ...rest } = options;
-  const snapshot = user === null ? null : createTestSession<U>({ user, permissions, unavailable, root, navigation, expiresAt });
+  const { user, permissions, unavailable, root, navigation, expiresAt, preferences, transport, config, session, ...rest } = options;
+  const snapshot = user === null ? null : createTestSession<U>({ user, permissions, unavailable, root, navigation, expiresAt, preferences });
   const adapter: SessionAdapter<U> = session ?? { load: async () => snapshot, signOut: async () => undefined };
   const platform = createPlatform<U, RegisteredConfig>({
     ...rest,

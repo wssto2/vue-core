@@ -23,6 +23,11 @@ export interface SessionSnapshot<U extends SessionUser = SessionUser> {
   readonly access: AccessSnapshot;
   /** The menu the server built for this user; absent when the adapter's backend has none. */
   readonly navigation?: readonly NavigationNode[];
+  /**
+   * The person's own settings the server keeps for them (dark mode, tips they closed): a JSON object of the application's shape,
+   * `{}` when nothing is stored, absent when the backend has none. Read and saved with `usePreferences`.
+   */
+  readonly preferences?: Readonly<Record<string, unknown>>;
 }
 
 /**
@@ -51,7 +56,7 @@ export function heldSession<U extends SessionUser>(state: SessionState<U>): Sess
 }
 
 /** The parts of a signed-in session `Session.update` may replace. */
-export type SessionPatch<U extends SessionUser = SessionUser> = Partial<Pick<SessionSnapshot<U>, "user" | "access" | "navigation">>;
+export type SessionPatch<U extends SessionUser = SessionUser> = Partial<Pick<SessionSnapshot<U>, "user" | "access" | "navigation" | "preferences">>;
 
 /** The seam to a backend: how to ask who is signed in and how to end the session. */
 export interface SessionAdapter<U extends SessionUser = SessionUser> {
@@ -227,6 +232,7 @@ export function createSession<U extends SessionUser = SessionUser>(
         user: patch.user ?? current.user,
         access: patch.access ?? current.access,
         ...((patch.navigation ?? current.navigation) && { navigation: patch.navigation ?? current.navigation }),
+        ...((patch.preferences ?? current.preferences) && { preferences: patch.preferences ?? current.preferences }),
       };
     },
     expire() {

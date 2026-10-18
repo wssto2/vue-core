@@ -40,6 +40,8 @@ export { usersRoutes } from "./users/routes";
 export { default as ActionRow } from "./shared/ActionRow.vue";
 export { default as SignInAsButton } from "./SignInAsButton.vue";
 export { isSessionEnded, lockedUntil, returnToOwnAccount, signIn, signInAs } from "./signIn";
+export { usePreferences } from "./usePreferences";
+export type { UsedPreferences } from "./usePreferences";
 export { parseIdentityUser } from "./user";
 export type { IdentityUser } from "./user";
 export { serviceAccountsFeature } from "./serviceaccounts/feature";

@@ -22,7 +22,7 @@ export const parseSessionUser: UserParser<SessionUser> = (raw) => {
 };
 
 /**
- * Reads go-core's session payload `{ user, expires_at?, access, navigation? }` (the answer of `/auth/me`, and of a login).
+ * Reads go-core's session payload `{ user, expires_at?, access, navigation?, preferences? }` (the answer of `/auth/me`, and of a login).
  * Throws an `ApiError` of kind `malformed` naming what is wrong.
  */
 export function parseSessionPayload<U extends SessionUser = SessionUser>(
@@ -57,8 +57,14 @@ export function parseSessionPayload<U extends SessionUser = SessionUser>(
   const access = parseAccessSnapshot(raw.access);
   issues.push(...access.issues);
   const navigation = raw.navigation === undefined || raw.navigation === null ? undefined : parseNavigation(raw.navigation, issues);
+  // The generated session type of go-core's identity module follows once vue-core syncs it (`modules:sync`); the wire already carries it.
+  let preferences: Record<string, unknown> = {};
+  if (raw.preferences !== undefined && raw.preferences !== null) {
+    if (isObject(raw.preferences)) preferences = raw.preferences;
+    else issues.push("preferences: expected an object");
+  }
   if (user === null || issues.length > 0) throw malformed(issues);
-  return { user, expiresAt, access: access.snapshot, ...(impersonator && { impersonator }), ...(navigation && { navigation }) };
+  return { user, expiresAt, access: access.snapshot, preferences, ...(impersonator && { impersonator }), ...(navigation && { navigation }) };
 }
 
 const malformed = (issues: readonly string[]) =>

@@ -11,6 +11,8 @@ export { httpSessionAdapter, parseSessionPayload } from "./httpSession";
 export type { HttpSessionOptions, UserParser } from "./httpSession";
 export { createPlatform, installPlatform, platformKey, usePlatform } from "./platform";
 export type { Platform, PlatformOptions } from "./platform";
+export { mergePatch, preferencesOf } from "./preferences";
+export type { Preferences, PreferencesPatch } from "./preferences";
 export { useSessionUser } from "./sessionUser";
 export { beforeSignOutTimeout, createSession, heldSession } from "./session";
 export type { BeforeSignOutHook, Session, SessionAdapter, SessionEnd, SessionImpersonator, SessionOptions, SessionPatch, SessionSnapshot, SessionState, SessionUser } from "./session";
