@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { ticketRoutes } from "../tickets/routes";
 import type { Ticket } from "../tickets/api";
 
-// Where the preference lives is the application's: here a ref, usually a field of the session user saved on the server.
+// `darkMode()` alone keeps the choice in the person's stored preferences; `dark` and `set` keep it where you like: here a ref.
 const dark = ref(false);
 
 /** The shell's opt-in features: put them in `createApplication({ features })` beside your own. */

@@ -61,7 +61,7 @@ To switch accents at run time (per tenant, per user), scope the same variables u
 
 ## Dark mode
 
-Dark mode is the `dark` class on `<html>`: `document.documentElement.classList.toggle("dark", on)`. The library decides nothing (follow the system, a stored choice, a user setting are yours); the account-menu switch in the [shell recipe](shell.md) is one way. The page background and text colors come from the `body` classes you set (`bg-surface-page text-content`).
+Dark mode is the `dark` class on `<html>`: `document.documentElement.classList.toggle("dark", on)`. The library decides nothing by itself (follow the system, a stored choice, a user setting are yours); `darkMode()` in the [shell recipe](shell.md) is one way, and keeps the choice in the person's stored [preferences](preferences.md). The page background and text colors come from the `body` classes you set (`bg-surface-page text-content`).
 
 ## Use the tokens in your own markup
 

@@ -77,3 +77,20 @@
 :where(.skeleton-bar) {
   height: 1rem;
 }
+
+/* The element a Tip points at breathes while the tip is open. */
+@keyframes app-tip-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--app-tint) 45%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--app-tint) 0%, transparent); }
+}
+
+[data-tip-anchor] {
+  animation: app-tip-glow 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tip-anchor] {
+    animation: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-tint) 45%, transparent);
+  }
+}
