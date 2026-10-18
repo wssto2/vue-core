@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.1 — 2026-10-18
+
+go-core `v1.16.1`: a type the wire writes as text is generated as a string.
+
+### Fixed
+- **modules:** regenerated from go-core v1.16.1. In the identity entities `ClauseInfo.qualifier` and `PermissionAccess.qualifier` are `Qualifier` (`"own" | "own_location" | "all"`, exported from `modules/identity/entities`); they were `number`, while the wire sends the text.
+- **playwright:** `SessionExtra.access` and `accessOf` use the generated `MyAccess`; the `WireAccess` workaround for the number-typed qualifier is gone.
+
 ## 0.12.0 — 2026-10-18
 
 The developer kit an application copied: one `vue-core` command for the ratcheted lint, the feature-folder architecture rules, the feature generator and the e2e timings, the ESLint config, and Playwright mocks of the library's own endpoints. Nothing existing changes. go-core is unchanged (`v1.15.0`; v1.16.0 changes no wire type).
