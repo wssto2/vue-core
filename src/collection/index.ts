@@ -3,7 +3,7 @@ export type { CollectionDefaults, CollectionDefinition, CollectionDefinitionInpu
 export { useCollection } from "./useCollection";
 export type { Collection, CollectionDisplay, LinkedQuery, SavedViewsHandle, UseCollectionOptions } from "./useCollection";
 export type { CollectionLoader, ListMeta, ListPage, CollectionQuery, CollectionStateSource, LoadContext, SortDirection } from "./types";
-export { httpList, listParams, readListPage } from "./http";
+export { httpList, listLoader, listParams, readListPage, routeListLoader } from "./http";
 export { LIST_CONTEXT_PARAM } from "./location";
 export type { CollectionColumns, Column, ColumnKey, ColumnKind, ColumnValue, MobileRole, RowAction, SlotKey, TableColumns } from "./columns";
 export type { FilterDescriptor, FilterOption, ViewDescriptor } from "./filters";

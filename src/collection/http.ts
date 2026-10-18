@@ -1,4 +1,5 @@
-import type { ApiResult, HttpClient, ListResult, PageMeta, QueryValue } from "../client";
+import { currentApplication } from "../app/current";
+import type { ApiResult, ApiRoute, HttpClient, ListResult, PageMeta, QueryValue } from "../client";
 import type { CollectionLoader, ListMeta, ListPage, CollectionQuery } from "./types";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -79,5 +80,33 @@ export function httpList<Row, Sort extends string = string, Filter extends strin
   return async (query, { signal }) => {
     const result = await http.get<unknown>(path, { query: options.params ? options.params(query) : listParams(query), signal });
     return readListPage<Row, Meta>(result, query);
+  };
+}
+
+/**
+ * `httpList` over the current application's client, read when the list loads: a definition declares it at module level, before the
+ * application exists (`createApplication` makes it later; `currentApplication`).
+ *
+ *   export const tickets = defineCollection({ id: "tickets", stateVersion: 1, load: listLoader<Ticket>("/v1/tickets"), key: (row) => row.id });
+ */
+export function listLoader<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Meta extends ListMeta = ListMeta>(
+  path: string,
+  options?: { params?: (query: CollectionQuery<Sort, Filter, View>) => Record<string, QueryValue> },
+): CollectionLoader<Row, Sort, Filter, View, Meta> {
+  return (query, context) => httpList<Row, Sort, Filter, View, Meta>(currentApplication().platform.http, path, options)(query, context);
+}
+
+/**
+ * `listLoader` over a typed route (`route.Page` in Go): the route asked through the current application's client with the collection's
+ * query. A route with path parameters takes them as `pathParams`. The list's filters and paging are the route's free-form query
+ * parameters. `Meta` is what the list's `meta` holds besides the library's own keys, so a page reads it without a cast.
+ */
+export function routeListLoader<Row, Sort extends string = string, Filter extends string = string, View extends string = string, Meta extends ListMeta = ListMeta>(
+  route: ApiRoute<object, readonly Row[]>,
+  pathParams: Readonly<Record<string, string | number>> = {},
+): CollectionLoader<Row, Sort, Filter, View, Meta> {
+  return async (query, { signal }) => {
+    const input: Record<string, unknown> = { ...pathParams, ...listParams(query) };
+    return readListPage<Row, Meta>(await currentApplication().platform.http.request(route, input, { signal }), query);
   };
 }

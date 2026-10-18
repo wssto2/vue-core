@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { createHttpClient } from "../client";
 import { route, type ListResult, type PageMeta } from "../client";
 import { jsonResponse, scriptedTransport } from "../testing";
-import { httpList, listParams, readListPage } from "./http";
+import { afterEach } from "vitest";
+import { createTestApplication, createTestPlatform } from "../testing";
+import { httpList, listLoader, listParams, readListPage, routeListLoader } from "./http";
 import { defineCollection } from "./definition";
 
 const query = { page: 2, pageSize: 10, sort: "title", direction: "desc" as const, search: "golf", view: "mine", filters: { status: "open", page: "evil" } };
@@ -78,5 +80,31 @@ describe("listParams and httpList", () => {
     expect(calls[0]!.url).toBe("/api/tickets?page=1&per_page=25&search=a+b");
     expect(calls[0]!.init.signal).toBe(controller.signal);
     expect(loaded.rows).toEqual([{ id: 1 }]);
+  });
+});
+
+describe("listLoader and routeListLoader on the current application", () => {
+  let application: { dispose(): void } | undefined;
+  afterEach(() => application?.dispose());
+  const meta = { total: 1, page: 1, per_page: 25, last_page: 1, from: 1, to: 1 };
+
+  it("listLoader reads the client when the list loads, not when it is declared", async () => {
+    const load = listLoader<{ id: number }>("/tickets"); // declared before any application exists
+    const { transport, calls } = scriptedTransport(jsonResponse(200, { success: true, data: [{ id: 1 }], meta }));
+    application = createTestApplication({ platform: createTestPlatform({ transport }) });
+    const controller = new AbortController();
+    const page = await load({ ...defineCollection({ id: "t", stateVersion: 1, load, key: (row: { id: number }) => row.id }).defaults, search: "a" }, { signal: controller.signal });
+    expect(calls[0]!.url).toBe("/tickets?page=1&per_page=25&search=a");
+    expect(page.rows).toEqual([{ id: 1 }]);
+  });
+
+  it("routeListLoader asks a typed route with the path parameters and the collection's query", async () => {
+    const list = route<{ id: number; page: number }, { id: number }[], PageMeta>("GET", "/v1/dealers/:id/cars");
+    const { transport, calls } = scriptedTransport(jsonResponse(200, { success: true, data: [{ id: 5 }], meta }));
+    application = createTestApplication({ platform: createTestPlatform({ transport }) });
+    const load = routeListLoader(list, { id: 3 });
+    const page = await load({ page: 1, pageSize: 25, sort: null, direction: "asc", search: "", view: null, filters: {} }, { signal: new AbortController().signal });
+    expect(calls[0]!.url).toContain("/v1/dealers/3/cars");
+    expect(page.rows).toEqual([{ id: 5 }]);
   });
 });
