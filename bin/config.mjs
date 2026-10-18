@@ -8,7 +8,19 @@ export const CONFIG_FILE = "vue-core.config.mjs";
 
 /** The top-level sections, one per command, with their defaults; a command that has defaults adds them here. */
 export const DEFAULTS = {
-  lint: {},
+  lint: {
+    baselines: "scripts/lint-baselines.json",
+    generated: ["generated"],
+    patternCounters: [],
+    // What the messages tell the developer to run; an application points them at its own npm scripts.
+    commands: {
+      update: "vue-core lint --update",
+      typedUpdate: "LINT_TYPED=1 vue-core lint --update",
+      typedReport: "LINT_TYPED=1 vue-core lint --report",
+      typedReportAll: "LINT_TYPED=1 vue-core lint --report --all",
+    },
+    policy: "the project's lint policy",
+  },
   architecture: {
     featuresDir: "features",
     alias: "@/",

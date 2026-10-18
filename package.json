@@ -142,6 +142,10 @@
       "types": "./dist/testing/index.d.ts",
       "import": "./dist/testing/index.js"
     },
+    "./eslint": {
+      "types": "./dist/eslint/index.d.ts",
+      "import": "./dist/eslint/index.js"
+    },
     "./config": {
       "types": "./dist/config/index.d.ts",
       "import": "./dist/config/index.js"

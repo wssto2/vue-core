@@ -339,6 +339,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Users and profile](docs/recipes/users.md): the users list and a person's record, "my profile" with the e-mail change by code, opting out, extra sections, refusals
 - [Service accounts](docs/recipes/service-accounts.md): the list and an account's record, its roles, API keys shown once, tenants, linking
 - [Roles and access](docs/recipes/access.md): go-core's access module: the roles list and editor from your catalogue, a person's roles and effective access, where a role applies, the refusals
+- [Lint](docs/recipes/lint.md): `vue-core lint` and `@wssto2/vue-core/eslint`: ceilings per file and rule that only go down, the typed run on changed files
 - [Notifications](docs/recipes/notifications.md): the bell, the inbox and the live stream, categories, the failed-events page, trying it against go-core's dev server
 - [Incidents](docs/recipes/incidents.md): go-core's incident module: the list and an incident, "Report a bug", the browser's errors reported (what is and is not sent), source maps
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues

@@ -18,7 +18,7 @@ describe("loadConfig", () => {
   it("without a file gives every section's defaults and the cwd as root", async () => {
     const dir = folder();
     const loaded = await loadConfig({ cwd: dir });
-    expect(loaded).toEqual({ path: null, root: dir, config: { lint: {}, architecture: DEFAULTS.architecture, generator: DEFAULTS.generator, e2eTimings: DEFAULTS.e2eTimings } });
+    expect(loaded).toEqual({ path: null, root: dir, config: { lint: DEFAULTS.lint, architecture: DEFAULTS.architecture, generator: DEFAULTS.generator, e2eTimings: DEFAULTS.e2eTimings } });
   });
 
   it("finds the file from a nested folder and fills the sections it leaves out", async () => {
@@ -29,7 +29,7 @@ describe("loadConfig", () => {
     expect(findConfig(nested)).toBe(file);
     const loaded = await loadConfig({ cwd: nested });
     expect(loaded.root).toBe(dir);
-    expect(loaded.config).toEqual({ lint: { files: ["src"] }, architecture: DEFAULTS.architecture, generator: DEFAULTS.generator, e2eTimings: DEFAULTS.e2eTimings });
+    expect(loaded.config).toEqual({ lint: { ...DEFAULTS.lint, files: ["src"] }, architecture: DEFAULTS.architecture, generator: DEFAULTS.generator, e2eTimings: DEFAULTS.e2eTimings });
   });
 
   it("--config names the file, relative to the cwd", async () => {
