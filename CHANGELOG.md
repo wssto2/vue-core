@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.12.0 — 2026-10-18
+
+The developer kit an application copied: one `vue-core` command for the ratcheted lint, the feature-folder architecture rules, the feature generator and the e2e timings, the ESLint config, and Playwright mocks of the library's own endpoints. Nothing existing changes. go-core is unchanged (`v1.15.0`; v1.16.0 changes no wire type).
+
+### New
+- **bin:** the `vue-core` command, `vue-core [--config <path>] <command>`: `lint`, `check-architecture`, `feature`, `e2e-timings`, all reading one `vue-core.config.mjs` (found from the current folder upwards). `@wssto2/vue-core/config` exports `defineConfig` and the config types.
+- **lint:** `vue-core lint` runs ESLint with per-file, per-rule ceilings that only go down (`--fix`, `--update`, `--all`, `--report`, `--rule=`, `--file=`, `--summary`; `LINT_TYPED=1` lints the changed files type-aware). The `lint` section sets `baselines`, `generated`, `patternCounters`, `commands` and `policy`.
+- **eslint:** `@wssto2/vue-core/eslint`: `vueCoreConfig({ typed, tsconfigRootDir, ignores, rules })`, the generic flat config, and `TYPED_RULES` / `TYPED_RULE_SET`, the one list of type-aware rules.
+- **architecture:** `vue-core check-architecture`: outside code reaches a feature only through `index.ts` / `routes.ts`, no feature imports another, the shared layer imports no feature, generated code only through its subpaths, HTTP only in `api.ts`, one `ApiError`, single-word folder names, `views/` needs `index.ts` + `routes.ts`. Opt-in packs `design-values` and `presentation`, allowlists that only shrink, and an application's own rules (`architecture.rules`).
+- **feature:** `vue-core feature <a/b> --entity <Name>` scaffolds a CRUD feature folder on go-core's route table. The default template uses vue-core subpaths only and creates its own modal; `generator.template` and `generator.out` configure it.
+- **e2e-timings:** `vue-core e2e-timings [--report] [--top]`: the slowest files and tests of a Playwright JSON report.
+- **playwright:** `@wssto2/vue-core/playwright`: Playwright mocks for the library's own endpoints (the go-core envelope, `/auth/me`, access, notifications, profile, users and service accounts), typed from the go-core module types. See docs/recipes/e2e.md.
+
+### Changed
+- `eslint`, `@eslint/js`, `eslint-plugin-vue`, `typescript-eslint`, `vue-eslint-parser`, `globals` and `@playwright/test` are optional peer dependencies: an application that does not lint or test with Playwright installs nothing.
+- The library's own `eslint.config.js` uses `vueCoreConfig`.
+
 ## 0.11.0 — 2026-10-17
 
 The five gaps an application met adopting 0.10.0's users screens and quick search. go-core is unchanged (`v1.15.0`).
