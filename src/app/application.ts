@@ -11,7 +11,7 @@ import {
   type RouterScrollBehavior,
 } from "vue-router";
 import { installLeaveGuard } from "../form/leaveGuard";
-import { createFormatting, formattingKey, installFormatting, type Formatters, type Formatting } from "../format";
+import { createFormatting, formattingKey, installFormatting, type Formatters, type Formatting, type FormattingSettings } from "../format";
 import { coreMessages, createMessageRuntime, type MessageNamespace } from "../i18n";
 import { iconSetKey } from "../icon/environment";
 import { installIcons, type IconSet } from "../icon";
@@ -103,8 +103,11 @@ export interface ApplicationOptions {
   router?: ApplicationRouterOptions;
   i18n?: ApplicationI18nOptions;
   locale?: ApplicationLocaleOptions;
-  /** Replace any of the `Intl` formatters (ARV shows `DD.MM.YYYY.`), and the symbol shown after an amount without an ISO currency ("€", "KM"). */
-  formatting?: Partial<Formatters> & { currencySymbol?: string };
+  /**
+   * How dates and numbers are written: the `Intl` formatters, any of them replaced, and the `FormattingSettings` (the `intlLocale` map, a numeric
+   * `datePattern` per language, `numberSymbols`, `emptyNumber`, the `currencySymbol` shown after an amount without an ISO currency).
+   */
+  formatting?: Partial<Formatters> & FormattingSettings;
   /** Message namespaces the application or its shell owns itself, outside any feature. */
   messages?: readonly MessageNamespace[];
   /** The application's icons (`installIcons`): one set, or several partial ones (a feature's own) that are merged. */
@@ -230,8 +233,17 @@ export function createApplication(options: ApplicationOptions): Application {
   for (const [locale, messages] of Object.entries(coreMessages)) composer.mergeLocaleMessage(locale, messages);
   for (const [locale, messages] of Object.entries(options.i18n?.messages ?? {})) composer.mergeLocaleMessage(locale, messages as Record<string, unknown>);
 
-  const { currencySymbol, ...formatters } = options.formatting ?? {};
-  const formatting: Formatting = createFormatting({ locale: () => composer.locale.value, formatters, currencySymbol });
+  const { currencySymbol, intlLocale, datePattern, numberSymbols, emptyNumber, ...formatters } = options.formatting ?? {};
+  const formatting: Formatting = createFormatting({
+    locale: () => composer.locale.value,
+    formatters,
+    currencySymbol,
+    intlLocale,
+    datePattern,
+    numberSymbols,
+    emptyNumber,
+    translate: (key) => composer.t(key),
+  });
 
   const namespaces = [...features.flatMap((feature) => feature.messages), ...(options.messages ?? [])];
   const report = (value: Omit<ApplicationErrorReport, "route">) =>

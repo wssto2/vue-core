@@ -3,5 +3,8 @@
 // Add a row here only when a second locale has the same gap.
 const INTL_LOCALE: Readonly<Record<string, string>> = { bs: "sr-Latn-BA" };
 
-/** The locale to give `Intl` for the app's active one. Not for a language's own name: `DisplayNames` knows `bs` ("bosanski"). */
-export const intlLocale = (locale: string): string => INTL_LOCALE[locale] ?? locale;
+/**
+ * The locale to give `Intl` for the app's active one; `overrides` is the application's own map (`en` → `en-GB`) and wins over the library's.
+ * Not for a language's own name: `DisplayNames` knows `bs` ("bosanski").
+ */
+export const intlLocale = (locale: string, overrides: Readonly<Record<string, string>> = {}): string => overrides[locale] ?? INTL_LOCALE[locale] ?? locale;

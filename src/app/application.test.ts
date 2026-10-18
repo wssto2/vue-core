@@ -212,6 +212,16 @@ describe("mount", () => {
     expect(target.textContent).toBe("KM");
   });
 
+  it("hands the formatting settings and the library's own words to the formatting", async () => {
+    const { platform } = fakeBackend(signedIn(1));
+    const { useFormat } = await import("../format");
+    const probe = defineComponent({ setup() { const format = useFormat(); return () => h("p", `${format.date(new Date(2026, 8, 30))}|${format.day(new Date())}|${format.number(NaN)}`); } });
+    const feature = defineFeature({ id: "f", routes: [{ name: "f", path: "/f", component: probe }] });
+    const formatting = { datePattern: { hr: "DD.MM.YYYY.", en: "DD/MM/YYYY" }, emptyNumber: "0" };
+    const target = await start(createApplication(options(platform, [loginFeature, feature], "/f", { formatting })));
+    expect(target.textContent).toMatch(/^(30\.09\.2026\.|30\/09\/2026)\|(Danas|Today)\|0$/);
+  });
+
   it("mounting twice, or after dispose, is an error", async () => {
     const { platform } = fakeBackend(signedIn(1));
     const application = createApplication(options(platform, [loginFeature, ticketsFeature()], "/tickets"));
