@@ -33,6 +33,7 @@ const entries: Record<string, string> = {
   "push-worker/index": "src/push-worker/index.ts",
   "pwa/index": "src/pwa/index.ts",
   "testing/index": "src/testing/index.ts",
+  "config/index": "src/config/index.ts",
 };
 
 const source = fileURLToPath(new URL("src", import.meta.url));
@@ -57,7 +58,7 @@ export default defineConfig({
     // Room for the 5 s waits of vitest.setup.ts inside one test.
     testTimeout: 15_000,
     // The documentation's examples are tested too: they import the library by its public name, so that name points at the source here.
-    include: ["src/**/*.test.ts", "docs/examples/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "docs/examples/**/*.test.ts", "bin/**/*.test.mjs"],
     alias: [
       { find: /^@wssto2\/vue-core$/, replacement: `${source}/index.ts` },
       { find: /^@wssto2\/vue-core\/([\w-]+)$/, replacement: `${source}/$1/index.ts` },
