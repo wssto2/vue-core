@@ -44,6 +44,42 @@ describe("clientErrorReporter: what is reported", () => {
     expect(await sent()).toHaveLength(1);
   });
 
+  it("reports a handled error, naming it in the message because the input has no field for the source", async () => {
+    const { report, sent } = setup();
+    report(aReport(errorWith("save failed"), { source: "handled", detail: "vehicle-location-edit" }));
+    const [call] = await sent();
+    expect(JSON.parse(String(call?.init.body)).message).toBe("[handled: vehicle-location-edit] save failed");
+  });
+
+  it("names a handled error without a detail by its source alone, and keeps the 2000 characters bound", async () => {
+    const { report, sent } = setup();
+    report(aReport(errorWith("x".repeat(3000)), { source: "handled" }));
+    const [call] = await sent();
+    const message = JSON.parse(String(call?.init.body)).message as string;
+    expect(message.startsWith("[handled] xxx")).toBe(true);
+    expect(message).toHaveLength(2000);
+  });
+
+  it("does not send a handled ApiError, a handled string, or one from another origin or while signed out", async () => {
+    const { report, sent } = setup();
+    const api = new ApiError({ kind: "server", message: "failed" });
+    api.stack = `ApiError: failed\n${frame()}`;
+    report(aReport(api, { source: "handled" }));
+    report(aReport("a string", { source: "handled" }));
+    report(aReport(errorWith("elsewhere", "Error: elsewhere\n    at f (https://other.test/a.js:1:1)"), { source: "handled" }));
+    expect(await sent()).toHaveLength(0);
+    const signedOut = setup({ status: "none" });
+    signedOut.report(aReport(errorWith("boom"), { source: "handled" }));
+    expect(await signedOut.sent()).toHaveLength(0);
+  });
+
+  it("counts a handled error once per fingerprint, like the others", async () => {
+    const { report, sent } = setup();
+    report(aReport(errorWith("same"), { source: "handled", detail: "a" }));
+    report(aReport(errorWith("same"), { source: "handled", detail: "a" }));
+    expect(await sent()).toHaveLength(1);
+  });
+
   it.each(["effect", "messages", "session", "router", "locale"] as const)("does not report a %s failure", async (source) => {
     const { report, sent } = setup();
     report(aReport(errorWith("boom"), { source }));

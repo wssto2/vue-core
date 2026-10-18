@@ -26,6 +26,7 @@ import NoAccess from "../router/NoAccess.vue";
 import { createShellContributions, shellContributionsKey, type OwnedContribution } from "./contributions";
 import { applicationKey, type ApplicationEnvironment, type ApplicationState } from "./environment";
 import { appErrorDescriberKey, appFieldErrorDescriberKey, type AppErrorDescriber, type AppFieldErrorDescriber } from "../i18n/describeError";
+import { bindApplication } from "./current";
 import { createEffectRunner, type OwnedEffect } from "./effects";
 import type { Feature, ShellSlot } from "./feature";
 import StartupFailure from "./StartupFailure.vue";
@@ -41,7 +42,8 @@ export interface ShellDefinition {
 
 /** Where an error the application caught came from. */
 export interface ApplicationErrorReport {
-  readonly source: "vue" | "unhandledrejection" | "window" | "effect" | "messages" | "session" | "router" | "locale";
+  /** `handled`: an error the application's own code caught and showed the user (`report`), not one that escaped. */
+  readonly source: "vue" | "unhandledrejection" | "window" | "effect" | "messages" | "session" | "router" | "locale" | "handled";
   readonly error: unknown;
   /** The route the user was on, when there was one. */
   readonly route: string | null;
@@ -137,12 +139,18 @@ export interface ApplicationOptions {
 export interface Application {
   /** The Vue app, for the few things that need it (a plugin, a test). */
   readonly app: App;
+  /** The app-scoped services, as `createApplication` was given them: `currentApplication().platform.http` outside setup. */
+  readonly platform: Platform;
+  /** The application's formatting (`useFormat()` in setup): dates, numbers and money in the active locale. */
+  readonly format: Formatting;
   readonly router: Router;
   /** The vue-i18n instance of this application. */
   readonly i18n: ApplicationI18n;
   readonly state: ApplicationEnvironment["state"];
   readonly locale: ApplicationEnvironment["locale"];
   setLocale: ApplicationEnvironment["setLocale"];
+  /** Reports an error the code caught and the user saw fail (`ApplicationEnvironment.report`), through `onError`. */
+  report: ApplicationEnvironment["report"];
   /**
    * Starts the application and mounts it: restores the session, loads the essential texts, runs the
    * first navigation, then renders. A failure of the session or the texts mounts the failure view
@@ -248,6 +256,7 @@ export function createApplication(options: ApplicationOptions): Application {
   const namespaces = [...features.flatMap((feature) => feature.messages), ...(options.messages ?? [])];
   const report = (value: Omit<ApplicationErrorReport, "route">) =>
     (options.onError ?? defaultOnError)({ ...value, route: router.currentRoute.value.matched.length > 0 ? router.currentRoute.value.fullPath : null });
+  const reportHandled: ApplicationEnvironment["report"] = (error, reportOptions) => report({ source: "handled", error, detail: reportOptions?.detail });
   const messages = createMessageRuntime({
     target: composer,
     namespaces,
@@ -309,6 +318,7 @@ export function createApplication(options: ApplicationOptions): Application {
       return committed;
     },
     retry: () => retry(),
+    report: reportHandled,
   };
 
   const owned: { contributions: OwnedContribution[]; effects: OwnedEffect[] } = {
@@ -483,13 +493,16 @@ export function createApplication(options: ApplicationOptions): Application {
     await start();
   }
 
-  return {
+  const application: Application = {
     app,
+    platform,
+    format: formatting,
     router,
     i18n,
     state,
     locale: environment.locale,
     setLocale: environment.setLocale,
+    report: reportHandled,
 
     async mount(target) {
       if (disposed) throw new Error("This application was disposed; create a new one with createApplication().");
@@ -507,6 +520,7 @@ export function createApplication(options: ApplicationOptions): Application {
     dispose() {
       if (disposed) return;
       disposed = true;
+      unbind();
       effects.dispose();
       messages.dispose();
       if (rendered) app.unmount();
@@ -514,6 +528,8 @@ export function createApplication(options: ApplicationOptions): Application {
       router.options.history.destroy(); // listeners of a history whose router was never installed
     },
   };
+  const unbind = bindApplication(application);
+  return application;
 }
 
 /** What `onError` does without an application's own: one console line. Exported for handlers that add to it (`clientErrorReporter`); not part of the public API. */

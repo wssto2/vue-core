@@ -25,6 +25,12 @@ export interface ApplicationEnvironment {
   setLocale(locale: string): Promise<boolean>;
   /** Tries the start again after a failed one. */
   retry(): Promise<void>;
+  /**
+   * Reports an error the code caught and the user saw fail (a save that did not go through, a panel that could not load): it goes
+   * through the application's `onError` as `source: "handled"` with the page the user was on, and `clientErrorReporter` sends it to the
+   * incidents. `detail` says where ("vehicle-location-edit"). Not for an error the user is expected to fix (a validation message).
+   */
+  report(error: unknown, options?: { readonly detail?: string }): void;
 }
 
 export const [applicationKey, useApplication] = defineFeatureContext<ApplicationEnvironment>("vue-core.application");

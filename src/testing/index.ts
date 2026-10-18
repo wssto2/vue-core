@@ -4,7 +4,7 @@
 // @vue/test-utils). Import it from test files only.
 export { deferred, settle } from "./async";
 export type { Deferred } from "./async";
-export { createTestApp, stubRoutes, withSetup } from "./app";
+export { createTestApp, createTestApplication, stubRoutes, withSetup } from "./app";
 export type { TestApp, TestAppOptions } from "./app";
 export { fakeLoader, listPage } from "./collection";
 export { testFormatting } from "./format";

@@ -25,7 +25,7 @@ const REQUEST_ID_MAX = 100;
 /** The most distinct errors one page session reports: a loop that throws something new each time stops here. */
 export const MAX_REPORTS_PER_SESSION = 20;
 
-const SOURCES: ReadonlySet<ApplicationErrorReport["source"]> = new Set(["vue", "unhandledrejection", "window"]);
+const SOURCES: ReadonlySet<ApplicationErrorReport["source"]> = new Set(["vue", "unhandledrejection", "window", "handled"]);
 const cut = (text: string, max: number) => text.slice(0, max);
 // `Script error.` is all a browser tells about a script of another origin.
 const isOpaque = (message: string) => /^script error\.?$/i.test(message.trim());
@@ -39,7 +39,8 @@ const topFrame = (stack: string) => stack.split("\n").find((line) => /^\s*at\s|@
  *
  *   createApplication({ platform, features, onError: clientErrorReporter({ platform, appVersion: __APP_VERSION__ }) })
  *
- * Reported: component errors, unhandled rejections and window errors that carry a real `Error` whose stack has a frame of the
+ * Reported: component errors, unhandled rejections, window errors and errors the code handled itself (`report` of the application, as
+ * `[handled: detail] message`) that carry a real `Error` whose stack has a frame of the
  * application's own origin. Not reported: failed requests (`ApiError`, of any kind: the server captures its own 5xx),
  * `Script error.`, errors of extensions and other origins, failures of effects, loads and the router, and anything while nobody
  * is signed in. Each error (message plus top frame) goes once per page session, at most 20 distinct ones. A report sends the message,
@@ -62,8 +63,10 @@ export function clientErrorReporter(options: ClientErrorReporterOptions): (repor
     if (seen.has(fingerprint) || seen.size >= MAX_REPORTS_PER_SESSION) return;
     seen.add(fingerprint);
 
+    // The input has no field for the source or the detail (go-core's `ClientErrorInput`): a handled error says so at the head of its message.
+    const heading = report.source === "handled" ? `[handled${report.detail ? `: ${report.detail}` : ""}] ` : "";
     const input: ClientErrorInput = {
-      message: cut(error.message, MESSAGE_MAX),
+      message: cut(heading + error.message, MESSAGE_MAX),
       stack: cut(stack, STACK_MAX),
       route: cut((report.route ?? "").split(/[?#]/)[0] ?? "", ROUTE_MAX),
       browser: cut(globalThis.navigator?.userAgent ?? "", BROWSER_MAX),

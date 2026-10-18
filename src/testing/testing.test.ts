@@ -3,11 +3,13 @@ import { afterEach, describe, expect, it } from "vitest";
 import { defineComponent, h, inject, onScopeDispose, ref, watchEffect, type App } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { currentApplication } from "../app";
 import { ApiError } from "../client";
 import { useFormat } from "../format";
 import { usePlatform } from "../platform";
 import {
   createTestApp,
+  createTestApplication,
   createTestI18n,
   createTestPlatform,
   createTestSession,
@@ -310,5 +312,16 @@ describe("mockMedia", () => {
     } finally {
       media.restore();
     }
+  });
+});
+
+describe("createTestApplication", () => {
+  afterEach(() => currentApplication().dispose());
+
+  it("is what currentApplication() returns, over the platform it was given, without a mount", async () => {
+    const { transport } = scriptedTransport(jsonResponse(200, { id: 7 }));
+    const application = createTestApplication({ platform: createTestPlatform({ transport }) });
+    expect(currentApplication()).toBe(application);
+    expect((await currentApplication().platform.http.get<{ id: number }>("/v1/things/7")).data).toEqual({ id: 7 });
   });
 });

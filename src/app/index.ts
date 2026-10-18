@@ -9,6 +9,7 @@ export type {
   ApplicationRouterOptions,
   ShellDefinition,
 } from "./application";
+export { currentApplication } from "./current";
 export { ShellOutlet } from "./contributions";
 export { applicationKey, useApplication } from "./environment";
 export type { ApplicationEnvironment, ApplicationState } from "./environment";

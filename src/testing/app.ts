@@ -1,6 +1,7 @@
 /* eslint-disable vue/one-component-per-file -- the helpers are small stand-in components */
 import { createApp, defineComponent, h, type App, type Plugin } from "vue";
 import { createMemoryHistory, createRouter, RouterView, type RouteRecordRaw, type Router } from "vue-router";
+import { createApplication, type Application, type ApplicationOptions } from "../app";
 import { installPlatform, type Platform } from "../platform";
 import { createTestI18n, type TestMessages } from "./i18n";
 import { testFormatting } from "./format";
@@ -96,4 +97,17 @@ export function withSetup<T>(setup: () => T, environment: { readonly plugins: re
   for (const plugin of environment.plugins) app.use(plugin);
   app.mount(document.createElement("div"));
   return { result, app, unmount: () => app.unmount() };
+}
+
+/**
+ * A real application, never mounted, as the stand-in for `currentApplication()` in a unit test of code outside setup (an `api.ts`, a
+ * router guard): `createApplication` over a test platform (a signed-in user holding nothing; pass `platform` for your own), a memory
+ * history and no features. It is the current application until you `dispose()` it: do that after each test.
+ *
+ *   let application: Application;
+ *   beforeEach(() => (application = createTestApplication({ platform: createTestPlatform({ transport }) })));
+ *   afterEach(() => application.dispose());
+ */
+export function createTestApplication(extra: Partial<ApplicationOptions> = {}): Application {
+  return createApplication({ platform: createTestPlatform(), features: [], router: { history: createMemoryHistory() }, i18n: { missingWarn: false }, ...extra });
 }
