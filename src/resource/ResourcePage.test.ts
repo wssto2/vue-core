@@ -6,6 +6,7 @@ import { useShortcutRegistry } from "../button";
 import { ApiError } from "../client";
 import { RecordHeader } from "../page";
 import { deferred } from "../platform/testing";
+import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
 import { mockMedia } from "../testing/media";
 import type { RecordListContext } from "./listContext";
@@ -72,7 +73,7 @@ async function openPage(path: string, options: PageOptions) {
     ],
   });
   await router.push(path);
-  const view = render(defineComponent({ render: () => h(RouterView) }), { global: { plugins: [router, i18n] }, container: document.body.appendChild(document.createElement("div")) });
+  const view = render(defineComponent({ render: () => h(RouterView) }), { global: { plugins: [router, i18n, testFormatting(i18n)] }, container: document.body.appendChild(document.createElement("div")) });
   return { ...view, router };
 }
 

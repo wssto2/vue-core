@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { useFormat } from "../format";
 import { controlWidth, type ControlWidth } from "../controls";
 import { useControlSurface } from "../form/control";
 import Field from "../form/Field.vue";
@@ -41,7 +42,8 @@ defineSlots<{
   actions?: (scope: { number: string; formatted: string }) => unknown;
 }>();
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const format = useFormat();
 const defaults = inject(phoneDefaultsKey, {});
 const inRow = !!useFormGroup();
 const surface = useControlSurface("text", () => (props.error || problem.value ? "error" : props.disabled ? "locked" : "rest"));
@@ -123,7 +125,7 @@ const problem = computed(() => (left.value && model.value !== "" ? phoneProblem(
 const message = computed(() => {
   const found = problem.value;
   if (!found) return undefined;
-  return found.country ? t(`core.form.phone.${found.kind}`, { country: countryName(found.country, locale.value) }) : t("core.form.phone.invalid_any");
+  return found.country ? t(`core.form.phone.${found.kind}`, { country: countryName(found.country, format.intlLocale) }) : t("core.form.phone.invalid_any");
 });
 const kind = computed(() => (model.value !== "" && !problem.value ? phoneKind(model.value) : undefined));
 const formatted = computed(() => formatInternational(model.value));

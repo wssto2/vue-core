@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { defineComponent, h } from "vue";
 import { createMemoryHistory, createRouter, RouterView, useRoute } from "vue-router";
 import { ResourcePage, useRouteResource } from "../resource";
+import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
 import { mockMedia } from "../testing/media";
 import { defineCollection } from "./definition";
@@ -42,7 +43,8 @@ async function openRecord(id: number) {
     ],
   });
   await router.push(`/records/${id}?from=${from}`);
-  render(defineComponent({ render: () => h(RouterView) }), { global: { plugins: [router, createTestI18n()] }, container: document.body.appendChild(document.createElement("div")) });
+  const i18n = createTestI18n();
+  render(defineComponent({ render: () => h(RouterView) }), { global: { plugins: [router, i18n, testFormatting(i18n)] }, container: document.body.appendChild(document.createElement("div")) });
   await flush();
   return { router, from };
 }

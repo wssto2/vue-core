@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { useFormat } from "../format";
 import { Icon } from "../icon";
 import CountryFlag from "../internal/CountryFlag.vue";
 import { useAnchoredPosition } from "../overlay/anchored";
@@ -21,7 +22,8 @@ const props = defineProps<{
 const country = defineModel<PhoneCountry>({ required: true });
 const emit = defineEmits<{ picked: [country: PhoneCountry] }>();
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const format = useFormat();
 const root = useTemplateRef<HTMLElement>("root");
 const trigger = useTemplateRef<HTMLButtonElement>("trigger");
 const panel = useTemplateRef<HTMLElement>("panel");
@@ -32,7 +34,7 @@ const highlighted = ref(0);
 
 const names = computed(() => {
   const display = new Map<PhoneCountry, string>();
-  for (const code of allCountries()) display.set(code, countryName(code, locale.value));
+  for (const code of allCountries()) display.set(code, countryName(code, format.intlLocale));
   return display;
 });
 const nameOf = (code: PhoneCountry): string => names.value.get(code) ?? code;
@@ -44,11 +46,11 @@ interface Group {
 const groups = computed<readonly Group[]>(() => {
   const common = props.common.filter((code) => names.value.has(code));
   if (query.value.trim() !== "") {
-    const found = searchCountries(query.value, locale.value, allCountries());
+    const found = searchCountries(query.value, format.intlLocale, allCountries());
     // the common ones keep the top of a search too
     return [{ title: null, countries: [...found.filter((code) => common.includes(code)), ...found.filter((code) => !common.includes(code))] }];
   }
-  const rest = allCountries().filter((code) => !common.includes(code)).sort((a, b) => nameOf(a).localeCompare(nameOf(b), locale.value));
+  const rest = allCountries().filter((code) => !common.includes(code)).sort((a, b) => nameOf(a).localeCompare(nameOf(b), format.intlLocale));
   return [{ title: t("core.form.phone.common"), countries: common }, { title: t("core.form.phone.all"), countries: rest }].filter((group) => group.countries.length > 0);
 });
 const flat = computed(() => groups.value.flatMap((group) => group.countries));

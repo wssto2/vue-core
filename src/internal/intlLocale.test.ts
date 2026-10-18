@@ -17,7 +17,7 @@ describe("intlLocale", () => {
     const format = createFormatting({ locale: () => "bs" });
     format.number(1234.5);
     format.money(1, { currency: "BAM" });
-    countryName("DE", "bs");
+    countryName("DE", format.intlLocale);
     expect(number.mock.calls.map(([locale]) => locale)).toEqual(["sr-Latn-BA", "sr-Latn-BA"]);
     expect(names.mock.calls[0]![0]).toEqual(["sr-Latn-BA"]);
   });

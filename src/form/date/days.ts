@@ -5,7 +5,6 @@
  * component, the parsers and the quick picks all stand on this file.
  */
 
-import { intlLocale } from "../../internal/intlLocale";
 
 /** A calendar day, `"YYYY-MM-DD"` (years 0001 to 9999). Sorts and compares as text. */
 export type Day = string;
@@ -132,14 +131,14 @@ export function clampDay(day: Day, rules: DayRules): Day {
   return day;
 }
 
-/** The locale's first day of the week, 1 (Monday) to 7 (Sunday). Monday where the platform does not know. */
-export function firstWeekday(locale: string): number {
-  return weekInfo(locale)?.firstDay ?? 1;
+/** The locale's first day of the week, 1 (Monday) to 7 (Sunday). Monday where the platform does not know. `tag` is the BCP 47 tag `Intl` is given: `useFormat().intlLocale`. */
+export function firstWeekday(tag: string): number {
+  return weekInfo(tag)?.firstDay ?? 1;
 }
 
 /** The days of the week that are a weekend in the locale (Saturday and Sunday where the platform does not know). */
-export function weekendDays(locale: string): readonly number[] {
-  return weekInfo(locale)?.weekend ?? [6, 7];
+export function weekendDays(tag: string): readonly number[] {
+  return weekInfo(tag)?.weekend ?? [6, 7];
 }
 
 interface WeekInfo {
@@ -147,9 +146,9 @@ interface WeekInfo {
   weekend: number[];
 }
 
-function weekInfo(locale: string): WeekInfo | null {
+function weekInfo(tag: string): WeekInfo | null {
   try {
-    const intl = new Intl.Locale(intlLocale(locale)) as Intl.Locale & { getWeekInfo?: () => WeekInfo; weekInfo?: WeekInfo };
+    const intl = new Intl.Locale(tag) as Intl.Locale & { getWeekInfo?: () => WeekInfo; weekInfo?: WeekInfo };
     return intl.getWeekInfo?.() ?? intl.weekInfo ?? null;
   } catch {
     return null;

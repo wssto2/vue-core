@@ -9,6 +9,7 @@ import { createAccessClient, platformKey, type AccessSnapshot, type Platform } f
 import { accessOf } from "../platform/testing";
 import { AppRouterView, createRouteAccess, routeAccessKey } from "../router/access";
 import { AsyncSection, EmptyState } from "../state";
+import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
 import { mockMedia } from "../testing/media";
 import { useResource } from "./resource";
@@ -104,7 +105,7 @@ async function openLead(reads: Reads, path = "/leads/5") {
   await router.push(path);
   const routeAccess = createRouteAccess({ router, access, noAccess: defineComponent({ render: () => h("p", "no access") }) });
   const view = render(defineComponent({ render: () => h(RouterView) }), {
-    global: { plugins: [router, i18n], provide: { [platformKey as symbol]: { access } as unknown as Platform, [routeAccessKey as symbol]: routeAccess, [pageSectionBackKey as symbol]: ref(null) } },
+    global: { plugins: [router, i18n, testFormatting(i18n)], provide: { [platformKey as symbol]: { access } as unknown as Platform, [routeAccessKey as symbol]: routeAccess, [pageSectionBackKey as symbol]: ref(null) } },
     container: document.body.appendChild(document.createElement("div")),
   });
   await settle();

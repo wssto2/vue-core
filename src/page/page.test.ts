@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, defineComponent, h, nextTick, ref } from "vue";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { MissingContextError } from "../platform/context";
+import { testFormatting } from "../testing/format";
 import { createTestI18n } from "../testing/i18n";
 import { mockMedia } from "../testing/media";
 import AdaptivePageShell from "./AdaptivePageShell.vue";
@@ -187,7 +188,7 @@ describe("AdaptivePageShell", () => {
     const result = render(AdaptivePageShell, {
       props: { title: "Customer", ...props },
       slots: { default: "<p>Content</p>", ...slots },
-      global: { plugins: [i18n, router], stubs: { transition: false }, provide: { [pageChromeKey as symbol]: chrome } },
+      global: { plugins: [i18n, testFormatting(i18n), router], stubs: { transition: false }, provide: { [pageChromeKey as symbol]: chrome } },
     });
     return { ...result, chrome, router };
   }
@@ -264,7 +265,7 @@ describe("AdaptivePageShell", () => {
     const Host = defineComponent({
       setup: () => () => h(AdaptivePageShell, { title: "Customer", back: { label: "Customers", to: "/customers" } }, { default: () => (show.value ? h(Section) : null) }),
     });
-    render(Host, { global: { plugins: [i18n, router] } });
+    render(Host, { global: { plugins: [i18n, testFormatting(i18n), router] } });
 
     await settle();
     await fireEvent.click(screen.getByRole("button", { name: "Edit" }));
@@ -358,7 +359,7 @@ describe("AdaptivePageShell", () => {
     render(AdaptivePageShell, {
       props: { title: "Customers" },
       slots: { default: () => h("a", { href: "/customers/1?row=7" }, "Seven") },
-      global: { plugins: [i18n, router], provide: { [pageChromeKey as symbol]: chrome } },
+      global: { plugins: [i18n, testFormatting(i18n), router], provide: { [pageChromeKey as symbol]: chrome } },
     });
 
     // (The test renderer re-parents the mounted tree afterwards, which resets the document's focus,
@@ -377,7 +378,7 @@ describe("AdaptivePageShell", () => {
     const { unmount } = render(AdaptivePageShell, {
       props: { title: "Customers" },
       slots: { default: () => h("a", { href: "/customers/1" }, "One") },
-      global: { plugins: [i18n, router], provide: { [pageChromeKey as symbol]: chrome } },
+      global: { plugins: [i18n, testFormatting(i18n), router], provide: { [pageChromeKey as symbol]: chrome } },
     });
     screen.getByRole("link", { name: "One" }).focus();
 
@@ -393,7 +394,7 @@ describe("AdaptivePageShell", () => {
     const { unmount } = render(AdaptivePageShell, {
       props: { title: "Customers" },
       slots: { default: () => h("a", { href: "/customers/1" }, "One") },
-      global: { plugins: [i18n, router], provide: { [pageChromeKey as symbol]: chrome } },
+      global: { plugins: [i18n, testFormatting(i18n), router], provide: { [pageChromeKey as symbol]: chrome } },
     });
     await router.replace("/customers?query=abc");
     await nextTick();
@@ -409,7 +410,7 @@ describe("AdaptivePageShell", () => {
 
 describe("PageActions", () => {
   const mount = (actions: PageAction[], leading?: PageAction | null) =>
-    render(PageActions, { props: { actions, leading }, global: { plugins: [i18n], stubs: { transition: false } } });
+    render(PageActions, { props: { actions, leading }, global: { plugins: [i18n, testFormatting(i18n)], stubs: { transition: false } } });
 
   it("renders nothing without actions", () => {
     const { container } = mount([]);
@@ -494,7 +495,7 @@ describe("PageActions", () => {
 });
 
 describe("ResourceHeader", () => {
-  const mount = (props: Record<string, unknown> = {}) => render(ResourceHeader, { props: { title: "Customers", ...props }, global: { plugins: [i18n] } });
+  const mount = (props: Record<string, unknown> = {}) => render(ResourceHeader, { props: { title: "Customers", ...props }, global: { plugins: [i18n, testFormatting(i18n)] } });
 
   it("is the page h1 with a count formatted for the locale and no action area without actions", () => {
     const { container } = mount({ count: 1248 });
@@ -530,7 +531,7 @@ describe("ResourceHeader", () => {
 
   it("publishes its title to the app's chrome until unmounted", () => {
     const chrome = createPageChrome();
-    const { unmount } = render(ResourceHeader, { props: { title: "Customers" }, global: { plugins: [i18n], provide: { [pageChromeKey as symbol]: chrome } } });
+    const { unmount } = render(ResourceHeader, { props: { title: "Customers" }, global: { plugins: [i18n, testFormatting(i18n)], provide: { [pageChromeKey as symbol]: chrome } } });
     expect(chrome.title.value).toBe("Customers");
 
     unmount();

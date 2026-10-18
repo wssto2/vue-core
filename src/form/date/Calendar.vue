@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { intlLocale } from "../../internal/intlLocale";
 import { computed, nextTick, ref, useId, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useFormat } from "../../format";
@@ -56,7 +55,7 @@ const titleId = useId();
 const grid = useTemplateRef<HTMLElement>("grid");
 
 const rules = computed<DayRules>(() => ({ min: props.min, max: props.max, disabled: props.disabledDates }));
-const first = computed(() => firstWeekday(format.locale));
+const first = computed(() => firstWeekday(format.intlLocale));
 
 function startingDay(): Day {
   if (isDay(model.value)) return model.value;
@@ -78,7 +77,7 @@ function show(day: Day) {
 }
 
 const weeks = computed(() =>
-  monthGrid(view.value.year, view.value.month, { firstWeekday: first.value, weekend: weekendDays(format.locale), today: today(), selected: model.value, rules: rules.value }),
+  monthGrid(view.value.year, view.value.month, { firstWeekday: first.value, weekend: weekendDays(format.intlLocale), today: today(), selected: model.value, rules: rules.value }),
 );
 const monthStart = computed(() => makeDay(view.value.year, view.value.month, 1) ?? "1970-01-01");
 /** The one day in the tab order: the focused one while it is on screen, else the first of the month. */
@@ -86,16 +85,16 @@ const tabbable = computed(() => (focused.value.startsWith(monthStart.value.slice
 
 const title = computed(() => t("core.form.months.with_year", { month: t(`core.form.months.long.${view.value.month}`), year: view.value.year }));
 const weekdays = computed(() => {
-  const names = new Intl.DateTimeFormat(intlLocale(format.locale), { weekday: "short", timeZone: "UTC" });
+  const names = new Intl.DateTimeFormat(format.intlLocale, { weekday: "short", timeZone: "UTC" });
   // 2026-09-28 is a Monday; a short name is cut to two letters ("pon" → "Po").
   return Array.from({ length: 7 }, (_, offset) => {
     const day = new Date(Date.UTC(2026, 8, 28 + ((first.value - 1 + offset) % 7)));
     const name = names.format(day).replace(/\.$/, "");
-    return name.charAt(0).toLocaleUpperCase(intlLocale(format.locale)) + name.slice(1, 2);
+    return name.charAt(0).toLocaleUpperCase(format.intlLocale) + name.slice(1, 2);
   });
 });
 const label = computed(() => {
-  const full = new Intl.DateTimeFormat(intlLocale(format.locale), { dateStyle: "full", timeZone: "UTC" });
+  const full = new Intl.DateTimeFormat(format.intlLocale, { dateStyle: "full", timeZone: "UTC" });
   return (day: Day) => {
     const civil = parseDay(day)!;
     return full.format(new Date(Date.UTC(civil.year, civil.month - 1, civil.day)));

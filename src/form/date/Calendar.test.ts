@@ -1,16 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
+import type { FormattingSettings } from "../../format";
 import { testFormatting } from "../../testing/format";
 import { createTestI18n } from "../../testing/i18n";
 import Calendar from "./Calendar.vue";
 
 const NOW = new Date(2026, 9, 15, 12, 0); // Thursday, 15 October 2026
 
-function mount(props: Record<string, unknown> = {}, locale: "en" | "hr" = "hr") {
+function mount(props: Record<string, unknown> = {}, locale: "en" | "hr" = "hr", settings: FormattingSettings = {}) {
   const i18n = createTestI18n({ locale });
   const update = vi.fn();
-  const view = render(Calendar, { props: { ...props, "onUpdate:modelValue": update }, global: { plugins: [i18n, testFormatting(i18n)] } });
+  const view = render(Calendar, { props: { ...props, "onUpdate:modelValue": update }, global: { plugins: [i18n, testFormatting(i18n, settings)] } });
   return { ...view, update };
 }
 const day = (value: string) => document.querySelector<HTMLElement>(`[data-day="${value}"]`)!;
@@ -29,6 +30,14 @@ afterEach(() => {
 });
 
 describe("Calendar", () => {
+  it("follows the application's intlLocale map for the first weekday and the weekday names (en is Sunday first, en-GB Monday first)", () => {
+    mount({ modelValue: "2026-10-20" }, "en");
+    expect(screen.getAllByRole("columnheader").map((cell) => cell.textContent)).toEqual(["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]);
+    document.body.innerHTML = "";
+    mount({ modelValue: "2026-10-20" }, "en", { intlLocale: { en: "en-GB" } });
+    expect(screen.getAllByRole("columnheader").map((cell) => cell.textContent)).toEqual(["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]);
+  });
+
   it("is a labelled grid of the month, Monday first in hr, with a live month title", () => {
     mount({ modelValue: "2026-10-20" });
     expect(screen.getByRole("grid").getAttribute("aria-labelledby")).toBeTruthy();

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { intlLocale } from "../internal/intlLocale";
+import { useFormat } from "../format";
 import { computed, inject, nextTick, ref, useId, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { applicationKey } from "../app/environment";
@@ -37,6 +37,7 @@ const props = withDefaults(
 const model = defineModel<I18nText>({ default: () => ({}) });
 
 const { t, locale: uiLocale, availableLocales } = useI18n();
+const format = useFormat();
 const application = inject(applicationKey, null);
 const baseId = useId();
 const field = useTemplateRef<HTMLInputElement | HTMLTextAreaElement>("field");
@@ -56,7 +57,7 @@ const written = (locale: string): boolean => textOf(locale).trim() !== "";
 const code = (locale: string): string => locale.toUpperCase();
 function nameOf(locale: string): string {
   try {
-    return new Intl.DisplayNames([intlLocale(uiLocale.value)], { type: "language" }).of(locale) ?? code(locale);
+    return new Intl.DisplayNames([format.intlLocale], { type: "language" }).of(locale) ?? code(locale);
   } catch {
     return code(locale);
   }

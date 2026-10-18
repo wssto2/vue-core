@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { intlLocale } from "../internal/intlLocale";
+import { useFormat } from "../format";
 import { computed, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
 import { Icon, type IconName } from "../icon";
 import { useMediaQuery } from "../internal/mediaQuery";
 import PageActions from "./PageActions.vue";
@@ -40,10 +39,10 @@ const props = withDefaults(defineProps<{
 
 defineSlots<{ leading?: () => unknown; description?: () => unknown }>();
 
-const { locale } = useI18n();
 // The nav bar exists below md, so that is where actions move.
+const format = useFormat();
 const phone = useMediaQuery("(max-width: 47.999rem)");
-const count = computed(() => (props.count == null ? null : new Intl.NumberFormat(intlLocale(locale.value)).format(props.count)));
+const count = computed(() => (props.count == null ? null : format.number(props.count)));
 
 const titleElement = useTemplateRef<HTMLElement>("titleElement");
 useLargeTitle(titleElement, () => props.title);
