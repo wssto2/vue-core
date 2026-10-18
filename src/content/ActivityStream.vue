@@ -32,7 +32,6 @@ export type ActivityItem = ActivityEvent | ActivityComment;
 
 <script setup lang="ts" generic="T extends ActivityItem">
 import { computed } from "vue";
-import { useI18n } from "vue-i18n";
 import { toDate, useFormat } from "../format";
 import { Icon } from "../icon";
 import Avatar from "./Avatar.vue";
@@ -66,7 +65,6 @@ defineSlots<{
   "comment-actions"?: (props: { item: Extract<T, { kind: "comment" }> }) => unknown;
 }>();
 
-const { t } = useI18n();
 const format = useFormat();
 
 // Written out in full so Tailwind generates every class.
@@ -80,14 +78,6 @@ const TONES = {
 
 const time = (item: ActivityItem): number => toDate(item.at)?.getTime() ?? 0;
 
-function dayLabel(at: string | null): string {
-  const date = toDate(at);
-  if (!date) return "";
-  const days = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(date).setHours(0, 0, 0, 0)) / 86_400_000);
-  if (days === 0) return t("core.activity.today");
-  return days === 1 ? t("core.activity.yesterday") : format.date(date);
-}
-
 const days = computed(() => {
   const sorted = props.items
     .map((item, index) => ({ item, index }))
@@ -99,7 +89,7 @@ const days = computed(() => {
     const key = time(item) > 0 ? new Date(item.at!).toDateString() : "";
     const last = groups[groups.length - 1];
     if (last && last.key === key) last.items.push(item);
-    else groups.push({ key, label: dayLabel(item.at), items: [item] });
+    else groups.push({ key, label: format.day(item.at), items: [item] });
   }
   return groups;
 });
