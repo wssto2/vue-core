@@ -8,5 +8,5 @@
     }
   },
   "include": ["./**/*", "../src/internal/*.d.ts"],
-  "exclude": ["registry"]
+  "exclude": ["registry", "architecture"]
 }

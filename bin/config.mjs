@@ -9,7 +9,16 @@ export const CONFIG_FILE = "vue-core.config.mjs";
 /** The top-level sections, one per command, with their defaults; a command that has defaults adds them here. */
 export const DEFAULTS = {
   lint: {},
-  architecture: {},
+  architecture: {
+    featuresDir: "features",
+    alias: "@/",
+    sharedLayers: ["components", "composables"],
+    skip: ["dist", "generated", "node_modules"],
+    allow: {},
+    packs: [],
+    rules: [],
+    doc: {},
+  },
   generator: {},
   e2eTimings: {},
 };

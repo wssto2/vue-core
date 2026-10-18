@@ -1,0 +1,33 @@
+Frontend architecture warnings:
+
+- features/shipping: no api.ts — expected for any feature that talks to the backend.
+
+Frontend architecture violations:
+
+- components/OrderPicker.vue: the shared layer (components/, composables/) cannot import "@/features/orders" — take what the feature provides as a prop or callback, or move this code into the feature (docs: shared layer).
+- components/design/ArbitraryShadow.vue: no-arbitrary-design-value — arbitrary shadow / radius / hex colour — add the value to vue-core theme.css and use its utility.
+- components/design/BlueFocus.vue: no-unbranded-focus — blue / sky / cyan / indigo focus colour — focus rings and borders are primary-* everywhere (decorative rings are fine).
+- components/design/BoldTitle.vue: no-unloaded-font-weight — font-bold / extrabold / black — the type scale stops at semibold until decision D9; use font-semibold.
+- components/design/BrandTick.vue: no-raw-brand-hue — green / emerald colour — the brand green is primary-* (a stepper tick, switch, success or active state).
+- components/design/NeutralBox.vue: no-stray-neutral — neutral / zinc / slate / stone colour — the one neutral is gray (vue-core theme.css).
+- composables/useOrders.ts: the shared layer (components/, composables/) cannot import "../features/orders" — take what the feature provides as a prop or callback, or move this code into the feature (docs: shared layer).
+- composables/useTodo.ts: no-todo — finish it or file an issue
+- features/billing/index.ts: feature "features/billing" cannot import "@/features/orders/api". Import shared code or the owning app-shell route instead.
+- features/orders/api.ts: import generated code only through "@/generated/entities/*", "@/generated/schemas/*", "@/generated/routes/*" or "@/generated/permissions".
+- features/orders/components/AlertBox.vue: no-adhoc-alert — coloured alert box — use <Banner type=…> instead of a bg-*-50 rounded p-* div.
+- features/orders/components/EditableInGroup.vue: no-field-editable-in-group — a shared field with its own `editable` in a grouped form — put read mode on the FormGroup / ResourceForm (`:editable`) and lock a single value with `disabled`.
+- features/orders/components/HandBadge.vue: no-adhoc-badge — hand-built uppercase badge — use <Badge tone=…> (@wssto2/vue-core/state).
+- features/orders/components/LoadingText.vue: no-bare-loading-text — the word “Loading” rendered directly — render <AsyncSection>'s skeleton instead.
+- features/orders/components/RawControl.vue: no-raw-form-control — raw <input>/<select>/<textarea>/<label> in a feature .vue — use the field components.
+- features/orders/components/RawTable.vue: no-raw-table — raw <table> — use <DataTable> (child collections) or <collection-table> (paginated lists).
+- features/orders/components/RolelessTable.vue: collection-table-roles — CollectionTable without column `mobile` roles (or with the retired #mobile-row slot) — give the columns primary / accessory / meta roles (docs: collections).
+- features/orders/components/TypeScale.vue: no-arbitrary-type-scale — arbitrary text-[N px|rem] or font-[N] — use the type scale (text-2xs…text-3xl, font-medium/semibold; vue-core theme.css).
+- features/orders/errors.ts: declares a second ApiError class — a failed request is vue-core's ApiError (import { ApiError, isApiError } from "@wssto2/vue-core/client").
+- features/orders/helpers.ts: no raw fetch()/axios outside an api.ts — route the call through the platform client (currentRuntime().platform.http) so it shares error handling and ApiError.
+- features/orders/wrong-client.ts: imports ApiError from "@/client/errors" — the one error class comes from "@wssto2/vue-core/client".
+- main.ts: import feature code through "@/features/orders" (or "@/features/orders/routes"), not the internal path "@/features/orders/components/OrderRow".
+- main.ts: replace legacy "@/entities" imports with "@/generated/entities".
+- features/orders/components/CleanTable.vue: stale no-raw-table allowlist entry in vue-core.config.mjs — the file no longer trips the rule; remove it from the allowlist.
+- features/Order_Items: feature directory name "Order_Items" must be a single lowercase word (^[a-z][a-z0-9]*$), matching the backend route/policy convention.
+- features/shipping: a feature with views/ must ship index.ts (its public surface / route table).
+- features/shipping: a feature with views/ must ship routes.ts (its public surface / route table).

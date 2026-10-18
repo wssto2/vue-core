@@ -31,7 +31,7 @@ describe("vue-core", () => {
   });
 
   it("every command is a stub that exits 2 until its lane replaces it", async () => {
-    for (const name of Object.keys(COMMANDS)) {
+    for (const name of Object.keys(COMMANDS).filter((command) => command !== "check-architecture")) {
       const { code, err } = await run([name]);
       expect(code).toBe(2);
       expect(err).toBe(`vue-core ${name}: not implemented yet`);
