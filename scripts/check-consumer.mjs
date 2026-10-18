@@ -38,7 +38,8 @@ renameSync(join(packDir, packed.filename), join(packDir, "vue-core.tgz"));
 const shipped = packed.files.map((file) => file.path);
 const stray = shipped.filter((path) => !/^(dist\/|bin\/|src\/styles\/|package\.json$|README\.md$|CHANGELOG\.md$)/.test(path));
 if (stray.length > 0) fail(`tarball ships files outside dist/, src/styles/, package.json, README.md and CHANGELOG.md: ${stray.join(", ")}`);
-if (shipped.some((path) => /\.test\.|^src\/(?!styles\/)/.test(path))) fail("tarball ships sources or tests");
+// bin/templates/ holds the feature template's own test (tests/scaffold.test.ts.tpl)
+if (shipped.some((path) => !path.startsWith("bin/templates/") && /\.test\.|^src\/(?!styles\/)/.test(path))) fail("tarball ships sources or tests");
 console.log(`${shipped.length} files, ${(packed.size / 1024).toFixed(0)} kB packed`);
 
 step("install the tarball into the playground");
