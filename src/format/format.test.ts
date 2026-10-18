@@ -17,6 +17,73 @@ describe("toDate", () => {
   });
 });
 
+describe("toDate, as the wire writes dates", () => {
+  it("reads a space-separated date-time as local time (Safari rejects it in new Date)", () => {
+    expect(toDate("2026-09-30 14:05")).toEqual(new Date(2026, 8, 30, 14, 5));
+    expect(toDate("2026-09-30 14:05:33")).toEqual(new Date(2026, 8, 30, 14, 5, 33));
+  });
+
+  it("treats the zero dates as empty, however they continue", () => {
+    for (const value of ["0000-00-00", "0000-00-00 00:00:00", "0001-01-01 00:00:00", "1970-01-01", "1970-01-01 02:00:00", "1970-01-01T12:00:00+02:00"]) {
+      expect(toDate(value), value).toBeNull();
+    }
+    expect(toDate("2026-09-30T00:00:00")).toEqual(new Date(2026, 8, 30));
+  });
+});
+
+describe("the intlLocale option", () => {
+  it("gives time and relative text the application's tag, over the library's", () => {
+    const at = new Date(2026, 8, 30, 14, 5);
+    const plain = createFormatting({ locale: () => "en" });
+    const gb = createFormatting({ locale: () => "en", intlLocale: { en: "en-GB" } });
+
+    expect(plain.time(at)).toMatch(/^0?2:05\s?pm$/i);
+    expect(gb.time(at)).toBe("14:05");
+    expect(gb.date(at)).toBe("30/09/2026");
+    expect(gb.intlLocale).toBe("en-GB");
+    expect(plain.intlLocale).toBe("en");
+    expect(createFormatting({ locale: () => "bs", intlLocale: { en: "en-GB" } }).intlLocale).toBe("sr-Latn-BA");
+    expect(createFormatting({ locale: () => "bs", intlLocale: { bs: "bs-Latn" } }).intlLocale).toBe("bs-Latn");
+  });
+});
+
+describe("numberSymbols", () => {
+  const format = createFormatting({ locale: () => "en", numberSymbols: { group: ".", decimal: "," }, emptyNumber: "0" });
+
+  it("writes every number with the symbols, from four digits, rounded like toFixed", () => {
+    expect(format.number(1234.5, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toBe("1.234,50");
+    expect(format.number(1.005, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toBe("1,00");
+    expect(format.number(1234, { useGrouping: false })).toBe("1234");
+    expect(format.money(1234.5, { currency: "EUR" })).toBe("1.234,50 €");
+  });
+
+  it("keeps Intl for a style that is not decimal, and shows the empty text only for no value", () => {
+    expect(format.number(0.256, { style: "percent" })).toMatch(/^26\s?%$/);
+    expect(format.number(null)).toBe("0");
+    expect(createFormatting({ locale: () => "en" }).number(null)).toBe("");
+  });
+});
+
+describe("day", () => {
+  const now = new Date(2026, 8, 30, 12, 0);
+  const words: Record<string, string> = { "core.activity.today": "Danas", "core.activity.yesterday": "Jučer" };
+  const format = createFormatting({ locale: () => "hr", translate: (key) => words[key]!, datePattern: { hr: "DD.MM.YYYY." } });
+
+  it("says today and yesterday, and the date for any other day", () => {
+    expect(format.day(new Date(2026, 8, 30, 0, 1), { now })).toBe("Danas");
+    expect(format.day("2026-09-29 23:59", { now })).toBe("Jučer");
+    expect(format.day("2026-09-29 23:59", { now, inSentence: true })).toBe("jučer");
+    expect(format.day("2026-09-28 10:00", { now })).toBe("28.09.2026.");
+    expect(format.day("2026-10-01 10:00", { now })).toBe("01.10.2026.");
+    expect(format.dayTime("2026-09-30 09:12", { now })).toBe("Danas · 09:12");
+    expect(format.dayTime("0000-00-00", { now })).toBe("");
+  });
+
+  it("is the date when the application gave no words", () => {
+    expect(createFormatting({ locale: () => "hr", datePattern: { hr: "DD.MM.YYYY." } }).day(now, { now })).toBe("30.09.2026.");
+  });
+});
+
 describe("money", () => {
   const en = createFormatting({ locale: () => "en", currencySymbol: "KM" });
 
