@@ -34,6 +34,7 @@ const entries: Record<string, string> = {
   "pwa/index": "src/pwa/index.ts",
   "testing/index": "src/testing/index.ts",
   "config/index": "src/config/index.ts",
+  "eslint/index": "src/eslint/index.ts",
 };
 
 const source = fileURLToPath(new URL("src", import.meta.url));
