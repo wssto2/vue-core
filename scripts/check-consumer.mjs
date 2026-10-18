@@ -110,7 +110,8 @@ const pkg = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"));
 const forbidden = [
   { pattern: /["']@\//, what: "an `@/` import" },
   { pattern: /\b(IconKey|MessageSchema|UserResponse|AccentKey)\b/, what: "an ARV global type name" },
-  { pattern: /\bRoute\b/, what: "the ARV global `Route` type" },
+  // dist/playwright/ names Playwright's own Route, imported from @playwright/test.
+  { pattern: /\bRoute\b/, what: "the ARV global `Route` type", unless: /import type \{[^}]*\bRoute\b[^}]*\} from "@playwright\/test"/ },
   { pattern: /from\s*["']pinia["']/, what: "a pinia import" },
 ];
 // The test helpers live in dist/testing/ and in nothing else: no other entry or shared chunk contains
@@ -122,8 +123,8 @@ for (const file of walk(join(installed, "dist"))) {
   if (!/\.(js|d\.ts|css)$/.test(file)) continue;
   scanned++;
   const code = readFileSync(file, "utf8");
-  for (const { pattern, what } of forbidden) {
-    if (pattern.test(code)) fail(`${relative(installed, file)} contains ${what}`);
+  for (const { pattern, what, unless } of forbidden) {
+    if (pattern.test(code) && !unless?.test(code)) fail(`${relative(installed, file)} contains ${what}`);
   }
   const inTesting = relative(join(installed, "dist"), file).startsWith(`testing${sep}`);
   if (!inTesting && file.endsWith(".js") && (testCode.test(code) || /from\s*["'](\.\.?\/)+testing\//.test(code))) fail(`${relative(installed, file)} contains or imports the test helpers`);
