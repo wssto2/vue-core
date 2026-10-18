@@ -18,13 +18,10 @@ export interface ArchitectureFile {
 /** An application's own rule: the messages for one file (each is prefixed with the file's path), or none. */
 export type ArchitectureRule = (file: ArchitectureFile) => string[] | undefined;
 
-/** The rules of the shared allowlists. */
-export type ArchitectureAllowKey = "deep-import" | "raw-http" | "feature-name" | "feature-shape";
-
 export interface ArchitectureConfig {
   /** The folder of the features, relative to the config file (default "features"). */
   featuresDir?: string;
-  /** The import alias that points at the config file's folder (default "@/"). */
+  /** The import alias that points at the config file's folder (default `@/`). */
   alias?: string;
   /** Folders that import no feature (default components, composables). */
   sharedLayers?: string[];
@@ -34,14 +31,14 @@ export interface ArchitectureConfig {
   uiDirs?: string[];
   /**
    * Generated code: its folder under the alias and the subpaths code may import ("entities/*" a folder, "permissions" one module;
-   * default entities, schemas, routes). `moved` maps an old import prefix to its new home ({ "@/entities/": "@/generated/entities" }).
+   * default entities, schemas, routes). `moved` maps an old import prefix to its new home (old prefix to new home, each with the alias).
    */
   generated?: { dir?: string; allowed?: string[]; moved?: Record<string, string> };
   /**
    * Known offenders that predate a rule, by rule: "deep-import" (`<file> -> <specifier>`), "raw-http", "feature-name" and
    * "feature-shape" (paths), and a pack rule's id (files; a stale entry is a violation, so the list only shrinks).
    */
-  allow?: Partial<Record<ArchitectureAllowKey | (string & {}), string[]>>;
+  allow?: Record<string, string[]>;
   /** Opt-in rule packs: "design-values" (theme tokens) and "presentation" (use the library's components). */
   packs?: ("design-values" | "presentation")[];
   /** The application's own rules, run on every source file. */
