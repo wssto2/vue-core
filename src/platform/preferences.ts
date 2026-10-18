@@ -1,5 +1,6 @@
 import { computed, type ComputedRef } from "vue";
 import { ApiError } from "../client";
+import { identityRoutes } from "../modules/identity/routes";
 import type { Platform } from "./platform";
 import type { SessionUser } from "./session";
 
@@ -21,9 +22,6 @@ export interface Preferences<T extends object> {
 type Bag = Record<string, unknown>;
 
 const isBag = (value: unknown): value is Bag => typeof value === "object" && value !== null && !Array.isArray(value);
-
-/** go-core identity's route; its generated entry follows when vue-core syncs the module. */
-const PATH = "/v1/auth/preferences";
 
 /**
  * `target` with `patch` merged in as JSON Merge Patch (RFC 7396), which is also what the server does by default: objects
@@ -98,7 +96,7 @@ function create({ session, http }: Platform<SessionUser>): Preferences<Bag> {
 
       const send = async () => {
         try {
-          const { data } = await http.put<{ preferences?: unknown }>(PATH, { preferences: patch });
+          const { data } = await http.request(identityRoutes.preferencesUpdate, { preferences: patch });
           if (!isBag(data?.preferences)) throw new ApiError({ kind: "malformed", message: "Unreadable preferences answer: expected { preferences: {} }" });
           if (owner === id) confirmed = data.preferences;
           leave(entry);
