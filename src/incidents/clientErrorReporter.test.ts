@@ -30,6 +30,7 @@ describe("clientErrorReporter: what is reported", () => {
     const body = JSON.parse(String(call?.init.body));
     expect(body).toEqual({
       message: "x is undefined",
+      source: "vue",
       stack: error.stack,
       route: "/leads/7",
       browser: navigator.userAgent,
@@ -38,26 +39,30 @@ describe("clientErrorReporter: what is reported", () => {
     });
   });
 
-  it.each(["vue", "unhandledrejection", "window"] as const)("reports a %s error", async (source) => {
+  it.each(["vue", "unhandledrejection", "window"] as const)("reports a %s error, naming its source", async (source) => {
     const { report, sent } = setup();
     report(aReport(errorWith("boom"), { source }));
-    expect(await sent()).toHaveLength(1);
+    const calls = await sent();
+    expect(calls).toHaveLength(1);
+    const body = JSON.parse(String(calls[0]?.init.body));
+    expect(body).toMatchObject({ message: "boom", source });
+    expect(body).not.toHaveProperty("detail");
   });
 
-  it("reports a handled error, naming it in the message because the input has no field for the source", async () => {
+  it("reports a handled error with its source and detail beside the message, which stays the error's own", async () => {
     const { report, sent } = setup();
     report(aReport(errorWith("save failed"), { source: "handled", detail: "vehicle-location-edit" }));
     const [call] = await sent();
-    expect(JSON.parse(String(call?.init.body)).message).toBe("[handled: vehicle-location-edit] save failed");
+    expect(JSON.parse(String(call?.init.body))).toMatchObject({ message: "save failed", source: "handled", detail: "vehicle-location-edit" });
   });
 
-  it("names a handled error without a detail by its source alone, and keeps the 2000 characters bound", async () => {
+  it("keeps go-core's bounds: the message at 2000 characters, the detail at 255", async () => {
     const { report, sent } = setup();
-    report(aReport(errorWith("x".repeat(3000)), { source: "handled" }));
+    report(aReport(errorWith("x".repeat(3000)), { source: "handled", detail: "d".repeat(300) }));
     const [call] = await sent();
-    const message = JSON.parse(String(call?.init.body)).message as string;
-    expect(message.startsWith("[handled] xxx")).toBe(true);
-    expect(message).toHaveLength(2000);
+    const body = JSON.parse(String(call?.init.body)) as { message: string; detail: string };
+    expect(body.message).toBe("x".repeat(2000));
+    expect(body.detail).toHaveLength(255);
   });
 
   it("does not send a handled ApiError, a handled string, or one from another origin or while signed out", async () => {
