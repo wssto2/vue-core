@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.1 — 2026-10-19
+
+go-core `v1.18.1`: a client error says where it came from.
+
+### Changed
+- **incidents:** `clientErrorReporter` sends every report's `source` (`vue`, `unhandledrejection`, `window`, `handled`) and a handled error's `detail` (at most 255 characters) as fields of `ClientErrorInput`; the message is the error's own again, without the `[handled: detail]` prefix of 0.13.0. go-core keeps both in the occurrence's context and groups the same error as one incident whether it was handled or not.
+- **modules:** regenerated from go-core v1.18.1 (`ClientErrorInput.source`, `detail`, optional).
+
 ## 0.13.0 — 2026-10-18
 
 Platform features an application kept to itself: per-person preferences (dark mode, dismissed tips) on go-core identity, an
