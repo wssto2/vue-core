@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.15.0 — 2026-10-19
+
+What arv-next kept to itself and the library can say once: server field messages, a WhatsApp link, a stat card and the "no access" panel, two architecture rules and the request helpers every `api.ts` redefined. go-core is unchanged (`v1.19.0`). Breaking only in that `useForm` now words go-core's `validation_errors.*` keys itself (see Changed).
+
+### New
+- **i18n:** `useServerMessages({ prefixes })`. A field message that starts with one of the prefixes (default `["validation_errors"]`, go-core's) is a key: the application's text for it, else the library's `core.<key>`; a rule whose text needs a parameter the server does not send (`min`, `max`, `min_value`, `max_value`, `between`, `in`, `not_in`) reads as `<prefix>.out_of_range`. `fieldMessageWith(translator, options)` is the same outside setup. New text `core.validation_errors.out_of_range` in hr, en, sl, bs and sr-Latn.
+- **phone:** `whatsAppLink(value, country)`: a `https://wa.me/` link for a number as typed; a local number gets the dial code of `country` (ISO code, any case), a number with `+` or `00` keeps its own, fewer than six digits give `null`.
+- **content:** `StatSummary` (and `StatItem`, `StatTone`): one grouped card of numbers with tones, share bars, and header and footer rows.
+- **access:** `RestrictedPanel`: the lock, `core.no_access` text, an optional `contact` address and a Back button (the application's history, else `home`). For `createApplication({ noAccess: () => h(RestrictedPanel, { contact }) })`. New texts `core.no_access.contact` and `core.no_access.back` in five languages.
+- **client:** `RequestOptions.idempotencyKey`: sent as the `Idempotency-Key` header of that call (it wins over a header of the same name) and again on the renew-and-retry after a 401. The library's incident and service-account calls use it.
+- **app:** `currentHttp()`: the current application's platform client, for an `api.ts`.
+- **devkit:** `vue-core check-architecture` rule `no-hardcoded-copy` (`architecture.copy: { pattern, scope, properNames }`, allowlist `allow["no-hardcoded-copy"]`): no text in the authors' language in a template, in `form.ts` strings or, inside `scope`, in any string literal or copy attribute. It is arv-next's own heuristic, ported unchanged (checked against it on 951 files of its tree).
+- **devkit:** rule `no-route-policy` (`architecture.routeAccess: { sessionField, exclude }`): no `policy:` / `requires:` in a `routes.ts`, and no `authStore.<sessionField>` / `state.<sessionField>`.
+
+### Changed
+- **form:** a form with no `describeFieldError` of its own and none from the application now words go-core's `validation_errors.*` keys (it showed them as sent before). Other messages still show as sent.
+- **eslint:** `vueCoreConfig` gives `tests/**/*.{ts,vue}`, as well as `**/*.test.ts`, the vitest globals and the stub-component allowances.
+
+### Tests
+- Moved from arv-next's e2e: the saved-view save popover (Replace on a taken name), and the profile code step (resend countdown, tries left, expiry, the refusal sentences).
+
 ## 0.14.0 — 2026-10-19
 
 An incident's occurrences for the staff, and Bosnian month names. Needs go-core v1.19.0 (`goCore`, `src/modules` synced).
