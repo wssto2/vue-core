@@ -128,8 +128,8 @@ export interface ApplicationOptions {
   describeError?: AppErrorDescriber;
   /**
    * The application's one sentence for a field message the server sent (often a code or a translation key), for every form
-   * (`useForm`, `useResourceForm`, `useCommand`) that has no `describeFieldError` of its own; a form's own wins. Without either,
-   * messages show as sent.
+   * (`useForm`, `useResourceForm`, `useCommand`) that has no `describeFieldError` of its own; a form's own wins. Without either, go-core's validator keys (`validation_errors.*`) are worded by the library and
+   * other messages show as sent.
    */
   describeFieldError?: AppFieldErrorDescriber;
   /** Called with every error the application catches (component errors, unhandled rejections, failed effects and loads). Default: `console.error`. */

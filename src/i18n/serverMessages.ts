@@ -4,6 +4,28 @@ import { useFormat } from "../format";
 import type { FormFailureKind } from "../form";
 import { useDescribeError } from "./describeError";
 
+export interface ServerMessagesOptions {
+  /**
+   * The namespaces of the keys the server's validator writes (`validation_errors.required`): a field message that starts with one
+   * (and a dot) is a key, said with the app's text for it, else the library's `core.<key>`. Default `["validation_errors"]` (go-core's);
+   * `[]` leaves every such message as sent. A rule whose text needs a parameter the server does not send (`min`, `max`, `min_value`,
+   * `max_value`, `between`, `in`, `not_in`) reads as the namespace's `out_of_range`.
+   */
+  readonly prefixes?: readonly string[];
+}
+
+const NEEDS_PARAMETERS = new Set(["min", "max", "min_value", "max_value", "between", "in", "not_in"]);
+
+/** `describeFieldError` over a translator: the validator's keys by `prefixes`, then the app's `errors.<reason>` and the library's `core.errors.<reason>`; other text as sent. */
+export function fieldMessageWith({ t, te }: { t(key: string): string; te(key: string): boolean }, { prefixes = ["validation_errors"] }: ServerMessagesOptions = {}): (message: string) => string {
+  return (message) => {
+    const prefix = prefixes.find((candidate) => message.startsWith(`${candidate}.`));
+    const reason = prefix === undefined ? message : NEEDS_PARAMETERS.has(message.slice(prefix.length + 1)) ? `${prefix}.out_of_range` : message;
+    const key = (prefix === undefined ? [`errors.${reason}`, `core.errors.${reason}`] : [reason, `core.${reason}`]).find((candidate) => te(candidate));
+    return key === undefined ? message : t(key);
+  };
+}
+
 /**
  * What a form needs to speak any go-core refusal, in the app's language (an app's `errors.<reason>` first, then
  * `core.errors.<reason>`): the reason of a field (`identity.email.taken`) becomes a sentence (`describeFieldError`); a refusal of
@@ -14,7 +36,7 @@ import { useDescribeError } from "./describeError";
  *   const messages = useServerMessages();
  *   useForm({ ...messages, failureMessage: (kind, error) => myRefusal(error) ?? messages.failureMessage(kind, error), defaults, validator });
  */
-export function useServerMessages() {
+export function useServerMessages(options: ServerMessagesOptions = {}) {
   const { t, te } = useI18n();
   const format = useFormat();
   const describeError = useDescribeError();
@@ -33,10 +55,7 @@ export function useServerMessages() {
 
   return {
     sentence,
-    describeFieldError: (message: string): string => {
-      const key = keyOf(message);
-      return key === undefined ? message : t(key);
-    },
+    describeFieldError: fieldMessageWith({ t: (key) => t(key), te }, options),
     failureMessage: (kind: FormFailureKind, error: unknown): string | undefined =>
       isApiError(error) && error.code && (kind === "failed" || kind === "forbidden" || kind === "conflict") ? sentence(error) : undefined,
   };

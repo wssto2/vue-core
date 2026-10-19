@@ -9,7 +9,8 @@
       "email": "Unesite ispravnu e-mail adresu.",
       "url": "Unesite ispravan URL.",
       "date": "Unesite ispravan datum.",
-      "datetime": "Unesite ispravan datum i vrijeme."
+      "datetime": "Unesite ispravan datum i vrijeme.",
+      "out_of_range": "Vrijednost nije u dopuštenom rasponu."
     },
     "access": {
       "title": "Uloge",

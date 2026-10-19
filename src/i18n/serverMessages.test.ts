@@ -34,3 +34,26 @@ describe("useServerMessages", () => {
     expect(text).not.toContain("2026-10-03T14:35:00Z");
   });
 });
+
+describe("useServerMessages({ prefixes })", () => {
+  const withMessages = (en: object, options?: Parameters<typeof useServerMessages>[0]) => withSetup(() => useServerMessages(options), createTestApp({ messages: { en } })).result;
+
+  it("says a validator's key (validation_errors.<rule>) with the app's text, else the library's", () => {
+    const { describeFieldError } = withMessages({ validation_errors: { required: "Fill this in." } });
+    expect(describeFieldError("validation_errors.required")).toBe("Fill this in.");
+    expect(describeFieldError("validation_errors.email")).toBe("Enter a valid email address.");
+    expect(describeFieldError("validation_errors.no_such_rule")).toBe("validation_errors.no_such_rule");
+  });
+
+  it("reads a rule that needs a parameter the server did not send as a range message", () => {
+    const { describeFieldError } = withMessages({});
+    for (const rule of ["min", "max", "min_value", "max_value", "between", "in", "not_in"]) expect(describeFieldError(`validation_errors.${rule}`)).toBe("The value is not within the allowed range.");
+    expect(withMessages({ validation_errors: { out_of_range: "Out." } }).describeFieldError("validation_errors.min")).toBe("Out.");
+  });
+
+  it("takes the prefixes it is given, and none leaves every key as sent", () => {
+    expect(withMessages({ rules: { required: "Needed." } }, { prefixes: ["rules"] }).describeFieldError("rules.required")).toBe("Needed.");
+    expect(withMessages({}, { prefixes: [] }).describeFieldError("validation_errors.required")).toBe("validation_errors.required");
+  });
+});
+

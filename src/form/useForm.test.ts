@@ -345,10 +345,14 @@ describe("the application's describeFieldError", () => {
     expect(form.errors.first("subject")).toBe("own:required");
   });
 
-  it("leaves messages as sent when neither says anything", async () => {
+  it("leaves messages as sent when neither says anything, except go-core's validator keys, which the library words", async () => {
     const form = withSetup(() => useForm({ defaults: empty })).result;
     await refuse(form);
     expect(form.errors.first("subject")).toBe("required");
+    await form.submit(async () => {
+      throw api("validation", { status: 422, fields: { subject: ["validation_errors.required"] } });
+    });
+    expect(form.errors.first("subject")).toBe("Required.");
   });
 });
 

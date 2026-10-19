@@ -9,7 +9,8 @@
       "email": "Enter a valid email address.",
       "url": "Enter a valid URL.",
       "date": "Enter a valid date.",
-      "datetime": "Enter a valid date and time."
+      "datetime": "Enter a valid date and time.",
+      "out_of_range": "The value is not within the allowed range."
     },
     "access": {
       "title": "Roles",

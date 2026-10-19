@@ -9,7 +9,8 @@
       "email": "Vnesite veljaven e-poštni naslov.",
       "url": "Vnesite veljaven URL.",
       "date": "Vnesite veljaven datum.",
-      "datetime": "Vnesite veljaven datum in čas."
+      "datetime": "Vnesite veljaven datum in čas.",
+      "out_of_range": "Vrednost ni v dovoljenem obsegu."
     },
     "access": {
       "title": "Vloge",

@@ -1,6 +1,7 @@
 import { computed, reactive, ref, shallowRef, type ComputedRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { isAborted, isApiError } from "../client";
+import { fieldMessageWith } from "../i18n/serverMessages";
 import { useAppErrorDescriber, useAppFieldErrorDescriber, useDescribeError } from "../i18n/describeError";
 import { ErrorBag } from "./errors";
 import { cloneValue, sameValue } from "./snapshot";
@@ -83,7 +84,7 @@ export interface FormOptions<Values extends object, Output = Values> {
   readonly defaults: Values | (() => Values);
   /** The app's schema (anything with Zod's `safeParse`). Without one the server is the only validator. */
   readonly validator?: FormValidator<Output>;
-  /** A field message into a sentence, for a form that says it differently from the rest of the app. Default: the application's (`createApplication({ describeFieldError })`), else as sent. */
+  /** A field message into a sentence, for a form that says it differently from the rest of the app. Default: the application's (`createApplication({ describeFieldError })`), else the library's words for go-core's validator keys (`useServerMessages`), other text as sent. */
   readonly describeFieldError?: (message: string, field: string) => string;
   /** The draft's name for a field the server names, given the whole dotted path (`tax_id` is `taxId`, `lines.0.unit_price` is `lines.0.unitPrice`). Default: the same name. */
   readonly serverField?: (field: string) => string;
@@ -154,8 +155,9 @@ const newKey = (): string =>
  * from the validator, so a schema that turns "" into null or text into a number is honest in the types.
  */
 export function useForm<Values extends object, Output = Values>(options: FormOptions<Values, Output>): Form<Values, Output> {
-  const { t } = useI18n();
-  const describeFieldError = options.describeFieldError ?? useAppFieldErrorDescriber();
+  const { t, te } = useI18n();
+  // A form's own, else the application's, else the library's words for go-core's validator keys (`validation_errors.required`).
+  const describeFieldError = options.describeFieldError ?? useAppFieldErrorDescriber() ?? fieldMessageWith({ t: (key) => t(key), te });
   const describeError = useDescribeError();
   const appDescriber = useAppErrorDescriber();
   const initial = (): Values => cloneValue(typeof options.defaults === "function" ? (options.defaults as () => Values)() : options.defaults);
