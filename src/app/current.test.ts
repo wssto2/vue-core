@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createApplication } from "./application";
-import { currentApplication } from "./current";
+import { currentApplication, currentHttp } from "./current";
 import { fakeBackend, options } from "./testing";
 
 const made: { dispose(): void }[] = [];
@@ -31,5 +31,13 @@ describe("currentApplication", () => {
     expect(currentApplication()).toBe(second);
     second.dispose();
     expect(() => currentApplication()).toThrow(/createApplication/);
+  });
+});
+
+describe("currentHttp", () => {
+  it("is the platform's client of the current application, read when it is called", () => {
+    expect(() => currentHttp()).toThrow(/createApplication/);
+    const application = create();
+    expect(currentHttp()).toBe(application.platform.http);
   });
 });

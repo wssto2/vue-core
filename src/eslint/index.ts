@@ -110,8 +110,8 @@ export function vueCoreConfig({ typed = false, tsconfigRootDir, ignores = [], ru
         ...rules,
       },
     },
-    // Test doubles define stub components inline, several per file, with untyped prop lists on purpose.
-    { files: ["**/*.test.ts"], languageOptions: { globals: globals.vitest }, rules: { "vue/require-prop-types": "off", "vue/one-component-per-file": "off" } },
+    // Test files (named *.test.ts or in a tests/ folder) define stub components inline, several per file, with untyped prop lists on purpose.
+    { files: ["**/*.test.ts", "tests/**/*.{ts,vue}"], languageOptions: { globals: globals.vitest }, rules: { "vue/require-prop-types": "off", "vue/one-component-per-file": "off" } },
   ];
   return config;
 }

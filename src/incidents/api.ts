@@ -30,8 +30,6 @@ export interface IncidentDetail {
 /** The occurrences a page of the incident page shows. */
 export const OCCURRENCES_PER_PAGE = 10;
 
-const idempotent = (key: string) => ({ headers: { "Idempotency-Key": key } });
-
 /** go-core's incident routes as calls; `data` of each answer already read. A change takes the `Idempotency-Key` of its attempt. */
 export function createIncidentsApi(http: HttpClient) {
   return {
@@ -46,11 +44,11 @@ export function createIncidentsApi(http: HttpClient) {
     },
     /** The whole management form; the answer is the stored incident (without its people: the page reads again for them). */
     update: async (id: number, input: UpdateRequest, idempotencyKey: string): Promise<Incident> =>
-      (await http.request(incidentRoutes.update, { ...input, incidentID: id }, idempotent(idempotencyKey))).data,
+      (await http.request(incidentRoutes.update, { ...input, incidentID: id }, { idempotencyKey })).data,
     /** A report: the incident it opened or joined. */
-    report: async (input: ReportInput, idempotencyKey: string): Promise<Incident> => (await http.request(incidentRoutes.report, input, idempotent(idempotencyKey))).data.data,
+    report: async (input: ReportInput, idempotencyKey: string): Promise<Incident> => (await http.request(incidentRoutes.report, input, { idempotencyKey })).data.data,
     comment: async (id: number, input: CommentRequest, idempotencyKey: string): Promise<CommentResponse> =>
-      (await http.request(incidentRoutes.comment, { ...input, incidentID: id }, idempotent(idempotencyKey))).data,
+      (await http.request(incidentRoutes.comment, { ...input, incidentID: id }, { idempotencyKey })).data,
   };
 }
 

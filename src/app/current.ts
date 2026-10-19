@@ -1,3 +1,4 @@
+import type { HttpClient } from "../client";
 import type { Application } from "./application";
 
 // The one application of this page, for code that runs outside setup (an api.ts, a router guard). A page runs one application; the
@@ -26,4 +27,12 @@ export function currentApplication(): Application {
     );
   }
   return current;
+}
+
+/**
+ * The platform's HTTP client of the current application, for an `api.ts` (`const http = currentHttp` is a module's one line of setup).
+ * Call it when a request is made, not at module load: it throws before `createApplication` ran.
+ */
+export function currentHttp(): HttpClient {
+  return currentApplication().platform.http;
 }

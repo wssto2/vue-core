@@ -8,6 +8,12 @@ import { fetchTransport, type Transport } from "./transport";
 export interface RequestOptions {
   query?: Readonly<Record<string, QueryValue>>;
   headers?: HeadersInit;
+  /**
+   * The key of this attempt at a change, sent as the `Idempotency-Key` header (it wins over a header of that name): the server does
+   * it once however many times the same key arrives. Make it once per attempt (a form holds one until it succeeds) and give it
+   * to every retry; the client's own renew-and-retry after a 401 sends it again.
+   */
+  idempotencyKey?: string;
   /** Cancels the request; it then fails with kind `aborted` (see `isAborted`), it never resolves half-way. */
   signal?: AbortSignal;
   /** False for calls that establish or end the session (sign-in, `/auth/me`), where a 401 is an answer, not an expiry. Default true. */
@@ -137,6 +143,7 @@ export function createHttpClient(options: HttpClientOptions = {}): HttpClient {
     for (const source of [extra, callOptions.headers]) {
       if (source) new Headers(source).forEach((value, name) => headers.set(name, value));
     }
+    if (callOptions.idempotencyKey !== undefined) headers.set("Idempotency-Key", callOptions.idempotencyKey);
     if (sentId !== null && !headers.has(REQUEST_ID_HEADER)) headers.set(REQUEST_ID_HEADER, sentId);
     if (encoded.contentType !== null && !headers.has("Content-Type")) headers.set("Content-Type", encoded.contentType);
 

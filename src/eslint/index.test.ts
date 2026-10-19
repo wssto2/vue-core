@@ -31,4 +31,11 @@ describe("vueCoreConfig", () => {
     expect(rules["vue/no-v-html"]).toBe("off");
     expect(config[0]?.ignores).toEqual(["dist/**", "node_modules/**", "coverage/**", "**/*.d.ts", "generated/**"]);
   });
+
+  it("gives the test files, in a tests/ folder or named *.test.ts, the vitest globals and the stub-component allowances", () => {
+    const entry = vueCoreConfig().find((candidate) => candidate.files?.includes("tests/**/*.{ts,vue}"));
+    expect(entry?.files).toEqual(["**/*.test.ts", "tests/**/*.{ts,vue}"]);
+    expect(entry?.languageOptions?.globals).toMatchObject({ describe: false, it: false, expect: false, vi: false });
+    expect(entry?.rules).toMatchObject({ "vue/require-prop-types": "off", "vue/one-component-per-file": "off" });
+  });
 });

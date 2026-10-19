@@ -110,3 +110,24 @@ describe("typed meta", () => {
     expectTypeOf(plain.meta).toEqualTypeOf<unknown>();
   });
 });
+
+describe("RequestOptions.idempotencyKey", () => {
+  it("sends the key of the attempt as Idempotency-Key on a route call, on a plain call and again on the retry after a renewed session", async () => {
+    const { transport, calls } = scriptedTransport(jsonResponse(200, { id: 1, title: "n" }), jsonResponse(200, { id: 1, title: "n" }), jsonResponse(401, { success: false, error: "expired" }), jsonResponse(200, { success: true, data: 1 }));
+    const client = createHttpClient({ transport, onUnauthorized: async () => "retry" });
+    await client.request(create, { title: "n" }, { idempotencyKey: "attempt-1" });
+    await client.post("/v1/tickets", { title: "n" }, { idempotencyKey: "attempt-2" });
+    await client.post("/v1/tickets", {}, { idempotencyKey: "attempt-3" });
+    const sent = calls.map((call) => new Headers(call.init.headers).get("Idempotency-Key"));
+    expect(sent).toEqual(["attempt-1", "attempt-2", "attempt-3", "attempt-3"]);
+  });
+
+  it("is absent without the option, and wins over a header of the same name", async () => {
+    const { client, calls } = setup(jsonResponse(200, { id: 1, title: "n" }), jsonResponse(200, { id: 1, title: "n" }));
+    await client.request(create, { title: "n" });
+    await client.request(create, { title: "n" }, { headers: { "Idempotency-Key": "old", "X-Other": "kept" }, idempotencyKey: "new" });
+    expect(new Headers(calls[0]?.init.headers).has("Idempotency-Key")).toBe(false);
+    expect(new Headers(calls[1]?.init.headers).get("Idempotency-Key")).toBe("new");
+    expect(new Headers(calls[1]?.init.headers).get("X-Other")).toBe("kept");
+  });
+});
