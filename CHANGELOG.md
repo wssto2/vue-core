@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.14.0 — 2026-10-19
+
+An incident's occurrences for the staff, and Bosnian month names. Needs go-core v1.19.0 (`goCore`, `src/modules` synced).
+
+### New
+- **incidents:** the incident page has an "Occurrences" section for `incident:manage`: a paged list, newest first (time, method and route, person, request id, error class and code, message), each row opening to the stack and the captured context and request JSON (`incidentRoutes.occurrences`). Texts in hr, en, sl, bs and sr-Latn.
+- **format:** `format.date(value, options)` takes `Intl.DateTimeFormatOptions` for the active locale (the application's `datePattern` does not apply there).
+
+### Fixed
+- **format:** a Bosnian date written with a month word uses the Bosnian names (`juni`, `juli`, `august`; `juna`, `jula`, `augusta` with a day; short = three letters), since `bs` reads `sr-Latn-BA` and Chromium has no Bosnian data.
+
+### Changed
+- **modules:** regenerated from go-core v1.19.0 (incident `OccurrenceResponse`, `occurrences`).
+
 ## 0.13.1 — 2026-10-19
 
 go-core `v1.18.1`: a client error says where it came from.
