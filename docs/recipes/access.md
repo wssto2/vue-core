@@ -181,6 +181,8 @@ go-core's delegation rules refuse with a reason; the screens say it in words (en
 
 `useRefusalMessage()` is the same sentence for a form of your own (`useForm({ failureMessage })`).
 
+`RestrictedPanel` (`@wssto2/vue-core/access`) is what a page the person may not open can show in its place: a lock, `core.no_access`'s sentence, an optional `contact` address to write to, and a Back button (one step in the application's history, else `home`, default `/`). `createApplication({ noAccess })` renders a component without props, so give the address through a function: `noAccess: () => h(RestrictedPanel, { contact: "access@example.com" })`.
+
 ## Try it
 
 `playground/identity.html` runs these screens against go-core's own dev server (`go run github.com/wssto2/go-core/cmd/devserver`): sign in as `admin`, edit roles at `/iam/roles`, open People and give `user` a role; sign in as `user` (the home page has the button) and none of it is offered.

@@ -635,6 +635,8 @@ Read mode shows the value the way the app formats it (`useFormat().date`, `.date
 
 `PhoneField` is in its own subpath, `@wssto2/vue-core/phone`, because it brings the phone metadata of libphonenumber-js (about 225 kB minified, 55 kB compressed, with the mobile / landline data): an app without phone fields does not download it. It is a country picker with the flag and dial code (common countries first, then all, searchable by name or dial code) and a number that is formatted as it is typed. The value is a string in E.164, `+38591234567`, or `""`.
 
+`whatsAppLink(value, country)` (same subpath) turns a number as people type it (`098 999 888`, `+385 98 999 888`, `00385...`) into a `https://wa.me/...` link: a local number gets the dial code of `country` (an ISO code, any case), one that already has a country code keeps it, and fewer than six digits give `null`.
+
 <!-- example: docs/examples/forms/components/ContactFields.vue:35-36 -->
 ```vue
     <PhoneField v-bind="form.bind('mobile')" :label="t('forms.mobile')" />

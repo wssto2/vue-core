@@ -253,9 +253,9 @@ async function archive() {
 </template>
 ```
 
-The same goes for the messages a server sends for a field (`{ fields: { oib: ["validation_errors.required"] } }`): say once how one becomes a sentence, beside `describeError`, and every form (`useForm`, `useResourceForm`, `useCommand`) uses it unless it has its own `describeFieldError`. Without either, messages show as sent.
+The same goes for the messages a server sends for a field (`{ fields: { oib: ["validation_errors.required"] } }`): say once how one becomes a sentence, beside `describeError`, and every form (`useForm`, `useResourceForm`, `useCommand`) uses it unless it has its own `describeFieldError`. Without either, go-core's validator keys (`validation_errors.required`) are worded by the library and other messages show as sent.
 
-`useServerMessages()` (also `@wssto2/vue-core/i18n`) is that rule for go-core's refusals, ready to spread into a form or a command: `describeFieldError` (a field's reason, `identity.email.taken`, becomes your `errors.<reason>` or the library's `core.errors.<reason>`), `failureMessage(kind, error)` (a refusal of the whole action says its reason) and `sentence(error)` for a toast. Put your own refusals first with `failureMessage: (kind, error) => mine(error) ?? messages.failureMessage(kind, error)`.
+`useServerMessages()` (also `@wssto2/vue-core/i18n`) is that rule for go-core's refusals, ready to spread into a form or a command: `describeFieldError` (a field's reason, `identity.email.taken`, becomes your `errors.<reason>` or the library's `core.errors.<reason>`), `failureMessage(kind, error)` (a refusal of the whole action says its reason) and `sentence(error)` for a toast. `useServerMessages({ prefixes })` names the key namespaces the server's validator writes (default `["validation_errors"]`): a field message that starts with one is a key, said with your text for it, else the library's `core.<key>`; a rule that needs a parameter the server does not send (`min`, `max`, `between`, ...) reads as `validation_errors.out_of_range`. Put your own refusals first with `failureMessage: (kind, error) => mine(error) ?? messages.failureMessage(kind, error)`.
 
 <!-- example: docs/examples/app/describeFieldError.ts -->
 ```ts
@@ -276,12 +276,12 @@ Regions and forms word their own failures already (`useResource`, `useLoad`, `us
 
 ## Outside setup
 
-`currentApplication()` is the application `createApplication` made, for code that is not in a component: an `api.ts`, a router guard, a store. `.platform` (the HTTP client, session, access), `.format`, `.router`, `.i18n` and `.report` are on it. Read it when the code runs, not at module load: a module is evaluated before `main.ts` creates the application, so declare a list or a read with `listLoader` / `readRecord` (they read the client at the call) and call `currentApplication()` inside functions. Before one exists it throws an error that says so. The newest application is the current one; `dispose()` releases it.
+`currentApplication()` is the application `createApplication` made, for code that is not in a component: an `api.ts`, a router guard, a store. `currentHttp()` is its HTTP client (`currentApplication().platform.http`). `.platform` (the HTTP client, session, access), `.format`, `.router`, `.i18n` and `.report` are on it. Read it when the code runs, not at module load: a module is evaluated before `main.ts` creates the application, so declare a list or a read with `listLoader` / `readRecord` (they read the client at the call) and call `currentApplication()` inside functions. Before one exists it throws an error that says so. The newest application is the current one; `dispose()` releases it.
 
 <!-- example: docs/examples/app/outsideSetup.ts -->
 ```ts
 // Code that runs outside a component's setup reaches the application through currentApplication().
-import { currentApplication } from "@wssto2/vue-core/app";
+import { currentApplication, currentHttp } from "@wssto2/vue-core/app";
 import { defineCollection, listLoader } from "@wssto2/vue-core/collection";
 import { found, readRecord } from "@wssto2/vue-core/resource";
 
@@ -294,7 +294,8 @@ export interface Dealer {
 export const dealers = defineCollection({ id: "dealers", stateVersion: 1, load: listLoader<Dealer>("/v1/dealers"), key: (dealer) => dealer.id });
 export const dealerRecord = (id: number, context: { signal: AbortSignal }) => readRecord<Dealer | null>(`/v1/dealers/${id}`, context).then(found);
 
-export const archive = (id: number) => currentApplication().platform.http.post(`/v1/dealers/${id}/archive`, {});
+// currentHttp() is currentApplication().platform.http; idempotencyKey is the key of this attempt, sent as the Idempotency-Key header.
+export const archive = (id: number, idempotencyKey: string) => currentHttp().post(`/v1/dealers/${id}/archive`, {}, { idempotencyKey });
 
 // A failure the code caught, and the user saw: a handled error goes to the incidents (and the console), with where it happened.
 export function restoreLayout(): unknown {

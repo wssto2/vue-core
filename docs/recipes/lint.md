@@ -19,7 +19,7 @@ export default [
     ignores: ["generated/**"], // on top of dist, node_modules, coverage and *.d.ts
     rules: { "@typescript-eslint/no-explicit-any": "warn", "vue/require-default-prop": "warn" }, // `warn` = counted, `error` = zero
   }),
-  { files: ["tests/**/*.ts"], rules: { "vue/one-component-per-file": "off" } },
+  // Your own objects go after it. Files named *.test.ts and everything under tests/ already have the vitest globals.
 ];
 ```
 

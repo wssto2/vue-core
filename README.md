@@ -11,12 +11,12 @@ Its plan and rules are in [PLAN.md](PLAN.md).
 | Import | For |
 |---|---|
 | `@wssto2/vue-core/platform` | `readBootstrap`, `createPlatform` (HTTP client, session, access), `AccessGate`, typed contexts |
-| `@wssto2/vue-core/app` | `createApplication`, `defineFeature`, `currentApplication` and `application.report` (outside setup, handled errors), shell outlets, effects |
+| `@wssto2/vue-core/app` | `createApplication`, `defineFeature`, `currentApplication`, `currentHttp` and `application.report` (outside setup, handled errors), shell outlets, effects |
 | `@wssto2/vue-core/shell` | `backofficeShell`, the shell's parts for a custom one |
 | `@wssto2/vue-core/router` | `defineRoutes` (typed targets), guards, navigation |
 | `@wssto2/vue-core/collection` | `defineCollection`, `useCollection`, `CollectionPage`, `DataTable` (a table over an array), record neighbors |
 | `@wssto2/vue-core/resource`, `/page` | `useRouteResource`, `ResourcePage`, `SectionNavigator`, `AdaptivePageShell` |
-| `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives |
+| `@wssto2/vue-core/button`, `/controls`, `/content`, `/state`, `/overlay`, `/modal`, `/icon` | the primitives (`/content` includes `Panel`, `KeyValueList`, `StatSummary`, the grouped card of numbers) |
 | `@wssto2/vue-core/i18n`, `/format`, `/client` | messages, `useDescribeError`, formatting, `HttpClient` and `ApiError` |
 | `@wssto2/vue-core/identity`, `/access` | go-core's module contracts (types, route tables) and, in `/identity`, `identityFeature` (sign-in page, language), `identityPlatform()` and `usersFeature` (users, "my profile") and `serviceAccountsFeature` (service accounts and their API keys): [sign-in](docs/recipes/sign-in.md), [users](docs/recipes/users.md), [service accounts](docs/recipes/service-accounts.md) |
 | `@wssto2/vue-core/access` (screens) | `accessFeature({ catalogue })`: roles list and editor, compare, replace, a person's roles (`PersonAccess`) and what they can do: [roles and access](docs/recipes/access.md) |
