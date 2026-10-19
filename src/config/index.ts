@@ -41,6 +41,24 @@ export interface ArchitectureFile {
 /** An application's own rule: the messages for one file (each is prefixed with the file's path), or none. */
 export type ArchitectureRule = (file: ArchitectureFile) => string[] | undefined;
 
+/** The rule `no-hardcoded-copy`: no text in the language of the code's authors where a person reads it. */
+export interface CopyRuleConfig {
+  /** What the text of that language looks like: its letters and common words (matched line by line). Required. */
+  pattern: RegExp;
+  /** Where every string literal of a `.ts` / `<script>` and a template's `placeholder`, `title`, `aria-label` and `label` count. Default: the UI folders (`uiDirs`). Elsewhere only a template's text and the strings of `form.ts`, `*Form.ts` and `forms/` count. */
+  scope?: RegExp;
+  /** Words that are written in that language's letters in every language (brand names), cut out of what `scope` scans. Give it the `g` flag. */
+  properNames?: RegExp;
+}
+
+/** The rule `no-route-policy`: a route names its permission in `meta.permission`, never in `policy:` / `requires:` of a `routes.ts`. */
+export interface RouteAccessConfig {
+  /** The session's retired list of permission names (`policies`): `authStore.<name>` and `state.<name>` are reported too. Default none. */
+  sessionField?: string;
+  /** Files (by path from the config's folder) that are not scanned: scripts, docs, e2e. Tests are never scanned. */
+  exclude?: RegExp;
+}
+
 export interface ArchitectureConfig {
   /** The folder of the features, relative to the config file (default "features"). */
   featuresDir?: string;
@@ -59,11 +77,15 @@ export interface ArchitectureConfig {
   generated?: { dir?: string; allowed?: string[]; moved?: Record<string, string> };
   /**
    * Known offenders that predate a rule, by rule: "deep-import" (`<file> -> <specifier>`), "raw-http", "feature-name" and
-   * "feature-shape" (paths), and a pack rule's id (files; a stale entry is a violation, so the list only shrinks).
+   * "feature-shape" (paths), and a pack rule's or `copy` / `routeAccess` rule's id (files; a stale entry is a violation, so the list only shrinks).
    */
   allow?: Record<string, string[]>;
   /** Opt-in rule packs: "design-values" (theme tokens) and "presentation" (use the library's components). */
   packs?: ("design-values" | "presentation")[];
+  /** Switches on `no-hardcoded-copy`; its allowlist (`allow["no-hardcoded-copy"]`) is a ratchet like a pack rule's. */
+  copy?: CopyRuleConfig;
+  /** Switches on `no-route-policy`; its allowlist is `allow["no-route-policy"]`. */
+  routeAccess?: RouteAccessConfig;
   /** The application's own rules, run on every source file. */
   rules?: ArchitectureRule[];
   /** A document to name after a rule's message, by rule: "shared-layer", "api-error" or a pack rule's id. */

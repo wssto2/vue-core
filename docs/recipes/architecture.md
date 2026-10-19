@@ -17,6 +17,8 @@ A feature is a folder under `features/` (one or two levels deep) with an `index.
 
 Two packs are opt-in by name. `design-values` keeps `features/` and `components/` on vue-core's theme (one neutral, the brand green as `primary-*`, no arbitrary shadows or hex colours). `presentation` asks for the library's components in `features/**/*.vue`: `DataTable` or `CollectionTable` instead of `<table>`, the field components instead of `<input>`, `Banner`, `Badge`, `AsyncSection`, column `mobile` roles on a `CollectionTable`. A pack rule's allowlist is a ratchet in both directions: an entry whose file no longer breaks the rule is a violation too.
 
+Two more rules take options and are on when their section is given. `copy` is `no-hardcoded-copy`: `pattern` is what the text of a language looks like (its letters and common words); a `.vue` template's text nodes and the strings of `form.ts`, `*Form.ts` and `forms/` files may not match it, and inside `scope` (default the UI folders) neither may any string literal of a `.ts` or `<script>`, or a template's `placeholder`, `title`, `aria-label` and `label`; `properNames` cuts brand names out of what `scope` scans. `routeAccess` is `no-route-policy`: a route names its permission in `meta.permission`, so `policy:` and `requires:` in a `routes.ts` are reported, and with `sessionField` so is the session's retired list (`authStore.policies`, `state.policies`); `exclude` leaves out scripts and docs. Tests are never scanned. Both have an allowlist that is a ratchet in both directions, and a line of the text is quoted in the message.
+
 The section of `vue-core.config.mjs` (every key is optional):
 
 <!-- example: docs/examples/devkit/architecture.config.ts -->
@@ -28,8 +30,11 @@ export default defineConfig({
     // The defaults: features/, the "@/" alias, components/ and composables/ as the shared layer.
     generated: { allowed: ["entities/*", "schemas/*", "routes/*", "permissions"] },
     packs: ["design-values", "presentation"],
+    // No text of the authors' language in a template or a string a person reads (here Croatian), and no `policy:` in a routes.ts.
+    copy: { pattern: /[čćžšđ]|\b(Spremi|Odustani)\b/, properNames: /Njuškalo|Škoda/g },
+    routeAccess: { sessionField: "policies", exclude: /^(e2e|scripts|docs)\// },
     // Known offenders that predate a rule; the lists only shrink.
-    allow: { "feature-name": ["features/old_stuff"] },
+    allow: { "feature-name": ["features/old_stuff"], "no-hardcoded-copy": ["features/vehicles/form.ts"] },
     doc: { "shared-layer": "docs/architecture.md, Shared layer" },
     // The application's own rules: the messages for one file, each prefixed with its path.
     rules: [({ content, isTest }) => (!isTest && content.includes("debugger") ? ["no-debugger — remove it"] : [])],
@@ -37,6 +42,6 @@ export default defineConfig({
 });
 ```
 
-`allow` is keyed by rule: `deep-import` (`<file> -> <specifier>`), `raw-http`, `feature-name` and `feature-shape` take paths, and a pack rule's id (`no-raw-table`, ...) takes files. A key that names no rule is an error, so a typo cannot silence anything. `doc` appends a reference to a message: `shared-layer`, `api-error` or a pack rule's id. A custom rule gets `{ file, content, template, imports, isVue, isTest }` and runs after the built-in import rules, before the packs.
+`allow` is keyed by rule: `deep-import` (`<file> -> <specifier>`), `raw-http`, `feature-name` and `feature-shape` take paths, and a pack rule's id (`no-raw-table`, ...) or `no-hardcoded-copy` / `no-route-policy` takes files. A key that names no rule is an error, so a typo cannot silence anything. `doc` appends a reference to a message: `shared-layer`, `api-error` or a pack rule's id. A custom rule gets `{ file, content, template, imports, isVue, isTest }` and runs after the built-in import rules, before the packs.
 
 The `featuresDir`, `alias`, `sharedLayers`, `skip` (folders the walk leaves out) and `uiDirs` (where `design-values` looks) keys move the rules to another layout.

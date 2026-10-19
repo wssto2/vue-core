@@ -4,6 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { PACKS } from "./packs.mjs";
+import { builtInRules } from "./rules.mjs";
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".vue"]);
 const toPosix = (value) => value.split(path.sep).join("/");
@@ -24,6 +25,7 @@ export function check({ root, config, configName }) {
   const docRef = (key, join = " (") => (doc[key] ? `${join}${doc[key]}${join === " (" ? ")" : ""}` : "");
   const packs = config.packs.map((name) => PACKS[name]);
   const packRules = packs.flatMap((pack, index) => pack.rules.map((rule) => ({ ...rule, pack: packs[index], seen: new Set() })));
+  const builtIns = builtInRules(config);
   const featuresRoot = path.join(root, featuresDir);
   const violations = [];
   const warnings = [];
@@ -99,6 +101,14 @@ export function check({ root, config, configName }) {
       }
     }
 
+    // the built-in rules with options (`copy`, `routeAccess`)
+    for (const rule of builtIns) {
+      const message = rule.check({ file, content, isVue, isTest });
+      if (!message) continue;
+      if (allowed(rule.id).has(file)) rule.seen.add(file);
+      else violations.push(`${file}: ${rule.id} — ${message}${docRef(rule.id)}.`);
+    }
+
     // a failed request is vue-core's `ApiError`; a second class makes `isApiError` miss the errors of the other client
     if (/\bclass\s+\w*ApiError\b/.test(content)) {
       violations.push(
@@ -124,7 +134,7 @@ export function check({ root, config, configName }) {
   }
 
   // a stale allowlist entry (the file no longer trips the rule) is a violation: the lists only shrink
-  for (const rule of packRules) {
+  for (const rule of [...packRules, ...builtIns]) {
     for (const entry of allowed(rule.id)) {
       if (!rule.seen.has(entry)) {
         violations.push(`${entry}: stale ${rule.id} allowlist entry in ${configName} — the file no longer trips the rule; remove it from the allowlist.`);

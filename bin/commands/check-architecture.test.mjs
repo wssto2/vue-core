@@ -105,3 +105,81 @@ describe("vue-core check-architecture rules", () => {
     expect(missing.text).toContain("featuresDir:");
   });
 });
+
+describe("vue-core check-architecture: no-hardcoded-copy", () => {
+  const feature = { "features/orders/index.ts": "export const orders = 1;", "features/orders/routes.ts": "export const routes = [];" };
+  const copy = '{ copy: { pattern: /[čćžšđ]|\\b(Spremi|Odustani)\\b/, properNames: /Škoda/g } }';
+
+  it("is off unless the architecture config has a `copy` section", async () => {
+    const files = { ...feature, "features/orders/Box.vue": "<template><p>Spremi</p></template>" };
+    expect((await check(app(files))).code).toBe(0);
+  });
+
+  it("finds copy in a template's text nodes, in the copy attributes and, in scope, in every string literal", async () => {
+    const dir = app(
+      {
+        ...feature,
+        "features/orders/Text.vue": "<template><p>Spremi</p></template>",
+        "features/orders/Attr.vue": '<template><input placeholder="Unesi šifru" :title="t(\'ok\')" /></template>',
+        "features/orders/Script.vue": '<script setup lang="ts">const label = "Odustani";</script><template><p>{{ label }}</p></template>',
+        "features/orders/labels.ts": 'export const label = "Odustani";',
+        "lib/labels.ts": 'export const label = "Odustani";',
+        "lib/OutOfScope.vue": '<script setup lang="ts">const label = "Odustani";</script><template><p>{{ t(label) }}</p></template>',
+        "features/orders/Clean.vue": "<template><p>{{ $t('orders.save') }} Škoda</p></template>",
+      },
+      copy,
+    );
+    const { code, text } = await check(dir);
+    expect(code).toBe(1);
+    expect(text).toContain("- features/orders/Attr.vue: no-hardcoded-copy — hardcoded copy in a user-facing string (“Unesi šifru”)");
+    expect(text).toContain("- features/orders/Script.vue: no-hardcoded-copy — hardcoded copy in a user-facing string (“\"Odustani\"”)");
+    expect(text).toContain("- features/orders/Text.vue: no-hardcoded-copy — hardcoded copy in a user-facing string (“Spremi”)");
+    expect(text).toContain("- features/orders/labels.ts: no-hardcoded-copy");
+    expect(text).not.toContain("lib/");
+    expect(text).not.toContain("Clean.vue");
+  });
+
+  it("takes the scope and the proper names it is given, and never scans a test", async () => {
+    const files = { ...feature, "lib/labels.ts": 'export const label = "Odustani";', "features/orders/Brand.vue": "<script setup lang=\"ts\">const brand = \"Škoda\";</script><template><p>{{ brand }}</p></template>", "features/orders/Brand.test.ts": 'const x = "Spremi";' };
+    const config = '{ copy: { pattern: /[čćžšđ]|\\b(Spremi|Odustani)\\b/, properNames: /Škoda/g, scope: /^(features|lib)\\// } }';
+    expect((await check(app(files, config))).text).toBe('Frontend architecture violations:\n\n- lib/labels.ts: no-hardcoded-copy — hardcoded copy in a user-facing string (“"Odustani"”) — move it to an i18n key.');
+  });
+
+  it("keeps its allowlist a ratchet, and refuses a config without a pattern", async () => {
+    const files = { ...feature, "features/orders/Box.vue": "<template><p>Spremi</p></template>", "features/orders/Fine.vue": "<template><p>ok</p></template>" };
+    const allowed = '{ copy: { pattern: /Spremi/ }, allow: { "no-hardcoded-copy": ["features/orders/Box.vue", "features/orders/Fine.vue"] } }';
+    expect((await check(app(files, allowed))).text).toBe(
+      "Frontend architecture violations:\n\n- features/orders/Fine.vue: stale no-hardcoded-copy allowlist entry in vue-core.config.mjs — the file no longer trips the rule; remove it from the allowlist.",
+    );
+    expect((await check(app(files, "{ copy: {} }"))).text).toContain("copy.pattern: a regular expression");
+    expect((await check(app(files, '{ allow: { "no-hardcoded-copy": ["x"] } }'))).text).toContain("allow.no-hardcoded-copy: no such rule");
+  });
+});
+
+describe("vue-core check-architecture: no-route-policy", () => {
+  const files = {
+    "features/orders/index.ts": "export const orders = 1;",
+    "features/orders/routes.ts": "export const routes = [{ path: '/', meta: {\n  policy: 'orders:view',\n  requires: ['x'] } }];",
+    "features/orders/Other.ts": "const meta = { policy: 'fine here' };",
+    "app/guard.ts": "const held = authStore.policies; // not state.policies\nconst ok = session.access;",
+    "app/comment.ts": "// authStore.policies is gone\n/* state.policies */",
+    "docs/routes.ts": "const meta = {\n policy: 'x' };",
+    "features/orders/routes.test.ts": "const meta = {\n policy: 'x' };",
+  };
+
+  it("is off unless the architecture config has a `routeAccess` section", async () => {
+    expect((await check(app(files))).code).toBe(0);
+  });
+
+  it("flags policy: / requires: in a routes.ts and the old session field, by the field's name, outside the excluded folders and comments", async () => {
+    const { code, text } = await check(app(files, "{ routeAccess: { sessionField: 'policies', exclude: /^docs\\// } }"));
+    expect(code).toBe(1);
+    expect(text).toContain("- features/orders/routes.ts: no-route-policy — “policy: 'orders:view',”");
+    expect(text).toContain("- app/guard.ts: no-route-policy — “const held = authStore.policies;");
+    expect(text).not.toContain("Other.ts");
+    expect(text).not.toContain("comment.ts");
+    expect(text).not.toContain("docs/");
+    expect(text).not.toContain("routes.test.ts");
+    expect((await check(app(files, "{ routeAccess: { sessionField: 'grants', exclude: /^docs\\// } }"))).text).not.toContain("app/guard.ts");
+  });
+});

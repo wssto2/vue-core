@@ -30,6 +30,8 @@ export const DEFAULTS = {
     packs: [],
     rules: [],
     doc: {},
+    copy: null,
+    routeAccess: null,
   },
   generator: { template: join(dirname(fileURLToPath(import.meta.url)), "templates", "feature-crud"), out: "features" },
   e2eTimings: { report: "e2e-timings/results.json" },
