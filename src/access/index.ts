@@ -15,3 +15,4 @@ export { roleProblems, useDescribeRefusal, useRefusalMessage } from "./refusals"
 export type { RoleProblem } from "./refusals";
 export { default as PersonAccess } from "./PersonAccess.vue";
 export { default as BindingRow } from "./BindingRow.vue";
+export { default as RestrictedPanel } from "./RestrictedPanel.vue";

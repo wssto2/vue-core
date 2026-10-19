@@ -129,6 +129,9 @@ export type CoreMessages = {
     no_access: {
       title: string;
       body: string;
+      /** Shown before the address `RestrictedPanel` is given to write to. */
+      contact: string;
+      back: string;
     };
     shortcuts: {
       title: string;

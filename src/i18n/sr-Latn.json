@@ -354,7 +354,9 @@
     },
     "no_access": {
       "title": "Nemate pristup",
-      "body": "Vaša ovlašćenja ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru."
+      "body": "Vaša ovlašćenja ne uključuju ovu stranicu. Ako mislite da je došlo do greške, obratite se administratoru.",
+      "contact": "Pišite na",
+      "back": "Nazad na prethodnu stranicu"
     },
     "startup": {
       "title": "Aplikacija se nije mogla pokrenuti",

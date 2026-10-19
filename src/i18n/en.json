@@ -354,7 +354,9 @@
     },
     "no_access": {
       "title": "No access",
-      "body": "Your access does not include this page. If you believe this is a mistake, contact your administrator."
+      "body": "Your access does not include this page. If you believe this is a mistake, contact your administrator.",
+      "contact": "Write to",
+      "back": "Back to the previous page"
     },
     "startup": {
       "title": "The application could not start",

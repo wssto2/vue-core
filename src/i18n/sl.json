@@ -354,7 +354,9 @@
     },
     "no_access": {
       "title": "Ni dostopa",
-      "body": "Vaše pravice ne vključujejo te strani. Če menite, da je prišlo do napake, se obrnite na skrbnika."
+      "body": "Vaše pravice ne vključujejo te strani. Če menite, da je prišlo do napake, se obrnite na skrbnika.",
+      "contact": "Pišite na",
+      "back": "Nazaj na prejšnjo stran"
     },
     "startup": {
       "title": "Aplikacije ni bilo mogoče zagnati",
