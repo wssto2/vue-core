@@ -172,4 +172,61 @@ describe("changing the e-mail address", () => {
     expect(await screen.findByText("There is no active code. Request a new one.")).toBeTruthy();
     expect(await dialog().findByLabelText(/^New e-mail address/)).toBeTruthy();
   });
+
+  // What the person is told when the server refuses the code (go-core's identity.code.* reasons), and what the step does about it.
+  const refused = (status: number, code: string, params?: object) => jsonResponse(status, { success: false, error: "server text", code, ...(params ? { params } : {}) });
+  const alert = () => document.querySelector("[data-verify-error]")?.textContent ?? "";
+
+  it("says how many tries are left on a wrong code and clears the boxes for the next one", async () => {
+    await open(profile(), { "POST /v1/iam/profile/email": dataOf(pending()), "POST /v1/iam/profile/email/confirm": refused(422, "identity.code.mismatch", { attempts_left: 2 }) });
+    await requestChange();
+    await type("111111");
+    await waitFor(() => expect(alert()).toBe("The code is not correct. Attempts left: 2."));
+    expect((document.querySelector("[data-test='otp-input-field']") as HTMLInputElement).value).toBe("");
+    expect(document.querySelector("[data-verify-submit]")).not.toBeNull();
+  });
+
+  it("an expired code locks the boxes and offers a new one, which clears the message and unlocks them", async () => {
+    const open_ = () => pending({ resend_available_at: new Date(Date.now() - 1000).toISOString() });
+    const { calls } = await open(profile(), {
+      "POST /v1/iam/profile/email": dataOf(open_()),
+      "POST /v1/iam/profile/email/confirm": refused(422, "identity.code.expired"),
+      "POST /v1/iam/profile/email/resend": dataOf(open_()),
+    });
+    await requestChange();
+    const boxes = () => document.querySelector("[data-test='otp-input-field']") as HTMLInputElement;
+    await type("123456");
+    await waitFor(() => expect(alert()).toBe("The code is no longer valid. Request a new one."));
+    expect(boxes().disabled).toBe(true);
+    expect(document.querySelector("[data-verify-submit]")).toBeNull();
+
+    await fireEvent.click(dialog().getByRole("button", { name: "Request a new code" }));
+    expect(await screen.findByText("A new code was sent to new@example.test")).toBeTruthy();
+    await waitFor(() => expect(document.querySelector("[data-verify-error]")).toBeNull());
+    expect(boxes().disabled).toBe(false);
+    expect(document.querySelector("[data-verify-submit]")).not.toBeNull();
+    expect(callsTo(calls, "POST", "/v1/iam/profile/email/resend")).toHaveLength(1);
+  });
+
+  it.each([
+    ["too_many_attempts", "Too many wrong attempts. Request a new code."],
+    ["no_pending", "There is no active code. Request a new one."],
+  ])("a code refused as %s is said in full and ends that code", async (reason, sentence) => {
+    await open(profile(), { "POST /v1/iam/profile/email": dataOf(pending()), "POST /v1/iam/profile/email/confirm": refused(422, `identity.code.${reason}`) });
+    await requestChange();
+    await type("654321");
+    await waitFor(() => expect(alert()).toBe(sentence));
+    expect((document.querySelector("[data-test='otp-input-field']") as HTMLInputElement).disabled).toBe(true);
+    expect(document.querySelector("[data-verify-submit]")).toBeNull();
+  });
+
+  it("says on the code that a new one was asked for too soon, with the wait the server named", async () => {
+    await open(profile({ pending_email: pending({ resend_available_at: new Date(Date.now() - 1000).toISOString() }) }), {
+      "POST /v1/iam/profile/email/resend": refused(429, "identity.code.resend_too_soon", { retry_after: 30 }),
+    });
+    await fireEvent.click(document.querySelector("[data-email-enter-code] button") as HTMLElement);
+    await settle();
+    await fireEvent.click(document.querySelector("[data-verify-resend]") as HTMLElement);
+    await waitFor(() => expect(alert()).toBe("You can request a new code in 30 s."));
+  });
 });

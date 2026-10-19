@@ -668,6 +668,58 @@ describe("filters", () => {
     await flush();
     expect(list.query.value.filters).toEqual({ location: "a" });
   });
+
+  describe("the save popover of the filter panel", () => {
+    const openSavePopover = async (savedViews: ReturnType<typeof createMemorySavedViews>) => {
+      await mountList({ filters, savedViews, start: { filters: { location: "a" } } });
+      await fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
+      await flush();
+      await fireEvent.click(document.querySelector("[data-test='saved-filter-open']")!);
+      await flush();
+      return document.querySelector("[data-test='saved-filter-form']") as HTMLFormElement;
+    };
+    const name = (form: HTMLFormElement, text: string) => fireEvent.update(form.querySelector("input")!, text);
+    const stored = { id: 7, name: "Golf search", state: { version: 1 as const, filters: { phase: "open" }, search: "Golf" } };
+
+    it("offers Replace for a name that is taken, and Save for a new one", async () => {
+      const form = await openSavePopover(createMemorySavedViews({ customers: [stored] }));
+      const submit = () => form.querySelector("[data-test='saved-filter-save']")!.textContent?.trim();
+      expect(submit()).toBe("Save");
+      expect(form.querySelector("[data-test='saved-filter-replace-hint']")).toBeNull();
+
+      await name(form, "Golf search");
+      expect(form.querySelector("[data-test='saved-filter-replace-hint']")!.textContent).toContain("Golf search");
+      expect(submit()).toBe("Replace");
+
+      await name(form, "  Golf search  "); // the name is trimmed before it is compared
+      expect(submit()).toBe("Replace");
+      await name(form, "Golf search 2");
+      expect(form.querySelector("[data-test='saved-filter-replace-hint']")).toBeNull();
+      expect(submit()).toBe("Save");
+    });
+
+    it("replaces the stored view of that name, not adding a second one", async () => {
+      const savedViews = createMemorySavedViews({ customers: [stored] });
+      const form = await openSavePopover(savedViews);
+      await name(form, "Golf search");
+      await fireEvent.submit(form);
+      await flush();
+
+      const views = await savedViews.list("customers");
+      expect(views).toHaveLength(1);
+      expect(views[0]).toMatchObject({ id: 7, name: "Golf search", state: { filters: { location: "a" } } });
+      expect(document.querySelector("[data-test='saved-filter-form']")).toBeNull(); // the popover closed with the save
+    });
+
+    it("cannot be submitted without a name, and Escape closes only the popover", async () => {
+      const form = await openSavePopover(createMemorySavedViews({ customers: [stored] }));
+      expect((form.querySelector("[data-test='saved-filter-save']") as HTMLButtonElement).disabled).toBe(true);
+      await fireEvent.keyDown(form.querySelector("input")!, { key: "Escape" });
+      await flush();
+      expect(document.querySelector("[data-test='saved-filter-form']")).toBeNull();
+      expect(screen.getByRole("button", { name: "Apply" })).toBeTruthy();
+    });
+  });
 });
 
 describe("views", () => {
