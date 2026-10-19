@@ -17,12 +17,13 @@ import { MANAGE_INCIDENTS, UPDATE_INCIDENTS } from "./access";
 import { incidentList, useIncidentsApi, type IncidentDetail } from "./api";
 import { commentFormDefaults, managementDefaults, managementDraft, requiredText, type CommentForm } from "./form";
 import { SEVERITY_LABELS, SEVERITY_TONES, SOURCE_LABELS, STATUS_LABELS, STATUS_TONES } from "./look";
+import Occurrences from "./Occurrences.vue";
 import Person from "./Person.vue";
 import { incidentsRoutes } from "./routes";
 
 /**
  * An incident (`/incidents/:incidentID`): what happened, the reports people filed on it, its comments (internal ones are the staff's),
- * a summary, and, for whoever holds `incident:update`, the management form (status, severity, who may see it, the resolution, the external
+ * a summary, for the staff its occurrences, and, for whoever holds `incident:update`, the management form (status, severity, who may see it, the resolution, the external
  * ticket). It is opened from the list with previous / next within the list's result set. Comments are added without editing the incident.
  */
 const { t } = useI18n();
@@ -160,6 +161,8 @@ const named = (labels: Readonly<Record<string, string>>, value: string) => t(lab
             <Button prominence="primary" :processing="comment.form.submitting.value" @click="comment.run()">{{ t("core.incidents.actions.add_comment") }}</Button>
           </div>
         </Panel>
+
+        <Occurrences v-if="isStaff" :incident-id="incidentID" />
       </div>
 
       <!-- Sidebar -->

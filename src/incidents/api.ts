@@ -1,6 +1,6 @@
-import type { HttpClient } from "../client";
+import type { HttpClient, PageMeta } from "../client";
 import { defineCollection, listParams, readListPage } from "../collection";
-import type { CommentResponse, Incident, ReportResponse } from "../modules/incident/entities";
+import type { CommentResponse, Incident, OccurrenceResponse, ReportResponse } from "../modules/incident/entities";
 import { incidentRoutes } from "../modules/incident/routes";
 import type { CommentRequest, ReportInput, UpdateRequest } from "../modules/incident/schemas";
 import { usePlatform } from "../platform";
@@ -27,6 +27,9 @@ export interface IncidentDetail {
   readonly comments: readonly CommentResponse[];
 }
 
+/** The occurrences a page of the incident page shows. */
+export const OCCURRENCES_PER_PAGE = 10;
+
 const idempotent = (key: string) => ({ headers: { "Idempotency-Key": key } });
 
 /** go-core's incident routes as calls; `data` of each answer already read. A change takes the `Idempotency-Key` of its attempt. */
@@ -35,6 +38,11 @@ export function createIncidentsApi(http: HttpClient) {
     show: async (id: number, options?: { readonly signal?: AbortSignal }): Promise<IncidentDetail> => {
       const { data, meta } = await http.request(incidentRoutes.show, { incidentID: id }, options);
       return { incident: data, reports: meta?.reports ?? [], comments: meta?.comments ?? [] };
+    },
+    /** One page of an incident's occurrences, newest first (`incident:manage`). */
+    occurrences: async (id: number, page: number, options?: { readonly signal?: AbortSignal }): Promise<{ readonly rows: readonly OccurrenceResponse[]; readonly meta: PageMeta | null }> => {
+      const { data, meta } = await http.request(incidentRoutes.occurrences, { incidentID: id, page, per_page: OCCURRENCES_PER_PAGE }, options);
+      return { rows: data, meta };
     },
     /** The whole management form; the answer is the stored incident (without its people: the page reads again for them). */
     update: async (id: number, input: UpdateRequest, idempotencyKey: string): Promise<Incident> =>

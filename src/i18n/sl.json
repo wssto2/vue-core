@@ -1290,6 +1290,12 @@
         "no_reports": "Za ta incident še ni povezanih prijav.",
         "comments": "Komentarji",
         "no_comments": "Še ni komentarjev.",
+        "occurrences": "Pojavitve",
+        "no_occurrences": "Ni zabeleženih pojavitev.",
+        "show_details": "Prikaži podrobnosti",
+        "hide_details": "Skrij podrobnosti",
+        "context": "Kontekst",
+        "request": "Zahteva",
         "summary": "Povzetek",
         "management": "Upravljanje"
       }

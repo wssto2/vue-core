@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { choose, offered } from "../identity/serviceaccounts/testing";
 import { callsTo, dataOf, refusal, stopApplications } from "../identity/testing";
 import { settle } from "../testing";
-import { INCIDENT_CREATE, INCIDENT_MANAGE, INCIDENT_UPDATE, INCIDENT_VIEW, ana, comment, incident, ivan, shown, startIncidents } from "./testing";
+import { INCIDENT_CREATE, INCIDENT_MANAGE, INCIDENT_UPDATE, INCIDENT_VIEW, ana, comment, incident, ivan, occurrence, occurrencePage, shown, startIncidents } from "./testing";
 
 vi.setConfig({ testTimeout: 30_000 });
 afterEach(stopApplications);
@@ -121,5 +121,55 @@ describe("commenting", () => {
     await fireEvent.click(screen.getByRole("button", { name: "Add comment" }));
     await waitFor(() => expect(callsTo(calls, "POST", "/v1/incidents/12/comments")).toHaveLength(1));
     expect(body(calls, "POST", "/v1/incidents/12/comments")).toEqual({ body: "Note for us", visibility: "internal" });
+  });
+});
+
+describe("an incident's occurrences", () => {
+  const PATH = "/v1/incidents/12/occurrences";
+  const section = (target: Element) => target.querySelector("[data-test=incident-occurrences]");
+
+  it("is hidden, and not read, without incident:manage", async () => {
+    const { target, calls } = await open([INCIDENT_VIEW]);
+    expect(section(target)).toBeNull();
+    expect(callsTo(calls, "GET", PATH)).toHaveLength(0);
+  });
+
+  it("lists the time, route, person, request id, error and message of each, newest first", async () => {
+    const { target, calls } = await open([INCIDENT_VIEW, INCIDENT_MANAGE], { [`GET ${PATH}`]: occurrencePage([occurrence(), occurrence({ id: 30, user: null, request_id: "req-older" })]) });
+    await waitFor(() => expect(target.querySelectorAll("[data-test=incident-occurrence-item]")).toHaveLength(2));
+    const first = target.querySelector("[data-test=incident-occurrence-item]")!.textContent!;
+    for (const expected of ["GET /v1/invoices/export", "Ana Anić", "req-abc123", "sql.ErrConnDone · E_CONN", "connection is already closed"]) expect(first).toContain(expected);
+    expect(callsTo(calls, "GET", PATH)[0]!.url).toContain("page=1");
+  });
+
+  it("opens an occurrence to its stack, context and request as JSON", async () => {
+    const { target } = await open([INCIDENT_VIEW, INCIDENT_MANAGE], { [`GET ${PATH}`]: occurrencePage([occurrence()]) });
+    await fireEvent.click(await screen.findByRole("button", { name: "Show details" }));
+    const details = target.querySelector("[data-test=incident-occurrence-details]")!.textContent!;
+    expect(details).toContain("main.export()");
+    expect(details).toContain('"tenant": "acme"');
+    expect(details).toContain('"year": "2026"');
+    await fireEvent.click(screen.getByRole("button", { name: "Hide details" }));
+    expect(target.querySelector("[data-test=incident-occurrence-details]")).toBeNull();
+  });
+
+  it("pages: the next page is read, the first has no previous", async () => {
+    const { calls } = await open([INCIDENT_VIEW, INCIDENT_MANAGE], { [`GET ${PATH}`]: occurrencePage([occurrence()], 1, 2) });
+    const previous = (await screen.findByRole("button", { name: "Previous page" })) as HTMLButtonElement;
+    expect(previous.disabled).toBe(true);
+    await fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    await waitFor(() => expect(callsTo(calls, "GET", PATH).some((call) => call.url.includes("page=2"))).toBe(true));
+  });
+
+  it("says when there are none", async () => {
+    await open([INCIDENT_VIEW, INCIDENT_MANAGE], { [`GET ${PATH}`]: occurrencePage([]) });
+    expect(await screen.findByText("No occurrences recorded.")).toBeTruthy();
+  });
+
+  it("shows the error with a retry when the read fails", async () => {
+    const { calls } = await open([INCIDENT_VIEW, INCIDENT_MANAGE], { [`GET ${PATH}`]: refusal(500, "internal") });
+    await screen.findByRole("alert");
+    await fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(callsTo(calls, "GET", PATH).length).toBeGreaterThanOrEqual(2));
   });
 });

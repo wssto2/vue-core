@@ -1,6 +1,6 @@
 // Fixtures for this folder's tests; the declaration build excludes it.
 import { jsonResponse } from "../testing";
-import type { CommentResponse, Incident, ReportResponse } from "../modules/incident/entities";
+import type { CommentResponse, Incident, OccurrenceResponse, ReportResponse } from "../modules/incident/entities";
 import { startScreen, type ScreenOptions } from "../identity/testing";
 import { incidentsFeature, type IncidentsFeatureOptions } from "./feature";
 
@@ -79,3 +79,25 @@ export function startIncidents(options: Omit<ScreenOptions, "features"> & { feat
   const { feature, ...rest } = options;
   return startScreen({ ...rest, features: [incidentsFeature(feature)] });
 }
+
+export const occurrence = (extra: Partial<OccurrenceResponse> = {}): OccurrenceResponse => ({
+  id: 31,
+  incident_id: 12,
+  occurred_at: "2026-10-14T09:30:00Z",
+  route: "/v1/invoices/export",
+  method: "GET",
+  user_id: ana.id,
+  user: ana,
+  request_id: "req-abc123",
+  error_class: "sql.ErrConnDone",
+  error_code: "E_CONN",
+  message: "connection is already closed",
+  stacktrace: "goroutine 1 [running]:\nmain.export()",
+  context: { tenant: "acme", attempt: 2 },
+  request: { query: { year: "2026" } },
+  ...extra,
+});
+
+/** The answer of `GET /v1/incidents/:id/occurrences`: one page. */
+export const occurrencePage = (rows: OccurrenceResponse[], page = 1, lastPage = 1) =>
+  jsonResponse(200, { success: true, data: rows, meta: { total: rows.length, page, per_page: 10, last_page: lastPage, from: 1, to: rows.length } });

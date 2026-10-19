@@ -1290,6 +1290,12 @@
         "no_reports": "No reports linked to this incident yet.",
         "comments": "Comments",
         "no_comments": "No comments yet.",
+        "occurrences": "Occurrences",
+        "no_occurrences": "No occurrences recorded.",
+        "show_details": "Show details",
+        "hide_details": "Hide details",
+        "context": "Context",
+        "request": "Request",
         "summary": "Summary",
         "management": "Management"
       }
