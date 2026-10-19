@@ -46,8 +46,8 @@ describe("StatSummary", () => {
 
   it("renders the header and footer rows only when given", () => {
     expect(render(StatSummary, { props: { items }, global }).container.querySelectorAll(".border-b")).toHaveLength(0);
-    const { container } = render(StatSummary, { props: { items }, slots: { header: "<span>Last import</span>", footer: "<span>Success rate</span>" }, global });
-    expect(container.textContent).toContain("Last import");
+    const { container } = render(StatSummary, { props: { items }, slots: { header: "<span>Last run</span>", footer: "<span>Success rate</span>" }, global });
+    expect(container.textContent).toContain("Last run");
     expect(container.textContent).toContain("Success rate");
   });
 });

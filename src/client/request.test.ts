@@ -114,7 +114,7 @@ describe("typed meta", () => {
 describe("RequestOptions.idempotencyKey", () => {
   it("sends the key of the attempt as Idempotency-Key on a route call, on a plain call and again on the retry after a renewed session", async () => {
     const { transport, calls } = scriptedTransport(jsonResponse(200, { id: 1, title: "n" }), jsonResponse(200, { id: 1, title: "n" }), jsonResponse(401, { success: false, error: "expired" }), jsonResponse(200, { success: true, data: 1 }));
-    const client = createHttpClient({ transport, onUnauthorized: async () => "retry" });
+    const client = createHttpClient({ transport, onUnauthorized: async () => "retry" as const });
     await client.request(create, { title: "n" }, { idempotencyKey: "attempt-1" });
     await client.post("/v1/tickets", { title: "n" }, { idempotencyKey: "attempt-2" });
     await client.post("/v1/tickets", {}, { idempotencyKey: "attempt-3" });

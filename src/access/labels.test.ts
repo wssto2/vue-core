@@ -40,7 +40,7 @@ describe("the words arv-next kept its own copy of", () => {
 
   it("says a refused delegation by its reason, a problem with a text of its own by that text, and anything else not at all", () => {
     const refusal = inApplication(useRefusalMessage);
-    const refused = (code: string, params?: object) => new ApiError({ kind: "forbidden", message: "server text", status: 403, code, ...(params ? { params } : {}) });
+    const refused = (code: string, params?: Record<string, unknown>) => new ApiError({ kind: "forbidden", message: "server text", status: 403, code, ...(params ? { params } : {}) });
     const reasons = ["escalation", "self_assignment", "last_admin", "role_in_use", "invalid", "forbidden"].map((reason) => refusal("failed", refused(`authz.${reason}`)));
     expect(new Set(reasons).size).toBe(6);
     expect(reasons.every((text) => text && text !== "server text")).toBe(true);

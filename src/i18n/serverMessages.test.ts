@@ -36,7 +36,7 @@ describe("useServerMessages", () => {
 });
 
 describe("useServerMessages({ prefixes })", () => {
-  const withMessages = (en: object, options?: Parameters<typeof useServerMessages>[0]) => withSetup(() => useServerMessages(options), createTestApp({ messages: { en } })).result;
+  const withMessages = (en: Record<string, unknown>, options?: Parameters<typeof useServerMessages>[0]) => withSetup(() => useServerMessages(options), createTestApp({ messages: { en } })).result;
 
   it("says a validator's key (validation_errors.<rule>) with the app's text, else the library's", () => {
     const { describeFieldError } = withMessages({ validation_errors: { required: "Fill this in." } });

@@ -705,7 +705,7 @@ describe("filters", () => {
       await fireEvent.submit(form);
       await flush();
 
-      const views = await savedViews.list("customers");
+      const views = await savedViews.list("customers", { signal: new AbortController().signal });
       expect(views).toHaveLength(1);
       expect(views[0]).toMatchObject({ id: 7, name: "Golf search", state: { filters: { location: "a" } } });
       expect(document.querySelector("[data-test='saved-filter-form']")).toBeNull(); // the popover closed with the save
