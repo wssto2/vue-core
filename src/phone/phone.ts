@@ -27,6 +27,27 @@ const dialCodeOf = (country: PhoneCountry): string => getCountryCallingCode(coun
 /** The dial code of a country, with its plus ("+385"). */
 export const dialCode = (country: PhoneCountry): string => `+${dialCodeOf(country)}`;
 
+/**
+ * A `wa.me` link for a number as people type it ("098 999 888", "+385 98 999 888", "00385…"): a local number gets the dial code of
+ * `country` (an ISO code, any case; an unknown one adds nothing), one that already has a country code keeps it. Null when there are
+ * fewer than six digits.
+ */
+export function whatsAppLink(value: string | null | undefined, country: string): string | null {
+  let digits = (value ?? "").replace(/\D/g, "");
+  if (digits.length < 6) return null;
+
+  let code = "";
+  try {
+    code = dialCodeOf(country.toUpperCase() as PhoneCountry);
+  } catch {
+    // an unknown country has no dial code to add
+  }
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  else if (!(value ?? "").trim().startsWith("+") && code && !digits.startsWith(code)) digits = code + digits.replace(/^0/, "");
+
+  return `https://wa.me/${digits}`;
+}
+
 /** Every country a number can belong to. */
 export const allCountries = (): readonly PhoneCountry[] => getCountries();
 

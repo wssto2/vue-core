@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allCountries, countryName, dialCode, formatInternational, isValidPhone, phoneCountry, phoneKind, phoneProblem, readPhone, searchCountries, withCountry } from "./phone";
+import { allCountries, countryName, dialCode, formatInternational, isValidPhone, phoneCountry, phoneKind, phoneProblem, readPhone, searchCountries, whatsAppLink, withCountry } from "./phone";
 
 describe("reading a number", () => {
   it.each([
@@ -110,5 +110,28 @@ describe("countries", () => {
     expect(searchCountries("+38", "en", all)).toEqual(expect.arrayContaining(["HR", "BA", "SI", "RS"]));
     expect(searchCountries("", "en", all)).toBe(all);
     expect(searchCountries("zzzz", "en", all)).toEqual([]);
+  });
+});
+
+describe("whatsAppLink", () => {
+  it("adds the country's dial code to a local number, whatever the case of the country", () => {
+    expect(whatsAppLink("098 999 888", "hr")).toBe("https://wa.me/38598999888");
+    expect(whatsAppLink("061/123-456", "BA")).toBe("https://wa.me/38761123456");
+    expect(whatsAppLink("041 123 456", "si")).toBe("https://wa.me/38641123456");
+    expect(whatsAppLink("060 1234567", "rs")).toBe("https://wa.me/381601234567");
+  });
+
+  it("keeps a number that already has a country code", () => {
+    expect(whatsAppLink("+387 61 123 456", "hr")).toBe("https://wa.me/38761123456");
+    expect(whatsAppLink("00385 98 999 888", "ba")).toBe("https://wa.me/38598999888");
+    expect(whatsAppLink("38598999888", "hr")).toBe("https://wa.me/38598999888");
+  });
+
+  it("is null when there are too few digits or no value, and leaves a local number alone for a country it does not know", () => {
+    expect(whatsAppLink("", "hr")).toBeNull();
+    expect(whatsAppLink(null, "hr")).toBeNull();
+    expect(whatsAppLink(undefined, "hr")).toBeNull();
+    expect(whatsAppLink("12-34", "hr")).toBeNull();
+    expect(whatsAppLink("098 999 888", "zz")).toBe("https://wa.me/098999888");
   });
 });
