@@ -83,8 +83,11 @@ export interface MoneyOptions {
 export interface Formatting {
   /** The locale the next call formats for. */
   readonly locale: string;
-  /** Numeric by default: `30. 09. 2026.` in hr, `09/30/2026` in en. */
-  date(value: DateInput): string;
+  /**
+   * Numeric by default: `30. 09. 2026.` in hr, `09/30/2026` in en. With `options` it is `Intl.DateTimeFormat`'s for the active locale
+   * (`{ month: "long", year: "numeric" }`; the application's `datePattern` does not apply), and in Bosnian the month words are Bosnian.
+   */
+  date(value: DateInput, options?: Intl.DateTimeFormatOptions): string;
   dateTime(value: DateInput): string;
   time(value: DateInput): string;
   number(value: number | null | undefined, options?: Intl.NumberFormatOptions): string;
@@ -137,6 +140,22 @@ export interface FormatterSettings {
    * (`percent`, `unit`) stays `Intl`'s. Money in an ISO currency is then this number and the currency's symbol ("12,50 €").
    */
   numberSymbols?: NumberSymbols;
+}
+
+// Chromium has no Bosnian data and `bs` reads `sr-Latn-BA`, which writes the Serbian jun / jul / avgust: the Bosnian names replace the month word.
+const BOSNIAN_TAG = "sr-Latn-BA";
+const NOMINATIVE = ["januar", "februar", "mart", "april", "maj", "juni", "juli", "august", "septembar", "oktobar", "novembar", "decembar"];
+const GENITIVE = ["januara", "februara", "marta", "aprila", "maja", "juna", "jula", "augusta", "septembra", "oktobra", "novembra", "decembra"];
+
+/** `Intl.DateTimeFormat(tag, options)` of a date; a month written as a word is Bosnian when the tag is `sr-Latn-BA`: genitive with a day, nominative alone, short = its first three letters. */
+function formatWithOptions(value: Date, tag: string, options: Intl.DateTimeFormatOptions): string {
+  const intl = new Intl.DateTimeFormat(tag, options);
+  if (tag !== BOSNIAN_TAG || (options.month !== "long" && options.month !== "short")) return intl.format(value);
+  const month = value.getMonth();
+  return intl
+    .formatToParts(value)
+    .map((part) => (part.type !== "month" ? part.value : options.month === "short" ? NOMINATIVE[month]!.slice(0, 3) : (options.day === undefined ? NOMINATIVE : GENITIVE)[month]!))
+    .join("");
 }
 
 const pad = (value: number, length = 2) => String(value).padStart(length, "0");
@@ -221,9 +240,10 @@ export function createFormatting(options: FormattingOptions): Formatting {
     const date = toDate(value);
     return date ? formatters.time(date, options.locale()) : "";
   };
-  const date = (value: DateInput) => {
+  const date = (value: DateInput, dateOptions?: Intl.DateTimeFormatOptions) => {
     const parsed = toDate(value);
-    return parsed ? formatters.date(parsed, options.locale()) : "";
+    if (!parsed) return "";
+    return dateOptions ? formatWithOptions(parsed, tag(), dateOptions) : formatters.date(parsed, options.locale());
   };
   const day = (value: DateInput, { inSentence = false, now = new Date() }: DayOptions = {}) => {
     const parsed = toDate(value);
