@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.1 — 2026-10-20
+
+A dialog opened from a dialog could paint behind it.
+
+### Fixed
+- **overlay:** every dialog (Modal, Sheet, AlertDialog, PhotoViewer, ...) teleports to `<body>` with the same z-index, so a dialog whose Teleport was mounted earlier (the application's shell host) painted under one opened later. The dialog stack now gives each open dialog `z-index: 9000 + its depth`: the topmost paints on top whatever the mount order. Menus (10001) and tooltips (10002) stay above.
+
 ## 0.15.0 — 2026-10-19
 
 What arv-next kept to itself and the library can say once: server field messages, a WhatsApp link, a stat card and the "no access" panel, two architecture rules and the request helpers every `api.ts` redefined. go-core is unchanged (`v1.19.0`). Breaking only in that `useForm` now words go-core's `validation_errors.*` keys itself (see Changed).

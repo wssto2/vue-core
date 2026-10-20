@@ -468,4 +468,29 @@ describe("open dialog count", () => {
     await settle();
     expect(count.value).toBe(0);
   });
+
+  it("paints the topmost dialog above one whose Teleport sits later in <body>", async () => {
+    // A is mounted first (its teleport anchor comes first), B later; B opens first, then A on top.
+    const mountOne = (id: string) =>
+      render(
+        defineComponent({
+          components: { Modal },
+          setup: () => ({ modal: ref<InstanceType<typeof Modal> | null>(null) }),
+          template: `<div><button id="${id}" @click="modal?.present()">Open</button><Modal ref="modal" title="${id}-title">${id}</Modal></div>`,
+        }),
+        { global },
+      );
+    mountOne("a");
+    mountOne("b");
+    for (const id of ["b", "a"]) {
+      await fireEvent.click(document.querySelector(`#${id}`)!);
+      await settle();
+    }
+    const rootOf = (title: string) => screen.getByText(title).closest("body > *") as HTMLElement;
+    const [a, b] = [rootOf("a-title"), rootOf("b-title")];
+    // Even document order puts A first; the z-index is what puts it on top.
+    expect(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(Number(a.style.zIndex)).toBeGreaterThan(Number(b.style.zIndex));
+    expect(Number(a.style.zIndex)).toBeLessThan(10001);
+  });
 });

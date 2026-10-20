@@ -12,6 +12,9 @@ import { perDocument } from "../internal/perDocument";
  *   (out of the tab order, hit testing and the accessibility tree). Opening a nested dialog makes
  *   its parent inert; closing it hands the parent back. Only what the stack itself made inert is
  *   released again: an element that was inert already stays so.
+ * - Paint order. Teleports mount wherever their anchor sits, so equal z-indexes would paint a dialog
+ *   mounted at app start under one opened later. Each open dialog's `<body>` child gets
+ *   `z-index: DIALOG_Z_BASE + its depth`, so the topmost paints on top; menus and tooltips (10001+) stay above.
  * - Escape. Only the topmost dialog reacts, otherwise one keypress closes the whole stack.
  * - Scroll locking. The lock belongs to the stack, so closing a nested dialog does not unlock the
  *   page under its parent.
@@ -22,6 +25,10 @@ import { perDocument } from "../internal/perDocument";
 export const INERT_SKIP_ATTR = "data-dialog-inert-skip";
 /** The class the stack puts on `<body>` while a dialog is open. */
 export const SCROLL_LOCK_CLASS = "overflow-hidden";
+
+/** Below Menu (10001) and Tooltip (10002); the stack adds its depth. */
+const DIALOG_Z_BASE = 9000;
+const Z_ATTR = "data-dialog-z";
 
 interface Entry {
   root: () => HTMLElement | null;
@@ -49,6 +56,25 @@ function sync(state: Stack) {
     } else if (!shouldBeInert && state.inertedByUs.has(child)) {
       child.inert = false;
       state.inertedByUs.delete(child);
+    }
+  }
+
+  // Depth is the z-index; a child that left the stack gets its class back.
+  const depth = new Map<Element, number>();
+  state.entries.value.forEach((entry, index) => {
+    const root = entry.root();
+    const child = root && Array.from(document.body.children).find((c) => c.contains(root));
+    if (child) depth.set(child, index);
+  });
+  for (const child of Array.from(document.body.children)) {
+    if (!(child instanceof HTMLElement)) continue;
+    const index = depth.get(child);
+    if (index !== undefined) {
+      child.style.zIndex = String(DIALOG_Z_BASE + index);
+      child.setAttribute(Z_ATTR, "");
+    } else if (child.hasAttribute(Z_ATTR)) {
+      child.style.zIndex = "";
+      child.removeAttribute(Z_ATTR);
     }
   }
 
