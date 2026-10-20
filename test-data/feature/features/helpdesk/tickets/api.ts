@@ -17,7 +17,7 @@ export const ticketsApi = (http: HttpClient) => ({
 
   /** A 422 lands on the form's fields (`form.submit`). */
   async create(payload: TicketForm, idempotencyKey: string): Promise<Ticket> {
-    return (await http.request(ticketsRoutes.create, payload, { headers: { "Idempotency-Key": idempotencyKey } })).data;
+    return (await http.request(ticketsRoutes.create, payload, { idempotencyKey })).data;
   },
 });
 

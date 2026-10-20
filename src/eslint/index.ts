@@ -36,6 +36,16 @@ export const TYPED_RULES: readonly string[] = [
 
 export const TYPED_RULE_SET: ReadonlySet<string> = new Set(TYPED_RULES);
 
+const IDEMPOTENCY_KEY = "/^idempotency-key$/i";
+/** Rule `no-raw-idempotency-header`, as `no-restricted-syntax` selectors: the key goes through `RequestOptions.idempotencyKey`. */
+export const RAW_IDEMPOTENCY_HEADER_SELECTORS: readonly { selector: string; message: string }[] = [
+  `Property[key.name='headers'] > ObjectExpression > Property[key.value=${IDEMPOTENCY_KEY}]`,
+  `CallExpression[callee.property.name=/^(set|append)$/][arguments.0.value=${IDEMPOTENCY_KEY}]`,
+].map((selector) => ({
+  selector,
+  message: "Do not build the Idempotency-Key header by hand: pass the request option { idempotencyKey } (it is also re-sent on the renew-and-retry after a 401).",
+}));
+
 export interface VueCoreConfigOptions {
   /**
    * Turn on the type-aware rules (`TYPED_RULES`, at `warn`: the ratchet counts them). Type-aware linting is slow, so it is
@@ -110,6 +120,8 @@ export function vueCoreConfig({ typed = false, tsconfigRootDir, ignores = [], ru
         ...rules,
       },
     },
+    // The client implementation sets the header itself; applications must use the request option.
+    { files: ["**/*.{ts,vue}"], ignores: ["src/client/**"], rules: { "no-restricted-syntax": ["error", ...RAW_IDEMPOTENCY_HEADER_SELECTORS] } },
     // Test files (named *.test.ts or in a tests/ folder) define stub components inline, several per file, with untyped prop lists on purpose.
     { files: ["**/*.test.ts", "tests/**/*.{ts,vue}"], languageOptions: { globals: globals.vitest }, rules: { "vue/require-prop-types": "off", "vue/one-component-per-file": "off" } },
   ];

@@ -17,7 +17,7 @@ export const __FEATURE_API_CLIENT__ = (http: HttpClient) => ({
 
   /** A 422 lands on the form's fields (`form.submit`). */
   async create(payload: __FEATURE_FORM_TYPE__, idempotencyKey: string): Promise<__FEATURE_ENTITY__> {
-    return (await http.request(__FEATURE_ROUTE_TABLE__.create, payload, { headers: { "Idempotency-Key": idempotencyKey } })).data;
+    return (await http.request(__FEATURE_ROUTE_TABLE__.create, payload, { idempotencyKey })).data;
   },
 });
 

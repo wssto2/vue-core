@@ -41,7 +41,7 @@ export interface ContactBody {
 }
 
 export function createTicketFormsApi(http: HttpClient) {
-  const idempotency = (key: string) => ({ headers: { "Idempotency-Key": key } });
+  const idempotency = (key: string) => ({ idempotencyKey: key });
   return {
     get: (id: number, signal: AbortSignal) => http.get<Ticket>(`/tickets/${id}`, { signal }).then((result) => result.data),
     /** The record's full update. */

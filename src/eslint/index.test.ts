@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { Linter } from "eslint";
 import { describe, expect, it } from "vitest";
 import { TYPED_RULE_SET, TYPED_RULES, vueCoreConfig } from "./index";
 
@@ -37,5 +38,30 @@ describe("vueCoreConfig", () => {
     expect(entry?.files).toEqual(["**/*.test.ts", "tests/**/*.{ts,vue}"]);
     expect(entry?.languageOptions?.globals).toMatchObject({ describe: false, it: false, expect: false, vi: false });
     expect(entry?.rules).toMatchObject({ "vue/require-prop-types": "off", "vue/one-component-per-file": "off" });
+  });
+});
+
+describe("no-raw-idempotency-header", () => {
+  const entry = vueCoreConfig().find((candidate) => candidate.rules?.["no-restricted-syntax"] && candidate.ignores?.includes("src/client/**"))!;
+  const lint = (code: string, filename = "src/api.ts") => new Linter({ configType: "flat" }).verify(code, [{ files: ["**/*.ts"], rules: entry.rules }], { filename }).length;
+
+  it.each([
+    "http.post(url, body, { idempotencyKey: key });",
+    "http.post(url, body, { headers: { 'X-Other': key } });",
+    "const h = new Headers(); h.set('Content-Type', 'x');",
+    "const o = { 'Idempotency-Key': key };",
+  ])("allows %s", (code) => expect(lint(code)).toBe(0));
+
+  it.each([
+    "http.post(url, body, { headers: { 'Idempotency-Key': key } });",
+    'http.post(url, body, { headers: { "idempotency-key": key } });',
+    "http.post(url, body, { headers: { ['IDEMPOTENCY-KEY']: key } });",
+    "http.post(url, body, { headers: { ...base, 'Idempotency-Key': key } });",
+    "headers.set('Idempotency-Key', key);",
+    "init.headers.append('idempotency-key', key);",
+  ])("reports %s", (code) => expect(lint(code)).toBe(1));
+
+  it("leaves the library's own client alone", () => {
+    expect(entry.ignores).toEqual(["src/client/**"]);
   });
 });

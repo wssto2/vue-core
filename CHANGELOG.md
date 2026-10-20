@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.2 — 2026-10-20
+
+A hand-built `Idempotency-Key` header is now a lint error.
+
+### New
+- **eslint:** `vueCoreConfig` reports a hand-built `Idempotency-Key` header (`no-raw-idempotency-header`, a `no-restricted-syntax` entry): a `headers: { "Idempotency-Key": … }` object property in any casing, and `headers.set(...)` / `.append(...)` with that name. Use the request option `{ idempotencyKey }`, which is also re-sent on the renew-and-retry after a 401. `src/client` is excluded. An application that sets its own `no-restricted-syntax` replaces it and should spread `RAW_IDEMPOTENCY_HEADER_SELECTORS` (exported from `@wssto2/vue-core/eslint`).
+
 ## 0.15.1 — 2026-10-20
 
 A dialog opened from a dialog could paint behind it.
