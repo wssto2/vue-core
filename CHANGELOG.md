@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.3 — 2026-10-21
+
+A group sheet focuses its first error.
+
+### Changed
+- **form:** `GroupSheet` calls `focusFirstError` on its body once it has opened and after a refused Save, so a sheet opened with errors already set (`form.errors.add(field, message)` before `present()`) lands on the first flagged field in page order instead of the first control. No new API and no option: with no errors nothing changes. An application that focused the field itself after `present()` can drop that code.
+
 ## 0.15.2 — 2026-10-20
 
 A hand-built `Idempotency-Key` header is now a lint error.

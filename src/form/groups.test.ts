@@ -238,6 +238,29 @@ describe("saving one group: the record's full update", () => {
   });
 });
 
+describe("focus on the first error", () => {
+  it("opens with the errors already set and focuses the first flagged field, not the first control", async () => {
+    const { form, contact } = await openRecord();
+    form.errors.add("phone", "Required");
+    contact.present();
+    await settle();
+    await vi.waitFor(() => expect(document.activeElement).toBe(inSheet().getByLabelText("Phone")));
+  });
+
+  it("a refused save moves focus to the field the server named", async () => {
+    await openRecord({
+      save: async () => {
+        throw new ApiError({ kind: "validation", message: "no", status: 422, fields: { phone: ["bad number"] } });
+      },
+    });
+    await fireEvent.click(editButton("Contact"));
+    await settle();
+    await fireEvent.update(inSheet().getByLabelText("Email"), "dup@x.test");
+    await save();
+    await vi.waitFor(() => expect(document.activeElement).toBe(inSheet().getByLabelText("Phone")));
+  });
+});
+
 describe("foreign-field errors", () => {
   it("names the group whose data the save needs, when the record is invalid elsewhere", async () => {
     const { form } = await openRecord({ record: customer({ name: "" }) });
