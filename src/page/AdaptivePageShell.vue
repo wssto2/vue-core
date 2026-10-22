@@ -5,6 +5,7 @@ import BottomDockPortal from "./BottomDockPortal.vue";
 import PageActions from "./PageActions.vue";
 import PageToolbar from "./PageToolbar.vue";
 import ResourceHeader from "./ResourceHeader.vue";
+import { useOriginBack } from "./back";
 import { createPageChrome, pageChromeKey, useOptionalPageChrome } from "./chrome";
 import { pageSectionBackKey } from "./sectionBack";
 import { usePageFocus } from "./usePageFocus";
@@ -92,8 +93,12 @@ const phone = useMediaQuery("(max-width: 47.999rem)");
 const sectionBack = ref<PageSectionBack | null>(null);
 provide(pageSectionBackKey, sectionBack);
 
+// `?back=`: the page the user came from replaces the page's own back (the only place it is resolved: toolbar and nav bar read this).
+const originBack = useOriginBack();
+
 const back = computed<PageBack | null>(() => {
   if (sectionBack.value) return sectionBack.value;
+  if (originBack.value) return originBack.value;
   if (props.back !== undefined) return props.back;
   const parent = props.path?.[props.path.length - 1];
   return parent ? { label: parent.label, to: parent.to } : null;
@@ -101,9 +106,9 @@ const back = computed<PageBack | null>(() => {
 
 const toolbarPath = computed<readonly PagePathItem[] | null | undefined>(() => {
   const section = sectionBack.value;
-  if (!section) return props.path;
+  if (!section) return originBack.value ? null : props.path;
   if (!section.path) return null;
-  const own = props.path ?? (props.back ? [props.back] : []);
+  const own = originBack.value ? [originBack.value] : (props.path ?? (props.back ? [props.back] : []));
   return [...own, ...section.path];
 });
 

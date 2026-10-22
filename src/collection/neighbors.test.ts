@@ -54,6 +54,13 @@ describe("useCollectionNeighbors", () => {
     expect(neighbors.next.value?.key).toBe(10);
   });
 
+  it("drops the page the user came from (?back=) when stepping to another record", async () => {
+    const { definition } = setup();
+    const { neighbors } = await open(definition, 1, `${stateOf(definition, { page: 1 })}&back=/takeovers/7&back_title=Golf`);
+    const query = (neighbors.next.value?.to as { query: Record<string, string> }).query;
+    expect(Object.keys(query)).toEqual(["from"]);
+  });
+
   it("steps across page boundaries and back to the list on the record's own page", async () => {
     const { definition } = setup();
     const from = stateOf(definition, { page: 2 });

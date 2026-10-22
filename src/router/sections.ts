@@ -3,6 +3,7 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter, type RouteLocationRaw, type RouteRecordNormalized, type RouteRecordRaw } from "vue-router";
 import type { IconName } from "../icon";
 import { usePlatform } from "../platform/platform";
+import { BACK_PARAM, BACK_TITLE_PARAM } from "../page/back";
 import { isAllowed } from "./meta";
 
 /** One section of a record page, as its navigation shows it. */
@@ -47,7 +48,7 @@ export interface RouteSections {
  *
  * A section the session may not open (`meta.access`) is left out. A page inside a section is a
  * sibling route without `meta.section` and with `meta.sectionParent` naming the section's route.
- * Links keep the query (a list's state) and carry only the params their own path declares.
+ * Links keep the query (a list's state, `?back=`) and carry only the params their own path declares.
  */
 export function useRouteSections(): RouteSections {
   const route = useRoute();
@@ -73,6 +74,9 @@ export function useRouteSections(): RouteSections {
     return Object.fromEntries(Object.entries(route.params).filter(([key]) => keys.has(key)));
   };
 
+  // A sub-page's own query stays behind, but the page the user came from (`?back=`) goes with them.
+  const backQuery = computed(() => Object.fromEntries([BACK_PARAM, BACK_TITLE_PARAM].filter((key) => key in route.query).map((key) => [key, route.query[key]])));
+
   const sections = computed<readonly SectionLink[]>(() =>
     children.value
       .filter((child) => isAllowed(child.meta?.access, access))
@@ -85,7 +89,7 @@ export function useRouteSections(): RouteSections {
           shortLabel: meta.shortLabelKey ? t(meta.shortLabelKey) : label,
           icon: meta.icon,
           group: meta.groupKey ? t(meta.groupKey) : undefined,
-          to: { name: child.name!, params: paramsFor(child.name), query: route.meta.sectionParent ? {} : route.query },
+          to: { name: child.name!, params: paramsFor(child.name), query: route.meta.sectionParent ? backQuery.value : route.query },
           active: isCurrent(child),
         };
       }),

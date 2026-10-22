@@ -1,4 +1,5 @@
 export { default as AdaptivePageShell } from "./AdaptivePageShell.vue";
+export { BACK_PARAM, BACK_TITLE_PARAM, useBackLinks, type BackLinks } from "./back";
 export { default as BottomDock } from "./BottomDock.vue";
 export { bottomDockKey, installBottomDock, useBottomDockTarget } from "./bottomDock";
 export { default as BottomDockPortal } from "./BottomDockPortal.vue";

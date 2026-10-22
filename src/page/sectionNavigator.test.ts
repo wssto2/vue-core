@@ -113,6 +113,17 @@ async function mountRecord(wide: boolean, options: Options = {}) {
   };
 }
 
+describe("SectionNavigator and ?back=", () => {
+  it("keeps the origin when the section changes, and into a sub-page's links (its other query stays behind)", async () => {
+    const page = await mountRecord(true, { path: "/records/3/general?back=/x&back_title=Golf&noise=1" });
+    const hrefs = () => [...document.querySelectorAll<HTMLAnchorElement>('nav[aria-label="Parts of the record"] a')].map((link) => link.getAttribute("href"));
+    expect(hrefs()[1]).toBe("/records/3/notes?back=/x&back_title=Golf&noise=1");
+    await page.router.push("/records/3/notes/9?back=/x&back_title=Golf&noise=1");
+    await settle();
+    expect(hrefs()[1]).toBe("/records/3/notes?back=/x&back_title=Golf");
+  });
+});
+
 describe("SectionNavigator on compact screens", () => {
   it("shows a segmented control of short labels, the current one marked, in front of the section", async () => {
     const page = await mountRecord(false);

@@ -2,6 +2,7 @@ import { getCurrentScope, onScopeDispose, ref, shallowRef, watch, type Ref } fro
 import { useRoute, type RouteLocationRaw } from "vue-router";
 import { isAborted } from "../client";
 import type { RecordListContext } from "../resource/listContext";
+import { withoutBack } from "../page/back";
 import { listRouteOf } from "./back";
 import type { CollectionDefinition } from "./definition";
 import { LIST_CONTEXT_PARAM } from "./location";
@@ -133,7 +134,7 @@ export function useCollectionNeighbors<Row, Sort extends string, Filter extends 
       return {
         key,
         get to(): RouteLocationRaw {
-          return { name: route.name ?? undefined, params: { ...route.params, [options.param]: String(key) }, query: { ...route.query, [LIST_CONTEXT_PARAM]: state }, hash: route.hash };
+          return { name: route.name ?? undefined, params: { ...route.params, [options.param]: String(key) }, query: { ...withoutBack(route.query), [LIST_CONTEXT_PARAM]: state }, hash: route.hash };
         },
       };
     };
