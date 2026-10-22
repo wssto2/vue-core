@@ -345,3 +345,30 @@ function add(text: string) {
 ```
 
 For a history that mixes comments with what happened (an assignment, a phase change), use `ActivityStream` and `Composer` directly: `items` are `{ kind: "event", icon, tone?, actor?, text? }` and `{ kind: "comment", body, author?, avatarUrl?, mine? }`, oldest first so the newest sits by the composer; the `#event` slot draws an event's content (a badge), `#comment-meta` and `#comment-actions` add to a comment's line.
+
+## 7. Back to the page you came from
+
+A link that leaves a record for another module (a ticket to its customer, a takeover to a new contract) should not make the user press the browser's back button. `useBackLinks()` (from `@wssto2/vue-core/page`) gives two functions that put the origin in the URL:
+
+<!-- example: docs/examples/tickets/components/CustomerLink.vue -->
+```vue
+<script setup lang="ts">
+import { useBackLinks } from "@wssto2/vue-core/page";
+import { RouterLink } from "vue-router";
+
+// From a ticket to its customer's record: the customer page's back reads "‹ <this ticket's title>" and leads here.
+defineProps<{ customerId: number }>();
+const { backHere } = useBackLinks();
+</script>
+
+<template>
+  <!-- Called in the template: the link follows the ticket's title once it has loaded. -->
+  <RouterLink :to="backHere(`/customers/${customerId}`)">Customer</RouterLink>
+</template>
+```
+
+- `backHere(to)` adds `?back=<this page's path>&back_title=<its title>`; the title is the one the page shows (its large title, which `RecordHeader` and `ResourcePage` publish to the page chrome), so callers pass nothing. It is in the URL, so a reload or a copied link reads the same. Call it where it is rendered (a template, a `computed`), not once in `setup`: it reads the title when the page has loaded.
+- `keepBack(to)` carries the page's own `?back=` and `back_title=` onto `to`, for a page that hands the user on (create, then the saved record). It returns `to` unchanged when the page was not opened with one.
+- Every page in the shell (`AdaptivePageShell`, so `ResourcePage`, `EditorPage` and a list page) resolves it in one place, desktop toolbar and phone bar alike: the page's own back is replaced by the origin. With no `back_title` the label is the origin route's `meta.titleKey`.
+- `?back=` is untrusted. A path that does not start with a single `/`, an external URL, a path no route owns, the current page, or a back with neither a title nor a `titleKey` is ignored and the page keeps its own back. The title is shown as text, trimmed and cut at 80 characters.
+- A record's sections (`SectionNavigator`) keep it, so changing section does not lose the way back. The pager's previous / next drop it: another record is not reached from that page.

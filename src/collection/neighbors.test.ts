@@ -3,6 +3,7 @@ import { useRoute } from "vue-router";
 import { createPlatform, parseBootstrap } from "../platform";
 import { snapshotOf } from "../platform/testing";
 import { defineCollection } from "./definition";
+import { LIST_CONTEXT_PARAM } from "./location";
 import { useCollectionNeighbors } from "./neighbors";
 import { encodeState } from "./state";
 import { fakeLoader, flush, inApp, makeRouter, page, type Row } from "./testing";
@@ -58,7 +59,7 @@ describe("useCollectionNeighbors", () => {
     const { definition } = setup();
     const { neighbors } = await open(definition, 1, `${stateOf(definition, { page: 1 })}&back=/takeovers/7&back_title=Golf`);
     const query = (neighbors.next.value?.to as { query: Record<string, string> }).query;
-    expect(Object.keys(query)).toEqual(["from"]);
+    expect(Object.keys(query)).toEqual([LIST_CONTEXT_PARAM]);
   });
 
   it("steps across page boundaries and back to the list on the record's own page", async () => {

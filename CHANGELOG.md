@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.16.0 — 2026-10-22
+
+Back to the page a record was opened from.
+
+### New
+- **page:** `useBackLinks()` returns `backHere(to)` and `keepBack(to)`. `backHere` adds `?back=<current path>&back_title=<the page's title>` (the title is the page chrome's, so a caller passes nothing and the link updates once the record has loaded); `keepBack` carries the page's own `back` and `back_title`. `BACK_PARAM` and `BACK_TITLE_PARAM` are exported.
+- **page:** `AdaptivePageShell` (so `EditorPage`, `ResourcePage` and list pages) replaces the page's back with the valid `?back=`, on the desktop toolbar and the phone bar alike. The label is `back_title` (text, trimmed, 80 characters), else the target route's `meta.titleKey`. A back that is not a single-slash path of this app, resolves to no route (the catch-all does not count), is the current page, or has no label is ignored and the page keeps its own.
+
+### Changed
+- **router:** `useRouteSections` keeps `back` and `back_title` in a sub-page's section links (the rest of a sub-page's query is still left behind); sections already kept the whole query.
+- **collection:** the previous / next links of `useCollectionNeighbors` drop `back` and `back_title`: another record is not reached from the page the user came from.
+
 ## 0.15.3 — 2026-10-21
 
 A group sheet focuses its first error.
