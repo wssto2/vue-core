@@ -14,8 +14,8 @@ export function createTicketsFeature(http: HttpClient) {
     id: "tickets",
     routes: ticketRoutes.records,
     context: provideContext(TICKETS, { api, list: createTicketList(api) }),
-    // Loaded the first time a route of this feature is entered, in the active locale.
-    messages: localeMessages("tickets", { en: () => import("./i18n/en.json"), hr: () => import("./i18n/hr.json") }),
+    // Loaded the first time a route of this feature is entered, in the active locale. The lazy glob takes the file names as locales (en.json, hr.json); `createApplication({ localeFiles: { bs: "ba" } })` renames the exceptions.
+    messages: localeMessages("tickets", import.meta.glob("./i18n/*.json")),
     // The backend's menu names destinations; this says which route opens "tickets" and which records keep it highlighted.
     navigation: [{ destination: "tickets", to: ticketRoutes.index, within: ["tickets.record"] }],
   });

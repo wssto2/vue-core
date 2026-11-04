@@ -270,8 +270,8 @@ export const coreMessages: { readonly en: CoreMessages; readonly hr: CoreMessage
 
 export type CoreLocale = keyof typeof coreMessages;
 
-export { localeMessages } from "./messages";
-export type { LocaleMessagesOptions, MessageLoader, MessageNamespace, Messages } from "./messages";
+export { localeMessages, messageLoaders } from "./messages";
+export type { LocaleFiles, LocaleMessagesOptions, MessageLoader, MessageNamespace, Messages } from "./messages";
 export { createMessageRuntime } from "./runtime";
 export type { MessageFailure, MessageRuntime, MessageRuntimeOptions, MessageTarget } from "./runtime";
 export { fieldMessageWith, useServerMessages } from "./serverMessages";

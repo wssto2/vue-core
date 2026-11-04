@@ -1,6 +1,6 @@
 import type { InjectionKey } from "vue";
 import type { RouteRecordRaw } from "vue-router";
-import type { MessageNamespace } from "../i18n";
+import { messageLoaders, type LocaleFiles, type MessageNamespace } from "../i18n";
 import type { Platform } from "../platform/platform";
 import type { Feature, ShellSlot } from "./feature";
 import { isFeature } from "./feature";
@@ -31,6 +31,8 @@ export interface CompositionInput {
   /** Keys the runtime provides: a feature may not provide them. */
   reservedContexts: readonly InjectionKey<never>[];
   supportedLocales: readonly string[];
+  /** The file name per locale where it differs (`createApplication({ localeFiles })`). */
+  localeFiles?: LocaleFiles;
   /** The slots the shell renders, when it says. */
   shellSlots: readonly ShellSlot[] | undefined;
 }
@@ -142,7 +144,7 @@ export function validateComposition(input: CompositionInput): { features: readon
       const other = namespaces.get(entry.namespace);
       if (other) report(owner, `declares the message namespace "${entry.namespace}", which ${other} declares too.`);
       else namespaces.set(entry.namespace, owner);
-      for (const locale of Object.keys(entry.loaders)) {
+      for (const locale of Object.keys(messageLoaders(entry, input.localeFiles))) {
         if (!input.supportedLocales.includes(locale)) report(owner, `the namespace "${entry.namespace}" has a loader for "${locale}", which is not a supported locale (${input.supportedLocales.join(", ")}).`);
       }
     }

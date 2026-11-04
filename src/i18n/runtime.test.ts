@@ -19,6 +19,36 @@ function setup(loaders: Record<string, Record<string, () => Promise<{ default: R
   return { i18n, runtime, failures, t: i18n.global.t as (key: string) => string };
 }
 
+describe("localeMessages from a glob", () => {
+  const glob = (load: (file: string) => void) =>
+    Object.fromEntries(["./en.json", "./ba.json", "./hr.json"].map((path) => [path, () => (load(path), Promise.resolve(module({ title: path })))]));
+  const run = (localeFiles?: Record<string, string>) => {
+    const load = vi.fn();
+    const i18n = createI18n({ legacy: false, locale: "bs", fallbackLocale: "en", missingWarn: false, fallbackWarn: false, messages: { en: {}, hr: {}, bs: {} } });
+    const runtime = createMessageRuntime({ target: i18n.global, namespaces: [localeMessages("tickets", glob(load))], fallback: "en", supported: ["en", "hr", "bs"], localeFiles });
+    return { load, runtime, t: i18n.global.t as (key: string) => string };
+  };
+
+  it("imports nothing until the namespace is needed, then only the active locale and the fallback", async () => {
+    const { load, runtime } = run({ bs: "ba" });
+    expect(load).not.toHaveBeenCalled();
+    await runtime.load(["tickets"]);
+    expect(load.mock.calls.map(([file]) => file).sort()).toEqual(["./ba.json", "./en.json"]);
+  });
+
+  it("maps a locale to its file name with localeFiles", async () => {
+    const { runtime, t } = run({ bs: "ba" });
+    await runtime.load(["tickets"]);
+    expect(t("tickets.title")).toBe("./ba.json");
+  });
+
+  it("takes the file name as the locale without a mapping, and a locale with no file falls back as before", async () => {
+    const { runtime, t } = run();
+    await runtime.load(["tickets"]);
+    expect(t("tickets.title")).toBe("./en.json"); // bs has no bs.json: en stands in
+  });
+});
+
 describe("localeMessages", () => {
   it("validates the namespace and keeps `core` for the library", () => {
     expect(() => localeMessages("", {})).toThrow(/not a namespace/);

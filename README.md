@@ -116,8 +116,8 @@ export function createTicketsFeature(http: HttpClient) {
     id: "tickets",
     routes: ticketRoutes.records,
     context: provideContext(TICKETS, { api, list: createTicketList(api) }),
-    // Loaded the first time a route of this feature is entered, in the active locale.
-    messages: localeMessages("tickets", { en: () => import("./i18n/en.json"), hr: () => import("./i18n/hr.json") }),
+    // Loaded the first time a route of this feature is entered, in the active locale. The lazy glob takes the file names as locales (en.json, hr.json); `createApplication({ localeFiles: { bs: "ba" } })` renames the exceptions.
+    messages: localeMessages("tickets", import.meta.glob("./i18n/*.json")),
     // The backend's menu names destinations; this says which route opens "tickets" and which records keep it highlighted.
     navigation: [{ destination: "tickets", to: ticketRoutes.index, within: ["tickets.record"] }],
   });
@@ -327,7 +327,7 @@ Dark mode is the `dark` class on `<html>`; nothing is decided for you. An app th
 
 ## Texts and locales
 
-The library's own texts are under the `core` namespace in English, Croatian, Bosnian and Slovenian (`t("core.actions.cancel")`). `createApplication` merges them into its vue-i18n instance; override any key with `i18n.messages` and restrict the offered locales with `locale.supported`. A feature's texts are a namespace (`localeMessages("tickets", { en: () => import("./i18n/en.json") })`, used as `t("tickets.title")`) loaded per locale on demand. A locale switch (the account menu has one) loads every namespace in use first, so nothing shows a raw key; `locale.onChange` lets you save the choice on the user.
+The library's own texts are under the `core` namespace in English, Croatian, Bosnian and Slovenian (`t("core.actions.cancel")`). `createApplication` merges them into its vue-i18n instance; override any key with `i18n.messages` and restrict the offered locales with `locale.supported`. A feature's texts are a namespace (`localeMessages("tickets", import.meta.glob("./i18n/*.json"))`, or one `() => import("./i18n/en.json")` per locale; used as `t("tickets.title")`) loaded per locale on demand. A locale switch (the account menu has one) loads every namespace in use first, so nothing shows a raw key; `locale.onChange` lets you save the choice on the user.
 
 ## Recipes
 

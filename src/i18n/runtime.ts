@@ -1,4 +1,4 @@
-import type { MessageNamespace, Messages } from "./messages";
+import { messageLoaders, type LocaleFiles, type MessageNamespace, type Messages } from "./messages";
 
 /** The part of a vue-i18n composer (`i18n.global`) the runtime writes to. */
 export interface MessageTarget {
@@ -16,6 +16,8 @@ export interface MessageRuntimeOptions {
   target: MessageTarget;
   /** Every namespace of the application, unique by name (the application validates that). */
   namespaces: readonly MessageNamespace[];
+  /** The file name that holds a locale's messages when it is not the locale itself, for namespaces declared from a glob. */
+  localeFiles?: LocaleFiles;
   /** The locale whose messages stand in for a missing one. */
   fallback: string;
   /** The locales `setLocale` accepts. */
@@ -48,7 +50,7 @@ const nest = (namespace: string, messages: Messages): Record<string, unknown> =>
 
 export function createMessageRuntime(options: MessageRuntimeOptions): MessageRuntime {
   const { target, fallback } = options;
-  const registry = new Map(options.namespaces.map((entry) => [entry.namespace, entry]));
+    const loadersOf = new Map(options.namespaces.map((entry) => [entry.namespace, messageLoaders(entry, options.localeFiles)]));
   const loaded = new Set<string>();
   const pending = new Map<string, Promise<boolean>>();
   const failed = new Map<string, MessageFailure>();
@@ -64,7 +66,7 @@ export function createMessageRuntime(options: MessageRuntimeOptions): MessageRun
     const running = pending.get(key);
     if (running) return running;
 
-    const loader = registry.get(namespace)?.loaders[locale];
+    const loader = loadersOf.get(namespace)?.[locale];
     if (!loader) return Promise.resolve(true); // nothing to load in this locale: the fallback's messages stand in
 
     failed.delete(key);
