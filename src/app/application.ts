@@ -104,6 +104,8 @@ export interface ApplicationOptions {
   shell?: Component | ShellDefinition;
   router?: ApplicationRouterOptions;
   i18n?: ApplicationI18nOptions;
+  /** Which file holds a locale's messages when the name differs, for namespaces declared from `import.meta.glob` (`{ bs: "ba" }`: `ba.json` is Bosnian). Default: the file name is the locale. */
+  localeFiles?: Readonly<Record<string, string>>;
   locale?: ApplicationLocaleOptions;
   /**
    * How dates and numbers are written: the `Intl` formatters, any of them replaced, and the `FormattingSettings` (the `intlLocale` map, a numeric
@@ -223,6 +225,7 @@ export function createApplication(options: ApplicationOptions): Application {
     messages: options.messages ?? [],
     reservedContexts,
     supportedLocales,
+    localeFiles: options.localeFiles,
     shellSlots: shell?.slots,
   });
   const issues = [...appIssues, ...composition.issues];
@@ -250,7 +253,7 @@ export function createApplication(options: ApplicationOptions): Application {
     datePattern,
     numberSymbols,
     emptyNumber,
-    translate: (key) => composer.t(key),
+    translate: (key, params) => composer.t(key, params ?? {}),
   });
 
   const namespaces = [...features.flatMap((feature) => feature.messages), ...(options.messages ?? [])];
@@ -262,6 +265,7 @@ export function createApplication(options: ApplicationOptions): Application {
     namespaces,
     fallback: fallbackLocale,
     supported: supportedLocales,
+    localeFiles: options.localeFiles,
     onFailure: (failure) => report({ source: "messages", error: failure.error, detail: `${failure.namespace} (${failure.locale})`, feature: ownerOfNamespace.get(failure.namespace) }),
   });
   const ownerOfNamespace = new Map(features.flatMap((feature) => feature.messages.map((entry) => [entry.namespace, feature.id] as const)));

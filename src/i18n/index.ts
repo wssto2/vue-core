@@ -246,6 +246,18 @@ export type CoreMessages = {
         views: Texts<"all" | "failed">;
       };
     };
+    /** `PhaseTrack`: where a record stands in its process. */
+    stepper: Texts<"step_of" | "history" | "current" | "completed">;
+    /** `NextStepPanel`; `menu_hint` is for the note an application writes under the action (`{action}`, or `{first}` and `{second}`). */
+    next_step: Texts<"title" | "menu_hint" | "menu_hint_many">;
+    /** `RequirementList`. */
+    requirements: Texts<"all_met" | "met" | "not_met">;
+    /** `TodoRow`: the state a screen reader hears. */
+    todo_state: Texts<"done" | "missing" | "waiting" | "optional">;
+    /** `PhaseTiles`. */
+    phase_tiles: Texts<"position" | "timeline" | "done" | "current" | "skipped">;
+    /** `format.when`: a moment as people say it; `{n}` minutes, `{time}` as HH:mm, `{date}` as the application writes dates. */
+    when: Texts<"just_now" | "minutes_ago" | "today_at" | "yesterday_at" | "tomorrow_at" | "date_at">;
     startup: {
       title: string;
       session: string;
@@ -270,8 +282,8 @@ export const coreMessages: { readonly en: CoreMessages; readonly hr: CoreMessage
 
 export type CoreLocale = keyof typeof coreMessages;
 
-export { localeMessages } from "./messages";
-export type { LocaleMessagesOptions, MessageLoader, MessageNamespace, Messages } from "./messages";
+export { localeMessages, messageLoaders } from "./messages";
+export type { LocaleFiles, LocaleMessagesOptions, MessageLoader, MessageNamespace, Messages } from "./messages";
 export { createMessageRuntime } from "./runtime";
 export type { MessageFailure, MessageRuntime, MessageRuntimeOptions, MessageTarget } from "./runtime";
 export { fieldMessageWith, useServerMessages } from "./serverMessages";

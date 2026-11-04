@@ -1302,6 +1302,43 @@
         "summary": "Rezime",
         "management": "Upravljanje"
       }
+    },
+    "stepper": {
+      "step_of": "Korak {current} od {total}",
+      "history": "Tok faza",
+      "current": "trenutni korak",
+      "completed": "završeno"
+    },
+    "next_step": {
+      "title": "Šta dalje?",
+      "menu_hint": "„{action}” je u meniju ⋯.",
+      "menu_hint_many": "„{first}” i „{second}” su u meniju ⋯."
+    },
+    "requirements": {
+      "all_met": "Svi uslovi su ispunjeni.",
+      "met": "ispunjeno",
+      "not_met": "nije ispunjeno"
+    },
+    "todo_state": {
+      "done": "gotovo",
+      "missing": "nedostaje",
+      "waiting": "čeka prethodni korak",
+      "optional": "nije obavezno"
+    },
+    "phase_tiles": {
+      "position": "Faza {current} od {total}",
+      "timeline": "Faze",
+      "done": "završeno",
+      "current": "trenutna faza",
+      "skipped": "preskočeno"
+    },
+    "when": {
+      "just_now": "upravo sada",
+      "minutes_ago": "pre {n} min",
+      "today_at": "danas u {time}",
+      "yesterday_at": "juče u {time}",
+      "tomorrow_at": "sutra u {time}",
+      "date_at": "{date} u {time}"
     }
   }
 }

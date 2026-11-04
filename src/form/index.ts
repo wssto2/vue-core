@@ -17,6 +17,7 @@ export { default as ChoiceChips } from "./ChoiceChips.vue";
 export { default as ComboField } from "./ComboField.vue";
 export { default as Calendar } from "./date/Calendar.vue";
 export type { DisabledDates } from "./date/days";
+export { dateTimeValue, dateValue, now, parseDateValue, today } from "./date/value";
 export type { QuickPick, QuickTime } from "./date/quickPicks";
 export { default as DateField } from "./DateField.vue";
 export { default as DateTimeField } from "./DateTimeField.vue";

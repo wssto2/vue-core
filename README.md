@@ -116,8 +116,8 @@ export function createTicketsFeature(http: HttpClient) {
     id: "tickets",
     routes: ticketRoutes.records,
     context: provideContext(TICKETS, { api, list: createTicketList(api) }),
-    // Loaded the first time a route of this feature is entered, in the active locale.
-    messages: localeMessages("tickets", { en: () => import("./i18n/en.json"), hr: () => import("./i18n/hr.json") }),
+    // Loaded the first time a route of this feature is entered, in the active locale. The lazy glob takes the file names as locales (en.json, hr.json); `createApplication({ localeFiles: { bs: "ba" } })` renames the exceptions.
+    messages: localeMessages("tickets", import.meta.glob("./i18n/*.json")),
     // The backend's menu names destinations; this says which route opens "tickets" and which records keep it highlighted.
     navigation: [{ destination: "tickets", to: ticketRoutes.index, within: ["tickets.record"] }],
   });
@@ -327,7 +327,7 @@ Dark mode is the `dark` class on `<html>`; nothing is decided for you. An app th
 
 ## Texts and locales
 
-The library's own texts are under the `core` namespace in English, Croatian, Bosnian and Slovenian (`t("core.actions.cancel")`). `createApplication` merges them into its vue-i18n instance; override any key with `i18n.messages` and restrict the offered locales with `locale.supported`. A feature's texts are a namespace (`localeMessages("tickets", { en: () => import("./i18n/en.json") })`, used as `t("tickets.title")`) loaded per locale on demand. A locale switch (the account menu has one) loads every namespace in use first, so nothing shows a raw key; `locale.onChange` lets you save the choice on the user.
+The library's own texts are under the `core` namespace in English, Croatian, Bosnian and Slovenian (`t("core.actions.cancel")`). `createApplication` merges them into its vue-i18n instance; override any key with `i18n.messages` and restrict the offered locales with `locale.supported`. A feature's texts are a namespace (`localeMessages("tickets", import.meta.glob("./i18n/*.json"))`, or one `() => import("./i18n/en.json")` per locale; used as `t("tickets.title")`) loaded per locale on demand. A locale switch (the account menu has one) loads every namespace in use first, so nothing shows a raw key; `locale.onChange` lets you save the choice on the user.
 
 ## Recipes
 
@@ -345,6 +345,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Notifications](docs/recipes/notifications.md): the bell, the inbox and the live stream, categories, the failed-events page, trying it against go-core's dev server
 - [Incidents](docs/recipes/incidents.md): go-core's incident module: the list and an incident, "Report a bug", the browser's errors reported (what is and is not sent), source maps
 - [Preferences and tips](docs/recipes/preferences.md): `usePreferences`, the person's stored settings, `darkMode()` on them, the `Tip` beside something new
+- [Where a record stands](docs/recipes/workflow.md): `PhaseTrack`, `PhaseTiles`, `TodoRow`, `NextStepPanel`, `RequirementList` in `/state`
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 - [End-to-end specs](docs/recipes/e2e.md): `@wssto2/vue-core/playwright`, the Playwright mocks of go-core's envelope, session, access, notification, profile and users routes
