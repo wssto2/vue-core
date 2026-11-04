@@ -1331,6 +1331,14 @@
       "done": "done",
       "current": "current phase",
       "skipped": "skipped"
+    },
+    "when": {
+      "just_now": "just now",
+      "minutes_ago": "{n} min ago",
+      "today_at": "today at {time}",
+      "yesterday_at": "yesterday at {time}",
+      "tomorrow_at": "tomorrow at {time}",
+      "date_at": "{date} at {time}"
     }
   }
 }

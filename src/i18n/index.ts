@@ -256,6 +256,8 @@ export type CoreMessages = {
     todo_state: Texts<"done" | "missing" | "waiting" | "optional">;
     /** `PhaseTiles`. */
     phase_tiles: Texts<"position" | "timeline" | "done" | "current" | "skipped">;
+    /** `format.when`: a moment as people say it; `{n}` minutes, `{time}` as HH:mm, `{date}` as the application writes dates. */
+    when: Texts<"just_now" | "minutes_ago" | "today_at" | "yesterday_at" | "tomorrow_at" | "date_at">;
     startup: {
       title: string;
       session: string;

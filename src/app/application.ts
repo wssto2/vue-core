@@ -253,7 +253,7 @@ export function createApplication(options: ApplicationOptions): Application {
     datePattern,
     numberSymbols,
     emptyNumber,
-    translate: (key) => composer.t(key),
+    translate: (key, params) => composer.t(key, params ?? {}),
   });
 
   const namespaces = [...features.flatMap((feature) => feature.messages), ...(options.messages ?? [])];

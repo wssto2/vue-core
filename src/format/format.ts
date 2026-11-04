@@ -108,6 +108,12 @@ export interface Formatting {
   day(value: DateInput, options?: DayOptions): string;
   /** `day` and the time, "Today · 12:57" / "13.09.2026. · 12:57". */
   dayTime(value: DateInput, options?: DayOptions): string;
+  /**
+   * A moment as people say it: "just now", "20 min ago", "today at 09:12", "yesterday at 21:05", "tomorrow at 11:00", else the `date` and
+   * the time ("24.09.2026. at 14:12"). The words are the `core.when.*` texts; a moment ahead of `now` (an expiry) is a day and a time.
+   * Empty for a value that is no date. Without a `translate` in the options it is the `dateTime`.
+   */
+  when(value: DateInput, now?: Date): string;
   /** The BCP 47 tag the active locale is given to `Intl` as (the application's `intlLocale` map over the library's), for a caller that uses `Intl` itself. */
   readonly intlLocale: string;
 }
@@ -223,8 +229,8 @@ export interface FormattingOptions extends FormatterSettings {
   currencySymbol?: string;
   /** What `number` returns for a value with nothing to show (null, undefined, NaN): `"0"`. Default: the empty string, like the other functions. */
   emptyNumber?: string;
-  /** A message in the active language, for the words of `day` ("core.activity.today"). Without it `day` is `date`. */
-  translate?: (key: string) => string;
+  /** A message in the active language, for the words of `day` and `when` ("core.activity.today"). Without it `day` is `date`. */
+  translate?: (key: string, params?: Record<string, unknown>) => string;
 }
 
 /** The part of the options an application passes next to its formatters (`createApplication`'s `formatting`): the rest it already owns. */
@@ -253,6 +259,23 @@ export function createFormatting(options: FormattingOptions): Formatting {
     if (!key) return date(value);
     const word = options.translate(key);
     return inSentence ? word.toLocaleLowerCase(tag()) : word.charAt(0).toLocaleUpperCase(tag()) + word.slice(1);
+  };
+
+  const clock = (date: Date) => `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  const when = (value: DateInput, now = new Date()) => {
+    const parsed = toDate(value);
+    if (!parsed) return "";
+    const say = options.translate;
+    if (!say) return formatters.dateTime(parsed, options.locale());
+    const minutes = Math.floor((now.getTime() - parsed.getTime()) / 60000);
+    if (minutes >= 0 && minutes < 1) return say("core.when.just_now");
+    if (minutes >= 1 && minutes < 60) return say("core.when.minutes_ago", { n: minutes });
+    const offset = (days: number) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + days);
+    const time = clock(parsed);
+    if (sameDay(parsed, now)) return say("core.when.today_at", { time });
+    if (sameDay(parsed, offset(-1))) return say("core.when.yesterday_at", { time });
+    if (sameDay(parsed, offset(1))) return say("core.when.tomorrow_at", { time });
+    return say("core.when.date_at", { date: date(value), time });
   };
 
   return {
@@ -288,6 +311,7 @@ export function createFormatting(options: FormattingOptions): Formatting {
       return date ? formatters.relative(date, options.locale(), now) : "";
     },
     day,
+    when,
     dayTime: (value, dayOptions) => {
       const text = day(value, dayOptions);
       return text ? `${text} · ${time(value)}` : "";

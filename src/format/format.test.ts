@@ -2,6 +2,7 @@ import { render } from "@testing-library/vue";
 import { describe, expect, it, vi } from "vitest";
 import { defineComponent, h, ref } from "vue";
 import { createFormatting, installFormatting, toDate, useFormat } from "./format";
+import { coreMessages } from "../i18n";
 import { MissingContextError } from "../platform";
 
 const instant = new Date(2026, 8, 30, 14, 5); // local time: 30 Sep 2026, 14:05
@@ -219,5 +220,43 @@ describe("useFormat", () => {
   it("fails with an actionable error when the app installed no formatting", () => {
     expect(() => render(Probe)).toThrow(MissingContextError);
     expect(() => render(Probe)).toThrow(/vue-core\.formatting.*installFormatting|vue-core\.formatting.*app\.provide/s);
+  });
+});
+
+describe("when", () => {
+  const texts = (locale: "hr" | "sl") => (key: string, params: Record<string, unknown> = {}) =>
+    (key.split(".").reduce<unknown>((node, part) => (node as Record<string, unknown>)[part], coreMessages[locale]) as string).replace(/\{(\w+)\}/g, (_, name: string) => String(params[name]));
+  const format = createFormatting({ locale: () => "hr", translate: texts("hr"), datePattern: { hr: "DD.MM.YYYY." } });
+  const now = new Date(2026, 8, 30, 12, 0);
+  const at = (hours: number, minutes = 0, dayOffset = 0) => new Date(2026, 8, 30 + dayOffset, hours, minutes);
+
+  it("says a moment as people do", () => {
+    expect(format.when(new Date(now.getTime() - 20_000), now)).toBe("upravo sada");
+    expect(format.when(at(11, 59), now)).toBe("prije 1 min");
+    expect(format.when(at(11, 40), now)).toBe("prije 20 min");
+    expect(format.when(at(9, 12), now)).toBe("danas u 09:12");
+    expect(format.when(at(21, 5, -1), now)).toBe("jučer u 21:05");
+    expect(format.when(at(11, 0, 1), now)).toBe("sutra u 11:00");
+    expect(format.when("2026-09-30 09:12", now)).toBe("danas u 09:12");
+  });
+
+  it("says an older moment as a date and a time", () => {
+    expect(format.when(at(14, 12, -6), now)).toBe("24.09.2026. u 14:12");
+  });
+
+  it("counts calendar days, also across the clock change", () => {
+    const monday = new Date(2026, 2, 30, 0, 30); // the day after the 23-hour Sunday in Zagreb
+    expect(format.when(new Date(2026, 2, 29, 23, 50), monday)).toBe("prije 40 min");
+    expect(format.when(new Date(2026, 2, 29, 3, 0), monday)).toBe("jučer u 03:00");
+  });
+
+  it("is empty for what is no date, and the date and time where nothing can translate", () => {
+    expect(format.when(null, now)).toBe("");
+    expect(format.when("not a date", now)).toBe("");
+    expect(createFormatting({ locale: () => "hr", datePattern: { hr: "DD.MM.YYYY." } }).when(at(9, 12), now)).toBe("30.09.2026. 09:12");
+  });
+
+  it("uses the active language's words", () => {
+    expect(createFormatting({ locale: () => "sl", translate: texts("sl") }).when(at(9, 12), now)).toBe("danes ob 09:12");
   });
 });

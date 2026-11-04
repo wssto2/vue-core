@@ -1331,6 +1331,14 @@
       "done": "završeno",
       "current": "trenutna faza",
       "skipped": "preskočeno"
+    },
+    "when": {
+      "just_now": "upravo sada",
+      "minutes_ago": "pre {n} min",
+      "today_at": "danas u {time}",
+      "yesterday_at": "juče u {time}",
+      "tomorrow_at": "sutra u {time}",
+      "date_at": "{date} u {time}"
     }
   }
 }
