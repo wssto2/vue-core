@@ -59,6 +59,30 @@ export interface RouteAccessConfig {
   exclude?: RegExp;
 }
 
+/** A rule of the application's own as data: `forbidden[]`. A file (comments cut out, tests never) with a line `pattern` matches breaks it. */
+export interface ForbiddenRuleConfig {
+  /** The rule's name: in the message and the key of its allowlist (`allow[id]`, a ratchet). */
+  id: string;
+  /** Matched line by line. */
+  pattern: RegExp;
+  /** What to do instead; follows the quoted line. */
+  message: string;
+  /** Files (by path from the config's folder) that are not scanned. Default: `e2e`, `review`, `scripts`, `tests`, `docs`, `templates` and `static` folders; replaces that default. */
+  exclude?: RegExp;
+}
+
+/** The rule `permission-texts`: the generated permission ids and the texts of the locale files agree. */
+export interface PermissionTextsConfig {
+  /** The generated permissions file (a TypeScript union of string literals), relative to the config's folder. */
+  generated: string;
+  /** The message keys every id needs, `"<namespace>.{id}"`: `policies.{id}` is the file `i18n/policies/<locale>.json`, nested by dots (`"crm": { "lead:view": "…" }` holds `crm.lead:view`). */
+  keys: string[];
+  /** The locale file names to check (`hr`, `en`, ...). */
+  locales: string[];
+  /** The folder of the namespaces, relative to the config's folder. Default `"i18n"`. */
+  dir?: string;
+}
+
 export interface ArchitectureConfig {
   /** The folder of the features, relative to the config file (default "features"). */
   featuresDir?: string;
@@ -86,6 +110,10 @@ export interface ArchitectureConfig {
   copy?: CopyRuleConfig;
   /** Switches on `no-route-policy`; its allowlist is `allow["no-route-policy"]`. */
   routeAccess?: RouteAccessConfig;
+  /** Switches on `permission-texts`: every id of the generated permissions has each key in each locale, and no locale keeps a key for an id that is gone. */
+  permissions?: PermissionTextsConfig;
+  /** The application's own text rules as data; each is a rule with an allowlist. */
+  forbidden?: ForbiddenRuleConfig[];
   /** The application's own rules, run on every source file. */
   rules?: ArchitectureRule[];
   /** A document to name after a rule's message, by rule: "shared-layer", "api-error" or a pack rule's id. */

@@ -4,6 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { PACKS } from "./packs.mjs";
+import { checkPermissionTexts } from "./permissions.mjs";
 import { builtInRules } from "./rules.mjs";
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".vue"]);
@@ -141,6 +142,8 @@ export function check({ root, config, configName }) {
       }
     }
   }
+
+  if (config.permissions) violations.push(...checkPermissionTexts({ root, config: config.permissions }));
 
   // every directory name under the features folder is a single lowercase word
   for (const dirPath of collectFeatureDirs(featuresRoot)) {
