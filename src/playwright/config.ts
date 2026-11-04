@@ -1,5 +1,8 @@
 import { devices, type PlaywrightTestConfig } from "@playwright/test";
 
+// Node-only (a config file runs in Node); the build compiles without @types/node, so declare the one global used.
+declare const process: { env: Record<string, string | undefined> };
+
 /** Any Playwright config field; `webServer` is the one server this preset starts, so a part of it is enough. */
 export type PlaywrightOverrides = Omit<PlaywrightTestConfig, "webServer"> & {
   webServer?: { command?: string; url?: string; port?: number; reuseExistingServer?: boolean; timeout?: number; cwd?: string; env?: Record<string, string> };

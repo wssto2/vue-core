@@ -146,6 +146,9 @@ export function defineConfig(config: VueCoreConfig): VueCoreConfig {
   return config;
 }
 
+// Node-only (a config file runs in Node); the build compiles without @types/node, so declare the one global used.
+declare const process: { env: Record<string, string | undefined> };
+
 export interface VitestDefaultsOptions {
   /** The zone the unit tests run in, so a test of local calendar dates does not depend on the shell's. Sets `TZ`; unset leaves it alone. */
   timezone?: string;
