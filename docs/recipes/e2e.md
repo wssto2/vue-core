@@ -50,6 +50,25 @@ export const serveBell = async (page: Page, policies: string[] = []) => {
 };
 ```
 
+## The config
+
+`playwrightConfig({ testDir, timezone, ignore, port, report }, overrides)` is the `playwright.config.ts` every application on vue-core would write: the specs in `./e2e`, the dev server started with `npm run dev -- --port` (the port is `E2E_PORT`, then `port`, then 5173; reused outside CI), Chromium, fully parallel; in CI `forbidOnly`, two retries, two workers and the `github` reporter instead of `html`; the JSON report at `e2e-timings/results.json`, where `vue-core e2e-timings` reads it (`report` moves it, with `e2eTimings.report`); `trace: "on-first-retry"`. `timezone` sets `TZ` for the workers and `timezoneId` for the browser, so a spec's local dates are the markets' and not the runner's. The second argument is any Playwright field and replaces the preset's (`use` and `webServer` merge one level deep).
+
+<!-- example: docs/examples/e2e/playwright.config.ts -->
+```ts
+import { playwrightConfig } from "@wssto2/vue-core/playwright";
+
+// Review captures are opt-in: screenshot-only specs run only with CAPTURE=1.
+const CAPTURE = process.env.CAPTURE === "1";
+
+// Specs in ./e2e, on their own dev server (`E2E_PORT` moves it when a second checkout holds 5173), Chromium, and the zone the
+// markets run in, for the specs and the browser. The JSON timings report is where `vue-core e2e-timings` reads it.
+export default playwrightConfig({
+  timezone: "Europe/Zagreb",
+  ignore: CAPTURE ? [] : ["**/screens.spec.ts"],
+});
+```
+
 ## A spec
 
 A spec signs in, serves the screen's routes, drives the page, and reads what the page sent from `calls` (or `writes`):
