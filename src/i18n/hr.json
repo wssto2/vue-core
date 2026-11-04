@@ -1315,7 +1315,7 @@
       "menu_hint_many": "„{first}” i „{second}” su u izborniku ⋯."
     },
     "requirements": {
-      "all_met": "Vozilo ispunjava sve uvjete.",
+      "all_met": "Svi uvjeti su ispunjeni.",
       "met": "ispunjeno",
       "not_met": "nije ispunjeno"
     },

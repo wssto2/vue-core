@@ -1315,7 +1315,7 @@
       "menu_hint_many": "»{first}« in »{second}« sta v meniju ⋯."
     },
     "requirements": {
-      "all_met": "Vozilo izpolnjuje vse pogoje.",
+      "all_met": "Vsi pogoji so izpolnjeni.",
       "met": "izpolnjeno",
       "not_met": "ni izpolnjeno"
     },

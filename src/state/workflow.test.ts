@@ -155,7 +155,7 @@ describe("RequirementList", () => {
     const { container } = mountView(RequirementList, { items: items([{}, { met: true }]) });
     expect(one(container, '[data-test="requirements-all-met"]')).not.toBeNull();
     expect(one(container, '[data-test="requirement-list"]')).toBeNull();
-    expect(container.textContent).toContain("The vehicle meets all conditions.");
+    expect(container.textContent).toContain("All conditions are met.");
   });
 
   it("uses a custom summaryWhenMet when provided", () => {

@@ -1315,7 +1315,7 @@
       "menu_hint_many": "“{first}” and “{second}” are in the ⋯ menu."
     },
     "requirements": {
-      "all_met": "The vehicle meets all conditions.",
+      "all_met": "All conditions are met.",
       "met": "met",
       "not_met": "not met"
     },
