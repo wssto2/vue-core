@@ -2,7 +2,7 @@ import type { App, InjectionKey } from "vue";
 import { createHttpClient, type HttpClient, type HttpClientOptions, type Transport } from "../client";
 import { createAccessClient, type AccessClient, type AccessClientOptions } from "./access";
 import type { BootstrapConfig } from "./bootstrap";
-import type { RegisteredConfig, RegisteredUser } from "./index";
+import type { Permission, RegisteredConfig, RegisteredUser } from "./index";
 import { defineFeatureContext } from "./context";
 import { httpSessionAdapter } from "./httpSession";
 import { createSession, heldSession, type BeforeSignOutHook, type Session, type SessionAdapter, type SessionUser } from "./session";
@@ -16,7 +16,7 @@ export interface Platform<U extends SessionUser = RegisteredUser, C extends Boot
   readonly http: HttpClient;
   readonly session: Session<U>;
   /** Reads the session's access; empty until the session is restored or established. */
-  readonly access: AccessClient;
+  readonly access: AccessClient<Permission>;
 }
 
 export interface PlatformOptions<U extends SessionUser, C extends BootstrapConfig> extends AccessClientOptions {
@@ -88,7 +88,7 @@ export function createPlatform<U extends SessionUser, C extends BootstrapConfig>
     renew: options.renewSession && ((current) => options.renewSession!(current, http)),
     renewable: options.renewable,
   });
-  const access = createAccessClient(
+  const access = createAccessClient<Permission>(
     () => {
       return heldSession(session.state.value)?.access ?? null; // a session that just expired still shows what it showed
     },
@@ -103,6 +103,9 @@ const context = defineFeatureContext<Platform>("platform");
 // Annotated so the declaration build keeps `Platform` (the registered one) instead of expanding it to the defaults.
 export const platformKey: InjectionKey<Platform> = context[0];
 export const usePlatform: () => Platform = context[1];
+
+/** What the signed-in user may do: the platform's access client, typed to the registered permissions. */
+export const useAccess = (): AccessClient<Permission> => usePlatform().access;
 
 export function installPlatform(app: App, platform: Platform): void {
   app.provide(platformKey, platform);

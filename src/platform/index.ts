@@ -9,7 +9,7 @@ export { parseNavigation } from "./navigation";
 export type { NavigationNode } from "./navigation";
 export { httpSessionAdapter, parseSessionPayload } from "./httpSession";
 export type { HttpSessionOptions, UserParser } from "./httpSession";
-export { createPlatform, installPlatform, platformKey, usePlatform } from "./platform";
+export { createPlatform, installPlatform, platformKey, useAccess, usePlatform } from "./platform";
 export type { Platform, PlatformOptions } from "./platform";
 export { mergePatch, preferencesOf } from "./preferences";
 export type { Preferences, PreferencesPatch } from "./preferences";
@@ -25,6 +25,15 @@ export type { BeforeSignOutHook, Session, SessionAdapter, SessionEnd, SessionImp
  *   declare module "@wssto2/vue-core/platform" {
  *     interface PermissionRegistry { "tickets:view": true; "tickets:update": true }
  *   }
+ *
+ * An application with a generated union declares it in one line, and may split the rest across features (each
+ * feature's `routes.ts` adds its own keys the same way):
+ *
+ *   declare module "@wssto2/vue-core/platform" {
+ *     interface PermissionRegistry extends Record<GeneratedPermission, true> {}
+ *   }
+ *
+ * `usePlatform().access`, `useAccess()`, `AccessGate` and route `meta.access` are all typed from it.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- an empty interface is the point: apps augment it
 export interface PermissionRegistry {}
