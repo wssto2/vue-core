@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.17.0 — 2026-11-04
+
+What every app built on vue-core wrote again: the phase and to-do components, date values in the date fields' own shape, a lazy locale loader, the author of a list row, "today at 14:35", typed access, two architecture rules as data, and the Playwright and vitest setup. Breaking only in that `Platform.access` is now typed by the registered permissions (see Changed).
+
+### New
+- **state:** `PhaseTrack`, `PhaseTiles`, `TodoRow`, `NextStepPanel`, `RequirementList` and their types (`PhaseStep`, `PhaseTile`, `PhaseTone`, `RequirementItem`, `TodoRowAction`, `TodoRowState`): where a record stands, what is next, and what is still missing. New texts `core.stepper`, `core.next_step`, `core.requirements`, `core.todo_state`, `core.phase_tiles` in the five locales. Recipe: `docs/recipes/workflow.md`.
+- **i18n:** `localeMessages(namespace, import.meta.glob("./*.json"))`, still lazy: nothing loads until the namespace is needed. A file's locale is its name; `createApplication({ localeFiles: { bs: "ba" } })` renames the exceptions.
+- **form:** `dateValue(api)` (`YYYY-MM-DD`, sliced as written), `dateTimeValue(api)` (`YYYY-MM-DDTHH:mm` in local time, the shape `DateTimeField` writes), `parseDateValue(model)` (the `T` and the space form, as local time), `now()`; `today()` is exported. Go's zero date is `null`.
+- **collection:** `authorOf(meta, id)`, `ResourceAuthor`, `ResourceMeta`, for go-core's `meta.authors` / `meta.author` / `meta.editor`.
+- **format:** `format.when(value)`: just now, minutes ago, today / yesterday / tomorrow at a time, else the date and time. New texts `core.when.*`.
+- **platform:** `useAccess()`. An application registers its generated permissions once (`interface PermissionRegistry extends Record<Permission, true> {}`); `useAccess()`, `Platform.access`, route meta `access` and `AccessGate` then refuse an unknown permission at compile time, template literals over a namespace type included.
+- **devkit:** `check-architecture` rule `permission-texts` (`architecture.permissions: { generated, keys, locales, dir }`): every generated permission has each key (`policies.{id}`, `policy_descriptions.{id}`) in each locale, and no locale keeps a text for one that is gone.
+- **devkit:** `architecture.forbidden: [{ id, pattern, message, exclude? }]`: text rules as data. Comments are stripped (a `//` in a string or URL is kept), tests, e2e, docs and scripts are skipped by default, and each rule has its allowlist `allow[id]`.
+- **playwright:** `playwrightConfig({ testDir, timezone, ignore, port, report }, overrides)`: `E2E_PORT`, the dev server, CI retries and workers, the reporters plus the JSON report `vue-core e2e-timings` reads, and the time zone for the specs and the browser.
+- **config:** `vitestDefaults({ timezone, setupFiles })` for the vitest `test` block: globals, happy-dom, `e2e/` and `review/` excluded, `TZ` pinned.
+
+### Changed
+- **platform:** `Platform.access` is `AccessClient<Permission>`, the registered permissions. Code that assigned it to a narrower `AccessClient<X>` registers `X` instead.
+- **format:** `Formatting.translate` receives the message parameters.
+
 ## 0.16.0 — 2026-10-22
 
 Back to the page a record was opened from.
