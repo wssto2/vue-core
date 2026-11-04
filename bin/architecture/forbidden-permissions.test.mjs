@@ -71,6 +71,15 @@ describe("permission-texts", () => {
     expect(generatedIds(generated)).toEqual(["crm.lead:view", "crm.lead:manage", "crm.lead.notes:view", "customer:view"]);
   });
 
+  it("reads only the union, not the metadata map go-core writes after it", () => {
+    const withMap = `${generated}\nexport const permissions: Record<Permission, PermissionMeta> = {\n  'crm.lead:view': { module: 'crm', labelKey: 'policies.crm.lead:view', requires: [] },\n};\n`;
+    expect(generatedIds(withMap)).toEqual(["crm.lead:view", "crm.lead:manage", "crm.lead.notes:view", "customer:view"]);
+  });
+
+  it("refuses a generated file without the union", () => {
+    expect(() => generatedIds("export const nothing = 1;\n")).toThrow(/no `export type Permission/);
+  });
+
   it("is silent when every id has every key in every locale", () => {
     expect(run(complete)).toEqual([]);
   });

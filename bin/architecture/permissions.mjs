@@ -7,7 +7,10 @@ import path from "node:path";
 /** The ids of a generated permissions file: its quoted strings (`export type Permission = 'a:view' | 'b:view'`), comments cut out. */
 export function generatedIds(source) {
   const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
-  return [...new Set([...code.matchAll(/(["'`])([^"'`\n]+)\1/g)].map((match) => match[2]))];
+  // Only the `Permission` union names ids; go-core's generator writes a metadata map after it, full of other strings.
+  const union = /export\s+type\s+Permission\s*=([^;]*);/.exec(code);
+  if (!union) throw new Error("permission-texts: the generated file has no `export type Permission = …;` union");
+  return [...new Set([...union[1].matchAll(/(["'`])([^"'`\n]+)\1/g)].map((match) => match[2]))];
 }
 
 // A nested messages file as the identifiers it holds: a leaf string is named by the dotted path to it.
