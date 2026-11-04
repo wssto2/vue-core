@@ -8,9 +8,11 @@ import {
   httpSessionAdapter,
   parseBootstrap,
   type AccessClient,
+  type Permission,
 } from "@wssto2/vue-core/platform";
 
-export type AppPermission = "tickets:view" | "tickets:update";
+// The platform's access client is typed by the registered catalogue (app/platform.ts and each feature's routes.ts).
+export type AppPermission = Permission;
 
 // The server embeds this in the page; readBootstrap() reads it from <script id="app-state">.
 const config = parseBootstrap({ locale: "en", api_base: "/api/v1", app_name: "Playground", currency: "EUR" }, (fields) => ({
