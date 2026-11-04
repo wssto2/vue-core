@@ -1302,6 +1302,35 @@
         "summary": "Povzetek",
         "management": "Upravljanje"
       }
+    },
+    "stepper": {
+      "step_of": "Korak {current} od {total}",
+      "history": "Potek faz",
+      "current": "trenutni korak",
+      "completed": "zaključeno"
+    },
+    "next_step": {
+      "title": "Kaj sledi?",
+      "menu_hint": "»{action}« je v meniju ⋯.",
+      "menu_hint_many": "»{first}« in »{second}« sta v meniju ⋯."
+    },
+    "requirements": {
+      "all_met": "Vozilo izpolnjuje vse pogoje.",
+      "met": "izpolnjeno",
+      "not_met": "ni izpolnjeno"
+    },
+    "todo_state": {
+      "done": "opravljeno",
+      "missing": "manjka",
+      "waiting": "čaka prejšnji korak",
+      "optional": "ni obvezno"
+    },
+    "phase_tiles": {
+      "position": "Faza {current} od {total}",
+      "timeline": "Faze",
+      "done": "končano",
+      "current": "trenutna faza",
+      "skipped": "preskočeno"
     }
   }
 }

@@ -246,6 +246,16 @@ export type CoreMessages = {
         views: Texts<"all" | "failed">;
       };
     };
+    /** `PhaseTrack`: where a record stands in its process. */
+    stepper: Texts<"step_of" | "history" | "current" | "completed">;
+    /** `NextStepPanel`; `menu_hint` is for the note an application writes under the action (`{action}`, or `{first}` and `{second}`). */
+    next_step: Texts<"title" | "menu_hint" | "menu_hint_many">;
+    /** `RequirementList`. */
+    requirements: Texts<"all_met" | "met" | "not_met">;
+    /** `TodoRow`: the state a screen reader hears. */
+    todo_state: Texts<"done" | "missing" | "waiting" | "optional">;
+    /** `PhaseTiles`. */
+    phase_tiles: Texts<"position" | "timeline" | "done" | "current" | "skipped">;
     startup: {
       title: string;
       session: string;

@@ -1302,6 +1302,35 @@
         "summary": "Summary",
         "management": "Management"
       }
+    },
+    "stepper": {
+      "step_of": "Step {current} of {total}",
+      "history": "Progress",
+      "current": "current step",
+      "completed": "completed"
+    },
+    "next_step": {
+      "title": "What's next?",
+      "menu_hint": "“{action}” is in the ⋯ menu.",
+      "menu_hint_many": "“{first}” and “{second}” are in the ⋯ menu."
+    },
+    "requirements": {
+      "all_met": "The vehicle meets all conditions.",
+      "met": "met",
+      "not_met": "not met"
+    },
+    "todo_state": {
+      "done": "done",
+      "missing": "missing",
+      "waiting": "waits for an earlier step",
+      "optional": "optional"
+    },
+    "phase_tiles": {
+      "position": "Phase {current} of {total}",
+      "timeline": "Phases",
+      "done": "done",
+      "current": "current phase",
+      "skipped": "skipped"
     }
   }
 }

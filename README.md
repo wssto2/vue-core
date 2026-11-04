@@ -345,6 +345,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Notifications](docs/recipes/notifications.md): the bell, the inbox and the live stream, categories, the failed-events page, trying it against go-core's dev server
 - [Incidents](docs/recipes/incidents.md): go-core's incident module: the list and an incident, "Report a bug", the browser's errors reported (what is and is not sent), source maps
 - [Preferences and tips](docs/recipes/preferences.md): `usePreferences`, the person's stored settings, `darkMode()` on them, the `Tip` beside something new
+- [Where a record stands](docs/recipes/workflow.md): `PhaseTrack`, `PhaseTiles`, `TodoRow`, `NextStepPanel`, `RequirementList` in `/state`
 - [Theming](docs/recipes/theming.md): brand accent, dark mode, tokens, status tones and category hues
 - [Testing](docs/recipes/testing.md): the application's environment and a fake backend for your tests
 - [End-to-end specs](docs/recipes/e2e.md): `@wssto2/vue-core/playwright`, the Playwright mocks of go-core's envelope, session, access, notification, profile and users routes
