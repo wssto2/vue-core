@@ -24,7 +24,8 @@ export interface ResourceMeta {
  *
  * Null for no id, no `authors` in the meta, or an id nobody in it has. `A` is your own author type where it has more fields.
  */
-export function authorOf<A extends { readonly id: number } = ResourceAuthor>(meta: object | null | undefined, id: number | null | undefined): A | null {
+// NoInfer: a call inside another call's argument would otherwise infer A from that parameter and lose the default.
+export function authorOf<A extends { readonly id: number } = ResourceAuthor>(meta: object | null | undefined, id: number | null | undefined): NoInfer<A> | null {
   const authors = (meta as { authors?: unknown } | null | undefined)?.authors;
   return id == null || !Array.isArray(authors) ? null : ((authors as A[]).find((author) => author.id === id) ?? null);
 }

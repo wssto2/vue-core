@@ -4,6 +4,11 @@ import { authorOf, type ResourceAuthor } from "./authors";
 const ana: ResourceAuthor = { id: 7, name: "Ana", email: null, phone_number: null, avatar: null, active: true };
 
 describe("authorOf", () => {
+  it("is a ResourceAuthor by default even inside another call's argument", () => {
+    const nameOf = (person: { readonly name: string } | null) => person?.name ?? null;
+    expect(nameOf(authorOf({ authors: [ana] }, ana.id))).toBe(ana.name);
+  });
+
   it("finds the author of an id in a list's meta.authors", () => {
     expect(authorOf({ authors: [{ ...ana, id: 3 }, ana] }, 7)).toBe(ana);
   });

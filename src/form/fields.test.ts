@@ -341,6 +341,14 @@ describe("CheckboxField", () => {
     mount(CheckboxField, { modelValue: false, label: "Terms", error: "Accept the terms" });
     expect(screen.getByRole("alert").textContent).toContain("Accept the terms");
   });
+
+  it("marks its root, the group's child, as the row: only the first row loses its separator", () => {
+    mount(CheckboxField, { modelValue: false, label: "ABS", variant: "row" });
+    const box = screen.getByRole("checkbox", { name: /ABS/ });
+    // The marker must be on the element that is a sibling of the other rows; on the checkbox it was always first.
+    expect(box.parentElement?.classList.contains("group/check")).toBe(true);
+    expect(box.classList.contains("group/check")).toBe(false);
+  });
 });
 
 describe("SegmentedField, ChoiceChips and CardSelectField", () => {

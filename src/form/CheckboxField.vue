@@ -32,10 +32,10 @@ const toggle = () => {
 </script>
 
 <template>
-  <div :data-field-error="props.error ? 'true' : undefined">
+  <div class="group/check" :data-field-error="props.error ? 'true' : undefined">
     <div role="checkbox" :aria-checked="model" :aria-disabled="props.disabled || undefined" :aria-describedby="props.error ? `${id}-error` : undefined" :aria-invalid="props.error ? true : undefined"
-      :tabindex="props.disabled ? -1 : 0" data-test="checkbox" class="group/check flex items-center transition-colors duration-motion-fast focus-visible:outline-2 focus-visible:outline-border-focus"
-      :class="[props.variant === 'row' ? 'gap-3 pl-row-inset focus-visible:-outline-offset-2' : 'gap-2.5 rounded-control px-2 py-1.5 focus-visible:outline-offset-1', inGroup && props.variant === 'row' ? 'first:rounded-t-group last:rounded-b-group' : '', props.disabled ? 'cursor-not-allowed' : props.variant === 'row' ? 'cursor-pointer hover:bg-fill/60 active:bg-fill' : 'cursor-pointer hover:bg-fill']"
+      :tabindex="props.disabled ? -1 : 0" data-test="checkbox" class="flex items-center transition-colors duration-motion-fast focus-visible:outline-2 focus-visible:outline-border-focus"
+      :class="[props.variant === 'row' ? 'gap-3 pl-row-inset focus-visible:-outline-offset-2' : 'gap-2.5 rounded-control px-2 py-1.5 focus-visible:outline-offset-1', inGroup && props.variant === 'row' ? 'group-first/check:rounded-t-group group-last/check:rounded-b-group' : '', props.disabled ? 'cursor-not-allowed' : props.variant === 'row' ? 'cursor-pointer hover:bg-fill/60 active:bg-fill' : 'cursor-pointer hover:bg-fill']"
       @click="toggle" @keydown.space.prevent="toggle" @keydown.enter.prevent="toggle">
       <span class="flex shrink-0 items-center justify-center rounded-full border-2" :class="[props.variant === 'row' ? 'size-5.5' : 'size-5', model ? (props.disabled ? 'border-content-disabled bg-content-disabled text-white' : 'border-control-on bg-control-on text-white') : 'border-border-control']" aria-hidden="true">
         <Icon v-if="model" name="checkCustom" :size="12" />
