@@ -145,3 +145,24 @@ export interface VueCoreConfig {
 export function defineConfig(config: VueCoreConfig): VueCoreConfig {
   return config;
 }
+
+export interface VitestDefaultsOptions {
+  /** The zone the unit tests run in, so a test of local calendar dates does not depend on the shell's. Sets `TZ`; unset leaves it alone. */
+  timezone?: string;
+  /** Files run before every test file (the application's `tests/setup.ts`). Default none. */
+  setupFiles?: string[];
+}
+
+/**
+ * The `test` block of an application's vitest config: jest-style globals, a happy-dom document, the Playwright folders (`e2e/`, `review/`)
+ * left to Playwright, and `TZ` pinned. Spread more over it, or pass it whole: `test: vitestDefaults({ timezone: "Europe/Zagreb" })`.
+ */
+export function vitestDefaults(options: VitestDefaultsOptions = {}) {
+  if (options.timezone) process.env.TZ = options.timezone;
+  return {
+    globals: true,
+    environment: "happy-dom",
+    exclude: ["**/node_modules/**", "**/dist/**", "e2e/**", "review/**"],
+    setupFiles: options.setupFiles ?? [],
+  };
+}
