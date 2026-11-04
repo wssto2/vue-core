@@ -16,19 +16,21 @@
 
 ## Setup
 
-Vitest needs Vue's compiler and a DOM; nothing else:
+Vitest needs Vue's compiler and a DOM; nothing else. `vitestDefaults({ timezone, setupFiles })` (from `@wssto2/vue-core/config`) is the `test` block: globals, happy-dom, `e2e/` and `review/` left to Playwright, and `TZ` pinned so a test of local dates does not depend on the shell's zone.
 
 <!-- example: docs/examples/vitest.config.ts -->
 ```ts
 import vue from "@vitejs/plugin-vue";
+import { vitestDefaults } from "@wssto2/vue-core/config";
 import { defineConfig } from "vitest/config";
 
 // What the tests need from the application's build setup: Vue's compiler for `.vue` files and a DOM.
-// `@wssto2/vue-core/testing` brings no test runner and no testing library: install vitest and
-// @testing-library/vue (or @vue/test-utils) yourself.
+// `@wssto2/vue-core/testing` brings no test runner and no testing library: install vitest, happy-dom and
+// @testing-library/vue (or @vue/test-utils) yourself. `vitestDefaults` is the rest: globals, happy-dom, the
+// Playwright folders left out, and the zone the markets run in.
 export default defineConfig({
   plugins: [vue()],
-  test: { environment: "happy-dom" },
+  test: vitestDefaults({ timezone: "Europe/Zagreb", setupFiles: ["./tests/setup.ts"] }),
 });
 ```
 

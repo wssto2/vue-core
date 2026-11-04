@@ -20,10 +20,29 @@ export default function run({ config, root, configPath, err }) {
   const packRules = [
     ...settings.packs.filter((name) => Object.hasOwn(PACKS, name)).flatMap((name) => PACKS[name].rules.map((rule) => rule.id)),
     ...RULE_IDS.filter((id) => (id === "no-hardcoded-copy" ? settings.copy : settings.routeAccess)),
+    ...settings.forbidden.map((rule) => rule.id),
   ];
   if (settings.copy && !(settings.copy.pattern instanceof RegExp)) problems.push("copy.pattern: a regular expression for the language's letters and words, e.g. /[čćžšđ]|\\b(Spremi|Odustani)\\b/");
   for (const key of ["scope", "properNames"]) if (settings.copy?.[key] !== undefined && !(settings.copy[key] instanceof RegExp)) problems.push(`copy.${key}: must be a regular expression`);
   if (settings.routeAccess?.exclude !== undefined && !(settings.routeAccess.exclude instanceof RegExp)) problems.push("routeAccess.exclude: must be a regular expression");
+  const ids = new Set([...RULE_IDS, ...ALLOW_RULES, "permission-texts"]);
+  for (const [index, rule] of settings.forbidden.entries()) {
+    const at = `forbidden[${index}]`;
+    if (typeof rule?.id !== "string" || rule.id === "") problems.push(`${at}.id: a rule name, used in the message and the allowlist`);
+    else if (ids.has(rule.id)) problems.push(`${at}.id: "${rule.id}" is a built-in rule's name`);
+    else ids.add(rule.id);
+    if (!(rule?.pattern instanceof RegExp)) problems.push(`${at}.pattern: must be a regular expression`);
+    if (typeof rule?.message !== "string" || rule.message === "") problems.push(`${at}.message: what to do instead`);
+    if (rule?.exclude !== undefined && !(rule.exclude instanceof RegExp)) problems.push(`${at}.exclude: must be a regular expression`);
+  }
+  const texts = settings.permissions;
+  if (texts) {
+    if (typeof texts.generated !== "string") problems.push("permissions.generated: the generated permissions file, relative to the config's folder");
+    if (!Array.isArray(texts.keys) || texts.keys.length === 0 || !texts.keys.every((key) => typeof key === "string" && key.includes("{id}") && key.includes("."))) {
+      problems.push('permissions.keys: message keys with {id}, "<namespace>.{id}", e.g. ["policies.{id}", "policy_descriptions.{id}"]');
+    }
+    if (!Array.isArray(texts.locales) || texts.locales.length === 0) problems.push('permissions.locales: the locale file names, e.g. ["hr", "en"]');
+  }
   for (const rule of Object.keys(settings.allow)) {
     if (!ALLOW_RULES.includes(rule) && !packRules.includes(rule)) problems.push(`allow.${rule}: no such rule; the allowlists are ${[...ALLOW_RULES, ...packRules].join(", ")}`);
   }

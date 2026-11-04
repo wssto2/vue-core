@@ -19,6 +19,8 @@ Two packs are opt-in by name. `design-values` keeps `features/` and `components/
 
 Two more rules take options and are on when their section is given. `copy` is `no-hardcoded-copy`: `pattern` is what the text of a language looks like (its letters and common words); a `.vue` template's text nodes and the strings of `form.ts`, `*Form.ts` and `forms/` files may not match it, and inside `scope` (default the UI folders) neither may any string literal of a `.ts` or `<script>`, or a template's `placeholder`, `title`, `aria-label` and `label`; `properNames` cuts brand names out of what `scope` scans. `routeAccess` is `no-route-policy`: a route names its permission in `meta.permission`, so `policy:` and `requires:` in a `routes.ts` are reported, and with `sessionField` so is the session's retired list (`authStore.policies`, `state.policies`); `exclude` leaves out scripts and docs. Tests are never scanned. Both have an allowlist that is a ratchet in both directions, and a line of the text is quoted in the message.
 
+`forbidden` is a list of rules of your own as data, `{ id, pattern, message, exclude? }`: a file (comments cut out, tests never scanned, and by default not the `e2e`, `review`, `scripts`, `tests`, `docs`, `templates` and `static` folders; `exclude` replaces that default) with a line `pattern` matches breaks it, and the report quotes the line, then the message. A `//` inside a string (a URL) is not taken for a comment. Its `id` has an allowlist like the others. `permissions` is `permission-texts`: every id in the generated permissions file (`generated`, a TypeScript union of string literals) needs each of `keys` in each of `locales`, and a locale may keep no key for an id that is gone. A key is `<namespace>.{id}`; `policies.{id}` reads `i18n/policies/<locale>.json` (`dir` changes `i18n`), nested by dots, so `"crm": { "lead:view": "…" }` holds `crm.lead:view`. Run it after the permissions are regenerated, and a new permission without its texts fails the check.
+
 The section of `vue-core.config.mjs` (every key is optional):
 
 <!-- example: docs/examples/devkit/architecture.config.ts -->
@@ -33,6 +35,10 @@ export default defineConfig({
     // No text of the authors' language in a template or a string a person reads (here Croatian), and no `policy:` in a routes.ts.
     copy: { pattern: /[čćžšđ]|\b(Spremi|Odustani)\b/, properNames: /Njuškalo|Škoda/g },
     routeAccess: { sessionField: "policies", exclude: /^(e2e|scripts|docs)\// },
+    // The generated permissions have a title and a description in every locale file (i18n/policies/hr.json, ...).
+    permissions: { generated: "generated/permissions.ts", keys: ["policies.{id}", "policy_descriptions.{id}"], locales: ["hr", "en"] },
+    // A line of the application's own to forbid, as data (comments, tests, e2e, docs and scripts are not scanned).
+    forbidden: [{ id: "no-account-type-branching", pattern: /\baccountTypeId\b|\bisStaffAccount\s*\(/, message: "use a permission, a scope or a qualifier" }],
     // Known offenders that predate a rule; the lists only shrink.
     allow: { "feature-name": ["features/old_stuff"], "no-hardcoded-copy": ["features/vehicles/form.ts"] },
     doc: { "shared-layer": "docs/architecture.md, Shared layer" },

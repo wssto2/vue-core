@@ -81,6 +81,22 @@ function noRoutePolicy({ sessionField, exclude }) {
   };
 }
 
+/**
+ * forbidden: the application's own text rules as data. The first line of the file (comments cut out, tests never scanned, and by default
+ * not the e2e / review / scripts / tests / docs / templates / static folders) that `pattern` matches. `exclude` replaces that folder default.
+ */
+function forbiddenRule({ pattern, message, exclude = PLAIN_SOURCE }) {
+  return ({ file, content, isTest }) => {
+    if (isTest || matches(exclude, file)) return null;
+    const hit = withoutComments(content)
+      .split("\n")
+      .find((line) => matches(pattern, line));
+    return hit ? `“${hit.trim().slice(0, 80)}” — ${message}` : null;
+  };
+}
+
+const PLAIN_SOURCE = /^(e2e|review|scripts|tests|docs|templates|static)\//;
+
 export const RULE_IDS = ["no-hardcoded-copy", "no-route-policy"];
 
 /** The rules the config switches on, each `{ id, check, seen }` (`seen`: the allowlisted files that tripped it). */
@@ -91,5 +107,6 @@ export function builtInRules(config) {
     rules.push({ id: "no-hardcoded-copy", check: noHardcodedCopy({ ...config.copy, scope }) });
   }
   if (config.routeAccess) rules.push({ id: "no-route-policy", check: noRoutePolicy(config.routeAccess) });
+  for (const rule of config.forbidden) rules.push({ id: rule.id, check: forbiddenRule(rule) });
   return rules.map((rule) => ({ ...rule, seen: new Set() }));
 }

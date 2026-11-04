@@ -22,6 +22,7 @@ declare module "@wssto2/vue-core/platform" {
     "iam.role:delete": true;
     "iam.user:view": true;
     "iam.user:manage": true;
+    "events.deadletter:view": true; // the identity playground's failed-events link
     "records:audit": true; // the demo user does not hold this one: the dealer's audit section stays out of its navigation
   }
 }
