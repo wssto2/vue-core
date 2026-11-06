@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.18.0 — 2026-11-06
+
+Forms and lists built from a schema at run time, for content whose fields are data (site-builder's content types). The `Dynamic*` pair generates fields and columns from a typed schema; it is not a page renderer.
+
+### New
+- **form:** `DynamicForm` (a form from a `FormSchema`: each field kind mapped to the existing field, `visible_when` hiding, `localeMode: "perField" | "form"`, go-core's 422 field messages), `RepeatField` (repeatable group of fields, reordered with buttons), `ResourceField` (one or several ids picked through `PickerModal` over an app-supplied `list`), `RichTextField` (Quill 2, optional peer `quill`, loaded on first mount; HTML string, no sanitising in the browser), `evaluateVisibility(rule, values)` and `isEmptyValue`, `buildValidator(schema, { zod })`, and the schema types (`FormSchema`, `SchemaField`, `FieldKind`, `VisibilityRule`, `VisibilityCondition`, `ResourceSource`). New texts `core.form.dynamic.*` in the five locales. Recipe: `docs/recipes/content-forms.md`.
+- **collection:** `DynamicCollection`: columns, sort and filters from a schema, on `defineCollection`/`CollectionPage`.
+- **test-data:** `test-data/content/visibility.json`, the `visible_when` cases shared with servers that evaluate the same rule (copy it, do not edit the copy).
+
+### Fixed
+- **collection:** `RowOf`, `SortOf`, `FilterOf` and `ViewOf` were `never` for every definition; they now infer from the definition, and runtime keys (`Row = Record<string, unknown>`) type-check.
+
 ## 0.17.0 — 2026-11-04
 
 What every app built on vue-core wrote again: the phase and to-do components, date values in the date fields' own shape, a lazy locale loader, the author of a list row, "today at 14:35", typed access, two architecture rules as data, and the Playwright and vitest setup. Breaking only in that `Platform.access` is now typed by the registered permissions (see Changed).
