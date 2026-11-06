@@ -562,6 +562,42 @@
         "words": {
           "now": "sada"
         }
+      },
+      "dynamic": {
+        "repeat": {
+          "add": "Dodaj",
+          "row": "Redak {n}",
+          "remove": "Ukloni redak {n}",
+          "up": "Pomakni redak {n} gore",
+          "down": "Pomakni redak {n} dolje"
+        },
+        "language": "Jezik",
+        "resource": {
+          "choose": "Odaberi",
+          "change": "Promijeni",
+          "remove": "Ukloni",
+          "none": "Ništa nije odabrano",
+          "title": "Odaberite",
+          "search": "Traži",
+          "empty": "Ništa nije pronađeno",
+          "previous": "Prethodna",
+          "next": "Sljedeća",
+          "loading": "Učitavanje…",
+          "failed": "Popis se nije mogao učitati."
+        },
+        "rich_text": {
+          "bold": "Podebljano",
+          "italic": "Kurziv",
+          "heading": "Naslov",
+          "bullets": "Popis s oznakama",
+          "numbers": "Numerirani popis",
+          "link": "Poveznica",
+          "link_prompt": "Adresa poveznice",
+          "image": "Slika",
+          "video": "Video",
+          "video_prompt": "Adresa videa",
+          "failed": "Uređivač se nije mogao učitati."
+        }
       }
     },
     "errors": {

@@ -1,0 +1,674 @@
+{
+ "description": "Cases of visible_when (content-spec 4.4). evaluateVisibility(rule, values) must return `visible` for each case. Shared by vue-core's tests and the Go tests of site-builder: copy this file, do not edit the copy. Rules: no rule or no conditions = visible; all = every condition, any = at least one; eq/ne/in compare JSON values strictly (1 is not true) and lists/objects by content; empty = null, missing, blank string, empty list, or an object whose entries are all empty (false and 0 are values); a condition with an unknown operator, or `in` without a list, is skipped and a rule with no valid condition is visible.",
+ "cases": [
+  {
+   "name": "no rule is visible",
+   "rule": null,
+   "values": {},
+   "visible": true
+  },
+  {
+   "name": "empty all is visible",
+   "rule": {
+    "all": []
+   },
+   "values": {},
+   "visible": true
+  },
+  {
+   "name": "empty any is visible",
+   "rule": {
+    "any": []
+   },
+   "values": {},
+   "visible": true
+  },
+  {
+   "name": "eq true holds",
+   "rule": {
+    "all": [
+     {
+      "field": "replied",
+      "eq": true
+     }
+    ]
+   },
+   "values": {
+    "replied": true
+   },
+   "visible": true
+  },
+  {
+   "name": "eq true fails on false",
+   "rule": {
+    "all": [
+     {
+      "field": "replied",
+      "eq": true
+     }
+    ]
+   },
+   "values": {
+    "replied": false
+   },
+   "visible": false
+  },
+  {
+   "name": "eq true fails when the field is missing",
+   "rule": {
+    "all": [
+     {
+      "field": "replied",
+      "eq": true
+     }
+    ]
+   },
+   "values": {},
+   "visible": false
+  },
+  {
+   "name": "eq is strict: 1 is not true",
+   "rule": {
+    "all": [
+     {
+      "field": "replied",
+      "eq": true
+     }
+    ]
+   },
+   "values": {
+    "replied": 1
+   },
+   "visible": false
+  },
+  {
+   "name": "eq is strict: '1' is not 1",
+   "rule": {
+    "all": [
+     {
+      "field": "n",
+      "eq": 1
+     }
+    ]
+   },
+   "values": {
+    "n": "1"
+   },
+   "visible": false
+  },
+  {
+   "name": "eq on a string",
+   "rule": {
+    "all": [
+     {
+      "field": "type",
+      "eq": "video"
+     }
+    ]
+   },
+   "values": {
+    "type": "video"
+   },
+   "visible": true
+  },
+  {
+   "name": "eq compares lists by content",
+   "rule": {
+    "all": [
+     {
+      "field": "tags",
+      "eq": [
+       "a",
+       "b"
+      ]
+     }
+    ]
+   },
+   "values": {
+    "tags": [
+     "a",
+     "b"
+    ]
+   },
+   "visible": true
+  },
+  {
+   "name": "eq compares lists in order",
+   "rule": {
+    "all": [
+     {
+      "field": "tags",
+      "eq": [
+       "a",
+       "b"
+      ]
+     }
+    ]
+   },
+   "values": {
+    "tags": [
+     "b",
+     "a"
+    ]
+   },
+   "visible": false
+  },
+  {
+   "name": "eq null holds for null",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "eq": null
+     }
+    ]
+   },
+   "values": {
+    "x": null
+   },
+   "visible": true
+  },
+  {
+   "name": "eq null fails for a missing field",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "eq": null
+     }
+    ]
+   },
+   "values": {},
+   "visible": false
+  },
+  {
+   "name": "ne holds",
+   "rule": {
+    "all": [
+     {
+      "field": "kind",
+      "ne": "a"
+     }
+    ]
+   },
+   "values": {
+    "kind": "b"
+   },
+   "visible": true
+  },
+  {
+   "name": "ne fails",
+   "rule": {
+    "all": [
+     {
+      "field": "kind",
+      "ne": "a"
+     }
+    ]
+   },
+   "values": {
+    "kind": "a"
+   },
+   "visible": false
+  },
+  {
+   "name": "ne holds for a missing field",
+   "rule": {
+    "all": [
+     {
+      "field": "kind",
+      "ne": "a"
+     }
+    ]
+   },
+   "values": {},
+   "visible": true
+  },
+  {
+   "name": "in holds",
+   "rule": {
+    "all": [
+     {
+      "field": "kind",
+      "in": [
+       "a",
+       "b"
+      ]
+     }
+    ]
+   },
+   "values": {
+    "kind": "b"
+   },
+   "visible": true
+  },
+  {
+   "name": "in fails",
+   "rule": {
+    "all": [
+     {
+      "field": "kind",
+      "in": [
+       "a",
+       "b"
+      ]
+     }
+    ]
+   },
+   "values": {
+    "kind": "c"
+   },
+   "visible": false
+  },
+  {
+   "name": "in with numbers is strict",
+   "rule": {
+    "all": [
+     {
+      "field": "n",
+      "in": [
+       1,
+       2
+      ]
+     }
+    ]
+   },
+   "values": {
+    "n": "2"
+   },
+   "visible": false
+  },
+  {
+   "name": "in an empty list fails",
+   "rule": {
+    "all": [
+     {
+      "field": "kind",
+      "in": []
+     }
+    ]
+   },
+   "values": {
+    "kind": "a"
+   },
+   "visible": false
+  },
+  {
+   "name": "empty: null",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": null
+   },
+   "visible": true
+  },
+  {
+   "name": "empty: missing",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {},
+   "visible": true
+  },
+  {
+   "name": "empty: empty string",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": ""
+   },
+   "visible": true
+  },
+  {
+   "name": "empty: blank string",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": "  "
+   },
+   "visible": true
+  },
+  {
+   "name": "empty: empty list",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": []
+   },
+   "visible": true
+  },
+  {
+   "name": "empty: false is a value",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": false
+   },
+   "visible": false
+  },
+  {
+   "name": "empty: zero is a value",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": 0
+   },
+   "visible": false
+  },
+  {
+   "name": "empty: a translated text with no text",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": {
+     "hr": "",
+     "en": " "
+    }
+   },
+   "visible": true
+  },
+  {
+   "name": "empty: a translated text with one text",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": {
+     "hr": "Naslov",
+     "en": ""
+    }
+   },
+   "visible": false
+  },
+  {
+   "name": "not_empty: a text",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "not_empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": "a"
+   },
+   "visible": true
+  },
+  {
+   "name": "not_empty: a list",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "not_empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": [
+     1
+    ]
+   },
+   "visible": true
+  },
+  {
+   "name": "not_empty: empty string",
+   "rule": {
+    "all": [
+     {
+      "field": "x",
+      "not_empty": true
+     }
+    ]
+   },
+   "values": {
+    "x": ""
+   },
+   "visible": false
+  },
+  {
+   "name": "not_empty: an id",
+   "rule": {
+    "all": [
+     {
+      "field": "image",
+      "not_empty": true
+     }
+    ]
+   },
+   "values": {
+    "image": 12
+   },
+   "visible": true
+  },
+  {
+   "name": "all needs every condition",
+   "rule": {
+    "all": [
+     {
+      "field": "a",
+      "eq": 1
+     },
+     {
+      "field": "b",
+      "eq": 2
+     }
+    ]
+   },
+   "values": {
+    "a": 1,
+    "b": 3
+   },
+   "visible": false
+  },
+  {
+   "name": "all holds when every condition does",
+   "rule": {
+    "all": [
+     {
+      "field": "a",
+      "eq": 1
+     },
+     {
+      "field": "b",
+      "eq": 2
+     }
+    ]
+   },
+   "values": {
+    "a": 1,
+    "b": 2
+   },
+   "visible": true
+  },
+  {
+   "name": "any needs one condition",
+   "rule": {
+    "any": [
+     {
+      "field": "a",
+      "eq": 1
+     },
+     {
+      "field": "b",
+      "eq": 2
+     }
+    ]
+   },
+   "values": {
+    "a": 0,
+    "b": 2
+   },
+   "visible": true
+  },
+  {
+   "name": "any fails when none holds",
+   "rule": {
+    "any": [
+     {
+      "field": "a",
+      "eq": 1
+     },
+     {
+      "field": "b",
+      "eq": 2
+     }
+    ]
+   },
+   "values": {
+    "a": 0,
+    "b": 0
+   },
+   "visible": false
+  },
+  {
+   "name": "Lavcevic leads: replied_at shows once replied",
+   "rule": {
+    "all": [
+     {
+      "field": "replied",
+      "eq": true
+     }
+    ]
+   },
+   "values": {
+    "replied": true,
+    "replied_at": null
+   },
+   "visible": true
+  },
+  {
+   "name": "Lavcevic leads: replied_at hidden while not replied",
+   "rule": {
+    "all": [
+     {
+      "field": "replied",
+      "eq": true
+     }
+    ]
+   },
+   "values": {
+    "replied": false,
+    "replied_at": "2026-01-01"
+   },
+   "visible": false
+  },
+  {
+   "name": "an unknown operator is skipped, so the rule is visible",
+   "rule": {
+    "all": [
+     {
+      "field": "a",
+      "gt": 3
+     }
+    ]
+   },
+   "values": {
+    "a": 1
+   },
+   "visible": true
+  },
+  {
+   "name": "an unknown operator is skipped, the others still count",
+   "rule": {
+    "all": [
+     {
+      "field": "a",
+      "gt": 3
+     },
+     {
+      "field": "b",
+      "eq": 1
+     }
+    ]
+   },
+   "values": {
+    "b": 2
+   },
+   "visible": false
+  },
+  {
+   "name": "in without a list is skipped",
+   "rule": {
+    "all": [
+     {
+      "field": "a",
+      "in": "x"
+     }
+    ]
+   },
+   "values": {
+    "a": "x"
+   },
+   "visible": true
+  },
+  {
+   "name": "a field of a nested key is just a key",
+   "rule": {
+    "all": [
+     {
+      "field": "a.b",
+      "eq": 1
+     }
+    ]
+   },
+   "values": {
+    "a.b": 1
+   },
+   "visible": true
+  }
+ ]
+}

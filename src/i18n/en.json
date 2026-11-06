@@ -562,6 +562,42 @@
         "words": {
           "now": "now"
         }
+      },
+      "dynamic": {
+        "repeat": {
+          "add": "Add",
+          "row": "Row {n}",
+          "remove": "Remove row {n}",
+          "up": "Move row {n} up",
+          "down": "Move row {n} down"
+        },
+        "language": "Language",
+        "resource": {
+          "choose": "Choose",
+          "change": "Change",
+          "remove": "Remove",
+          "none": "Nothing chosen",
+          "title": "Choose",
+          "search": "Search",
+          "empty": "Nothing found",
+          "previous": "Previous",
+          "next": "Next",
+          "loading": "Loading…",
+          "failed": "The list could not be loaded."
+        },
+        "rich_text": {
+          "bold": "Bold",
+          "italic": "Italic",
+          "heading": "Heading",
+          "bullets": "Bulleted list",
+          "numbers": "Numbered list",
+          "link": "Link",
+          "link_prompt": "Link address",
+          "image": "Image",
+          "video": "Video",
+          "video_prompt": "Video address",
+          "failed": "The editor could not be loaded."
+        }
       }
     },
     "errors": {

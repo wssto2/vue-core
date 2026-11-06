@@ -562,6 +562,42 @@
         "words": {
           "now": "zdaj"
         }
+      },
+      "dynamic": {
+        "repeat": {
+          "add": "Dodaj",
+          "row": "Vrstica {n}",
+          "remove": "Odstrani vrstico {n}",
+          "up": "Premakni vrstico {n} navzgor",
+          "down": "Premakni vrstico {n} navzdol"
+        },
+        "language": "Jezik",
+        "resource": {
+          "choose": "Izberi",
+          "change": "Spremeni",
+          "remove": "Odstrani",
+          "none": "Nič ni izbrano",
+          "title": "Izberite",
+          "search": "Išči",
+          "empty": "Ni zadetkov",
+          "previous": "Prejšnja",
+          "next": "Naslednja",
+          "loading": "Nalaganje…",
+          "failed": "Seznama ni bilo mogoče naložiti."
+        },
+        "rich_text": {
+          "bold": "Krepko",
+          "italic": "Poševno",
+          "heading": "Naslov",
+          "bullets": "Seznam z oznakami",
+          "numbers": "Oštevilčen seznam",
+          "link": "Povezava",
+          "link_prompt": "Naslov povezave",
+          "image": "Slika",
+          "video": "Video",
+          "video_prompt": "Naslov videa",
+          "failed": "Urejevalnika ni bilo mogoče naložiti."
+        }
       }
     },
     "errors": {
