@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.19.0)
+## 0.19.0 — 2026-11-06
 
 A code editor for forms, for the templates, components and page code a site is built from.
 
