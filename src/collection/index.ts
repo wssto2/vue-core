@@ -28,3 +28,4 @@ export type { CellSlots, CollectionSlots, RowsSlots } from "./slots";
 export { createPicker } from "./picker";
 export type { Picker, PickerOptions } from "./picker";
 export { default as PickerModal } from "./PickerModal.vue";
+export { default as DynamicCollection } from "./DynamicCollection.vue";
