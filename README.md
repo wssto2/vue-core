@@ -337,6 +337,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [App setup](docs/recipes/app-setup.md): config, session, effects, locales and flags, permissions in the UI, error sentences, startup errors
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
 - [Forms and lists from a schema](docs/recipes/content-forms.md): `DynamicForm`, `RepeatField`, `ResourceField`, `RichTextField`, `buildValidator`, `DynamicCollection`, `visible_when`
+- [A code editor](docs/recipes/code-field.md): `CodeField` (CodeMirror 6): Liquid / HTML / CSS / JavaScript, linter markers, a preview beside it, the keyboard
 - [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Sign-in](docs/recipes/sign-in.md): go-core's identity module: the sign-in page, the session wiring, the language, the module's committed types, the dev server
 - [Users and profile](docs/recipes/users.md): the users list and a person's record, "my profile" with the e-mail change by code, opting out, extra sections, refusals

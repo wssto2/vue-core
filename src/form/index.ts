@@ -85,6 +85,8 @@ export { default as DynamicForm } from "./dynamic/DynamicForm.vue";
 export { default as RepeatField } from "./dynamic/RepeatField.vue";
 export { default as ResourceField } from "./dynamic/ResourceField.vue";
 export { default as RichTextField } from "./dynamic/RichTextField.vue";
+export { default as CodeField } from "./CodeField.vue";
+export type { CodeLanguage, CodeMarker } from "./codeEditor";
 export { evaluateVisibility, isEmptyValue } from "./dynamic/visibility";
 export { buildValidator } from "./dynamic/validator";
 export type { SchemaValidatorOptions } from "./dynamic/validator";

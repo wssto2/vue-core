@@ -148,6 +148,15 @@ for (const [, url] of stylesheet.matchAll(/url\(([^)]+)\)/g)) {
 }
 console.log(`${targets.length} export targets and the font urls of styles.css exist`);
 
+// The optional editors load on first use: nothing in dist/ imports them statically (only `import("…")`).
+step("optional editors (quill, CodeMirror) are imported lazily only");
+for (const file of walk(join(installed, "dist"))) {
+  if (!file.endsWith(".js")) continue;
+  const staticImport = /(?:^|[;\n])\s*(?:import|export)\s[^;"']*?from\s*["'](quill|@codemirror\/[\w-]+|@lezer\/[\w-]+)["']|(?:^|[;\n])\s*import\s*["'](quill|@codemirror\/[\w-]+|@lezer\/[\w-]+)["']/.exec(readFileSync(file, "utf8"));
+  if (staticImport) fail(`${relative(installed, file)} imports ${staticImport[1] ?? staticImport[2]} statically`);
+}
+console.log("quill and CodeMirror are reached only through import()");
+
 step("playground: typecheck and production build");
 run("npx", ["vue-tsc", "--noEmit"], playground);
 rmSync(join(playground, "dist"), { recursive: true, force: true });

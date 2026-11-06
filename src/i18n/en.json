@@ -563,6 +563,13 @@
           "now": "now"
         }
       },
+        "code": {
+          "tab_hint": "Esc, then Tab, leaves the editor.",
+          "preview": "Preview",
+          "show_preview": "Show preview",
+          "hide_preview": "Hide preview",
+          "failed": "The editor could not be loaded."
+        },
       "dynamic": {
         "repeat": {
           "add": "Add",

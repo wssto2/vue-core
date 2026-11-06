@@ -563,6 +563,13 @@
           "now": "sada"
         }
       },
+        "code": {
+          "tab_hint": "Esc, pa Tab, izlazi iz uređivača.",
+          "preview": "Pregled",
+          "show_preview": "Prikaži pregled",
+          "hide_preview": "Sakrij pregled",
+          "failed": "Uređivač nije mogao da se učita."
+        },
       "dynamic": {
         "repeat": {
           "add": "Dodaj",

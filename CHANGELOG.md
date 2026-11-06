@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased (0.19.0)
+
+A code editor for forms, for the templates, components and page code a site is built from.
+
+### New
+- **form:** `CodeField` (CodeMirror 6, optional peers loaded when the first one shows): `v-model` string, `language: "liquid" | "html" | "css" | "javascript"`, `readonly`, `lineNumbers`, `height` (resizable), `markers: CodeMarker[]` (`{ line, column?, severity, message }` from the server's linter, drawn in the gutter and as underlines), `@save` on Ctrl/Cmd+S, a `#preview` slot that puts the app's preview beside the editor (behind a button on narrow screens). Tab indents, Esc then Tab leaves the editor. Liquid is the official `@codemirror/lang-liquid`. New types `CodeLanguage`, `CodeMarker`; new texts `core.form.code.*`. Recipe: `docs/recipes/code-field.md`.
+- **peers:** optional `@codemirror/{state,view,commands,language,lint,lang-liquid,lang-html,lang-css,lang-javascript}` and `@lezer/highlight`.
+- **check:consumer:** fails when the packed output imports quill or CodeMirror statically.
+
 ## 0.18.0 — 2026-11-06
 
 Forms and lists built from a schema at run time, for content whose fields are data (site-builder's content types). The `Dynamic*` pair generates fields and columns from a typed schema; it is not a page renderer.

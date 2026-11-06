@@ -563,6 +563,13 @@
           "now": "zdaj"
         }
       },
+        "code": {
+          "tab_hint": "Esc, nato Tab, zapusti urejevalnik.",
+          "preview": "Predogled",
+          "show_preview": "Pokaži predogled",
+          "hide_preview": "Skrij predogled",
+          "failed": "Urejevalnika ni bilo mogoče naložiti."
+        },
       "dynamic": {
         "repeat": {
           "add": "Dodaj",
