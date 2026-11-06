@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { defineCollection } from "./definition";
 import type { CollectionColumns } from "./columns";
-import type { SortOf } from "./definition";
+import type { CollectionDefinition, RowOf, SortOf } from "./definition";
 import type { ListPage } from "./types";
 import { useCollection } from "./useCollection";
 
@@ -148,3 +148,33 @@ export function typedMeta() {
   const wrong: number | undefined = useCollection(tickets, { state: { kind: "memory" } }).page.value?.meta?.anything;
   void wrong;
 }
+
+// A list whose columns, sorts and filters are only known at runtime (a content type's schema): `Row` is a record and
+// every key is a plain string.
+type RuntimeRow = Record<string, unknown>;
+
+export function runtimeKeys(sortKeys: readonly string[], filterKeys: readonly string[]) {
+  const definition = defineCollection({
+    id: "runtime",
+    stateVersion: 1,
+    load: async (query): Promise<ListPage<RuntimeRow>> => {
+      const sort: string | null = query.sort;
+      void sort;
+      return { rows: [], total: 0, page: 1, pageSize: 25, lastPage: 0, from: 0, to: 0 };
+    },
+    key: (row) => String(row.id),
+    query: { sorts: sortKeys, filters: filterKeys },
+  });
+  const columns: CollectionColumns<RuntimeRow, SortOf<typeof definition>> = [{ key: "title", label: "Title", sort: "title" }];
+  const list = useCollection(definition, { columns, state: { kind: "memory" } });
+  list.sortBy("any_key");
+  list.setFilter("any_key", "x");
+  return list;
+}
+
+// The helpers read the definition's own types (they were `never` for every definition before 0.18).
+export const sortKey: SortOf<typeof tickets> = "title";
+export const ticketId: RowOf<typeof tickets>["id"] = 1;
+// @ts-expect-error not one of the declared sort keys
+export const badSortKey: SortOf<typeof tickets> = "nope";
+export const anySort: SortOf<CollectionDefinition<RuntimeRow, string>> = "whatever";
