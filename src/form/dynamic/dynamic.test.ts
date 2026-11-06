@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/vue";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick, ref } from "vue";
 import { ApiError } from "../../client";
@@ -219,9 +219,7 @@ describe("ResourceField", () => {
     const media = source();
     const { value } = mountResource({ source: media, accept: "image/*" }, null);
     await fireEvent.click(screen.getByRole("button", { name: "Choose" }));
-    await flush();
-
-    expect(media.list).toHaveBeenCalledWith({ search: "", page: 1, pageSize: 24, accept: "image/*" }, expect.objectContaining({ signal: expect.any(AbortSignal) }));
+    await waitFor(() => expect(media.list).toHaveBeenCalledWith({ search: "", page: 1, pageSize: 24, accept: "image/*" }, expect.objectContaining({ signal: expect.any(AbortSignal) })));
     await fireEvent.click(await screen.findByText("Garden"));
     await flush();
     expect(value.value).toBe(12);
@@ -257,6 +255,9 @@ describe("ResourceField", () => {
 });
 
 describe("RichTextField", () => {
+  // The editor is a lazy import: under a loaded machine it takes more than a few ticks.
+  const editorReady = () => waitFor(() => expect(document.querySelector(".ql-editor")).not.toBeNull(), { timeout: 10_000 });
+
   function mountRich(initial: string, props: Record<string, unknown> = {}) {
     const html = ref(initial);
     const Host = defineComponent({ setup: () => () => h(RichTextField, { label: "Text", ...props, modelValue: html.value, "onUpdate:modelValue": (next: string) => (html.value = next) }) });
@@ -265,7 +266,7 @@ describe("RichTextField", () => {
 
   it("loads the editor lazily and shows the HTML it was given", async () => {
     mountRich("<h2>Title</h2><p>Hello <strong>world</strong></p>");
-    await flush();
+    await editorReady();
     const editor = document.querySelector(".ql-editor")!;
     expect(editor.querySelector("h2")?.textContent).toBe("Title");
     expect(editor.querySelector("strong")?.textContent).toBe("world");
@@ -273,7 +274,8 @@ describe("RichTextField", () => {
 
   it("emits the HTML of a formatting made with the toolbar, unsanitised", async () => {
     const { html } = mountRich("<p>Hello</p>");
-    await flush();
+    await editorReady();
+    await waitFor(() => expect((screen.getByRole("button", { name: "Bold" }) as HTMLButtonElement).disabled).toBe(false));
     const editor = document.querySelector(".ql-editor") as HTMLElement;
     const range = document.createRange();
     range.selectNodeContents(editor.querySelector("p")!);
@@ -288,14 +290,14 @@ describe("RichTextField", () => {
 
   it("offers the image and video buttons only when asked", async () => {
     mountRich("");
-    await flush();
+    await editorReady();
     expect(screen.queryByRole("button", { name: "Image" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Video" })).toBeNull();
     expect(screen.getByRole("button", { name: "Link" })).toBeTruthy();
     document.body.innerHTML = "";
 
     mountRich("", { video: true, images: { thumbnail: "/m/{id}/t", image: "/m/{id}", list: async () => ({ rows: [], lastPage: 1 }) } });
-    await flush();
+    await editorReady();
     expect(screen.getByRole("button", { name: "Image" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Video" })).toBeTruthy();
   });
@@ -304,7 +306,7 @@ describe("RichTextField", () => {
     const html = ref("<p>One</p>");
     const Host = defineComponent({ setup: () => () => h(RichTextField, { label: "Text", modelValue: html.value }) });
     render(Host, { global });
-    await flush();
+    await editorReady();
     html.value = "<p>Two</p>";
     await flush();
     expect(document.querySelector(".ql-editor")?.textContent).toBe("Two");

@@ -336,6 +336,7 @@ The library's own texts are under the `core` namespace in English, Croatian, Bos
 - [Shell](docs/recipes/shell.md): the default shell, contributions from features, keyboard shortcuts and their help, running inside a frame, a custom shell
 - [App setup](docs/recipes/app-setup.md): config, session, effects, locales and flags, permissions in the UI, error sentences, startup errors
 - [Forms](docs/recipes/forms.md): form state, fields, a record edited in group sheets, a long form, commands
+- [Forms and lists from a schema](docs/recipes/content-forms.md): `DynamicForm`, `RepeatField`, `ResourceField`, `RichTextField`, `buildValidator`, `DynamicCollection`, `visible_when`
 - [Typed routes](docs/recipes/typed-routes.md): generated routes, `client.request`, a list from a route
 - [Sign-in](docs/recipes/sign-in.md): go-core's identity module: the sign-in page, the session wiring, the language, the module's committed types, the dev server
 - [Users and profile](docs/recipes/users.md): the users list and a person's record, "my profile" with the e-mail change by code, opting out, extra sections, refusals
