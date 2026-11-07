@@ -39,6 +39,8 @@ defineSlots<{
   default?: (scope: { tab: Value }) => unknown;
   footer?: () => unknown;
   actions?: () => unknown;
+  /** Replaces the title and the close button, as in `Sheet`. */
+  header?: (scope: { titleId: string }) => unknown;
 }>();
 
 const { t } = useI18n();
@@ -47,7 +49,7 @@ const items = computed(() =>
   props.tabs.map((item) => ({
     value: item.value,
     label: item.label,
-    ...(item.error ? { warning: typeof item.error === "string" ? item.error : t("core.sheet.tab_error") } : {}),
+    ...(item.error ? { error: typeof item.error === "string" ? item.error : t("core.sheet.tab_error") } : {}),
   })),
 );
 
@@ -57,6 +59,7 @@ defineExpose({ present: () => sheet.value?.present(), dismiss: () => sheet.value
 <template>
   <Sheet ref="sheet" :title="props.title" :grouped="props.grouped" :size="props.size" :docked="props.docked" @presented="$emit('presented')" @dismissed="$emit('dismissed')">
     <template v-if="$slots.actions" #actions><slot name="actions" /></template>
+    <template v-if="$slots.header" #header="scope"><slot name="header" v-bind="scope" /></template>
     <Tabs v-model="tab" :tabs="items" stretch :label="props.tabsLabel ?? props.title ?? t('core.sheet.tabs')">
       <div v-for="item in props.tabs" v-show="item.value === tab" :key="item.value" :data-tab-panel="String(item.value)">
         <slot :tab="item.value" />

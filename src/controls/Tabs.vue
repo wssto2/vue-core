@@ -17,6 +17,8 @@ export interface TabItem<Value extends string | number = string | number> {
   badge?: string | number;
   /** The reason this tab needs attention; shown as an icon with this text as its name. */
   warning?: string;
+  /** A failed field inside this tab: a red icon with this text as its name (a warning is amber and softer). */
+  error?: string;
   to?: RouteLocationRaw;
 }
 
@@ -103,6 +105,7 @@ const ALIGNMENT = { start: "justify-start", center: "justify-center", end: "just
             {{ tab.shortLabel ?? tab.label }}
             <span v-if="tab.badge" class="text-footnote font-normal tabular-nums">{{ tab.badge }}</span>
             <Icon v-if="tab.warning" name="alertTriangle" :size="14" :label="tab.warning" />
+            <Icon v-if="tab.error" name="errorWarningLine" :size="14" :label="tab.error" class="text-status-danger-content" />
           </button>
         </li>
       </ul>
@@ -132,6 +135,7 @@ const ALIGNMENT = { start: "justify-start", center: "justify-center", end: "just
               {{ tab.badge }}
             </span>
             <Icon v-if="tab.warning" name="alertTriangle" :size="16" :label="tab.warning" class="ml-2 text-status-warning-content" />
+            <Icon v-if="tab.error" name="errorWarningLine" :size="16" :label="tab.error" class="ml-2 text-status-danger-content" />
           </button>
         </li>
       </ul>
