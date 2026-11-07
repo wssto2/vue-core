@@ -37,7 +37,7 @@ const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
     @update:model-value="() => undefined" @move="(moved: LooseNode, _from: number, to: number) => ctx.reorder({ id: moved.id, parentId: props.parent?.id ?? null, index: to })">
     <template #item="{ item: entry }">
       <div class="flex flex-col" data-test="tree-node" :data-depth="props.depth">
-        <div class="tree-row h-[50px] items-center border-b border-border-separator pr-2 hover:bg-fill/40">
+        <div class="tree-row grid h-[50px] grid-cols-(--tree-columns) items-center border-b border-border-separator pr-2 hover:bg-fill/40">
           <div class="flex min-w-0 items-center gap-2">
             <button v-if="hasChildren(entry)" type="button" :aria-expanded="ctx.isOpen(entry)" :aria-label="t(ctx.isOpen(entry) ? 'core.tree.collapse' : 'core.tree.expand', { name: entry.label })"
               class="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-content-muted hover:bg-fill" :class="FOCUS" @click="ctx.toggle(entry)">
@@ -79,10 +79,3 @@ const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
     </template>
   </SortableList>
 </template>
-
-<style scoped>
-.tree-row {
-  display: grid;
-  grid-template-columns: var(--tree-columns);
-}
-</style>

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.21.0 (unreleased)
+
+The list pieces for site-builder's pages list, template resources and Karakteristike (approved mock-ups in site-builder `next/design/`), and the screen of go-core's characteristics module. Needs go-core v1.34.0-rc.1.
+
+### New
+- **collection:** `FileExplorer`, rows of folders, pages, links and files with a host switch, a breadcrumb, ticking (`v-model:selected`), a selection bar of labelled `PageAction`s that exists only while rows are ticked, per-row actions, `@open(row)`, and the open folder in the URL (`v-model:folder`, query parameter `folder`); the columns are the app's. `CollectionTree`, a tree of rows with indentation, chevrons (`aria-expanded`, `v-model:expanded`), reorder among siblings by drag or Alt+Arrow (`@reorder { id, parentId, index }`), an add button per level (`add-label`, `@add`), columns that belong to some branches only (`TreeColumn.visible`), an active switch column, search and filter that keep the ancestors of matches, row actions and `readonly`.
+- **form:** `CharacteristicField`, a select (or, with `multiple`, a multi-select) over a branch of the characteristics tree: `level`, `parent`, `value` (`"id"` or a described column), `lang`, searchable, loading and failed states from the select it wraps, an already-chosen inactive item shown marked "(inactive)" through `selected`. Typed so `form.bind()` fits either mode.
+- **characteristics:** `characteristicsFeature({ destination })`, `CharacteristicsPage`, `characteristicsPages`, `useCharacteristicsApi`, and go-core's types and routes. The tree, the item sheet (names per language, the described extra fields by type, read-only and branch-scoped fields), activate and deactivate, reorder, add at each level, and delete that shows where the item is used, offers to deactivate instead and sends `force` only after a second confirmation. Shown with `characteristics:view`, write actions with `characteristics:edit`.
+- **modules:** `src/modules/characteristics` (go-core v1.34.0-rc.1; `goCore` in package.json moves from v1.19.0, the other modules' generated schemas now trim text).
+- **controls:** `SortableList` `plain` (rows without a card, the handle at the top, for rows that hold a list of their own).
+- **icon:** `folderLine`, `fileLine`, `tagLine`; texts in en, hr, bs, sl and sr-Latn with Croatian and Slovenian plurals. Recipes `file-explorer.md`, `collection-tree.md`, `characteristics.md`.
+
 ## 0.20.0 — 2026-11-07
 
 The editor pieces for site-builder's template editor, page editor and page settings (approved mock-ups in site-builder `next/design/`).

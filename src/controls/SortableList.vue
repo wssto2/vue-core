@@ -105,7 +105,7 @@ function startDrag(event: PointerEvent, index: number) {
         :style="dragging?.from === index ? { transform: `translateY(${dragging.offset}px)` } : undefined">
         <button v-if="!props.disabled" type="button" data-sortable-handle :aria-label="t('core.sortable.handle', { item: nameOf(item) })" :aria-describedby="hintId"
           class="flex w-7 shrink-0 cursor-grab touch-none items-center justify-center text-content-muted hover:bg-fill focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-border-focus"
-          :class="props.plain ? 'h-(--sortable-row-height,2.5rem) self-start rounded-md' : 'rounded-l-md'"
+          :class="props.plain ? 'self-start rounded-md' : 'rounded-l-md'" :style="props.plain ? { height: 'var(--sortable-row-height, 2.5rem)' } : undefined"
           @keydown="onKey($event, index)" @pointerdown="startDrag($event, index)">
           <Icon name="draggable" :size="16" />
         </button>

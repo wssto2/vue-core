@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Value extends string | number = number">
+<script setup lang="ts" generic="Value extends string | number = number, Multiple extends boolean = false">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { characteristicsRoutes } from "../modules/characteristics/routes";
@@ -36,16 +36,17 @@ const props = withDefaults(defineProps<FieldProps & {
   value?: string;
   /** The language of the labels; default the first language the project lists. */
   lang?: string;
-  multiple?: boolean;
+  /** Several choices: the model is a list. */
+  multiple?: Multiple;
   /** Offers the search box (from the first option). */
   searchable?: boolean;
   placeholder?: string;
   /** The chosen options, when the caller has them (a saved record's labels): how an inactive item is named. */
   selected?: SelectOption<Value> | readonly SelectOption<Value>[] | null;
-}>(), { ...fieldDefaults, parent: undefined, value: "id", lang: undefined, multiple: false, searchable: true, placeholder: undefined, selected: null });
+}>(), { ...fieldDefaults, parent: undefined, value: "id", lang: undefined, multiple: undefined, searchable: true, placeholder: undefined, selected: null });
 
-/** One value, or with `multiple` a list of them; `null` for none. */
-const model = defineModel<Value | readonly Value[] | null>({ default: null });
+/** One value (`null` for none), or with `multiple` a list of them: the type follows `multiple`, so `form.bind()` fits either. */
+const model = defineModel<Multiple extends true ? Value[] : Value | null>({ default: null as never });
 
 const { t } = useI18n();
 const { http } = usePlatform();
@@ -60,7 +61,7 @@ const loaded = useOptions<{ level: number; parent: number | null; value: string;
   },
 });
 
-const chosen = computed<readonly Value[]>(() => (Array.isArray(model.value) ? (model.value as readonly Value[]) : model.value === null || model.value === undefined ? [] : [model.value as Value]));
+const chosen = computed<readonly Value[]>(() => (Array.isArray(model.value) ? (model.value as Value[]) : model.value === null || model.value === undefined ? [] : [model.value as Value]));
 const known = computed<readonly SelectOption<Value>[]>(() => (props.selected === null ? [] : Array.isArray(props.selected) ? (props.selected as readonly SelectOption<Value>[]) : [props.selected as SelectOption<Value>]));
 
 // The loaded options, plus the chosen ones the server no longer offers (inactive), marked; only once the load landed, or all would look inactive.
@@ -80,6 +81,6 @@ const selectedForSingle = computed(() => known.value.find((option) => option.val
 </script>
 
 <template>
-  <MultiSelectField v-if="props.multiple" v-bind="fieldProps(props)" v-model="model as Value[]" :options="options" :selected="known" :placeholder="props.placeholder" :search-from="searchFrom" />
+  <MultiSelectField v-if="props.multiple" v-bind="fieldProps(props)" v-model="(model as Value[])" :options="options" :selected="known" :placeholder="props.placeholder" :search-from="searchFrom" />
   <SelectField v-else v-bind="fieldProps(props)" v-model="model as Value | null" :options="options" :selected="selectedForSingle" :placeholder="props.placeholder" :search-from="searchFrom" />
 </template>

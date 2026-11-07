@@ -132,7 +132,7 @@ const actions = computed<PageAction[]>(() => {
 </script>
 
 <template>
-  <AdaptivePageShell :title="t('core.characteristics.title')" :description="t('core.characteristics.description')" icon="tagLine" :actions="actions">
+  <AdaptivePageShell :title="t('core.characteristics.title')" :description="t('core.characteristics.description')" :actions="actions">
     <div class="flex min-w-0 flex-col gap-group-gap" data-test="characteristics">
       <AsyncSection :state="load.state.value" :skeleton-rows="5" :is-empty="(value) => value.items.length === 0" :empty-title="t('core.characteristics.empty')" @retry="load.reload()">
         <template #default="{ value }">

@@ -109,7 +109,7 @@ const ALIGN = { start: "text-left", center: "text-center", end: "text-right" } a
   <section class="overflow-hidden rounded-group bg-surface-cell shadow-group" data-test="collection-tree" :style="{ '--tree-columns': template, '--sortable-row-height': '50px' }">
     <div class="overflow-x-auto">
       <div class="min-w-[44rem]" role="group" :aria-label="props.label">
-        <div class="tree-header items-center border-b border-border-separator bg-fill/40 py-2 pr-2 pl-4 text-footnote text-content-muted" aria-hidden="true">
+        <div class="tree-header grid grid-cols-(--tree-columns) items-center border-b border-border-separator bg-fill/40 py-2 pr-2 pl-4 text-footnote text-content-muted" aria-hidden="true">
           <span>{{ props.nameLabel ?? t("core.tree.name") }}</span>
           <span v-for="column in props.columns" :key="column.key" class="px-2" :class="ALIGN[column.align ?? 'start']">{{ column.label }}</span>
           <span v-if="props.activeLabel !== undefined" class="px-2">{{ props.activeLabel }}</span>
@@ -125,10 +125,3 @@ const ALIGN = { start: "text-left", center: "text-center", end: "text-right" } a
     </div>
   </section>
 </template>
-
-<style scoped>
-.tree-header {
-  display: grid;
-  grid-template-columns: var(--tree-columns);
-}
-</style>
