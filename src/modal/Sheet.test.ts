@@ -140,3 +140,84 @@ describe("Sheet drag", () => {
     expect(document.querySelector("[data-part=panel] .h-1\\.25")).not.toBeNull();
   });
 });
+
+describe("Sheet size and docked", () => {
+  it("is as wide as its size says on a wide screen", async () => {
+    for (const [size, width] of [["md", "max-w-md"], ["lg", "max-w-xl"], ["xl", "max-w-3xl"]] as const) {
+      document.body.innerHTML = "";
+      mountSheet({ size });
+      await open();
+      expect(document.querySelector("[data-part=panel]")!.className).toContain(width);
+    }
+  });
+
+  function mountDocked(props: Record<string, unknown> = {}) {
+    const Owner = defineComponent({
+      components: { Sheet },
+      setup: () => ({ sheet: ref<InstanceType<typeof Sheet> | null>(null), props }),
+      template: `
+        <div id="layout" class="flex">
+          <main id="page"><input id="page-field" /><button id="trigger" @click="sheet?.present()">Edit</button></main>
+          <Sheet ref="sheet" title="Component" docked v-bind="props"><input id="sheet-field" /></Sheet>
+        </div>`,
+    });
+    return render(Owner, { global });
+  }
+
+  it("sits in the layout beside the page: no scrim, no dialog, no scroll lock, nothing inert", async () => {
+    mountDocked();
+    await open();
+    const region = screen.getByRole("region", { name: "Component" });
+    expect(document.querySelector("#layout")!.contains(region)).toBe(true);
+    expect(document.querySelector("[aria-modal]")).toBeNull();
+    expect(document.querySelector(".bg-scrim")).toBeNull();
+    expect(document.body.classList.contains("overflow-hidden")).toBe(false);
+    expect(document.querySelector("#layout")!.hasAttribute("inert")).toBe(false);
+    expect(document.querySelector("#page")!.closest("[inert]")).toBeNull();
+    expect(region.className).toContain("w-md");
+  });
+
+  it("does not trap focus: Tab leaves the panel, and the page keeps working", async () => {
+    mountDocked();
+    await open();
+    const field = document.querySelector<HTMLInputElement>("#sheet-field")!;
+    field.focus();
+    const tab = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    field.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(false);
+    document.querySelector<HTMLInputElement>("#page-field")!.focus();
+    expect(document.activeElement).toBe(document.querySelector("#page-field"));
+    expect(screen.queryByRole("region", { name: "Component" })).not.toBeNull();
+  });
+
+  it("closes on Escape from inside it, and gives focus back to what opened it", async () => {
+    mountDocked();
+    await open();
+    const dismissed = document.querySelector<HTMLElement>("[data-part=panel]")!;
+    dismissed.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(screen.queryByRole("region", { name: "Component" })).toBeNull());
+    expect(document.activeElement).toBe(document.querySelector("#trigger"));
+  });
+
+  it("leaves Escape alone while focus is on the page", async () => {
+    mountDocked();
+    await open();
+    document.querySelector<HTMLInputElement>("#page-field")!.focus();
+    press("Escape");
+    await settle();
+    expect(screen.queryByRole("region", { name: "Component" })).not.toBeNull();
+  });
+
+  it("is an ordinary bottom sheet on a coarse pointer", async () => {
+    const media = mockMedia({ compact: true });
+    try {
+      mountDocked();
+      await open();
+      expect(screen.getByRole("dialog")).toBeTruthy();
+      expect(document.querySelector(".bg-scrim")).not.toBeNull();
+    } finally {
+      media.restore();
+    }
+  });
+});
+
