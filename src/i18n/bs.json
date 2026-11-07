@@ -267,7 +267,10 @@
     },
     "page": {
       "breadcrumbs": "Navigacijska putanja",
-      "more_actions": "Više radnji"
+      "more_actions": "Više radnji",
+      "split": {
+        "resize": "Promijeni veličinu okna"
+      }
     },
     "wait": {
       "seconds": "{count} s"
@@ -333,7 +336,8 @@
         "new_tab": "u novoj kartici"
       },
       "offline": "Nema veze s internetom",
-      "dark_mode": "Tamni način rada"
+      "dark_mode": "Tamni način rada",
+      "external": "Otvara se izvan aplikacije"
     },
     "preferences": {
       "save_failed": "Postavka nije sačuvana."
@@ -563,13 +567,13 @@
           "now": "sada"
         }
       },
-        "code": {
-          "tab_hint": "Esc, pa Tab, izlazi iz uređivača.",
-          "preview": "Pregled",
-          "show_preview": "Prikaži pregled",
-          "hide_preview": "Sakrij pregled",
-          "failed": "Uređivač se nije mogao učitati."
-        },
+      "code": {
+        "tab_hint": "Esc, pa Tab, izlazi iz uređivača.",
+        "preview": "Pregled",
+        "show_preview": "Prikaži pregled",
+        "hide_preview": "Sakrij pregled",
+        "failed": "Uređivač se nije mogao učitati."
+      },
       "dynamic": {
         "repeat": {
           "add": "Dodaj",
@@ -605,6 +609,14 @@
           "video_prompt": "Adresa videa",
           "failed": "Uređivač se nije mogao učitati."
         }
+      },
+      "markers": {
+        "label": "Nalazi",
+        "ok": "U redu",
+        "errors": "Nema grešaka | {count} greška | {count} greške | {count} grešaka | {count} grešaka",
+        "warnings": "Nema upozorenja | {count} upozorenje | {count} upozorenja | {count} upozorenja | {count} upozorenja",
+        "line": "Red {line}",
+        "line_column": "Red {line}, kolona {column}"
       }
     },
     "errors": {
@@ -1382,6 +1394,36 @@
       "yesterday_at": "jučer u {time}",
       "tomorrow_at": "sutra u {time}",
       "date_at": "{date} u {time}"
+    },
+    "diff": {
+      "label": "Promjene",
+      "added": "dodano",
+      "removed": "uklonjeno",
+      "identical": "Nema razlika.",
+      "collapsed": "{count} neizmijenjenih redova | {count} neizmijenjeni red | {count} neizmijenjena reda | {count} neizmijenjenih redova | {count} neizmijenjenih redova"
+    },
+    "preview": {
+      "device": "Širina uređaja",
+      "desktop": "Računar",
+      "tablet": "Tablet",
+      "mobile": "Mobitel",
+      "reload": "Osvježi pregled",
+      "open": "Otvori u novoj kartici",
+      "loading": "Učitavanje pregleda…",
+      "failed": "Pregled nije moguće učitati.",
+      "retry": "Pokušaj ponovo",
+      "loaded_in": "{ms} ms",
+      "size": "Širina {width} px",
+      "size_scaled": "Širina {width} px, smanjeno na {percent} %"
+    },
+    "sortable": {
+      "handle": "Premjesti {item}",
+      "hint": "Alt i strelica gore ili dolje pomjera stavku.",
+      "moved": "{item}: premješteno na poziciju {position} od {total}"
+    },
+    "sheet": {
+      "tab_error": "Sadrži greške",
+      "tabs": "Odjeljci"
     }
   }
 }
