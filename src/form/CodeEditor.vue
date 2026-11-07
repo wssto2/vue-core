@@ -129,7 +129,17 @@ onMounted(async () => {
           cm.language.syntaxHighlighting(cm.highlight.classHighlighter),
           cm.lint.lintGutter(),
           EditorView.lineWrapping,
-          EditorView.theme({ "&": { height: "100%", backgroundColor: "transparent" }, "&.cm-focused": { outline: "none" }, ".cm-scroller": { fontFamily: "var(--font-mono, ui-monospace, monospace)", fontSize: "0.8125rem" } }),
+          EditorView.theme({
+            "&": { height: "100%", backgroundColor: "transparent" },
+            "&.cm-focused": { outline: "none" },
+            ".cm-scroller": { fontFamily: "var(--font-mono, ui-monospace, monospace)", fontSize: "0.8125rem" },
+            // The editor's own colours are light-only: these follow the theme tokens, so dark mode works.
+            ".cm-gutters": { backgroundColor: "transparent", color: "var(--app-content-muted)", borderRight: "1px solid var(--app-border-separator)" },
+            ".cm-activeLine": { backgroundColor: "var(--app-fill)" },
+            ".cm-activeLineGutter": { backgroundColor: "var(--app-fill)" },
+            ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--app-content-strong)" },
+            "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": { backgroundColor: "var(--app-tint-soft)" },
+          }),
           compartments.language.of(grammar),
           compartments.locked.of(lockedExtension()),
           compartments.numbers.of(numbersExtension()),
@@ -172,7 +182,7 @@ defineExpose({ focus: () => view?.focus(), reveal });
 </script>
 
 <template>
-  <div data-code-editor class="min-h-0 min-w-0 overflow-hidden bg-surface-cell text-content-strong [&_.cm-gutters]:border-r [&_.cm-gutters]:border-border-separator [&_.cm-gutters]:bg-transparent [&_.cm-gutters]:text-content-muted [&_.tok-keyword]:text-content-link [&_.tok-tagName]:text-content-link [&_.tok-string]:text-emerald-700 dark:[&_.tok-string]:text-emerald-400 [&_.tok-comment]:italic [&_.tok-comment]:text-content-muted [&_.tok-number]:text-amber-700 dark:[&_.tok-number]:text-amber-400 [&_.tok-bool]:text-amber-700 dark:[&_.tok-bool]:text-amber-400 [&_.tok-attributeName]:text-violet-700 dark:[&_.tok-attributeName]:text-violet-400 [&_.tok-propertyName]:text-violet-700 dark:[&_.tok-propertyName]:text-violet-400 [&_.tok-meta]:text-content-muted [&_.cm-lintRange-error]:underline [&_.cm-lintRange-error]:decoration-wavy [&_.cm-lintRange-error]:decoration-red-600 [&_.cm-lintRange-warning]:underline [&_.cm-lintRange-warning]:decoration-wavy [&_.cm-lintRange-warning]:decoration-amber-500"
+  <div data-code-editor class="min-h-0 min-w-0 overflow-hidden bg-surface-cell text-content-strong [&_.tok-keyword]:text-content-link [&_.tok-tagName]:text-content-link [&_.tok-string]:text-emerald-700 dark:[&_.tok-string]:text-emerald-400 [&_.tok-comment]:italic [&_.tok-comment]:text-content-muted [&_.tok-number]:text-amber-700 dark:[&_.tok-number]:text-amber-400 [&_.tok-bool]:text-amber-700 dark:[&_.tok-bool]:text-amber-400 [&_.tok-attributeName]:text-violet-700 dark:[&_.tok-attributeName]:text-violet-400 [&_.tok-propertyName]:text-violet-700 dark:[&_.tok-propertyName]:text-violet-400 [&_.tok-meta]:text-content-muted [&_.cm-lintRange-error]:underline [&_.cm-lintRange-error]:decoration-wavy [&_.cm-lintRange-error]:decoration-red-600 [&_.cm-lintRange-warning]:underline [&_.cm-lintRange-warning]:decoration-wavy [&_.cm-lintRange-warning]:decoration-amber-500"
     :class="props.fill ? 'h-full' : ''" :style="props.fill ? undefined : { height: props.height }">
     <div ref="host" class="h-full" :class="{ hidden: failed }" />
     <p v-if="failed" role="alert" class="p-3 text-sm text-status-danger-content">{{ t("core.form.code.failed") }}</p>
