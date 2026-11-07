@@ -62,7 +62,7 @@ const actions = computed<PageAction[]>(() => [
     <template #leading><span class="grid size-10 shrink-0 place-items-center rounded-group bg-tile-brand text-tile-brand-foreground" aria-hidden="true">&lt;/&gt;</span></template>
     <template #badges>
       <Badge tone="warning">{{ t("workbench.draft") }}</Badge>
-      <Badge tone="success">{{ t("workbench.published") }}</Badge>
+      <Badge tone="positive">{{ t("workbench.published") }}</Badge>
     </template>
     <template #subheader><Tabs v-model="section" :tabs="tabs" /></template>
     <template #start>
