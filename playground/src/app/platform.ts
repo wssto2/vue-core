@@ -58,6 +58,8 @@ export function createDemoPlatform() {
           navigation: [
             { i18n: "nav.work", children: [{ i18n: "nav.tickets", route: "tickets", icon: "carLine" }, { i18n: "nav.reports", route: "reports", icon: "fileTextLine" }, { i18n: "nav.records", route: "records", icon: "box2Line" }, { i18n: "nav.customers", route: "customers" }, { i18n: "nav.leads", route: "leads" }, { i18n: "forms.nav", route: "forms" }, { i18n: "tools.nav", route: "tools" }] },
             { i18n: "workflows.nav", route: "workflows" },
+            // The workbench screens, and a link that leaves the app (the old admin): a node with an href and no route.
+            { i18n: "workbench.content", children: [{ i18n: "workbench.nav_template", route: "workbench", icon: "fileTextLine" }, { i18n: "workbench.nav_page", route: "pageeditor", icon: "box2Line" }, { i18n: "workbench.old_admin", icon: "carLine", href: "/old-admin/" }] },
           ],
           access: {
             root: false,

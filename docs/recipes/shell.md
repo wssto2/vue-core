@@ -297,3 +297,27 @@ createApplication({
 A shell of your own renders `<LeaveGuardRoot />` once (as `CustomShell.vue` does): `createApplication` installs the application's leave guard, `backofficeShell` renders its dialog, and without the dialog a page with unsaved changes that is left fails with a `MissingLeaveGuardRootError` instead of letting the user lose their work silently.
 
 Naming the slots has a purpose: a feature that contributes to a slot the shell does not render fails at startup, naming the feature, instead of silently showing nothing. The page chrome (the back, the title, the page's actions) is read by `ShellTopBar` from the page itself, so a custom shell gets the same phone bar and sidebar behavior.
+
+## A link that leaves the app
+
+The menu is the server's. A node with an `href` and no `route` is a destination outside the application (the old admin, a sibling app): the rail and the drawer draw it as a plain `<a href>` with an "opens outside the app" marker (an arrow icon, and the words for screen readers), and the browser follows it with a full page load, in the same tab, never through the router. It needs no binding (`bindNavigation`), is never "current", and takes part in grouping like any link.
+
+<!-- example: docs/examples/workbench/externalNavigation.ts -->
+```ts
+import type { NavigationNode } from "@wssto2/vue-core/platform";
+
+// What go-core's menu sends: a node with `route` is a destination the app binds to one of its routes, a node with `href` (and no
+// `route`) leaves the app. The rail draws it as a plain link with an "opens outside the app" marker; the browser loads the page.
+export const navigation: readonly NavigationNode[] = [
+  {
+    i18n: "navigation.structure",
+    children: [
+      { i18n: "navigation.pages", icon: "file", route: "pages" },
+      { i18n: "navigation.old_admin", icon: "settings", href: "/old-admin/" },
+    ],
+  },
+];
+```
+
+`href` is a path on this origin (`/old-admin/`) or an absolute `http(s)` URL; anything else (`javascript:`, `//host`, `data:`) is refused when the session is read, and a node with both a `route` and an `href` keeps the route. The resolved `NavigationItem` has `to: null` and `href` set (the field is optional, so an app that builds its own items is unaffected). go-core's `navigation.Node` has `Icon` and `Children` and needs one more optional field, a string with the JSON name `href`, omitted when empty; the menu builder sets it instead of `Route` for such an entry.
+

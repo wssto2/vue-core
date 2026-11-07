@@ -9,6 +9,6 @@ export default defineConfig({
   build: {
     // The manifest lets scripts/check-consumer.mjs follow what each page can reach.
     manifest: true,
-    rollupOptions: { input: { index: "index.html", prebuilt: "prebuilt.html", app: "app.html", "app-lite": "app-lite.html", identity: "identity.html" } },
+    rollupOptions: { input: { index: "index.html", prebuilt: "prebuilt.html", app: "app.html", "app-lite": "app-lite.html", identity: "identity.html", preview: "preview.html" } },
   },
 });

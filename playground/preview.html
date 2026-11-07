@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="hr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #0d1714; background: #fff; }
+      header { display: flex; align-items: center; gap: 24px; padding: 16px 32px; border-bottom: 1px solid #e4e7e5; }
+      header strong { font-size: 20px; letter-spacing: -0.02em; margin-right: auto; }
+      header a { color: #2b3632; text-decoration: none; font-size: 14px; }
+      .hero { padding: 72px 32px; color: #fff; background: linear-gradient(120deg, #0f2c25, #1d5b47); }
+      .hero h1 { margin: 0 0 12px; font-size: 40px; letter-spacing: -0.02em; }
+      .hero p { max-width: 36rem; margin: 0 0 20px; opacity: 0.85; }
+      .hero a { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; color: #0d1714; text-decoration: none; }
+      section.c { position: relative; padding: 40px 32px; }
+      section.c h2 { margin: 0 0 8px; font-size: 28px; }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+      .card { border: 1px solid #e4e7e5; border-radius: 10px; padding: 14px; }
+      .card div { height: 80px; border-radius: 6px; margin-bottom: 10px; background: linear-gradient(120deg, #cfe5dc, #8fc1ad); }
+      /* the editing affordance: a dashed frame and an Edit button on the hovered component */
+      [data-component] { outline: 2px dashed transparent; outline-offset: -2px; }
+      [data-component]:hover, [data-component].selected { outline-color: #059669; }
+      [data-component] button { display: none; position: absolute; top: 8px; right: 8px; padding: 2px 10px; border: 0; border-radius: 999px; background: #059669; color: #fff; font: 12px system-ui; cursor: pointer; }
+      [data-component]:hover button { display: block; }
+    </style>
+  </head>
+  <body>
+    <header><strong>LAVČEVIĆ</strong><a href="#">Početna</a><a href="#">O nama</a><a href="#">Usluge</a><a href="#">Reference</a></header>
+    <section class="hero c" data-component="hero"><button type="button">Uredi</button><h1>Gradimo kuće u kojima se živi</h1><p>Projektiranje, gradnja i uređenje stambenih i poslovnih objekata na području cijele Hrvatske.</p><a href="#">Pogledaj reference</a></section>
+    <section class="c" data-component="about"><button type="button">Uredi</button><h2>O nama</h2><p>Tvrtka Lavčević posluje više od dvadeset godina. Naši projekti obuhvaćaju novogradnju, adaptacije i poslovne objekte.</p></section>
+    <section class="c" data-component="references"><button type="button">Uredi</button><h2>Odabrane reference</h2><div class="cards"><div class="card"><div></div>Stambena zgrada Vrbik</div><div class="card"><div></div>Poslovni centar Savska</div><div class="card"><div></div>Obiteljska kuća Jarun</div></div></section>
+    <script>
+      // What a previewed page does: tell the editor which component the user wants to edit (same origin here).
+      for (const button of document.querySelectorAll("[data-component] button")) {
+        button.addEventListener("click", () => parent.postMessage({ type: "edit", id: button.parentElement.dataset.component }, location.origin));
+      }
+      addEventListener("message", (event) => {
+        if (event.origin !== location.origin || event.data?.type !== "select") return;
+        for (const element of document.querySelectorAll("[data-component]")) element.classList.toggle("selected", element.dataset.component === event.data.id);
+      });
+    </script>
+  </body>
+</html>
