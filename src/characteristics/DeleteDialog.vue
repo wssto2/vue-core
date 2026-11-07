@@ -86,7 +86,7 @@ defineExpose({ show });
 </script>
 
 <template>
-  <Modal ref="modal" size="sm" without-footer :title="t('core.characteristics.delete_dialog.title', { name: node?.item.name ?? '' })" @dismissed="node = null">
+  <Modal ref="modal" size="md" without-footer :title="t('core.characteristics.delete_dialog.title', { name: node?.item.name ?? '' })" @dismissed="node = null">
     <div class="flex flex-col gap-3 text-body" data-test="characteristic-usage" :aria-busy="status === 'loading' || undefined">
       <p v-if="status === 'loading'" class="text-content-muted">{{ t("core.characteristics.delete_dialog.checking") }}</p>
       <Banner v-else-if="status === 'failed'" tone="critical" icon="errorWarningLine">{{ t("core.characteristics.delete_dialog.usage_failed") }}</Banner>
