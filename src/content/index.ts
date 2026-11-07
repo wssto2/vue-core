@@ -2,6 +2,8 @@ export { default as ActivityStream, type ActivityComment, type ActivityEvent, ty
 export { default as Avatar } from "./Avatar.vue";
 export { default as CommentThread, type CommentItem } from "./CommentThread.vue";
 export { default as Composer } from "./Composer.vue";
+export { default as DiffView } from "./DiffView.vue";
+export type { DiffLine } from "./diff";
 export { default as Divider } from "./Divider.vue";
 export { initialsFor } from "./initials";
 export { default as KeyValue } from "./KeyValue.vue";
@@ -9,5 +11,7 @@ export { default as KeyValueList, type KeyValueItem } from "./KeyValueList.vue";
 export { default as MicroLabel } from "./MicroLabel.vue";
 export { default as Money } from "./Money.vue";
 export { default as Panel } from "./Panel.vue";
+export { default as PreviewFrame } from "./PreviewFrame.vue";
+export { PREVIEW_WIDTHS, parsePreviewAction, previewScale, type PreviewAction, type PreviewCommand, type PreviewDevice } from "./previewFrame";
 export { default as StatSummary, type StatItem, type StatTone } from "./StatSummary.vue";
 export { default as Timestamp } from "./Timestamp.vue";
