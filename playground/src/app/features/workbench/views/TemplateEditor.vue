@@ -25,7 +25,7 @@ const SAVED = `<!doctype html>
     {{ content }}
   </main>
   {% render 'podnozje-stranice' %}
-  {% for js in template.scripts %}<script src="{{ js.path }}"></script>{% endfor %}
+  {% for js in template.scripts %}<script src="{{ js.path }}">${"<"}/script>{% endfor %}
 </body>
 </html>`;
 

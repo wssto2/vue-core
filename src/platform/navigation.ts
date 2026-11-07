@@ -8,7 +8,7 @@
  * it as a plain link with an "opens outside the app" marker and the browser follows it with a full page load, never through the
  * router. `href` is a path on this origin (`/old-admin/pages`) or an absolute `http(s)` URL; anything else (`javascript:`, `//host`) is
  * refused when the session is read. go-core's `navigation.Node` needs one more optional field, `Href string` with the JSON name `href` (omitted when empty),
- * which the application's menu builder sets instead of `Route` for such an entry.
+ * which the application's menu builder sets instead of a route token for such an entry.
  */
 export interface NavigationNode {
   /** The i18n key of the label. */
