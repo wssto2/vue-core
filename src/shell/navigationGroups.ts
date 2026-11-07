@@ -6,7 +6,10 @@ export interface NavigationDestination {
   readonly key: string;
   readonly label: string;
   readonly icon: string | null;
-  readonly to: RouteLocationRaw;
+  /** The route; null for a link that leaves the app (`href`). */
+  readonly to: RouteLocationRaw | null;
+  /** Set for a link that leaves the app: a plain `<a>`, a full page load. */
+  readonly href: string | null;
   /** The current page belongs to this destination (or to one of its sections). */
   readonly active: boolean;
 }
@@ -25,7 +28,7 @@ export interface NavigationGroup {
  * of it, not more links), otherwise the links of its children, through groups that have no route of
  * their own (the distribution centre holding "Ordered" and "Dispatch").
  */
-const linksUnder = (node: NavigationItem): readonly NavigationItem[] => (node.to ? [node] : node.children.flatMap(linksUnder));
+const linksUnder = (node: NavigationItem): readonly NavigationItem[] => (node.to || node.href ? [node] : node.children.flatMap(linksUnder));
 
 /**
  * The menu as the rail and the drawer show it: one group per top-level node, a heading only over two
@@ -37,12 +40,12 @@ export function groupNavigation(tree: readonly NavigationItem[]): NavigationGrou
   for (const node of tree) {
     const links = linksUnder(node);
     if (links.length === 0) continue;
-    const heading = !node.to && links.length > 1 ? node.label : null;
+    const heading = !node.to && !node.href && links.length > 1 ? node.label : null;
     groups.push({
       key: node.key,
       heading,
       separated: heading === null && groups.length > 0,
-      items: links.map((link) => ({ key: link.key, label: link.label, icon: link.icon, to: link.to!, active: link.active })),
+      items: links.map((link) => ({ key: link.key, label: link.label, icon: link.icon, to: link.to, href: link.href ?? null, active: link.active })),
     });
   }
   return groups;

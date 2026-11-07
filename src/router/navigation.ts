@@ -70,6 +70,8 @@ export interface NavigationItem {
   readonly icon: string | null;
   /** Where it goes; null for a group. */
   readonly to: RouteLocationRaw | null;
+  /** A destination outside the application (a full page load, no router); `to` is null then. */
+  readonly href?: string | null;
   /** The current page belongs to this destination, or to one of its children. */
   readonly active: boolean;
   readonly children: readonly NavigationItem[];
@@ -95,8 +97,9 @@ export function createNavigation(options: NavigationOptions): ComputedRef<readon
 
   function resolve(nodes: readonly NavigationNode[], path: string): NavigationItem[] {
     return nodes.flatMap((node, index): NavigationItem[] => {
-      const key = `${path}/${node.route ?? index}`;
+      const key = `${path}/${node.route ?? node.href ?? index}`;
       const children = resolve(node.children ?? [], key);
+      if (node.route === undefined && node.href !== undefined) return [{ ...item(node, key, null, children, false), href: node.href }];
       if (node.route === undefined) return children.length > 0 ? [item(node, key, null, children, false)] : [];
 
       const bound = (destinations as ReadonlyMap<string, OwnedNavigationBinding>).get(node.route); // the server's token: any string, not only a declared destination
@@ -118,6 +121,7 @@ export function createNavigation(options: NavigationOptions): ComputedRef<readon
     label: label(node),
     icon: node.icon ?? null,
     to,
+    href: null,
     active: active || children.some((child) => child.active),
     children,
   });

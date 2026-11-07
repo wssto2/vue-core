@@ -11,7 +11,7 @@ import { groupNavigation } from "./navigationGroups";
 /**
  * The server's menu for the signed-in user, as a list of links: headings over groups of two or more
  * destinations, the current destination marked (`aria-current="page"`), a destination whose feature
- * is not installed left out. Reads the application's menu (`useNavigation()`) unless `items` is given.
+ * is not installed left out. A destination outside the app (`href`, the old admin) is a plain link with an "opens outside the app" marker. Reads the application's menu (`useNavigation()`) unless `items` is given.
  *
  * - `rail`: the desktop sidebar, on the dark anchor surface.
  * - `drawer`: the phone drawer, on the page surface; a tap is reported as `select` instead of
@@ -76,10 +76,17 @@ const iconSize = computed(() => (props.appearance === "rail" ? (16 as const) : (
         <p v-if="group.heading" :id="`${uid}-${index}`" :class="[look.heading, appearance === 'rail' ? (index > 0 ? 'pt-4' : 'pt-1') : '']">{{ group.heading }}</p>
         <ul :aria-labelledby="group.heading ? `${uid}-${index}` : undefined" :class="appearance === 'rail' ? 'space-y-0.5' : ''">
           <li v-for="destination in group.items" :key="destination.key">
-            <RouterLink custom :to="destination.to" v-slot="{ href, navigate }">
+            <!-- Leaves the app: a plain link, followed with a full page load (no router, no drawer `select`). -->
+            <a v-if="destination.href" :href="destination.href" data-shell-destination data-external :class="[look.item, look.inactive]">
+              <Icon v-if="known(destination.icon)" :name="known(destination.icon)!" :size="iconSize" :class="look.iconInactive" />
+              <span class="min-w-0 flex-1 truncate">{{ destination.label }}</span>
+              <Icon name="externalLink" :size="12" class="shrink-0 opacity-70" />
+              <span class="sr-only">{{ t("core.shell.external") }}</span>
+            </a>
+            <RouterLink v-else-if="destination.to" custom :to="destination.to" v-slot="{ href, navigate }">
               <a :href="href" :aria-current="destination.active ? 'page' : undefined" data-shell-destination
                 :class="[look.item, destination.active ? look.active : look.inactive]"
-                @click="follow($event, navigate, destination.to)">
+                @click="follow($event, navigate, destination.to!)">
                 <Icon v-if="known(destination.icon)" :name="known(destination.icon)!" :size="iconSize"
                   :class="destination.active ? look.iconActive : look.iconInactive" />
                 <span class="min-w-0 flex-1 truncate">{{ destination.label }}</span>

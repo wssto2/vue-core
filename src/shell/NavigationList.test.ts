@@ -6,11 +6,12 @@ import type { NavigationItem } from "../router/navigation";
 import NavigationList from "./NavigationList.vue";
 import { groupNavigation } from "./navigationGroups";
 
-const item = (label: string, options: { to?: string; active?: boolean; icon?: string; children?: NavigationItem[] } = {}): NavigationItem => ({
+const item = (label: string, options: { to?: string; href?: string; active?: boolean; icon?: string; children?: NavigationItem[] } = {}): NavigationItem => ({
   key: `/${label}`,
   label,
   icon: options.icon ?? null,
   to: options.to ?? null,
+  href: options.href ?? null,
   active: options.active ?? false,
   children: options.children ?? [],
 });
@@ -84,6 +85,31 @@ describe("NavigationList", () => {
     expect(screen.getByRole("list", { name: "Used" }).querySelectorAll("a")).toHaveLength(2); // a heading over two links names their list
     expect(screen.queryByText("Market")).toBeNull(); // none over one
     expect(document.querySelectorAll("[data-separated]")).toHaveLength(1);
+  });
+
+  it("draws a destination outside the app as a plain link with a marker, and the router and the drawer never see its click", async () => {
+    const outside = [item("Old admin", { href: "/old-admin/pages", icon: "search" }), item("Pages", { to: "/a" })];
+    const { router, emitted } = await mountList({ items: outside, appearance: "drawer" });
+    const link = screen.getByRole("link", { name: /Old admin/ });
+    expect(link.getAttribute("href")).toBe("/old-admin/pages");
+    expect(link.hasAttribute("data-external")).toBe(true);
+    expect(link.hasAttribute("target")).toBe(false); // a full page load in this tab
+    expect(link.querySelector("svg")).not.toBeNull();
+    expect(link.querySelector(".sr-only")!.textContent).toBe("Opens outside the app");
+    expect(link.getAttribute("aria-current")).toBeNull();
+
+    // jsdom-style: stop the navigation the browser would start, and look at what the app did
+    link.addEventListener("click", (event) => event.preventDefault());
+    await fireEvent.click(link);
+    await settle();
+    expect(emitted().select).toBeUndefined();
+    expect(router.currentRoute.value.path).toBe("/a");
+  });
+
+  it("a group of one internal and one outside link has a heading and both links", () => {
+    const [group] = groupNavigation([item("Content", { children: [item("Pages", { to: "/a" }), item("Old admin", { href: "/old" })] })]);
+    expect(group!.heading).toBe("Content");
+    expect(group!.items.map((each) => [each.label, each.to, each.href])).toEqual([["Pages", "/a", null], ["Old admin", null, "/old"]]);
   });
 
   it("draws the icons the application has and quietly skips the ones it lacks", async () => {

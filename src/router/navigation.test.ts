@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createMemoryHistory, createRouter } from "vue-router";
-import { createSession, type NavigationNode } from "../platform";
+import { createSession, parseNavigation, type NavigationNode } from "../platform";
 import { snapshotOf } from "../platform/testing";
 import { bindNavigation, createNavigation, type OwnedNavigationBinding } from "./navigation";
 import { defineRoutes } from "./defineRoutes";
@@ -59,6 +59,31 @@ describe("createNavigation", () => {
     });
     return { router, session, items };
   }
+
+  it("keeps a node with an href as a destination outside the app, with no binding needed", async () => {
+    const { items } = await setup([], [{ i18n: "navigation.old", icon: "box", href: "/old-admin/pages" }, { i18n: "navigation.admin", children: [{ i18n: "navigation.users", href: "https://old.example/users" }] }]);
+    expect(items.value).toMatchObject([
+      { label: "navigation.old", icon: "box", to: null, href: "/old-admin/pages", active: false },
+      { label: "navigation.admin", children: [{ to: null, href: "https://old.example/users" }] },
+    ]);
+  });
+
+  it("refuses an href that is not a path or an http(s) URL, and a node that has both a route and an href", () => {
+    const issues: string[] = [];
+    const parsed = parseNavigation(
+      [
+        { i18n: "a", href: "javascript:alert(1)" },
+        { i18n: "b", href: "//evil.example/x" },
+        { i18n: "c", href: "data:text/html,x" },
+        { i18n: "d", route: "home", href: "/old" },
+        { i18n: "e", href: "/old-admin" },
+        { i18n: "f", href: "https://old.example/" },
+      ],
+      issues,
+    );
+    expect(parsed.map((node) => node.href)).toEqual([undefined, undefined, undefined, undefined, "/old-admin", "https://old.example/"]);
+    expect(issues).toHaveLength(4);
+  });
 
   it("resolves the server's tree through the bindings: labels, icons and targets", async () => {
     const { items } = await setup([bind("tickets", "tickets", routes.tickets), bind("reports", "reports", routes.reports)]);
