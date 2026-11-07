@@ -2,6 +2,7 @@
 // naming two destinations. Every call builds an independent one.
 import type { Transport } from "@wssto2/vue-core/client";
 import { createPlatform, httpSessionAdapter, parseBootstrap, type SessionUser } from "@wssto2/vue-core/platform";
+import { serveCharacteristics } from "./features/lists/serve";
 import { serveLists } from "./features/crmdata/serve";
 
 declare module "@wssto2/vue-core/platform" {
@@ -24,6 +25,8 @@ declare module "@wssto2/vue-core/platform" {
     "iam.user:manage": true;
     "events.deadletter:view": true; // the identity playground's failed-events link
     "records:audit": true; // the demo user does not hold this one: the dealer's audit section stays out of its navigation
+    "characteristics:view": true; // the lists screens: go-core's characteristics module
+    "characteristics:edit": true;
   }
 }
 
@@ -59,6 +62,7 @@ export function createDemoPlatform() {
             { i18n: "nav.work", children: [{ i18n: "nav.tickets", route: "tickets", icon: "carLine" }, { i18n: "nav.reports", route: "reports", icon: "fileTextLine" }, { i18n: "nav.records", route: "records", icon: "box2Line" }, { i18n: "nav.customers", route: "customers" }, { i18n: "nav.leads", route: "leads" }, { i18n: "forms.nav", route: "forms" }, { i18n: "tools.nav", route: "tools" }] },
             { i18n: "workflows.nav", route: "workflows" },
             // The workbench screens, and a link that leaves the app (the old admin): a node with an href and no route.
+            { i18n: "lists.content", children: [{ i18n: "lists.nav_pages", route: "pageslist", icon: "fileTextLine" }, { i18n: "lists.nav_resources", route: "templateresources", icon: "box2Line" }, { i18n: "lists.nav_characteristics", route: "characteristics", icon: "tagLine" }] },
             { i18n: "workbench.content", children: [{ i18n: "workbench.nav_template", route: "workbench", icon: "fileTextLine" }, { i18n: "workbench.nav_page", route: "pageeditor", icon: "box2Line" }, { i18n: "workbench.old_admin", icon: "carLine", href: "/old-admin/" }] },
           ],
           access: {
@@ -71,6 +75,9 @@ export function createDemoPlatform() {
               "leads:view": { scope: { level: "organization" }, qualifier: "all", clauses: [] },
               "records:view": { scope: { level: "organization" }, qualifier: "all", clauses: [] },
               "records:settings": { scope: { level: "organization" }, qualifier: "all", clauses: [] },
+              "characteristics:view": { scope: { level: "organization" }, qualifier: "all", clauses: [] },
+              // `?readonly` is the same person without the right to edit.
+              ...(new URLSearchParams(location.search).has("readonly") ? {} : { "characteristics:edit": { scope: { level: "organization" }, qualifier: "all", clauses: [] } }),
             },
           },
         }),
@@ -84,6 +91,8 @@ export function createDemoPlatform() {
     if (signedIn) {
       const list = await serveLists(url, init); // the customers and leads of the fake backend
       if (list) return list;
+      const characteristics = await serveCharacteristics(url, init);
+      if (characteristics) return characteristics;
     }
     return new Response(JSON.stringify({ success: false, error: "unauthorized" }), { status: 401 });
   };

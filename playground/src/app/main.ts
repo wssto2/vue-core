@@ -3,6 +3,7 @@
 import { appUpdates, backofficeShell } from "@wssto2/vue-core/shell";
 import { viewTransitions } from "@wssto2/vue-core/shell";
 import { createApplication } from "@wssto2/vue-core/app";
+import { characteristicsFeature } from "@wssto2/vue-core/characteristics";
 import { createWebHashHistory } from "vue-router";
 import "../app.css";
 import { appIcons } from "../icons";
@@ -18,6 +19,7 @@ import { createCustomersFeature } from "./features/customers/feature";
 import { createLeadsFeature } from "./features/leads/feature";
 import { formsFeature } from "./features/forms/feature";
 import { toolsFeature } from "./features/tools/feature";
+import { listsFeature } from "./features/lists/feature";
 import { workbenchFeature } from "./features/workbench/feature";
 import { workflowsFeature } from "./features/workflows/feature";
 
@@ -35,7 +37,7 @@ const application = createApplication({
   // A flag stands for a language, so the app chooses; Croatian has none here, to show a row without a flag.
   locale: { initial: new URLSearchParams(location.search).get("lang") ?? undefined, flags: { en: "GB", bs: "BA", sl: "SI", "sr-Latn": "RS" } },
   i18n: { messages: { en: { nav: { work: "Work", tickets: "Tickets", reports: "Reports", records: "Records", customers: "Customers", leads: "Leads" } }, hr: { nav: { work: "Rad", tickets: "Tiketi", reports: "Izvještaji", records: "Zapisi", customers: "Kupci", leads: "Upiti" } } } },
-  navigation: { known: ["tickets", "reports", "records", "customers", "leads", "forms", "tools", "workflows", "workbench", "pageeditor"] },
+  navigation: { known: ["tickets", "reports", "records", "customers", "leads", "forms", "tools", "workflows", "workbench", "pageeditor", "pageslist", "templateresources", "characteristics"] },
   features: [
     sessionFeature,
     themeFeature,
@@ -48,6 +50,8 @@ const application = createApplication({
     toolsFeature,
     workflowsFeature,
     workbenchFeature,
+    listsFeature,
+    characteristicsFeature({ destination: "characteristics" }),
     viewTransitions(), // screen transitions on phones and tablets
     appUpdates({ url: "app.html" }), // offers a reload when a new build is served
   ],

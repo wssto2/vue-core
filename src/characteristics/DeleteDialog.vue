@@ -53,7 +53,7 @@ const children = computed(() => usage.value?.children ?? 0);
 const risky = computed(() => status.value !== "ready" || usage.value?.known === false || uses.value.length > 0 || children.value > 0);
 const usedBy = computed(() => {
   const parts = uses.value.map((use) => `${use.count} ${use.what}`);
-  return parts.length < 2 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} ${t("core.characteristics.delete_dialog.and")} ${parts.at(-1)}`;
+  return parts.length < 2 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} ${t("core.characteristics.delete_dialog.and")} ${parts[parts.length - 1]}`;
 });
 
 async function erase(force: boolean) {
