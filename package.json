@@ -122,6 +122,10 @@
       "types": "./dist/access/index.d.ts",
       "import": "./dist/access/index.js"
     },
+    "./characteristics": {
+      "types": "./dist/characteristics/index.d.ts",
+      "import": "./dist/characteristics/index.js"
+    },
     "./onboarding": {
       "types": "./dist/onboarding/index.d.ts",
       "import": "./dist/onboarding/index.js"

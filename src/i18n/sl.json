@@ -1486,6 +1486,7 @@
         "title": "Izbrisati »{name}«?",
         "checking": "Preverjam, kje se uporablja…",
         "usage_failed": "Ni bilo mogoče preveriti, kje se uporablja.",
+        "and": "in",
         "used": "Uporabljajo jo: {uses}.",
         "unknown": "Ni znano, kje se uporablja, zato se morda kje uporablja.",
         "children": "Pod njo ni elementov. | Pod njo je {count} element. | Pod njo sta {count} elementa. | Pod njo so {count} elementi. | Pod njo je {count} elementov.",

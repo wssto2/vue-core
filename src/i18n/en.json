@@ -1486,6 +1486,7 @@
         "title": "Delete “{name}”?",
         "checking": "Checking where it is used…",
         "usage_failed": "Where it is used could not be checked.",
+        "and": "and",
         "used": "Used by {uses}.",
         "unknown": "Where it is used is not known, so it may be used somewhere.",
         "children": "It has no items below it. | It has {count} item below it. | It has {count} items below it. | It has {count} items below it. | It has {count} items below it.",

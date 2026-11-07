@@ -1486,6 +1486,7 @@
         "title": "Obrisati „{name}”?",
         "checking": "Provjeravam gdje se koristi…",
         "usage_failed": "Nije moguće provjeriti gdje se koristi.",
+        "and": "i",
         "used": "Koriste je {uses}.",
         "unknown": "Nije poznato gdje se koristi, pa se možda negdje koristi.",
         "children": "Nema stavki ispod sebe. | Ima {count} stavku ispod sebe. | Ima {count} stavke ispod sebe. | Ima {count} stavki ispod sebe. | Ima {count} stavki ispod sebe.",

@@ -28,6 +28,7 @@ const entries: Record<string, string> = {
   "phone/index": "src/phone/index.ts",
   "identity/index": "src/identity/index.ts",
   "access/index": "src/access/index.ts",
+  "characteristics/index": "src/characteristics/index.ts",
   "notifications/index": "src/notifications/index.ts",
   "onboarding/index": "src/onboarding/index.ts",
   "incidents/index": "src/incidents/index.ts",
