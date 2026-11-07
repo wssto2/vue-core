@@ -102,7 +102,7 @@ describe("CodeField", () => {
   });
 
   it("is loaded lazily: no source file imports CodeMirror except through import()", () => {
-    for (const file of ["CodeField.vue", "index.ts", "codeEditor.ts"]) {
+    for (const file of ["CodeField.vue", "CodeEditor.vue", "MarkerList.vue", "index.ts", "codeEditor.ts"]) {
       const code = readFileSync(new URL(file, import.meta.url), "utf8");
       expect(code.match(/^\s*import (?!type\b)[^;]*from\s+["']@codemirror\//gm) ?? [], file).toEqual([]);
     }
