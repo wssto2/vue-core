@@ -12,9 +12,10 @@ import { useAccess } from "../platform";
 import { AsyncSection, Badge, useLoad } from "../state";
 import { EDIT_CHARACTERISTICS } from "./access";
 import { useCharacteristicsApi } from "./api";
+import { useCharacteristicsContext } from "./context";
 import DeleteDialog from "./DeleteDialog.vue";
 import ItemSheet from "./ItemSheet.vue";
-import { buildTree, displayValue, keyOf, labelIn, listColumns, parseKey, type CharacteristicNode } from "./model";
+import { buildTree, displayValue, keyOf, listColumns, parseKey, type CharacteristicNode } from "./model";
 
 /**
  * Characteristics: go-core's lookup lists as one tree (brands, categories, countries; as many levels as the project described), the screen
@@ -28,6 +29,7 @@ import { buildTree, displayValue, keyOf, labelIn, listColumns, parseKey, type Ch
 const { t, locale } = useI18n();
 const access = useAccess();
 const api = useCharacteristicsApi();
+const context = useCharacteristicsContext();
 const describeError = useDescribeError();
 const canEdit = computed(() => access.can(EDIT_CHARACTERISTICS));
 
@@ -112,10 +114,12 @@ function onDeleted(node: CharacteristicNode) {
   patch((list) => list.filter((item) => !gone.has(keyOf(item.level, item.id))));
 }
 
-const addLabel = (_parent: CharacteristicNode | null, level: number) => {
-  const described = levelOf(level);
-  return canEdit.value && described ? t("core.characteristics.add", { name: labelIn(described.label, locale.value) }) : null;
+// A whole phrase per level, never a noun pasted after a verb: the library's neutral one by role (group at the top, item below), or the application's own.
+const phrase = (parent: CharacteristicNode | null, level: number): string => {
+  const own = context.addLabel?.(parent ? { level: parent.level, name: parent.item.name } : null, level);
+  return own ?? t(level === 1 ? "core.characteristics.add_group" : "core.characteristics.add_item");
 };
+const addLabel = (parent: CharacteristicNode | null, level: number) => (canEdit.value && levelOf(level) ? phrase(parent, level) : null);
 const rowActions = (node: CharacteristicNode) =>
   canEdit.value
     ? [
@@ -126,8 +130,7 @@ const rowActions = (node: CharacteristicNode) =>
     : [{ key: "open", label: t("core.actions.open"), icon: "eye" as const, onSelect: () => sheet.value?.edit(node) }];
 
 const actions = computed<PageAction[]>(() => {
-  const root = levelOf(1);
-  return canEdit.value && root ? [{ id: "add", label: t("core.characteristics.add", { name: labelIn(root.label, locale.value) }), icon: "addLine", placement: "primary", onClick: () => sheet.value?.create(null) }] : [];
+  return canEdit.value && levelOf(1) ? [{ id: "add", label: phrase(null, 1), icon: "addLine", placement: "primary", onClick: () => sheet.value?.create(null) }] : [];
 });
 </script>
 
@@ -155,7 +158,7 @@ const actions = computed<PageAction[]>(() => {
       </AsyncSection>
     </div>
 
-    <ItemSheet v-if="description" ref="sheet" :description="description" :editable="canEdit" @saved="onSaved" @remove="(node) => removal?.show(node)" />
+    <ItemSheet v-if="description" ref="sheet" :description="description" :editable="canEdit" :create-title="phrase" @saved="onSaved" @remove="(node) => removal?.show(node)" />
     <DeleteDialog v-if="canEdit && description" ref="removal" :can-deactivate="(node) => levelOf(node.level)?.has_active ?? false" @deleted="onDeleted" @deactivate="(node) => toggle(node, false)" />
   </AdaptivePageShell>
 </template>

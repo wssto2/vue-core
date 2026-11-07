@@ -1456,7 +1456,8 @@
       "levels": "Brez ravni | {count} raven | {count} ravni | {count} ravni | {count} ravni",
       "reorder_hint": "povleci ali pritisni Alt+↑ / Alt+↓ za vrstni red znotraj veje",
       "active": "Aktivna",
-      "add": "Dodaj: {name}",
+      "add_group": "Dodaj skupino",
+      "add_item": "Dodaj element",
       "edit": "Uredi",
       "activate": "Aktiviraj",
       "deactivate": "Deaktiviraj",
@@ -1466,7 +1467,6 @@
         "inactive": "{label} (neaktivno)"
       },
       "sheet": {
-        "new_title": "Novo: {name}",
         "name": "Ime",
         "active": "Aktivna",
         "extra": "Dodatna polja te veje",

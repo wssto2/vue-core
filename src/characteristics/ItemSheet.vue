@@ -17,7 +17,7 @@ import { fieldsFor, labelIn, type CharacteristicNode } from "./model";
  * ones the item's branch does not have are not there. Nothing here is specific to a project. `editable` false is the same sheet read.
  * Saving creates (`parent` null for a root) or updates; a changed switch is its own call after it. Opened with `show`.
  */
-const props = defineProps<{ description: DescriptionResponse; editable: boolean }>();
+const props = defineProps<{ description: DescriptionResponse; editable: boolean; /** The title of a new item's sheet: the page's add phrase for its level. */ createTitle: (parent: CharacteristicNode | null, level: number) => string }>();
 const emit = defineEmits<{
   /** After a save: the item as the server stored it, and whether it was new. */
   saved: [item: ItemResponse, created: boolean];
@@ -43,7 +43,7 @@ const fields = computed(() => (level.value ? fieldsFor(level.value, path.value) 
 const editableFields = computed(() => fields.value.filter((field) => !field.read_only));
 const lockedFields = computed(() => fields.value.filter((field) => field.read_only));
 const where = computed(() => path.value.map((item) => item.name).join(" › "));
-const title = computed(() => (target.value === null ? "" : target.value.mode === "edit" ? target.value.node.item.name : t("core.characteristics.sheet.new_title", { name: labelIn(target.value.level.label, locale.value) })));
+const title = computed(() => (target.value === null ? "" : target.value.mode === "edit" ? target.value.node.item.name : props.createTitle(target.value.parent, target.value.level.level)));
 
 const required = () => t("core.validation_errors.required");
 const validator: FormValidator<Draft> = {

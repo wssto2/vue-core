@@ -1456,7 +1456,8 @@
       "levels": "No levels | {count} level | {count} levels | {count} levels | {count} levels",
       "reorder_hint": "drag, or press Alt+↑ / Alt+↓, to reorder within a branch",
       "active": "Active",
-      "add": "Add {name}",
+      "add_group": "Add group",
+      "add_item": "Add item",
       "edit": "Edit",
       "activate": "Activate",
       "deactivate": "Deactivate",
@@ -1466,7 +1467,6 @@
         "inactive": "{label} (inactive)"
       },
       "sheet": {
-        "new_title": "New: {name}",
         "name": "Name",
         "active": "Active",
         "extra": "Extra fields of this branch",

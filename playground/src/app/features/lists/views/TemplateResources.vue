@@ -40,7 +40,7 @@ const rowActions = () => [
       :breadcrumb="[{ id: null, label: t('lists.root') }]">
       <template #switch><span class="inline-flex items-center gap-1 text-body text-content-strong">Osnovni predložak<Icon name="arrowDownSLine" :size="16" /></span></template>
       <template #toolbar>
-        <Button size="sm" icon="download">{{ t("lists.upload") }}</Button>
+        <Button size="sm" icon="uploadLine">{{ t("lists.upload") }}</Button>
         <Button size="sm" icon="folderLine">{{ t("lists.new_directory") }}</Button>
         <Button size="sm" prominence="primary" icon="addLine">{{ t("lists.new") }}</Button>
       </template>

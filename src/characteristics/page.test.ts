@@ -32,8 +32,8 @@ describe("CharacteristicsPage: the tree", () => {
     await waitFor(() => expect(names()).toEqual(["Novosti", "Osnovno", "Webshop"]));
     for (const name of BRANDS) await fireEvent.click(screen.getByRole("button", { name }));
     expect(names()).toEqual(["Novosti", "Osnovno", "Marke", "Renault", "Dacia", "Škoda", "Države", "Webshop"]);
-    expect(screen.getAllByRole("button", { name: "Add Group" }).length).toBeGreaterThan(0); // the root add, a page action, labelled with the level's name
-    expect(document.querySelector("[data-test=tree-add-footer]")?.textContent).toContain("Add Item");
+    expect(screen.getAllByRole("button", { name: "Add group" }).length).toBeGreaterThan(0); // the root add, a page action, labelled with the level's name
+    expect(document.querySelector("[data-test=tree-add-footer]")?.textContent).toContain("Add item");
     expect(screen.getByText(/3 levels/)).toBeTruthy();
   });
 
@@ -182,7 +182,7 @@ describe("CharacteristicsPage: saving", () => {
     const { calls } = await showBrands({ permissions: [CHAR_VIEW, CHAR_EDIT], description: siteBuilderDescription, items: siteBuilderItems, answers: { "POST /v1/characteristics/items/3": dataOf(created) } });
     await fireEvent.click(document.querySelectorAll("[data-test=tree-add-footer]")[0]!);
     const dialog = await sheet();
-    expect(dialog.getByText("New: Item")).toBeTruthy();
+    expect(dialog.getByText("Add item")).toBeTruthy();
     await writeName(dialog, "Fiat");
     await fireEvent.click(dialog.getByRole("button", { name: "Add" }));
     await waitFor(() => expect(callsTo(calls, "POST", "/v1/characteristics/items/3")).toHaveLength(1));
@@ -192,7 +192,7 @@ describe("CharacteristicsPage: saving", () => {
 
   it("the page's add makes a root, without a parent", async () => {
     const { calls } = await startCharacteristics({ permissions: [CHAR_VIEW, CHAR_EDIT], description: siteBuilderDescription, items: siteBuilderItems, answers: { "POST /v1/characteristics/items/1": dataOf({ ...siteBuilderItems[0]!, id: 9, name: "Novo" }) } });
-    await fireEvent.click((await screen.findAllByRole("button", { name: "Add Group" }))[0]!);
+    await fireEvent.click((await screen.findAllByRole("button", { name: "Add group" }))[0]!);
     const dialog = await sheet();
     expect(dialog.queryByRole("switch", { name: "Active" })).toBeNull(); // level 1 has no active flag
     await writeName(dialog, "Novo");

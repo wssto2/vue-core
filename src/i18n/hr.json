@@ -1456,7 +1456,8 @@
       "levels": "Nema razina | {count} razina | {count} razine | {count} razina | {count} razina",
       "reorder_hint": "povuci ili pritisni Alt+↑ / Alt+↓ za redoslijed unutar grane",
       "active": "Aktivna",
-      "add": "Dodaj: {name}",
+      "add_group": "Dodaj skupinu",
+      "add_item": "Dodaj stavku",
       "edit": "Uredi",
       "activate": "Aktiviraj",
       "deactivate": "Deaktiviraj",
@@ -1466,7 +1467,6 @@
         "inactive": "{label} (neaktivno)"
       },
       "sheet": {
-        "new_title": "Novo: {name}",
         "name": "Naziv",
         "active": "Aktivna",
         "extra": "Dodatna polja ove grane",

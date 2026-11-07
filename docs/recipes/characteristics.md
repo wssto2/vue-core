@@ -31,7 +31,7 @@ export const application = createApplication({
 `characteristicsFeature({ destination? })` installs `/characteristics` (route `characteristics.index`, `characteristicsPages.index` for links). It is a **feature, not a page to mount**, like the access and service-account screens: it needs its route, its access rule and its title together. `CharacteristicsPage` is exported for an application that wants its own route.
 
 - **Permissions.** The route needs `characteristics:view`; every write action (add, edit, switch, reorder, delete) needs `characteristics:edit`. Without it the same screen is read-only (a "Read only" mark, no handles, the row menu only opens). go-core grants neither to anybody: give `characteristics.Grants()` to the webmaster role.
-- **The tree** is `GET /v1/characteristics` as a `CollectionTree`: search, the views *All / Active only / Inactive*, the switch, reorder (`PUT .../position`, applied at once and put back if the server refuses), an add button per level labelled with the level's name from the description.
+- **The tree** is `GET /v1/characteristics` as a `CollectionTree`: search, the views *All / Active only / Inactive*, the switch, reorder (`PUT .../position`, applied at once and put back if the server refuses), an add button per level. Its text is a whole phrase, never a noun pasted after "Dodaj:": the library says "Dodaj skupinu" at the top level and "Dodaj stavku" below, and the application passes its own per level through `characteristicsFeature({ addLabel: (parent, level) => … })` (e.g. "Dodaj marku" under Marke; `undefined` keeps the neutral phrase).
 - **An item opens in a `Sheet`**, built from the description: the name per language as the description lists them (a single field for a level without translations), the active switch, and the level's extra fields for the branch the item is in, each by its type (text, number, yes/no, choice). A read-only field is shown locked with a note that the project's code fills it; a field of another branch is not on the form. A field marked `in_list` is a column of the tree, on its branch only.
 - **Delete asks where the item is used** (`GET .../usage`): "Koriste je 2 stranice i 1 domena", "where it is used is not known" (never read as "unused"), "has 3 items below it". Each of those means a delete would take something with it, so the dialog offers **Deactivate instead**, and deleting needs a **second confirmation** that sends `force`. An item nothing uses is deleted by one click, without `force`.
 
@@ -70,7 +70,14 @@ defineProps<{ savedBrand?: { value: number; label: string } }>();
 
 It is a `SelectField` (or `MultiSelectField`) that fetches its own options, so it takes the same field props (`label`, `hint`, `required`, `disabled`, `error` ...) and `form.bind()`, and its loading state (a spinner, "Loading…") and failure ("Try again") are theirs. A `DynamicForm` field of kind `select` can use it through the field's slot the same way.
 
+## Known limits
+
+- The item sheet has no discard-changes guard (`Sheet` has no `beforeDismiss`): closing it drops unsaved edits.
+- In the tree the drag handle sits left of the chevron; the mock-up has the chevron first.
+
 ## What the module does not give (reported to go-core)
+
+- The description has no "add" text per level, only the level's name, and a phrase cannot be built from a name in Croatian. If apps keep passing `addLabel`, go-core could carry a per-level `add` label (hr/en) in `LevelResponse`; nothing is changed there.
 
 - The usage answer is counts per kind (`{ what, count }`), not the list of pages and domains; the mock-up's list of places cannot be drawn from it.
 - `options` lists only active items, and an inactive chosen item has no endpoint an editor may read (`show` needs `characteristics:view`): the caller keeps the label (`selected`).

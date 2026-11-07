@@ -60,7 +60,7 @@ const rowActions = (row: Entry) => [
         <button type="button" class="inline-flex cursor-pointer items-center gap-1 rounded-md px-1 py-1 text-body text-content-strong hover:bg-fill">lavcevic.example<Icon name="arrowDownSLine" :size="16" /></button>
       </template>
       <template #toolbar>
-        <Button size="sm" icon="download">{{ t("lists.upload") }}</Button>
+        <Button size="sm" icon="uploadLine">{{ t("lists.upload") }}</Button>
         <Button size="sm" icon="folderLine">{{ t("lists.new_directory") }}</Button>
         <Button size="sm" prominence="primary" icon="addLine">{{ t("lists.new") }}</Button>
       </template>

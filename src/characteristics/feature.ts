@@ -1,10 +1,17 @@
-import { defineFeature, type Feature } from "../app";
+import { defineFeature, provideContext, type Feature } from "../app";
+import { characteristicsContextKey, type CharacteristicsContext } from "./context";
 import type { Destination } from "../router";
 import { characteristicsPages } from "./routes";
 
 export interface CharacteristicsFeatureOptions {
   /** The destination of the backend's menu that opens the screen. Without it the application links to `characteristicsPages.index` itself. */
   destination?: Destination;
+  /**
+   * The add phrase of a level, whole, in the application's words: `addLabel: (parent, level) => (parent?.name === "Marke" ? t("add_brand") : undefined)`.
+   * The server's description has no text for it (only the level's name, which a sentence cannot be built from in Croatian), so without this
+   * the screen says "Dodaj skupinu" at the top level and "Dodaj stavku" below.
+   */
+  addLabel?: NonNullable<CharacteristicsContext["addLabel"]>;
 }
 
 /**
@@ -24,6 +31,7 @@ export function characteristicsFeature(options: CharacteristicsFeatureOptions = 
   return defineFeature({
     id: "characteristics",
     routes: characteristicsPages.records,
+    context: provideContext(characteristicsContextKey, { addLabel: options.addLabel ?? null }),
     navigation: options.destination ? [{ destination: options.destination, to: characteristicsPages.index }] : [],
   });
 }

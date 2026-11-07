@@ -86,11 +86,7 @@ defineExpose({ show });
 </script>
 
 <template>
-  <Modal ref="modal" size="sm" :title="t('core.characteristics.delete_dialog.title', { name: node?.item.name ?? '' })" :primary-label="risky && status === 'ready' ? t('core.characteristics.delete_dialog.delete_anyway') : t('core.characteristics.delete_dialog.delete')"
-    primary-icon="deleteBin2Line" :primary-disabled="status === 'loading' || busy" :status="busy ? 'processing' : 'idle'" @primary="primary" @dismissed="node = null">
-    <template v-if="node && canDeactivate(node) && node.item.active" #actions>
-      <Button prominence="standard" data-test="characteristic-deactivate" @click="emit('deactivate', node); modal?.dismiss()">{{ t("core.characteristics.delete_dialog.deactivate") }}</Button>
-    </template>
+  <Modal ref="modal" size="sm" without-footer :title="t('core.characteristics.delete_dialog.title', { name: node?.item.name ?? '' })" @dismissed="node = null">
     <div class="flex flex-col gap-3 text-body" data-test="characteristic-usage" :aria-busy="status === 'loading' || undefined">
       <p v-if="status === 'loading'" class="text-content-muted">{{ t("core.characteristics.delete_dialog.checking") }}</p>
       <Banner v-else-if="status === 'failed'" tone="critical" icon="errorWarningLine">{{ t("core.characteristics.delete_dialog.usage_failed") }}</Banner>
@@ -100,6 +96,12 @@ defineExpose({ show });
         <p v-if="children > 0" data-test="usage-children">{{ t("core.characteristics.delete_dialog.children", children) }}</p>
         <Banner v-if="risky" tone="warning" icon="alertTriangle">{{ t("core.characteristics.delete_dialog.warning") }}</Banner>
       </template>
+      <!-- Deactivating is the safe way out, so it is the primary action; deleting is the danger one. One row where it fits. -->
+      <div class="flex flex-wrap items-center justify-end gap-2 pt-1" data-test="delete-actions">
+        <Button prominence="plain" @click="modal?.dismiss()">{{ t("core.actions.cancel") }}</Button>
+        <Button tone="critical" icon="deleteBin2Line" :disabled="status === 'loading' || busy" :processing="busy" data-test="characteristic-delete-confirm" @click="primary()">{{ risky && status === 'ready' ? t("core.characteristics.delete_dialog.delete_anyway") : t("core.characteristics.delete_dialog.delete") }}</Button>
+        <Button v-if="node && canDeactivate(node) && node.item.active" prominence="primary" data-test="characteristic-deactivate" @click="emit('deactivate', node); modal?.dismiss()">{{ t("core.characteristics.delete_dialog.deactivate") }}</Button>
+      </div>
     </div>
   </Modal>
   <AlertDialog ref="confirm" tone="critical" :title="t('core.characteristics.delete_dialog.confirm_title')" :message="t('core.characteristics.delete_dialog.confirm_message', { name: node?.item.name ?? '' })"
