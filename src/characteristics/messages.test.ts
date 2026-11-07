@@ -4,7 +4,7 @@ import { coreMessages, slavicPluralRules } from "../i18n";
 
 // The plural texts of this screen in the languages that have more than one plural: what the person reads for 1, 2 and 5.
 function words(locale: "hr" | "bs" | "sr-Latn" | "sl", key: string, counts: number[]) {
-  const i18n = createI18n({ legacy: false, locale, messages: coreMessages as never, pluralRules: slavicPluralRules });
+  const i18n = createI18n({ legacy: false, locale, messages: coreMessages as never, pluralRules: slavicPluralRules }) as unknown as { global: { t: (key: string, named: object, plural: number) => string } };
   return counts.map((count) => i18n.global.t(key, { count }, count));
 }
 
