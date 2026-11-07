@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.21.0 (unreleased)
+## 0.21.0 — 2026-11-07
 
 The list pieces for site-builder's pages list, template resources and Karakteristike (approved mock-ups in site-builder `next/design/`), and the screen of go-core's characteristics module. Needs go-core v1.34.0-rc.1.
 
