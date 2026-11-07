@@ -96,3 +96,4 @@ export type { LocaleMode } from "./dynamic/localeMode";
 export { thumbnailUrl } from "./dynamic/resources";
 export type { ResourceId, ResourceItem, ResourcePage, ResourceQuery, ResourceSource } from "./dynamic/resources";
 export type { FieldKind, FieldRule, FormSchema, SchemaField, SelectChoice, VisibilityCondition, VisibilityRule } from "./dynamic/schema";
+export { default as CharacteristicField } from "./CharacteristicField.vue";

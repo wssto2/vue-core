@@ -1463,7 +1463,7 @@
       "delete": "Izbriši",
       "empty": "Še ni značilnosti.",
       "field": {
-        "inactive": "neaktivno"
+        "inactive": "{label} (neaktivno)"
       },
       "sheet": {
         "new_title": "Novo: {name}",

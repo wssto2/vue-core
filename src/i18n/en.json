@@ -1463,7 +1463,7 @@
       "delete": "Delete",
       "empty": "No characteristics yet.",
       "field": {
-        "inactive": "inactive"
+        "inactive": "{label} (inactive)"
       },
       "sheet": {
         "new_title": "New: {name}",

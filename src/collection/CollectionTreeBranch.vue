@@ -33,7 +33,7 @@ const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
 </script>
 
 <template>
-  <SortableList :model-value="shown" :item-key="'id'" plain :disabled="!sortable" :label="props.parent?.label" :item-label="(node) => node.label"
+  <SortableList :model-value="shown" :item-key="'id'" plain :disabled="!sortable" :label="props.parent?.label" :item-label="(entry) => entry.label"
     @update:model-value="() => undefined" @move="(node: LooseNode, _from: number, to: number) => ctx.reorder({ id: node.id, parentId: props.parent?.id ?? null, index: to })">
     <template #item="{ item: node }">
       <div class="flex flex-col" data-test="tree-node" :data-depth="props.depth">
