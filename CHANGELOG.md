@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.20.0 — 2026-11-07
+
+The editor pieces for site-builder's template editor, page editor and page settings (approved mock-ups in site-builder `next/design/`).
+
+### New
+- **page:** `WorkbenchPage`, a full-viewport page of two panes with the standard header (back/path, badges, actions) and a dirty-state guard; `SplitPane`, a keyboard-resizable divider that remembers its size (`storage-key`) and stacks below a breakpoint.
+- **form:** `CodeEditor`, the field-less core of `CodeField` (`fill`, `reveal(line, column?)`, `@cursor`, `@save`; still lazy-loaded); `MarkerList`, linter findings grouped by severity with plural counts and `@select` to jump to a line.
+- **content:** `DiffView` (unified or split, folded unchanged runs, signs plus screen-reader text); `PreviewFrame` (desktop/tablet/mobile widths rendered and scaled to fit, loading and error states, `postMessage` accepted only from its own frame and origin; `previewScale`, `PREVIEW_WIDTHS`, `PreviewAction`).
+- **controls:** `SortableList` (drag handle, Alt+Arrow moves announced in a live region); `Tabs` items take an `error` mark.
+- **modal:** `Sheet` `size` (`md`, `lg`, `xl`) and `docked` (a non-modal panel beside the page, no scrim or focus trap; a bottom sheet on phones); `TabbedSheet`.
+- **platform / router / shell:** a navigation node with `href` is a destination outside the app, drawn as a plain link with an external marker; unsafe hrefs are refused. Needs go-core v1.34.0-rc.1 (`navigation.Node.Href`).
+- Icons `externalLink`, `draggable`; texts in en, hr, bs, sl and sr-Latn. Recipes `workbench.md`, `page-editor.md`, `diff-view.md`.
+
+### Changed
+- `CodeField` is built on `CodeEditor` (no API change). The editor's gutter, caret and selection follow the theme tokens (dark mode), and its border uses real tokens.
+
 ## 0.19.0 — 2026-11-06
 
 A code editor for forms, for the templates, components and page code a site is built from.
