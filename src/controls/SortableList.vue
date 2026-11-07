@@ -13,7 +13,9 @@ import { Icon } from "../icon";
  *   </SortableList>
  *
  * Dragging with a pointer shows where the row will land and moves it on release. Vertical lists only; `disabled` hides the handles
- * (a viewer who may not reorder).
+ * (a viewer who may not reorder). `plain` draws the rows without their card (no border, background or gap) and puts the handle at the top, the
+ * height of the first line (`--sortable-row-height`, 2.5rem): for rows that hold more than a line, such as a tree's branches, where a row
+ * has its own list inside it.
  */
 const props = withDefaults(defineProps<{
   itemKey: (keyof Item & string) | ((item: Item) => string | number);
@@ -22,7 +24,8 @@ const props = withDefaults(defineProps<{
   /** What the handle and the announcement call a row; by default the row's key. */
   itemLabel?: (item: Item) => string;
   disabled?: boolean;
-}>(), { label: undefined, itemLabel: undefined, disabled: false });
+  plain?: boolean;
+}>(), { label: undefined, itemLabel: undefined, disabled: false, plain: false });
 
 const model = defineModel<Item[]>({ required: true });
 const emit = defineEmits<{ /** After a move, with where the item went. */ move: [item: Item, from: number, to: number] }>();
@@ -95,17 +98,19 @@ function startDrag(event: PointerEvent, index: number) {
 
 <template>
   <div>
-    <ul ref="list" :aria-label="props.label" class="flex flex-col gap-1.5" data-sortable-list>
+    <ul ref="list" :aria-label="props.label" class="flex flex-col" :class="props.plain ? '' : 'gap-1.5'" data-sortable-list>
       <li v-for="(item, index) in model" :key="keyOf(item)" data-sortable-row
-        class="relative flex items-stretch gap-1 rounded-md border border-border-separator bg-surface-cell"
-        :class="[dragging?.from === index ? 'z-10 shadow-md' : '', dragging && dragging.from !== index && dragging.to === index ? (dragging.to > dragging.from ? 'border-b-2 border-b-border-focus' : 'border-t-2 border-t-border-focus') : '']"
+        class="relative flex items-stretch gap-1"
+        :class="[props.plain ? (dragging?.from === index ? 'bg-surface-cell' : '') : 'rounded-md border border-border-separator bg-surface-cell', dragging?.from === index ? 'z-10 shadow-md' : '', dragging && dragging.from !== index && dragging.to === index ? (dragging.to > dragging.from ? 'border-b-2 border-b-border-focus' : 'border-t-2 border-t-border-focus') : '']"
         :style="dragging?.from === index ? { transform: `translateY(${dragging.offset}px)` } : undefined">
         <button v-if="!props.disabled" type="button" data-sortable-handle :aria-label="t('core.sortable.handle', { item: nameOf(item) })" :aria-describedby="hintId"
-          class="flex w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-l-md text-content-muted hover:bg-fill focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-border-focus"
+          class="flex w-7 shrink-0 cursor-grab touch-none items-center justify-center text-content-muted hover:bg-fill focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-border-focus"
+          :class="props.plain ? 'h-(--sortable-row-height,2.5rem) self-start rounded-md' : 'rounded-l-md'"
           @keydown="onKey($event, index)" @pointerdown="startDrag($event, index)">
           <Icon name="draggable" :size="16" />
         </button>
-        <div class="min-w-0 flex-1 py-1.5 pr-2"><slot name="item" :item="item" :index="index" :dragging="dragging?.from === index" /></div>
+        <span v-else-if="props.plain" class="w-7 shrink-0" aria-hidden="true"></span>
+        <div class="min-w-0 flex-1" :class="props.plain ? '' : 'py-1.5 pr-2'"><slot name="item" :item="item" :index="index" :dragging="dragging?.from === index" /></div>
       </li>
     </ul>
     <p :id="hintId" class="sr-only">{{ t("core.sortable.hint") }}</p>

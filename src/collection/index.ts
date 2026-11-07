@@ -29,3 +29,8 @@ export { createPicker } from "./picker";
 export type { Picker, PickerOptions } from "./picker";
 export { default as PickerModal } from "./PickerModal.vue";
 export { default as DynamicCollection } from "./DynamicCollection.vue";
+export { default as FileExplorer } from "./FileExplorer.vue";
+export type { ExplorerCrumb, ExplorerRow } from "./explorer";
+export { default as CollectionTree } from "./CollectionTree.vue";
+export { matchesText, visibleNodes } from "./tree";
+export type { TreeColumn, TreeNode, TreeReorder } from "./tree";

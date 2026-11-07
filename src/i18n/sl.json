@@ -1424,6 +1424,79 @@
     "sheet": {
       "tab_error": "Vsebuje napake",
       "tabs": "Razdelki"
+    },
+    "explorer": {
+      "breadcrumb": "Pot",
+      "selection": "Izbrani elementi",
+      "selected": "Nič izbranega | {count} izbran | {count} izbrana | {count} izbrani | {count} izbranih",
+      "clear": "Počisti izbor",
+      "select_all": "Izberi vse",
+      "select": "Izberi: {name}",
+      "name": "Ime",
+      "folder": "Mapa",
+      "empty": "Ta mapa je prazna."
+    },
+    "tree": {
+      "name": "Ime",
+      "expand": "Razširi: {name}",
+      "collapse": "Strni: {name}",
+      "empty": "Tu še ni ničesar.",
+      "no_match": "Nobena vrstica se ne ujema."
+    },
+    "characteristics": {
+      "title": "Značilnosti",
+      "description": "Šifranti, iz katerih urejevalci izbirajo v obrazcih: znamke, kategorije, države. Tabele ostanejo, kakršne so; pomen dodatnih stolpcev je opisan v kodi projekta.",
+      "search": "Išči po imenu",
+      "views": {
+        "all": "Vse",
+        "active": "Samo aktivne",
+        "inactive": "Neaktivne"
+      },
+      "read_only": "Samo za branje",
+      "levels": "Brez ravni | {count} raven | {count} ravni | {count} ravni | {count} ravni",
+      "reorder_hint": "povleci ali pritisni Alt+↑ / Alt+↓ za vrstni red znotraj veje",
+      "active": "Aktivna",
+      "add": "Dodaj: {name}",
+      "edit": "Uredi",
+      "activate": "Aktiviraj",
+      "deactivate": "Deaktiviraj",
+      "delete": "Izbriši",
+      "empty": "Še ni značilnosti.",
+      "field": {
+        "inactive": "neaktivno"
+      },
+      "sheet": {
+        "new_title": "Novo: {name}",
+        "name": "Ime",
+        "active": "Aktivna",
+        "extra": "Dodatna polja te veje",
+        "locked": "Samo za branje: izpolni ga koda projekta.",
+        "note": "Polje »{field}« je opisano v kodi projekta za vejo {path}.",
+        "create": "Dodaj",
+        "save": "Shrani spremembe"
+      },
+      "toasts": {
+        "saved": "Shranjeno",
+        "created": "Dodano",
+        "deleted": "Izbrisano",
+        "activated": "Aktivirano",
+        "deactivated": "Deaktivirano"
+      },
+      "delete_dialog": {
+        "title": "Izbrisati »{name}«?",
+        "checking": "Preverjam, kje se uporablja…",
+        "usage_failed": "Ni bilo mogoče preveriti, kje se uporablja.",
+        "used": "Uporabljajo jo: {uses}.",
+        "unknown": "Ni znano, kje se uporablja, zato se morda kje uporablja.",
+        "children": "Pod njo ni elementov. | Pod njo je {count} element. | Pod njo sta {count} elementa. | Pod njo so {count} elementi. | Pod njo je {count} elementov.",
+        "warning": "Z brisanjem se oznaka odstrani z vsega, kar jo uporablja. Namesto tega jo lahko deaktiviraš.",
+        "deactivate": "Deaktiviraj namesto brisanja",
+        "delete": "Izbriši",
+        "delete_anyway": "Vseeno izbriši",
+        "confirm_title": "Izbrisati za vedno?",
+        "confirm_message": "»{name}« in vse pod njo bo izbrisano. Tega ni mogoče razveljaviti.",
+        "confirm_action": "Izbriši za vedno"
+      }
     }
   }
 }

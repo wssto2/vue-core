@@ -1424,6 +1424,79 @@
     "sheet": {
       "tab_error": "Has errors",
       "tabs": "Sections"
+    },
+    "explorer": {
+      "breadcrumb": "Path",
+      "selection": "Selected items",
+      "selected": "Nothing selected | {count} selected | {count} selected | {count} selected | {count} selected",
+      "clear": "Clear selection",
+      "select_all": "Select all",
+      "select": "Select {name}",
+      "name": "Name",
+      "folder": "Folder",
+      "empty": "This folder is empty."
+    },
+    "tree": {
+      "name": "Name",
+      "expand": "Expand {name}",
+      "collapse": "Collapse {name}",
+      "empty": "Nothing here yet.",
+      "no_match": "No rows match."
+    },
+    "characteristics": {
+      "title": "Characteristics",
+      "description": "Lists that editors pick from: brands, categories, countries. The tables stay as they are; what the extra columns mean is described in the project's code.",
+      "search": "Search by name",
+      "views": {
+        "all": "All",
+        "active": "Active only",
+        "inactive": "Inactive"
+      },
+      "read_only": "Read only",
+      "levels": "No levels | {count} level | {count} levels | {count} levels | {count} levels",
+      "reorder_hint": "drag, or press Alt+↑ / Alt+↓, to reorder within a branch",
+      "active": "Active",
+      "add": "Add {name}",
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete",
+      "empty": "No characteristics yet.",
+      "field": {
+        "inactive": "inactive"
+      },
+      "sheet": {
+        "new_title": "New: {name}",
+        "name": "Name",
+        "active": "Active",
+        "extra": "Extra fields of this branch",
+        "locked": "Read only: the project's code fills it in.",
+        "note": "The field “{field}” is described in the project's code for the branch {path}.",
+        "create": "Add",
+        "save": "Save changes"
+      },
+      "toasts": {
+        "saved": "Saved",
+        "created": "Added",
+        "deleted": "Deleted",
+        "activated": "Activated",
+        "deactivated": "Deactivated"
+      },
+      "delete_dialog": {
+        "title": "Delete “{name}”?",
+        "checking": "Checking where it is used…",
+        "usage_failed": "Where it is used could not be checked.",
+        "used": "Used by {uses}.",
+        "unknown": "Where it is used is not known, so it may be used somewhere.",
+        "children": "It has no items below it. | It has {count} item below it. | It has {count} items below it. | It has {count} items below it. | It has {count} items below it.",
+        "warning": "Deleting removes the mark from what uses it. You can deactivate it instead.",
+        "deactivate": "Deactivate instead",
+        "delete": "Delete",
+        "delete_anyway": "Delete anyway",
+        "confirm_title": "Delete for good?",
+        "confirm_message": "“{name}” and everything below it will be deleted. This cannot be undone.",
+        "confirm_action": "Delete for good"
+      }
     }
   }
 }

@@ -1424,6 +1424,79 @@
     "sheet": {
       "tab_error": "Sadrži greške",
       "tabs": "Odeljci"
+    },
+    "explorer": {
+      "breadcrumb": "Putanja",
+      "selection": "Izabrane stavke",
+      "selected": "Ništa nije izabrano | {count} izabrano | {count} izabrano | {count} izabrano | {count} izabrano",
+      "clear": "Poništi izbor",
+      "select_all": "Izaberi sve",
+      "select": "Izaberi: {name}",
+      "name": "Naziv",
+      "folder": "Direktorij",
+      "empty": "Ovaj direktorij je prazan."
+    },
+    "tree": {
+      "name": "Naziv",
+      "expand": "Proširi: {name}",
+      "collapse": "Sažmi: {name}",
+      "empty": "Ovdje još nema ničega.",
+      "no_match": "Nijedan redak ne odgovara."
+    },
+    "characteristics": {
+      "title": "Karakteristike",
+      "description": "Šifarnici koje urednici biraju u obrascima: marke, kategorije, države. Tablice ostaju kakve jesu; značenje dodatnih kolona opisano je u kodu projekta.",
+      "search": "Traži po nazivu",
+      "views": {
+        "all": "Sve",
+        "active": "Samo aktivne",
+        "inactive": "Neaktivne"
+      },
+      "read_only": "Samo za čitanje",
+      "levels": "Nema nivoa | {count} nivo | {count} nivoa | {count} nivoa | {count} nivoa",
+      "reorder_hint": "povuci ili pritisni Alt+↑ / Alt+↓ za redoslijed unutar grane",
+      "active": "Aktivna",
+      "add": "Dodaj: {name}",
+      "edit": "Uredi",
+      "activate": "Aktiviraj",
+      "deactivate": "Deaktiviraj",
+      "delete": "Obriši",
+      "empty": "Još nema karakteristika.",
+      "field": {
+        "inactive": "neaktivno"
+      },
+      "sheet": {
+        "new_title": "Novo: {name}",
+        "name": "Naziv",
+        "active": "Aktivna",
+        "extra": "Dodatna polja ove grane",
+        "locked": "Samo za čitanje: popunjava ga kod projekta.",
+        "note": "Polje „{field}” opisano je u kodu projekta za granu {path}.",
+        "create": "Dodaj",
+        "save": "Sačuvaj promene"
+      },
+      "toasts": {
+        "saved": "Sačuvano",
+        "created": "Dodano",
+        "deleted": "Obrisano",
+        "activated": "Aktivirano",
+        "deactivated": "Deaktivirano"
+      },
+      "delete_dialog": {
+        "title": "Obrisati „{name}”?",
+        "checking": "Provjeravam gdje se koristi…",
+        "usage_failed": "Nije moguće provjeriti gdje se koristi.",
+        "used": "Koriste je {uses}.",
+        "unknown": "Nije poznato gdje se koristi, pa se možda negdje koristi.",
+        "children": "Nema stavki ispod sebe. | Ima {count} stavku ispod sebe. | Ima {count} stavke ispod sebe. | Ima {count} stavki ispod sebe. | Ima {count} stavki ispod sebe.",
+        "warning": "Brisanjem se oznaka uklanja s onoga što je koristi. Umjesto toga možeš je deaktivirati.",
+        "deactivate": "Deaktiviraj umjesto brisanja",
+        "delete": "Obriši",
+        "delete_anyway": "Obriši svejedno",
+        "confirm_title": "Obrisati zauvijek?",
+        "confirm_message": "„{name}” i sve ispod nje bit će obrisano. Ovo se ne može poništiti.",
+        "confirm_action": "Obriši zauvijek"
+      }
     }
   }
 }
