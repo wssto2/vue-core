@@ -64,7 +64,7 @@ const actions = computed<PageAction[]>(() => [
       <Badge tone="warning">{{ t("workbench.draft") }}</Badge>
       <Badge tone="positive">{{ t("workbench.published") }}</Badge>
     </template>
-    <template #subheader><Tabs v-model="section" :tabs="tabs" /></template>
+    <template #subheader><Tabs v-model="section" class="w-fit" :tabs="tabs" /></template>
     <template #start>
       <div class="flex h-full min-h-0 flex-col">
         <div class="flex shrink-0 items-center gap-2 border-b border-border-separator px-4 py-2 text-footnote">
@@ -79,6 +79,10 @@ const actions = computed<PageAction[]>(() => [
         </div>
       </div>
     </template>
-    <template #end><PreviewFrame v-model:device="device" src="/preview.html" :title="t('workbench.preview')" /></template>
+    <template #end>
+      <PreviewFrame v-model:device="device" src="/preview.html" :title="t('workbench.preview')">
+        <template #toolbar><span class="text-footnote font-medium text-content-strong">{{ t("workbench.preview") }}</span></template>
+      </PreviewFrame>
+    </template>
   </WorkbenchPage>
 </template>

@@ -36,7 +36,7 @@ onMounted(() => { if (route.query.open) sheet.value?.present(); });
 
 <template>
   <WorkbenchPage :title="t('workbench.page_name')" :description="t('workbench.page_meta')" :back="{ label: t('workbench.pages'), to: workbenchRoutes.page }" :actions="actions">
-    <template #subheader><Tabs v-model="mode" :tabs="modes" /></template>
+    <template #subheader><Tabs v-model="mode" class="w-fit" :tabs="modes" /></template>
     <template #start>
       <div class="flex h-full min-h-0">
         <div class="min-w-0 flex-1"><PreviewFrame src="/preview.html" :title="t('workbench.preview')" @message="onAction" /></div>
