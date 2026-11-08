@@ -5,6 +5,7 @@ import { ApiError } from "../../client";
 import { mockMedia } from "../../testing/media";
 import { createTestI18n } from "../../testing/i18n";
 import { testFormatting } from "../../testing/format";
+import FormGroup from "../FormGroup.vue";
 import DynamicForm from "./DynamicForm.vue";
 import RepeatField from "./RepeatField.vue";
 import ResourceField from "./ResourceField.vue";
@@ -321,5 +322,91 @@ describe("RichTextField", () => {
     html.value = "<p>Two</p>";
     await flush();
     expect(document.querySelector(".ql-editor")?.textContent).toBe("Two");
+  });
+});
+
+describe("DynamicForm as a grouped form", () => {
+  const all: FormSchema = {
+    fields: [
+      { key: "name", kind: "text", label: "Name", props: { hint: "Shown on the list." } },
+      { key: "year", kind: "number", label: "Year" },
+      { key: "category", kind: "select", label: "Category", options: [{ value: "a", label: "A" }] },
+      { key: "day", kind: "date", label: "Day" },
+      { key: "on", kind: "boolean", label: "On" },
+      { key: "intro", kind: "textarea", label: "Intro" },
+      { key: "image", kind: "image", label: "Image" },
+    ],
+  };
+  const media: ResourceSource = { list: async () => ({ rows: [], lastPage: 1 }), thumbnail: "/m/{id}" };
+  const rowOf = (label: string) => screen.getByText(label, { selector: "label, span" }).closest("[data-test='form-row']") as HTMLElement;
+
+  it("draws its fields as the rows of one group: entry, setting and stacked by kind", () => {
+    mountForm(all, {}, { resources: media });
+    expect(document.querySelectorAll("[data-test='form-group']")).toHaveLength(1);
+    for (const label of ["Name", "Year", "Category", "Day"]) expect(rowOf(label).dataset.layout).toBe("entry");
+    expect(rowOf("On").dataset.layout).toBe("setting");
+    expect(rowOf("Image").dataset.layout).toBe("stacked");
+    // The textarea is an entry row beside its label on desktop, stacked on a phone: BaseField's call.
+    expect(["entry", "stacked"]).toContain(rowOf("Intro").dataset.layout);
+  });
+
+  it("puts a hint under its row's label, and an error under its control", () => {
+    mountForm(all, {}, { errors: { name: ["Too long"] } });
+    expect(within(rowOf("Name")).getByText("Shown on the list.")).toBeTruthy();
+    expect(within(rowOf("Name")).getByRole("alert").textContent).toContain("Too long");
+    expect(rowOf("Name").hasAttribute("data-field-error")).toBe(true);
+  });
+
+  it("reads value rows when readonly, and leaves empty ones out", () => {
+    mountForm(all, { name: "Ana", on: true }, { readonly: true });
+    expect(rowOf("Name").dataset.layout).toBe("value");
+    expect(rowOf("On").dataset.layout).toBe("value");
+    expect(screen.queryByText("Year")).toBeNull();
+    expect(screen.queryByRole("textbox")).toBeNull();
+  });
+
+  it("form language mode: the switch is the group's header control, with the error mark per language", async () => {
+    mountForm({ fields: [{ key: "title", kind: "text", label: "Title", translatable: true }] }, { title: { hr: "Naslov", en: "Title" } }, { locales: ["hr", "en"], localeMode: "form", errors: { "title.en": ["Too long"] } });
+    const group = document.querySelector("[data-test='form-group']") as HTMLElement;
+    const header = group.querySelector("header") as HTMLElement;
+    expect(within(header).getAllByRole("tab").map((tab) => tab.textContent?.trim())).toEqual(["hr", "en"]);
+    expect(within(header).getByRole("tab", { name: "en" }).hasAttribute("data-error")).toBe(true);
+    await fireEvent.click(within(header).getByRole("tab", { name: "en" }));
+    expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe("Title");
+    expect(within(header).getByRole("tab", { name: "en" }).getAttribute("aria-selected")).toBe("true");
+  });
+
+  it("a collection is a card per item with its header, buttons and rows, and an add row after them; fields around it are groups of their own", async () => {
+    const schema: FormSchema = { fields: [{ key: "a", kind: "text", label: "A" }, { key: "rows", kind: "collection", label: "Slides", children: [{ key: "caption", kind: "text", label: "Caption" }, { key: "on", kind: "boolean", label: "Visible" }] }, { key: "b", kind: "text", label: "B" }] };
+    const { values } = mountForm(schema, { rows: [{ caption: "x" }, { caption: "y" }] });
+    const cards = [...document.querySelectorAll<HTMLElement>("[data-repeat-row]")];
+    expect(cards).toHaveLength(2);
+    expect(within(cards[1]!).getByRole("heading", { name: "Row 2" })).toBeTruthy();
+    expect(within(cards[1]!).getByRole("button", { name: "Move row 2 up" })).toBeTruthy();
+    expect(within(cards[1]!).getByRole("button", { name: "Remove row 2" })).toBeTruthy();
+    expect(within(cards[0]!).getByLabelText("Caption")).toBeTruthy();
+    // No group inside a card: the rows of the item sit in the card's own.
+    expect(cards[0]!.querySelectorAll("[data-test='form-group']")).toHaveLength(0);
+    expect(within(cards[0]!).getByText("Visible").closest("[data-test='form-row']")?.getAttribute("data-layout")).toBe("setting");
+    // Groups: A, two cards, the add row, B.
+    expect(document.querySelectorAll("[data-test='form-group']")).toHaveLength(5);
+    const add = document.querySelector("[data-add]") as HTMLElement;
+    expect(cards[1]!.compareDocumentPosition(add) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await fireEvent.click(add);
+    expect((values.value.rows as unknown[]).length).toBe(3);
+  });
+
+  it("a collection that reads shows its cards without buttons or the add row", () => {
+    mountForm({ fields: [{ key: "rows", kind: "collection", label: "Slides", children: [{ key: "caption", kind: "text", label: "Caption" }] }] }, { rows: [{ caption: "x" }] }, { readonly: true });
+    expect(document.querySelectorAll("[data-repeat-row]")).toHaveLength(1);
+    expect(document.querySelector("[data-add]")).toBeNull();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("inside a FormGroup of the app it draws rows only", () => {
+    const Host = defineComponent({ setup: () => () => h(FormGroup, { header: "Mine" }, () => h(DynamicForm, { schema: all, modelValue: {} })) });
+    render(Host, { global });
+    expect(document.querySelectorAll("[data-test='form-group']")).toHaveLength(1);
+    expect(screen.getByText("Mine")).toBeTruthy();
   });
 });

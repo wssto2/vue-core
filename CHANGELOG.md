@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.23.0 — draft
+
+`DynamicForm` is an Emerald Native grouped form. site-builder's content forms and the page editor's component panel were a label over a grey box; no code change on the app's side.
+
+### Changed
+- **form:** `DynamicForm` draws its fields as the rows of a `FormGroup` (entry rows for text, number, select, date and datetime; a setting row for a boolean; stacked rows for long text, rich text, multi select, image, document, gallery), a hint under the label, errors under the control, value rows when `readonly`. In `localeMode: "form"` the language switch is a segmented control in the group's header, the error mark kept. Inside a `FormGroup` of the app it draws rows only. Props, events, value shape, error keys and `ResourceSource` are unchanged.
+- **form:** a `collection` (`RepeatField`) is a card per item: header "Row n" with move up, move down and delete as icon buttons, the item's fields as rows, an add row at the end; its label, hint and error sit above the cards. The markup changed (`data-repeat-row` is a group `section`; `data-add`, `data-move`, `data-remove` are kept).
+- **form:** `RichTextField`'s frame uses the filled control look and the separator colour instead of a hard border.
+
 ## 0.22.0 — 2026-11-08
 
 Two gaps site-builder's page editor and content forms found.

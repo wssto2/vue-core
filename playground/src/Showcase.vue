@@ -18,6 +18,7 @@ import {
   type AsyncState,
 } from "@wssto2/vue-core/state";
 import { ref, useTemplateRef } from "vue";
+import DynamicFormPanel from "./DynamicFormPanel.vue";
 import LocalePanel from "./LocalePanel.vue";
 import RecordDialogPanel from "./RecordDialogPanel.vue";
 import SessionUserPanel from "./SessionUserPanel.vue";
@@ -172,6 +173,8 @@ const tones = ["neutral", "info", "positive", "warning", "critical"] as const;
         <Button size="xs" @click="progress = Math.min(progress + 25, 100)">Advance</Button>
       </div>
     </Panel>
+
+    <DynamicFormPanel />
 
     <LocalePanel />
 

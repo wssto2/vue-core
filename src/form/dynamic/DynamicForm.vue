@@ -3,6 +3,7 @@ import { computed, inject, provide, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { applicationKey } from "../../app/environment";
 import { ErrorBag } from "../errors";
+import { useFormGroup } from "../field";
 import DateField from "../DateField.vue";
 import DateTimeField from "../DateTimeField.vue";
 import I18nField from "../I18nField.vue";
@@ -13,7 +14,9 @@ import SwitchField from "../SwitchField.vue";
 import TextareaField from "../TextareaField.vue";
 import TextField from "../TextField.vue";
 import type { FieldMessages } from "../validation";
+import DynamicGroup from "./DynamicGroup.vue";
 import { activeLocaleKey, type LocaleMode } from "./localeMode";
+import LocaleSwitch from "./LocaleSwitch.vue";
 import RepeatField from "./RepeatField.vue";
 import ResourceField from "./ResourceField.vue";
 import type { ResourceId, ResourceSource } from "./resources";
@@ -31,6 +34,9 @@ import { evaluateVisibility } from "./visibility";
  *   a gallery a list of ids; a collection a list of row values.
  * - **`visible_when`:** a field whose rule does not hold is not shown. It keeps its value, and an error under its key is not shown.
  * - **`errors`:** go-core's field messages (`form.errors.all()`, or the `ErrorBag`), by field key; `images.0.title` reaches a row.
+ * - **Look:** the fields sit in an Emerald Native `FormGroup` (a collection is cards of its own, between groups): text, number, select and date are
+ *   entry rows, a boolean a setting row, long text, rich text and media stacked rows; `"form"` puts the language switch in the group's header. Inside a
+ *   `FormGroup` of yours it draws rows only. `readonly` reads value rows.
  * - **`localeMode`:** `"perField"` (default) shows a language strip on each translatable field; `"form"` shows one switcher for
  *   the whole form, which switches every translatable field at once.
  */
@@ -53,7 +59,9 @@ const props = withDefaults(
 );
 const emit = defineEmits<{ "update:modelValue": [values: Record<string, unknown>] }>();
 
-const { t, availableLocales } = useI18n();
+const { availableLocales } = useI18n();
+// Inside a group already (a collection's card, or the app's own `FormGroup`) the rows go there; otherwise this form makes its groups.
+const inGroup = useFormGroup() !== null;
 const application = inject(applicationKey, null);
 const known = computed(() => props.locales ?? application?.locales ?? availableLocales);
 const fallback = computed(() => props.defaultLocale ?? known.value[0] ?? "");
@@ -69,6 +77,19 @@ function errorOf(key: string): string | undefined {
 const inside = (key: string): FieldMessages => Object.fromEntries(Object.entries(messages.value).filter(([path]) => path.startsWith(`${key}.`)).map(([path, list]) => [path.slice(key.length + 1), list]));
 
 const visible = computed(() => props.schema.fields.filter((field) => evaluateVisibility(field.visible_when, props.modelValue)));
+
+// Runs of fields are one group each; a collection is its own block (its cards are groups).
+const blocks = computed(() => {
+  const list: { fields: SchemaField[]; collection: boolean }[] = [];
+  for (const field of visible.value) {
+    const collection = field.kind === "collection";
+    const last = list[list.length - 1];
+    if (last && !collection && !last.collection) last.fields.push(field);
+    else list.push({ fields: [field], collection });
+  }
+  return list;
+});
+const firstGroup = computed(() => blocks.value.findIndex((block) => !block.collection));
 
 function set(key: string, value: unknown) {
   emit("update:modelValue", { ...props.modelValue, [key]: value });
@@ -119,34 +140,40 @@ const plainText = (field: SchemaField): string => (typeof props.modelValue[field
 </script>
 
 <template>
-  <div class="flex w-full flex-col gap-4" data-dynamic-form>
-    <div v-if="ownSwitcher" role="tablist" :aria-label="t('core.form.dynamic.language')" class="flex gap-1">
-      <button v-for="locale in known" :id="`dynamic-locale-${locale}`" :key="locale" type="button" role="tab" :aria-selected="locale === active" :data-locale="locale" :data-error="hasErrorIn(locale) || undefined"
-        class="rounded-md px-3 py-1 text-sm font-medium uppercase aria-selected:bg-fill data-[error]:text-status-danger-content" @click="chosen = locale">{{ locale }}</button>
+  <div data-dynamic-form :class="inGroup ? 'contents' : 'flex w-full min-w-0 flex-col gap-group-gap'">
+    <div v-if="ownSwitcher && firstGroup < 0" class="flex justify-end">
+      <LocaleSwitch :locales="known" :active="active" :failed="hasErrorIn" @choose="chosen = $event" />
     </div>
-    <template v-for="field in visible" :key="field.key">
-      <!-- text kinds -->
-      <template v-if="translated(field)">
-        <template v-if="inForm(field)">
-          <RichTextField v-if="field.kind === 'rich_text'" v-bind="common(field)" :error="localeError(field)" :model-value="textOf(field)[active] ?? ''" :images="props.resources" :video="field.props?.video" @update:model-value="setText(field, active, $event)" />
-          <TextareaField v-else-if="field.kind === 'textarea'" v-bind="common(field)" :error="localeError(field)" :model-value="textOf(field)[active] ?? ''" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="setText(field, active, $event)" />
-          <TextField v-else v-bind="common(field)" :error="localeError(field)" :model-value="textOf(field)[active] ?? ''" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="setText(field, active, $event)" />
+    <template v-for="(block, at) in blocks" :key="block.fields[0]?.key">
+      <DynamicGroup :bare="inGroup || block.collection">
+        <template v-if="ownSwitcher && at === firstGroup" #header-trailing>
+          <LocaleSwitch :locales="known" :active="active" :failed="hasErrorIn" @choose="chosen = $event" />
         </template>
-        <I18nField v-else v-bind="common(field)" :model-value="textOf(field)" :locales="known" :default-locale="fallback" :required-locales="field.required ? [fallback] : []" :multiline="field.kind === 'textarea'" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
-      </template>
-      <TextField v-else-if="field.kind === 'text'" v-bind="common(field)" :type="hasRule(field, 'email') ? 'email' : hasRule(field, 'url') ? 'url' : 'text'" :model-value="plainText(field)" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
-      <TextareaField v-else-if="field.kind === 'textarea'" v-bind="common(field)" :model-value="plainText(field)" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
-      <RichTextField v-else-if="field.kind === 'rich_text'" v-bind="common(field)" :model-value="plainText(field)" :images="props.resources" :video="field.props?.video" @update:model-value="set(field.key, $event)" />
-      <NumberField v-else-if="field.kind === 'number'" v-bind="common(field)" :model-value="numberOf(field)" :placeholder="field.props?.placeholder" :grouping="field.props?.grouping" :decimals="field.props?.decimals" @update:model-value="set(field.key, $event)" />
-      <SwitchField v-else-if="field.kind === 'boolean'" v-bind="common(field)" :model-value="props.modelValue[field.key] === true" @update:model-value="set(field.key, $event)" />
-      <SelectField v-else-if="field.kind === 'select'" v-bind="common(field)" :options="field.options ?? []" :model-value="choiceOf(field)" :clearable="!field.required" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />
-      <MultiSelectField v-else-if="field.kind === 'multi_select'" v-bind="common(field)" :options="field.options ?? []" :model-value="choicesOf(field)" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />
-      <DateField v-else-if="field.kind === 'date'" v-bind="common(field)" :model-value="stringOf(field)" @update:model-value="set(field.key, $event)" />
-      <DateTimeField v-else-if="field.kind === 'datetime'" v-bind="common(field)" :model-value="stringOf(field)" @update:model-value="set(field.key, $event)" />
-      <template v-else-if="field.kind === 'image' || field.kind === 'document' || field.kind === 'gallery'">
-        <ResourceField v-if="props.resources" v-bind="common(field)" :source="props.resources" :multiple="field.kind === 'gallery'" :accept="field.props?.accept ?? (field.kind === 'image' ? 'image/*' : undefined)" :model-value="field.kind === 'gallery' ? idsOf(field) : (props.modelValue[field.key] as ResourceId | null | undefined)" @update:model-value="set(field.key, $event)" />
-      </template>
-      <RepeatField v-else-if="field.kind === 'collection'" v-bind="common(field)" :fields="field.children ?? []" :model-value="rowsOf(field)" :locales="known" :default-locale="fallback" :errors="inside(field.key)" :resources="props.resources" :add-label="field.props?.addLabel" :locale-mode="props.localeMode" @update:model-value="set(field.key, $event)" />
+        <template v-for="field in block.fields" :key="field.key">
+          <!-- text kinds -->
+          <template v-if="translated(field)">
+            <template v-if="inForm(field)">
+              <RichTextField v-if="field.kind === 'rich_text'" v-bind="common(field)" :error="localeError(field)" :model-value="textOf(field)[active] ?? ''" :images="props.resources" :video="field.props?.video" @update:model-value="setText(field, active, $event)" />
+              <TextareaField v-else-if="field.kind === 'textarea'" v-bind="common(field)" :error="localeError(field)" :model-value="textOf(field)[active] ?? ''" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="setText(field, active, $event)" />
+              <TextField v-else v-bind="common(field)" :error="localeError(field)" :model-value="textOf(field)[active] ?? ''" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="setText(field, active, $event)" />
+            </template>
+            <I18nField v-else v-bind="common(field)" :model-value="textOf(field)" :locales="known" :default-locale="fallback" :required-locales="field.required ? [fallback] : []" :multiline="field.kind === 'textarea'" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
+          </template>
+          <TextField v-else-if="field.kind === 'text'" v-bind="common(field)" :type="hasRule(field, 'email') ? 'email' : hasRule(field, 'url') ? 'url' : 'text'" :model-value="plainText(field)" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
+          <TextareaField v-else-if="field.kind === 'textarea'" v-bind="common(field)" :model-value="plainText(field)" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
+          <RichTextField v-else-if="field.kind === 'rich_text'" v-bind="common(field)" :model-value="plainText(field)" :images="props.resources" :video="field.props?.video" @update:model-value="set(field.key, $event)" />
+          <NumberField v-else-if="field.kind === 'number'" v-bind="common(field)" :model-value="numberOf(field)" :placeholder="field.props?.placeholder" :grouping="field.props?.grouping" :decimals="field.props?.decimals" @update:model-value="set(field.key, $event)" />
+          <SwitchField v-else-if="field.kind === 'boolean'" v-bind="common(field)" :model-value="props.modelValue[field.key] === true" @update:model-value="set(field.key, $event)" />
+          <SelectField v-else-if="field.kind === 'select'" v-bind="common(field)" :options="field.options ?? []" :model-value="choiceOf(field)" :clearable="!field.required" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />
+          <MultiSelectField v-else-if="field.kind === 'multi_select'" v-bind="common(field)" :options="field.options ?? []" :model-value="choicesOf(field)" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />
+          <DateField v-else-if="field.kind === 'date'" v-bind="common(field)" :model-value="stringOf(field)" @update:model-value="set(field.key, $event)" />
+          <DateTimeField v-else-if="field.kind === 'datetime'" v-bind="common(field)" :model-value="stringOf(field)" @update:model-value="set(field.key, $event)" />
+          <template v-else-if="field.kind === 'image' || field.kind === 'document' || field.kind === 'gallery'">
+            <ResourceField v-if="props.resources" v-bind="common(field)" :source="props.resources" :multiple="field.kind === 'gallery'" :accept="field.props?.accept ?? (field.kind === 'image' ? 'image/*' : undefined)" :model-value="field.kind === 'gallery' ? idsOf(field) : (props.modelValue[field.key] as ResourceId | null | undefined)" @update:model-value="set(field.key, $event)" />
+          </template>
+          <RepeatField v-else-if="field.kind === 'collection'" v-bind="common(field)" :fields="field.children ?? []" :model-value="rowsOf(field)" :locales="known" :default-locale="fallback" :errors="inside(field.key)" :resources="props.resources" :add-label="field.props?.addLabel" :locale-mode="props.localeMode" @update:model-value="set(field.key, $event)" />
+        </template>
+      </DynamicGroup>
     </template>
   </div>
 </template>

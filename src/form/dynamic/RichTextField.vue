@@ -133,12 +133,12 @@ const toolbar = computed(() => [
 <template>
   <Field v-bind="fieldProps(props)" row-layout="stacked" :value="null">
     <template #default="{ id }">
-      <div class="w-full rounded-md border border-border bg-surface">
-        <div v-if="editable && !props.disabled" class="flex flex-wrap gap-1 border-b border-border p-1" role="toolbar" :aria-label="props.label">
+      <div class="w-full rounded-control border border-border-separator bg-fill focus-within:border-border-focus">
+        <div v-if="editable && !props.disabled" class="flex flex-wrap gap-1 border-b border-border-separator p-1" role="toolbar" :aria-label="props.label">
           <button v-for="item in toolbar" :key="item.key" type="button" :data-tool="item.key" :aria-label="item.label" :title="item.label" :aria-pressed="item.on" :disabled="!ready"
             class="min-w-8 rounded px-2 py-1 text-sm font-medium hover:bg-fill aria-pressed:bg-fill" @mousedown.prevent @click="item.run">{{ item.text }}</button>
         </div>
-        <form v-if="asking" class="flex gap-2 border-b border-border p-2" @submit.prevent="apply">
+        <form v-if="asking" class="flex gap-2 border-b border-border-separator p-2" @submit.prevent="apply">
           <input v-model="address" type="url" class="w-full rounded-md border border-border bg-surface px-2 py-1 text-sm" :aria-label="asking === 'link' ? t('core.form.dynamic.rich_text.link_prompt') : t('core.form.dynamic.rich_text.video_prompt')" :placeholder="asking === 'link' ? t('core.form.dynamic.rich_text.link_prompt') : t('core.form.dynamic.rich_text.video_prompt')" />
           <Button type="submit" size="sm">OK</Button>
         </form>
