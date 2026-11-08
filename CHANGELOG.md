@@ -7,6 +7,8 @@
 ### Changed
 - **form:** `DynamicForm` draws its fields as the rows of a `FormGroup` (entry rows for text, number, select, date and datetime; a setting row for a boolean; stacked rows for long text, rich text, multi select, image, document, gallery), a hint under the label, errors under the control, value rows when `readonly`. In `localeMode: "form"` the language switch is a segmented control in the group's header, the error mark kept. Inside a `FormGroup` of the app it draws rows only. Props, events, value shape, error keys and `ResourceSource` are unchanged.
 - **form:** a `collection` (`RepeatField`) is a card per item: header "Row n" with move up, move down and delete as icon buttons, the item's fields as rows, an add row at the end; its label, hint and error sit above the cards. The markup changed (`data-repeat-row` is a group `section`; `data-add`, `data-move`, `data-remove` are kept).
+- **form:** a read-only image, document or gallery shows its pictures (through `ResourceSource.thumbnail`), no longer the ids; one without a value has no row. A text in an entry row takes the value column, so a long value is not cut off.
+- **form:** wrapped in the app's own `FormGroup` (`<FormGroup :header="…"><DynamicForm readonly /></FormGroup>`, instead of a `Panel`, so there is no card in a card) the form draws rows only and its language switch is a row of that group.
 - **form:** `RichTextField`'s frame uses the filled control look and the separator colour instead of a hard border.
 
 ## 0.22.0 — 2026-11-08
