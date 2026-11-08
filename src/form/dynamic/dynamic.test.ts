@@ -409,4 +409,29 @@ describe("DynamicForm as a grouped form", () => {
     expect(document.querySelectorAll("[data-test='form-group']")).toHaveLength(1);
     expect(screen.getByText("Mine")).toBeTruthy();
   });
+
+  it("in the app's FormGroup the language switch is a row of it, and a read-only form is rows under the app's header", () => {
+    const Host = defineComponent({ setup: () => () => h(FormGroup, { header: "Slideri" }, () => h(DynamicForm, { schema: { fields: [{ key: "title", kind: "text", label: "Title", translatable: true }] }, modelValue: { title: { hr: "Naslov" } }, locales: ["hr", "en"], localeMode: "form", readonly: true })) });
+    render(Host, { global });
+    expect(document.querySelectorAll("[data-test='form-group']")).toHaveLength(1);
+    expect(within(document.querySelector("[data-test='form-group'] header") as HTMLElement).queryByRole("tab")).toBeNull();
+    expect(screen.getAllByRole("tab")).toHaveLength(2);
+    expect(screen.getByText("Naslov")).toBeTruthy();
+  });
+
+  it("a field of pictures reads as thumbnails, never ids, and an empty one leaves no row", () => {
+    mountForm({ fields: [{ key: "image", kind: "image", label: "Image" }, { key: "gallery", kind: "gallery", label: "Gallery" }, { key: "file", kind: "document", label: "File" }] }, { image: 363, gallery: [1, 2] }, { readonly: true, resources: media });
+    const pictures = [...document.querySelectorAll<HTMLImageElement>("img[data-resource]")];
+    expect(pictures.map((img) => img.getAttribute("src"))).toEqual(["/m/363", "/m/1", "/m/2"]);
+    expect(screen.queryByText("363")).toBeNull();
+    expect(screen.queryByText("1, 2")).toBeNull();
+    expect(screen.queryByText("File")).toBeNull();
+  });
+
+  it("an entry text takes the value column, not a fixed short box", () => {
+    mountForm({ fields: [{ key: "name", kind: "text", label: "Name" }] }, { name: "Namjena: višenamjenski objekt društvene namjene" });
+    const input = screen.getByLabelText("Name") as HTMLInputElement;
+    expect(input.value).toBe("Namjena: višenamjenski objekt društvene namjene");
+    expect(input.closest("[data-test='form-row']")?.innerHTML).not.toContain("max-w-");
+  });
 });
