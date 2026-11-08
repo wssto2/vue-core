@@ -24,7 +24,7 @@ function onKeydown(event: KeyboardEvent, index: number) {
 <template>
   <div :id="base" role="tablist" :aria-label="t('core.form.dynamic.language')" class="flex shrink-0 gap-0.5 rounded-control bg-fill p-0.5" data-dynamic-locales>
     <button v-for="(locale, index) in props.locales" :id="tabId(locale)" :key="locale" type="button" role="tab" :aria-selected="locale === props.active" :tabindex="locale === props.active ? 0 : -1" :data-locale="locale" :data-error="props.failed(locale) || undefined"
-      class="flex min-h-7 cursor-pointer items-center rounded-control px-2.5 py-1 text-footnote font-semibold uppercase text-content-muted transition-colors duration-motion-fast hover:text-content-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-border-focus aria-selected:bg-segment-selected aria-selected:text-content-strong aria-selected:shadow-sm data-[error]:text-status-danger-content"
+      class="flex min-h-6 cursor-pointer items-center rounded-control px-2.5 py-0.5 text-footnote font-semibold uppercase text-content-muted transition-colors duration-motion-fast hover:text-content-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-border-focus aria-selected:bg-segment-selected aria-selected:text-content-strong aria-selected:shadow-sm data-[error]:text-status-danger-content"
       @click="emit('choose', locale)" @keydown="onKeydown($event, index)">{{ locale }}</button>
   </div>
 </template>
