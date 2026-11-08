@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased (0.22.0)
+
+Two gaps site-builder's page editor and content forms found.
+
+### New
+- **form:** a schema `number` field takes `props.grouping` and `props.decimals`, passed to `NumberField` (top-level and collection-child fields), so a year shows `2026`, not `2.026`.
+- **styles:** the `scrollbar-hide` utility (`PhotoViewer`, `SectionNavigator` used it; it did not exist).
+- **check:** `npm run check:css` (part of `check`): every static `class="…"` in `src/**/*.vue` must have a rule in `dist/styles.css`. `:class` expressions are not checked.
+
+### Fixed
+- **form:** the error mark on `DynamicForm`'s language switch, and the failed-load text in the resource picker and the rich text field, were never coloured: `text-critical` is not a theme class. They use `text-status-danger-content`.
+- Other classes with no rule, replaced by theme tokens: `text-muted` → `text-content-muted`, `bg-surface-muted` (and its `hover:`/`aria-*` forms) → the `fill` ones, `hover:border-accent` → `hover:border-border-selected`, `text-accent` → `text-content-link`, `text-title3` → `text-headline` (`EffectiveAccess`, `PermissionTree`), `text-callout` → `text-subheadline` (`QuickSearchButton`).
+
 ## 0.21.0 — 2026-11-07
 
 The list pieces for site-builder's pages list, template resources and Karakteristike (approved mock-ups in site-builder `next/design/`), and the screen of go-core's characteristics module. Needs go-core v1.34.0-rc.1.
