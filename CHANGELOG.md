@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.22.0)
+## 0.22.0 — 2026-11-08
 
 Two gaps site-builder's page editor and content forms found.
 
