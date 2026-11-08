@@ -52,6 +52,12 @@ const remove = (index: number) => commit(ids.value.filter((_, at) => at !== inde
 
 <template>
   <Field v-bind="fieldProps(props)" row-layout="stacked" :value="ids.length > 0 ? ids.join(', ') : null">
+    <!-- Read: the pictures (no row at all when empty), never the ids. -->
+    <template v-if="!editable && ids.length > 0" #readonly>
+      <div class="flex flex-wrap items-start gap-2">
+        <img v-for="(value, index) in ids" :key="`${value}-${index}`" :src="thumbnailUrl(props.source, value)" alt="" class="aspect-square w-24 rounded-md border border-border object-cover" data-resource />
+      </div>
+    </template>
     <template #default="{ id }">
       <div :id="id" class="flex flex-wrap items-start gap-2">
         <div v-for="(value, index) in ids" :key="`${value}-${index}`" class="relative w-24" data-resource>
