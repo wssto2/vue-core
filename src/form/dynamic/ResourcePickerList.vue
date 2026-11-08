@@ -54,12 +54,12 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex flex-col gap-3 p-4">
     <input v-model="search" type="search" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm" :placeholder="t('core.form.dynamic.resource.search')" :aria-label="t('core.form.dynamic.resource.search')" @input="typed" />
-    <p v-if="status === 'failed'" role="alert" class="text-sm text-critical">{{ t("core.form.dynamic.resource.failed") }}</p>
-    <p v-else-if="status === 'loading' && rows.length === 0" class="text-sm text-muted">{{ t("core.form.dynamic.resource.loading") }}</p>
-    <p v-else-if="rows.length === 0" class="text-sm text-muted">{{ t("core.form.dynamic.resource.empty") }}</p>
+    <p v-if="status === 'failed'" role="alert" class="text-sm text-status-danger-content">{{ t("core.form.dynamic.resource.failed") }}</p>
+    <p v-else-if="status === 'loading' && rows.length === 0" class="text-sm text-content-muted">{{ t("core.form.dynamic.resource.loading") }}</p>
+    <p v-else-if="rows.length === 0" class="text-sm text-content-muted">{{ t("core.form.dynamic.resource.empty") }}</p>
     <ul v-else class="grid grid-cols-3 gap-2 sm:grid-cols-4">
       <li v-for="item in rows" :key="item.id">
-        <button type="button" class="flex w-full flex-col gap-1 rounded-md border border-border p-1 text-left hover:border-accent focus-visible:outline-2" @click="emit('select', item)">
+        <button type="button" class="flex w-full flex-col gap-1 rounded-md border border-border p-1 text-left hover:border-border-selected focus-visible:outline-2" @click="emit('select', item)">
           <img :src="thumbnailUrl(props.source, item.id)" :alt="item.name ?? ''" class="aspect-square w-full rounded object-cover" loading="lazy" />
           <span v-if="item.name" class="truncate text-xs">{{ item.name }}</span>
         </button>

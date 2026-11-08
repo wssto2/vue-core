@@ -74,7 +74,7 @@ function rowErrors(index: number): FieldMessages {
     <div class="flex w-full flex-col gap-3">
       <div v-for="(row, index) in props.modelValue" :key="keys[index]" class="rounded-md border border-border p-3" data-repeat-row>
         <div class="mb-2 flex items-center justify-between">
-          <span class="text-sm font-medium text-muted">{{ t("core.form.dynamic.repeat.row", { n: index + 1 }) }}</span>
+          <span class="text-sm font-medium text-content-muted">{{ t("core.form.dynamic.repeat.row", { n: index + 1 }) }}</span>
           <div v-if="editable && !props.disabled" class="flex gap-1">
             <Button size="xs" prominence="plain" icon="arrowUpSLine" :disabled="index === 0" v-bind="{ 'aria-label': t('core.form.dynamic.repeat.up', { n: index + 1 }) }" data-move="up" @click="move(index, -1)" />
             <Button size="xs" prominence="plain" icon="arrowDownSLine" :disabled="index === props.modelValue.length - 1" v-bind="{ 'aria-label': t('core.form.dynamic.repeat.down', { n: index + 1 }) }" data-move="down" @click="move(index, 1)" />

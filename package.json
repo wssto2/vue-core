@@ -179,8 +179,9 @@
     "test": "vitest run",
     "build": "vite build && vite build -c vite.styles.config.ts && vue-tsc -p tsconfig.build.json",
     "check:consumer": "node scripts/check-consumer.mjs",
-    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run typecheck:fixtures && npm run typecheck:registry && npm run check:modules && npm run check:docs && npm run test && npm run build && npm run check:consumer",
+    "check": "npm run lint && npm run typecheck && npm run typecheck:docs && npm run typecheck:fixtures && npm run typecheck:registry && npm run check:modules && npm run check:docs && npm run test && npm run build && npm run check:css && npm run check:consumer",
     "check:docs": "node scripts/check-docs.mjs",
+    "check:css": "node scripts/check-css-classes.mjs",
     "prepublishOnly": "npm run check",
     "modules:sync": "node scripts/modules.mjs sync",
     "check:modules": "node scripts/modules.mjs check"

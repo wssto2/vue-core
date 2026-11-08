@@ -18,7 +18,7 @@ const keys = computed(() => shortcutKeys({ key: "k", mod: true }).join(" "));
 
 <template>
   <button type="button" data-test="quick-search-button"
-    class="flex h-9 w-full cursor-pointer items-center gap-2 rounded-control px-3 text-left text-callout transition-colors duration-motion-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus"
+    class="flex h-9 w-full cursor-pointer items-center gap-2 rounded-control px-3 text-left text-subheadline transition-colors duration-motion-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus"
     :class="onRail ? 'bg-gray-500/15 text-gray-400 hover:bg-gray-500/25' : 'bg-fill text-content-muted hover:bg-fill-strong'"
     @click="search.open()">
     <Icon name="search" :size="16" class="shrink-0" />

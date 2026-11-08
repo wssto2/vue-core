@@ -61,7 +61,7 @@ const remove = (index: number) => commit(ids.value.filter((_, at) => at !== inde
             <Button size="xs" prominence="plain" tone="critical" icon="close" v-bind="{ 'aria-label': t('core.form.dynamic.resource.remove') }" @click="remove(index)" />
           </div>
         </div>
-        <p v-if="ids.length === 0 && !editable" class="text-sm text-muted">{{ t("core.form.dynamic.resource.none") }}</p>
+        <p v-if="ids.length === 0 && !editable" class="text-sm text-content-muted">{{ t("core.form.dynamic.resource.none") }}</p>
         <Button v-if="editable && !props.disabled && (props.multiple || ids.length === 0)" icon="addLine" @click="choose()">{{ t("core.form.dynamic.resource.choose") }}</Button>
       </div>
       <PickerModal :picker="picker">

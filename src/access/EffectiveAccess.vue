@@ -38,7 +38,7 @@ const reach = (screen: EffectiveScreen) => [screen.qualifier ? labels.qualifierN
 
 <template>
   <section class="flex min-w-0 flex-col gap-group-gap" data-test="effective-access">
-    <h2 class="px-row-inset text-title3 font-semibold text-content-strong">{{ t("core.access.effective.title", { name: props.name }) }}</h2>
+    <h2 class="px-row-inset text-headline font-semibold text-content-strong">{{ t("core.access.effective.title", { name: props.name }) }}</h2>
 
     <FormGroup v-if="groups.length === 0" :footer="t('core.access.effective.footer')">
       <FormRow layout="setting" :label="t('core.access.effective.empty')" />

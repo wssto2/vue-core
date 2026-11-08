@@ -52,6 +52,10 @@ export interface SchemaFieldProps {
   readonly rows?: number;
   /** A `rich_text` field: show the video embed button. */
   readonly video?: boolean;
+  /** A `number` field: no thousands separator (a year, a code), as `NumberField grouping`. */
+  readonly grouping?: boolean;
+  /** A `number` field: the most fraction digits it takes, as `NumberField decimals`. */
+  readonly decimals?: number;
   /** A `collection` field: the label of its add button. */
   readonly addLabel?: string;
 }

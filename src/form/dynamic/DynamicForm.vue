@@ -122,7 +122,7 @@ const plainText = (field: SchemaField): string => (typeof props.modelValue[field
   <div class="flex w-full flex-col gap-4" data-dynamic-form>
     <div v-if="ownSwitcher" role="tablist" :aria-label="t('core.form.dynamic.language')" class="flex gap-1">
       <button v-for="locale in known" :id="`dynamic-locale-${locale}`" :key="locale" type="button" role="tab" :aria-selected="locale === active" :data-locale="locale" :data-error="hasErrorIn(locale) || undefined"
-        class="rounded-md px-3 py-1 text-sm font-medium uppercase aria-selected:bg-surface-muted data-[error]:text-critical" @click="chosen = locale">{{ locale }}</button>
+        class="rounded-md px-3 py-1 text-sm font-medium uppercase aria-selected:bg-fill data-[error]:text-status-danger-content" @click="chosen = locale">{{ locale }}</button>
     </div>
     <template v-for="field in visible" :key="field.key">
       <!-- text kinds -->
@@ -137,7 +137,7 @@ const plainText = (field: SchemaField): string => (typeof props.modelValue[field
       <TextField v-else-if="field.kind === 'text'" v-bind="common(field)" :type="hasRule(field, 'email') ? 'email' : hasRule(field, 'url') ? 'url' : 'text'" :model-value="plainText(field)" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
       <TextareaField v-else-if="field.kind === 'textarea'" v-bind="common(field)" :model-value="plainText(field)" :rows="field.props?.rows" :placeholder="field.props?.placeholder" :max-length="maxLength(field)" @update:model-value="set(field.key, $event)" />
       <RichTextField v-else-if="field.kind === 'rich_text'" v-bind="common(field)" :model-value="plainText(field)" :images="props.resources" :video="field.props?.video" @update:model-value="set(field.key, $event)" />
-      <NumberField v-else-if="field.kind === 'number'" v-bind="common(field)" :model-value="numberOf(field)" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />
+      <NumberField v-else-if="field.kind === 'number'" v-bind="common(field)" :model-value="numberOf(field)" :placeholder="field.props?.placeholder" :grouping="field.props?.grouping" :decimals="field.props?.decimals" @update:model-value="set(field.key, $event)" />
       <SwitchField v-else-if="field.kind === 'boolean'" v-bind="common(field)" :model-value="props.modelValue[field.key] === true" @update:model-value="set(field.key, $event)" />
       <SelectField v-else-if="field.kind === 'select'" v-bind="common(field)" :options="field.options ?? []" :model-value="choiceOf(field)" :clearable="!field.required" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />
       <MultiSelectField v-else-if="field.kind === 'multi_select'" v-bind="common(field)" :options="field.options ?? []" :model-value="choicesOf(field)" :placeholder="field.props?.placeholder" @update:model-value="set(field.key, $event)" />

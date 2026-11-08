@@ -78,7 +78,7 @@ const setGranted = (id: string, on: boolean) => (on ? grant(catalogue, props.gra
 
     <div v-if="current" class="flex min-w-0 flex-col gap-6" :data-test="`tree-panel-${current.key}`">
       <div class="flex min-w-0 items-center justify-between gap-3 px-row-inset">
-        <h2 class="min-w-0 flex-1 text-title3 font-semibold text-content-strong">{{ labels.groupLabel(current.key) }}</h2>
+        <h2 class="min-w-0 flex-1 text-headline font-semibold text-content-strong">{{ labels.groupLabel(current.key) }}</h2>
         <span class="text-footnote tabular-nums text-content-muted">{{ countText(current.key) }}</span>
         <span v-if="!props.readonly" class="contents" data-test="tree-toggle-all">
           <Button prominence="secondary" size="sm" @click="toggleAll">{{ allOn ? t("core.access.turn_off_all") : t("core.access.turn_on_all") }}</Button>

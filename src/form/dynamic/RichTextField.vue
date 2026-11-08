@@ -136,15 +136,15 @@ const toolbar = computed(() => [
       <div class="w-full rounded-md border border-border bg-surface">
         <div v-if="editable && !props.disabled" class="flex flex-wrap gap-1 border-b border-border p-1" role="toolbar" :aria-label="props.label">
           <button v-for="item in toolbar" :key="item.key" type="button" :data-tool="item.key" :aria-label="item.label" :title="item.label" :aria-pressed="item.on" :disabled="!ready"
-            class="min-w-8 rounded px-2 py-1 text-sm font-medium hover:bg-surface-muted aria-pressed:bg-surface-muted" @mousedown.prevent @click="item.run">{{ item.text }}</button>
+            class="min-w-8 rounded px-2 py-1 text-sm font-medium hover:bg-fill aria-pressed:bg-fill" @mousedown.prevent @click="item.run">{{ item.text }}</button>
         </div>
         <form v-if="asking" class="flex gap-2 border-b border-border p-2" @submit.prevent="apply">
           <input v-model="address" type="url" class="w-full rounded-md border border-border bg-surface px-2 py-1 text-sm" :aria-label="asking === 'link' ? t('core.form.dynamic.rich_text.link_prompt') : t('core.form.dynamic.rich_text.video_prompt')" :placeholder="asking === 'link' ? t('core.form.dynamic.rich_text.link_prompt') : t('core.form.dynamic.rich_text.video_prompt')" />
           <Button type="submit" size="sm">OK</Button>
         </form>
-        <p v-if="failed" role="alert" class="p-3 text-sm text-critical">{{ t("core.form.dynamic.rich_text.failed") }}</p>
+        <p v-if="failed" role="alert" class="p-3 text-sm text-status-danger-content">{{ t("core.form.dynamic.rich_text.failed") }}</p>
         <!-- Quill's own stylesheet is not loaded: the lists and the hidden clipboard are styled here. -->
-        <div :id="id" ref="host" class="min-h-32 px-3 py-2 text-sm [&_.ql-clipboard]:absolute [&_.ql-clipboard]:-left-[100000px] [&_.ql-editor]:min-h-28 [&_.ql-editor]:outline-none [&_.ql-editor_h2]:text-lg [&_.ql-editor_h2]:font-semibold [&_.ql-editor_img]:max-w-full [&_.ql-editor_ol]:pl-6 [&_.ql-editor_li[data-list=bullet]]:list-disc [&_.ql-editor_li[data-list=ordered]]:list-decimal [&_.ql-editor_a]:text-accent [&_.ql-editor_a]:underline [&_.ql-ui]:hidden [&_.ql-editor.ql-blank::before]:text-muted [&_.ql-editor.ql-blank::before]:content-[attr(data-placeholder)]" :class="{ hidden: failed }" />
+        <div :id="id" ref="host" class="min-h-32 px-3 py-2 text-sm [&_.ql-clipboard]:absolute [&_.ql-clipboard]:-left-[100000px] [&_.ql-editor]:min-h-28 [&_.ql-editor]:outline-none [&_.ql-editor_h2]:text-lg [&_.ql-editor_h2]:font-semibold [&_.ql-editor_img]:max-w-full [&_.ql-editor_ol]:pl-6 [&_.ql-editor_li[data-list=bullet]]:list-disc [&_.ql-editor_li[data-list=ordered]]:list-decimal [&_.ql-editor_a]:text-content-link [&_.ql-editor_a]:underline [&_.ql-ui]:hidden [&_.ql-editor.ql-blank::before]:text-content-muted [&_.ql-editor.ql-blank::before]:content-[attr(data-placeholder)]" :class="{ hidden: failed }" />
       </div>
       <PickerModal v-if="props.images" :picker="picker">
         <template #default="{ select }">

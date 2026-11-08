@@ -36,7 +36,7 @@ export const newsSchema = {
     { key: "slides", kind: "collection", label: "Slides", children: [{ key: "image", kind: "image", label: "Image", required: true }, { key: "caption", kind: "text", label: "Caption" }] },
 ```
 
-`validation` is a whitelist of `{ rule, args }`: `min` and `max` (a text's length, a number's value, the size of a list), `email`, `url`, `regex`; `required` is the field's flag. `props` holds what a control shows (`placeholder`, `hint`, `rows`, `accept`, `video`, `addLabel`).
+`validation` is a whitelist of `{ rule, args }`: `min` and `max` (a text's length, a number's value, the size of a list), `email`, `url`, `regex`; `required` is the field's flag. `props` holds what a control shows (`placeholder`, `hint`, `rows`, `accept`, `video`, `addLabel`, and for a `number` `grouping` and `decimals`, as `NumberField` takes them: `props: { grouping: false }` draws a year as `2026`, not `2.026`).
 
 ## A form
 

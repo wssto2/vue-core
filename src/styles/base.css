@@ -25,6 +25,12 @@
   }
 }
 
+/* scrollbar-hide: scrolls, draws no scrollbar (a strip of tabs or thumbnails). */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 /*
  * scrollbar-subtle — a macOS-style scroller that looks the same on Windows:
  * no track, no arrows, a thin rounded thumb that only shows while the pointer

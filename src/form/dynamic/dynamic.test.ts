@@ -29,10 +29,10 @@ const flush = async () => {
 };
 
 /** A DynamicForm with its v-model in a ref, so typing shows up in `values`. */
-function mountForm(schema: FormSchema, initial: Record<string, unknown> = {}, props: Record<string, unknown> = {}) {
+function mountForm(schema: FormSchema, initial: Record<string, unknown> = {}, props: Record<string, unknown> = {}, plugins = global) {
   const values = ref<Record<string, unknown>>(initial);
   const Host = defineComponent({ setup: () => () => h(DynamicForm, { schema, ...props, modelValue: values.value, "onUpdate:modelValue": (next: Record<string, unknown>) => (values.value = next) }) });
-  return { ...render(Host, { global }), values };
+  return { ...render(Host, { global: plugins }), values };
 }
 
 const lead: FormSchema = {
@@ -44,6 +44,17 @@ const lead: FormSchema = {
 };
 
 describe("DynamicForm", () => {
+  const hr = createTestI18n({ locale: "hr" });
+  it("number props: grouping false draws a year plain, also in a collection row; decimals limits the fraction", () => {
+    const year = (props?: { grouping?: boolean; decimals?: number }): FormSchema["fields"][number] => ({ key: "year", kind: "number", label: "Year", props });
+    mountForm({ fields: [{ ...year(), key: "grouped", label: "Grouped" }, { ...year({ grouping: false }), key: "plain", label: "Plain" }, { ...year({ decimals: 1 }), key: "one", label: "One" }, { key: "rows", kind: "collection", label: "Rows", children: [{ ...year({ grouping: false }), label: "Row year" }] }] },
+      { grouped: 2026, plain: 2026, one: 2.5, rows: [{ year: 2026 }] }, {}, { plugins: [hr, testFormatting(hr)] });
+    expect((screen.getByLabelText("Grouped") as HTMLInputElement).value).toBe("2.026");
+    expect((screen.getByLabelText("Plain") as HTMLInputElement).value).toBe("2026");
+    expect((screen.getByLabelText("One") as HTMLInputElement).value).toBe("2,5");
+    expect((screen.getByLabelText("Row year") as HTMLInputElement).value).toBe("2026");
+  });
+
   it("picks a control per kind and writes the typed value under the field's key", async () => {
     const { values } = mountForm({
       fields: [
