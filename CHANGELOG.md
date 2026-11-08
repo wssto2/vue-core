@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.23.0 — draft
+## 0.23.0 — 2026-11-08
 
 `DynamicForm` is an Emerald Native grouped form. site-builder's content forms and the page editor's component panel were a label over a grey box; no code change on the app's side.
 
