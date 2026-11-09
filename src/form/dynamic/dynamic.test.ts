@@ -13,6 +13,7 @@ import RichTextField from "./RichTextField.vue";
 import type { ResourceSource } from "./resources";
 import type { FormSchema } from "./schema";
 import { ErrorBag } from "../errors";
+import FormErrors from "../FormErrors.vue";
 import { useForm } from "../useForm";
 
 const i18n = createTestI18n();
@@ -322,6 +323,44 @@ describe("RichTextField", () => {
     html.value = "<p>Two</p>";
     await flush();
     expect(document.querySelector(".ql-editor")?.textContent).toBe("Two");
+  });
+});
+
+describe("DynamicForm path", () => {
+  const schema: FormSchema = { fields: [{ key: "naslov", kind: "text", label: "Naslov" }, { key: "slike", kind: "collection", label: "Slike", children: [{ key: "caption", kind: "text", label: "Caption" }] }] };
+  const shownErrors = async (errors: ErrorBag, props: Record<string, unknown>) => {
+    const Host = defineComponent({ setup: () => () => h("div", [h(DynamicForm, { schema, modelValue: { slike: [{ caption: "a" }] }, errors, ...props }), h(FormErrors, { form: { failure: ref(null), errors } })]) });
+    render(Host, { global });
+    await flush();
+    return [...document.querySelectorAll("[data-test='form-errors-hidden'] li")].map((li) => li.textContent);
+  };
+
+  it("reads the errors under the path and marks the fields with it, so FormErrors lists none of the shown ones", async () => {
+    const errors = new ErrorBag();
+    errors.add("content.naslov", "Obavezno polje.");
+    errors.add("content.slike.0.caption", "Obavezno polje.");
+    expect(await shownErrors(errors, { path: "content" })).toEqual([]);
+    expect(screen.getAllByText("Obavezno polje.")).toHaveLength(2);
+    expect(document.querySelector("[data-field-key='content.naslov']")).not.toBeNull();
+    expect(document.querySelector("[data-field-key='content.slike']")).not.toBeNull();
+    expect(document.querySelector("[data-field-key='content.slike.0.caption']")).not.toBeNull();
+  });
+
+  it("still lists an error under the path for a field the schema does not have", async () => {
+    const errors = new ErrorBag();
+    errors.add("content.nepoznato", "Nije dobro.");
+    errors.add("other.naslov", "Elsewhere.");
+    expect(await shownErrors(errors, { path: "content" })).toEqual(["content.nepoznato: Nije dobro.", "other.naslov: Elsewhere."]);
+    expect(screen.queryByText("Nije dobro.", { selector: "p" })).toBeNull();
+  });
+
+  it("without a path the keys are bare, as before", async () => {
+    const errors = new ErrorBag();
+    errors.add("naslov", "Obavezno polje.");
+    expect(await shownErrors(errors, {})).toEqual([]);
+    expect(document.querySelector("[data-field-key='naslov']")).not.toBeNull();
+    expect(document.querySelector("[data-field-key='slike']")).not.toBeNull();
+    expect(document.querySelector("[data-field-key='caption']")).not.toBeNull();
   });
 });
 

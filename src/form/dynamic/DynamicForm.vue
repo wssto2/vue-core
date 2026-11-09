@@ -34,6 +34,8 @@ import { evaluateVisibility } from "./visibility";
  *   a gallery a list of ids; a collection a list of row values.
  * - **`visible_when`:** a field whose rule does not hold is not shown. It keeps its value, and an error under its key is not shown.
  * - **`errors`:** go-core's field messages (`form.errors.all()`, or the `ErrorBag`), by field key; `images.0.title` reaches a row.
+ * - **`path`:** where the form's values sit in the form that is saved: `<DynamicForm path="content" :errors="form.errors.all()" />` reads `content.title` as the
+ *   field `title`, and marks each field `data-field-key="content.title"` (`content.images.0.title` in a row), so `FormErrors` beside it lists only the errors with no field here.
  * - **Look:** the fields sit in an Emerald Native `FormGroup` (a collection is cards of its own, between groups): text, number, select and date are
  *   entry rows, a boolean a setting row, long text, rich text and media stacked rows; `"form"` puts the language switch in the group's header. Inside a
  *   `FormGroup` of yours it draws rows only. `readonly` reads value rows.
@@ -49,13 +51,15 @@ const props = withDefaults(
     /** The language shown first, and the one a required translatable field needs. Default: the first. */
     defaultLocale?: string;
     errors?: FieldMessages | ErrorBag;
+    /** Where this form's values sit in the saved form (`"content"`): errors are read under it, fields are marked with it. */
+    path?: string;
     /** Reads the values instead of editing them. */
     readonly?: boolean;
     localeMode?: LocaleMode;
     /** The media library of image, document and gallery fields, and of the picture button of rich text. */
     resources?: ResourceSource;
   }>(),
-  { modelValue: () => ({}), locales: undefined, defaultLocale: undefined, errors: () => ({}), readonly: false, localeMode: "perField", resources: undefined },
+  { modelValue: () => ({}), locales: undefined, defaultLocale: undefined, errors: () => ({}), path: undefined, readonly: false, localeMode: "perField", resources: undefined },
 );
 const emit = defineEmits<{ "update:modelValue": [values: Record<string, unknown>] }>();
 
@@ -66,7 +70,11 @@ const application = inject(applicationKey, null);
 const known = computed(() => props.locales ?? application?.locales ?? availableLocales);
 const fallback = computed(() => props.defaultLocale ?? known.value[0] ?? "");
 
-const messages = computed<FieldMessages>(() => (props.errors instanceof ErrorBag ? props.errors.all() : props.errors));
+const all = computed<FieldMessages>(() => (props.errors instanceof ErrorBag ? props.errors.all() : props.errors));
+const messages = computed<FieldMessages>(() => {
+  const prefix = props.path ? `${props.path}.` : "";
+  return prefix ? Object.fromEntries(Object.entries(all.value).filter(([key]) => key.startsWith(prefix)).map(([key, list]) => [key.slice(prefix.length), list])) : all.value;
+});
 /** The first message under the key itself, else under a path inside it (`title.hr`). */
 function errorOf(key: string): string | undefined {
   const exact = messages.value[key]?.[0];
@@ -113,7 +121,7 @@ function setText(field: SchemaField, locale: string, text: string) {
   set(field.key, { ...textOf(field), [locale]: text });
 }
 
-const common = (field: SchemaField, path = field.key) => ({
+const common = (field: SchemaField, path = props.path ? `${props.path}.${field.key}` : field.key) => ({
   label: field.label,
   hint: field.props?.hint,
   required: field.required === true,
@@ -171,7 +179,7 @@ const plainText = (field: SchemaField): string => (typeof props.modelValue[field
           <template v-else-if="field.kind === 'image' || field.kind === 'document' || field.kind === 'gallery'">
             <ResourceField v-if="props.resources" v-bind="common(field)" :source="props.resources" :multiple="field.kind === 'gallery'" :accept="field.props?.accept ?? (field.kind === 'image' ? 'image/*' : undefined)" :model-value="field.kind === 'gallery' ? idsOf(field) : (props.modelValue[field.key] as ResourceId | null | undefined)" @update:model-value="set(field.key, $event)" />
           </template>
-          <RepeatField v-else-if="field.kind === 'collection'" v-bind="common(field)" :fields="field.children ?? []" :model-value="rowsOf(field)" :locales="known" :default-locale="fallback" :errors="inside(field.key)" :resources="props.resources" :add-label="field.props?.addLabel" :locale-mode="props.localeMode" @update:model-value="set(field.key, $event)" />
+          <RepeatField v-else-if="field.kind === 'collection'" v-bind="common(field)" :fields="field.children ?? []" :model-value="rowsOf(field)" :locales="known" :default-locale="fallback" :errors="inside(field.key)" :path="props.path ? `${props.path}.${field.key}` : undefined" :resources="props.resources" :add-label="field.props?.addLabel" :locale-mode="props.localeMode" @update:model-value="set(field.key, $event)" />
         </template>
       </DynamicGroup>
     </template>

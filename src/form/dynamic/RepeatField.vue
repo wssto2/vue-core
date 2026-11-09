@@ -28,11 +28,13 @@ const props = withDefaults(
     defaultLocale?: string;
     /** Messages by path inside this field: `"0.title"`. */
     errors?: FieldMessages;
+    /** Under a `DynamicForm` `path`: this field's path in the saved form (`content.slides`); its rows are marked and read errors under it. */
+    path?: string;
     resources?: ResourceSource;
     addLabel?: string;
     localeMode?: LocaleMode;
   }>(),
-  { ...fieldDefaults, modelValue: () => [], locales: undefined, defaultLocale: undefined, errors: () => ({}), resources: undefined, addLabel: undefined, localeMode: "perField" },
+  { ...fieldDefaults, modelValue: () => [], locales: undefined, defaultLocale: undefined, errors: () => ({}), path: undefined, resources: undefined, addLabel: undefined, localeMode: "perField" },
 );
 const emit = defineEmits<{ "update:modelValue": [rows: Record<string, unknown>[]] }>();
 
@@ -68,7 +70,9 @@ const edit = (index: number, row: Record<string, unknown>) => commit(props.model
 
 function rowErrors(index: number): FieldMessages {
   const prefix = `${index}.`;
-  return Object.fromEntries(Object.entries(props.errors).filter(([path]) => path.startsWith(prefix)).map(([path, list]) => [path.slice(prefix.length), list]));
+  // Under a path the row's form reads its errors by their full path.
+  const into = props.path ? `${props.path}.${prefix}` : "";
+  return Object.fromEntries(Object.entries(props.errors).filter(([path]) => path.startsWith(prefix)).map(([path, list]) => [into + path.slice(prefix.length), list]));
 }
 </script>
 
@@ -91,7 +95,7 @@ function rowErrors(index: number): FieldMessages {
           <Button size="xs" prominence="plain" tone="critical" icon="deleteBin2Line" v-bind="{ 'aria-label': t('core.form.dynamic.repeat.remove', { n: index + 1 }) }" data-remove @click="remove(index)" />
         </div>
       </template>
-      <DynamicForm :schema="{ fields: props.fields }" :model-value="row" :locales="props.locales" :default-locale="props.defaultLocale" :errors="rowErrors(index)" :resources="props.resources" :readonly="!editable || props.disabled" :locale-mode="props.localeMode" @update:model-value="edit(index, $event)" />
+      <DynamicForm :schema="{ fields: props.fields }" :model-value="row" :locales="props.locales" :default-locale="props.defaultLocale" :errors="rowErrors(index)" :path="props.path ? `${props.path}.${index}` : undefined" :resources="props.resources" :readonly="!editable || props.disabled" :locale-mode="props.localeMode" @update:model-value="edit(index, $event)" />
     </FormGroup>
     <FormGroup v-if="editable && !props.disabled">
       <FormRow layout="stacked">
