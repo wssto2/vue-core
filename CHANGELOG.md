@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.23.1 — 2026-11-09
+
+### New
+- **form:** `DynamicForm` takes `path` (`"content"`) for values that sit under a key of the saved form: it reads `errors` under that prefix (pass `form.errors.all()` as it is) and marks its fields `content.<key>` (`content.<key>.<i>.<child>` in a collection), so `FormErrors` no longer lists them as not shown.
+
+### Fixed
+- **form:** an entry row stacks (label above, control full width) when its `FormGroup` is narrower than 30rem, a container query on the group, so a docked panel no longer squeezes a long text into a sliver. Setting and value rows and the `compact` rules are unchanged.
+
 ## 0.23.0 — 2026-11-08
 
 `DynamicForm` is an Emerald Native grouped form. site-builder's content forms and the page editor's component panel were a label over a grey box; no code change on the app's side.
