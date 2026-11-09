@@ -81,7 +81,8 @@ const bodyLayout = computed(() => {
   switch (layout.value) {
     case "entry":
       // Compact: the label takes what it needs, but the value keeps at least 40 % of the row: a long label wraps instead of squeezing the input.
-      return "grid grid-cols-[var(--form-label-width,11rem)_minmax(0,1fr)] items-center gap-x-4 compact:grid-cols-[minmax(0,auto)_minmax(40%,1fr)]";
+      // In a group narrower than 30rem (a docked panel; container query on FormGroup) it stacks: label above, control full width. Compact keeps its own columns.
+      return "grid grid-cols-[var(--form-label-width,11rem)_minmax(0,1fr)] items-center gap-x-4 @max-[30rem]:grid-cols-1 @max-[30rem]:gap-y-1 compact:grid-cols-[minmax(0,auto)_minmax(40%,1fr)]";
     case "value":
       // The label keeps its longest word; the value wraps beside it.
       return "grid grid-cols-[minmax(min-content,1fr)_minmax(0,auto)] items-center gap-x-4";
@@ -92,7 +93,7 @@ const bodyLayout = computed(() => {
   }
 });
 
-const labelClass = computed(() => (props.labelHidden ? "sr-only" : layout.value === "stacked" ? "text-footnote text-content-muted" : props.layout === "value" ? "text-body text-content-muted" : "text-body text-content-strong"));
+const labelClass = computed(() => (props.labelHidden ? "sr-only" : layout.value === "stacked" ? "text-footnote text-content-muted" : props.layout === "value" ? "text-body text-content-muted" : props.layout === "entry" ? "text-body text-content-strong @max-[30rem]:text-footnote @max-[30rem]:text-content-muted" : "text-body text-content-strong"));
 const hasValue = computed(() => props.value !== undefined && props.value !== null && props.value !== "");
 </script>
 
@@ -104,7 +105,7 @@ const hasValue = computed(() => props.value !== undefined && props.value !== nul
 
     <div class="row-body min-h-row min-w-0 flex-1 border-t border-border-separator py-2 pr-row-inset">
       <div class="min-w-0" :class="bodyLayout">
-        <div v-if="props.label || props.sub || slots.sub" :class="[props.labelHidden && !props.sub && !slots.sub ? 'contents' : layout === 'setting' ? 'min-w-min flex-1' : 'min-w-0', props.labelAlign === 'top' ? 'self-start pt-1' : '']">
+        <div v-if="props.label || props.sub || slots.sub" :class="[props.labelHidden && !props.sub && !slots.sub ? 'contents' : layout === 'setting' ? 'min-w-min flex-1' : 'min-w-0', props.labelAlign === 'top' ? (layout === 'entry' ? 'self-start pt-1 @max-[30rem]:pt-0' : 'self-start pt-1') : '']">
           <div :class="slots['label-trailing'] ? 'flex items-center justify-between gap-3' : ''">
             <component :is="props.for ? 'label' : 'span'" :for="props.for" class="break-words" :class="[labelClass, props.labelHidden ? '' : props.labelLines ? LABEL_LINES[props.labelLines] : 'block']">
               {{ props.label }}<span v-if="props.required" class="text-content-destructive" aria-hidden="true"> *</span>
